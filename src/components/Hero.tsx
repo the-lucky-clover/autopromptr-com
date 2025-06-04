@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 const Hero = () => {
   return (
@@ -20,7 +20,7 @@ const Hero = () => {
             with Smart Prompts
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-400 mb-8 leading-relaxed">
+          <p className="text-xl md:text-2xl text-gray-400 mb-8 leading-relaxed max-w-3xl mx-auto">
             Create, manage, and deploy intelligent AI prompts that scale with your business. 
             Streamline your AI operations and boost productivity by 10x.
           </p>

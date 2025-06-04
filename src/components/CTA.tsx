@@ -22,7 +22,7 @@ const CTA = () => {
           </h2>
           
           <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-            Join thousands of developers and businesses who are already automating their AI processes with AutoPromptr.
+            Join thousands of developers and businesses who are already automating their AI processes with AutoPromptr. Start your journey today.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

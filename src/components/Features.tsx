@@ -7,37 +7,37 @@ const Features = () => {
     {
       icon: Brain,
       title: "Intelligent Prompt Engineering",
-      description: "Advanced AI algorithms optimize your prompts for maximum effectiveness and accuracy.",
+      description: "Advanced AI algorithms optimize your prompts for maximum effectiveness and accuracy across all models.",
       delay: "0s"
     },
     {
       icon: Workflow,
-      title: "Seamless Integration",
-      description: "Connect with your existing tools and workflows through our comprehensive API.",
+      title: "Seamless Integration", 
+      description: "Connect with your existing tools and workflows through our comprehensive API and native integrations.",
       delay: "0.1s"
     },
     {
       icon: BarChart3,
       title: "Real-time Analytics",
-      description: "Track performance metrics and gain insights into your AI prompt effectiveness.",
+      description: "Track performance metrics and gain deep insights into your AI prompt effectiveness and ROI.",
       delay: "0.2s"
     },
     {
       icon: Shield,
       title: "Enterprise Security",
-      description: "Bank-grade encryption and compliance standards to protect your sensitive data.",
+      description: "Bank-grade encryption, SOC 2 compliance, and data privacy standards to protect your information.",
       delay: "0.3s"
     },
     {
       icon: Clock,
       title: "Automated Scheduling",
-      description: "Set up recurring prompts and automated workflows to save time and resources.",
+      description: "Set up recurring prompts and automated workflows to save time and eliminate manual processes.",
       delay: "0.4s"
     },
     {
       icon: Rocket,
       title: "Rapid Deployment",
-      description: "Deploy your AI solutions in minutes, not weeks, with our streamlined platform.",
+      description: "Deploy your AI solutions in minutes, not weeks, with our streamlined cloud infrastructure.",
       delay: "0.5s"
     }
   ];
@@ -50,7 +50,7 @@ const Features = () => {
             Powerful Features for Modern AI
           </h2>
           <p className="text-xl text-gray-400">
-            Everything you need to build, deploy, and manage AI-powered applications at scale.
+            Everything you need to build, deploy, and manage AI-powered applications at enterprise scale.
           </p>
         </div>
         
