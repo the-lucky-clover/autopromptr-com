@@ -15,14 +15,15 @@ const Hero = () => {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            The Ultimate{" "}
-            <span className="gradient-text">AI Prompt</span>{" "}
-            Management Platform
+            <span className="gradient-text">Supercharge</span> Your AI{" "}
+            <br />
+            Prompt Workflow
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-400 mb-8 leading-relaxed max-w-3xl mx-auto">
-            Transform your AI workflows with intelligent prompt engineering, seamless integrations, 
-            and enterprise-grade performance that scales with your business.
+            Intelligently batch process, enhance, and deploy prompts across all major AI coding 
+            platforms. Transform your development workflow with AutoPromptr's powerful automation 
+            tools.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -31,7 +32,6 @@ const Hero = () => {
               className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-lg px-8 py-4 animate-glow"
             >
               Start Free Trial
-              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button 
               size="lg" 
@@ -39,22 +39,16 @@ const Hero = () => {
               className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 text-lg px-8 py-4"
             >
               Watch Demo
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              <div className="text-3xl font-bold text-purple-400 mb-2">99.9%</div>
-              <div className="text-gray-400">Uptime Guarantee</div>
-            </div>
-            <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
-              <div className="text-3xl font-bold text-blue-400 mb-2">10x</div>
-              <div className="text-gray-400">Faster Deployment</div>
-            </div>
-            <div className="animate-slide-up" style={{ animationDelay: '0.6s' }}>
-              <div className="text-3xl font-bold text-purple-400 mb-2">24/7</div>
-              <div className="text-gray-400">Expert Support</div>
-            </div>
+          <div className="mt-16">
+            <img 
+              src="/lovable-uploads/97e39d75-1742-44ad-854e-cb0a1edd06ba.png" 
+              alt="ChatGPT Interface" 
+              className="mx-auto rounded-lg shadow-2xl max-w-full h-auto"
+            />
           </div>
         </div>
       </div>
