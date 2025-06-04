@@ -15,14 +15,14 @@ const Hero = () => {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            Automate Your{" "}
-            <span className="gradient-text">AI Workflows</span>{" "}
-            with Smart Prompts
+            The Ultimate{" "}
+            <span className="gradient-text">AI Prompt</span>{" "}
+            Management Platform
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-400 mb-8 leading-relaxed max-w-3xl mx-auto">
-            Create, manage, and deploy intelligent AI prompts that scale with your business. 
-            Streamline your AI operations and boost productivity by 10x.
+            Transform your AI workflows with intelligent prompt engineering, seamless integrations, 
+            and enterprise-grade performance that scales with your business.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
