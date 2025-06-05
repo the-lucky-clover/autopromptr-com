@@ -100,9 +100,10 @@
     animation-delay: var(--animation-delay, 0s);
   }
 
-  /* Scrolling animation for client logos */
+  /* Improved scrolling animation for client logos */
   .animate-scroll-left {
-    animation: scroll-left 30s linear infinite;
+    animation: scroll-left 60s linear infinite;
+    width: calc(300% + 96px); /* Adjust based on number of sets and spacing */
   }
 
   @keyframes scroll-left {
@@ -110,7 +111,7 @@
       transform: translateX(0);
     }
     100% {
-      transform: translateX(-50%);
+      transform: translateX(calc(-100% / 3));
     }
   }
 }

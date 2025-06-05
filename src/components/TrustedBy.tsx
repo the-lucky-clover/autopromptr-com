@@ -1,14 +1,38 @@
 
 const TrustedBy = () => {
   const clients = [
-    "bolt.new",
-    "v0.dev", 
-    "a0.dev",
-    "same.new",
-    "create.xyz",
-    "Replit",
-    "lovable.dev",
-    "Hostinger Horizons"
+    {
+      name: "bolt.new",
+      logo: "https://bolt.new/favicon.ico"
+    },
+    {
+      name: "v0.dev", 
+      logo: "https://v0.dev/favicon.ico"
+    },
+    {
+      name: "a0.dev",
+      logo: "https://a0.dev/favicon.ico"
+    },
+    {
+      name: "same.new",
+      logo: "https://same.new/favicon.ico"
+    },
+    {
+      name: "create.xyz",
+      logo: "https://create.xyz/favicon.ico"
+    },
+    {
+      name: "Replit",
+      logo: "https://replit.com/favicon.ico"
+    },
+    {
+      name: "lovable.dev",
+      logo: "https://lovable.dev/favicon.ico"
+    },
+    {
+      name: "Hostinger Horizons",
+      logo: "https://www.hostinger.com/favicon.ico"
+    }
   ];
 
   return (
@@ -32,23 +56,92 @@ const TrustedBy = () => {
             {clients.map((client, index) => (
               <div
                 key={`first-${index}`}
-                className="flex-shrink-0 mx-8 flex items-center justify-center"
-                style={{ minWidth: '200px' }}
+                className="flex-shrink-0 mx-8 flex items-center justify-center bg-white/10 backdrop-blur-sm rounded-lg p-6 hover:bg-white/20 transition-all duration-300"
+                style={{ minWidth: '200px', height: '100px' }}
               >
-                <div className="text-2xl font-bold text-gray-300 hover:text-white transition-colors duration-300">
-                  {client}
+                <div className="flex items-center space-x-3">
+                  <img 
+                    src={client.logo} 
+                    alt={`${client.name} logo`}
+                    className="w-8 h-8 object-contain"
+                    onError={(e) => {
+                      // Fallback to text if logo fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const textElement = target.nextElementSibling as HTMLElement;
+                      if (textElement) {
+                        textElement.style.display = 'block';
+                      }
+                    }}
+                  />
+                  <div className="text-lg font-semibold text-white hidden">
+                    {client.name}
+                  </div>
+                  <div className="text-lg font-semibold text-white">
+                    {client.name}
+                  </div>
                 </div>
               </div>
             ))}
-            {/* Duplicate set for seamless loop */}
+            {/* Second set for seamless loop */}
             {clients.map((client, index) => (
               <div
                 key={`second-${index}`}
-                className="flex-shrink-0 mx-8 flex items-center justify-center"
-                style={{ minWidth: '200px' }}
+                className="flex-shrink-0 mx-8 flex items-center justify-center bg-white/10 backdrop-blur-sm rounded-lg p-6 hover:bg-white/20 transition-all duration-300"
+                style={{ minWidth: '200px', height: '100px' }}
               >
-                <div className="text-2xl font-bold text-gray-300 hover:text-white transition-colors duration-300">
-                  {client}
+                <div className="flex items-center space-x-3">
+                  <img 
+                    src={client.logo} 
+                    alt={`${client.name} logo`}
+                    className="w-8 h-8 object-contain"
+                    onError={(e) => {
+                      // Fallback to text if logo fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const textElement = target.nextElementSibling as HTMLElement;
+                      if (textElement) {
+                        textElement.style.display = 'block';
+                      }
+                    }}
+                  />
+                  <div className="text-lg font-semibold text-white hidden">
+                    {client.name}
+                  </div>
+                  <div className="text-lg font-semibold text-white">
+                    {client.name}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {/* Third set to ensure full coverage */}
+            {clients.map((client, index) => (
+              <div
+                key={`third-${index}`}
+                className="flex-shrink-0 mx-8 flex items-center justify-center bg-white/10 backdrop-blur-sm rounded-lg p-6 hover:bg-white/20 transition-all duration-300"
+                style={{ minWidth: '200px', height: '100px' }}
+              >
+                <div className="flex items-center space-x-3">
+                  <img 
+                    src={client.logo} 
+                    alt={`${client.name} logo`}
+                    className="w-8 h-8 object-contain"
+                    onError={(e) => {
+                      // Fallback to text if logo fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const textElement = target.nextElementSibling as HTMLElement;
+                      if (textElement) {
+                        textElement.style.display = 'block';
+                      }
+                    }}
+                  />
+                  <div className="text-lg font-semibold text-white hidden">
+                    {client.name}
+                  </div>
+                  <div className="text-lg font-semibold text-white">
+                    {client.name}
+                  </div>
                 </div>
               </div>
             ))}
