@@ -4,10 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { AuthModal } from "@/components/AuthModal";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const { user, signOut } = useAuth();
 
   useEffect(() => {
@@ -18,6 +22,11 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleAuthClick = (mode: 'signin' | 'signup') => {
+    setAuthMode(mode);
+    setAuthModalOpen(true);
+  };
 
   return (
     <nav className={`sticky top-0 z-50 transition-all duration-300 ${
@@ -76,23 +85,36 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link to="/auth">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10"
-                  >
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/auth">
-                  <Button 
-                    size="sm"
-                    className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                  >
-                    Get Started
-                  </Button>
-                </Link>
+                <Popover open={authModalOpen && authMode === 'signin'} onOpenChange={(open) => !open && setAuthModalOpen(false)}>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      onClick={() => handleAuthClick('signin')}
+                      variant="outline" 
+                      size="sm"
+                      className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10"
+                    >
+                      Sign In
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-96 glass-effect border-purple-500/30">
+                    <AuthModal mode="signin" onClose={() => setAuthModalOpen(false)} />
+                  </PopoverContent>
+                </Popover>
+                
+                <Popover open={authModalOpen && authMode === 'signup'} onOpenChange={(open) => !open && setAuthModalOpen(false)}>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      onClick={() => handleAuthClick('signup')}
+                      size="sm"
+                      className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                    >
+                      Get Started
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-96 glass-effect border-purple-500/30">
+                    <AuthModal mode="signup" onClose={() => setAuthModalOpen(false)} />
+                  </PopoverContent>
+                </Popover>
               </div>
             )}
           </div>
@@ -155,23 +177,21 @@ const Navbar = () => {
                 </div>
               ) : (
                 <div className="pt-2 space-y-2">
-                  <Link to="/auth" onClick={() => setIsOpen(false)}>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full mx-3 border-purple-500/50 text-purple-300 hover:bg-purple-500/10"
-                    >
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link to="/auth" onClick={() => setIsOpen(false)}>
-                    <Button 
-                      size="sm" 
-                      className="w-full mx-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                    >
-                      Get Started
-                    </Button>
-                  </Link>
+                  <Button 
+                    onClick={() => { handleAuthClick('signin'); setIsOpen(false); }}
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full mx-3 border-purple-500/50 text-purple-300 hover:bg-purple-500/10"
+                  >
+                    Sign In
+                  </Button>
+                  <Button 
+                    onClick={() => { handleAuthClick('signup'); setIsOpen(false); }}
+                    size="sm" 
+                    className="w-full mx-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                  >
+                    Get Started
+                  </Button>
                 </div>
               )}
             </div>
