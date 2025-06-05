@@ -9,49 +9,175 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      batches: {
+      automation_logs: {
         Row: {
-          created_at: string
-          description: string | null
+          batch_id: string | null
           id: string
-          name: string
-          prompts: Json
-          status: string | null
-          target_platform: string
-          updated_at: string
-          user_id: string | null
+          level: string
+          message: string
+          metadata: Json | null
+          timestamp: string | null
         }
         Insert: {
-          created_at?: string
-          description?: string | null
+          batch_id?: string | null
           id?: string
-          name: string
-          prompts: Json
-          status?: string | null
-          target_platform: string
-          updated_at?: string
-          user_id?: string | null
+          level: string
+          message: string
+          metadata?: Json | null
+          timestamp?: string | null
         }
         Update: {
-          created_at?: string
-          description?: string | null
+          batch_id?: string | null
           id?: string
-          name?: string
-          prompts?: Json
-          status?: string | null
-          target_platform?: string
-          updated_at?: string
-          user_id?: string | null
+          level?: string
+          message?: string
+          metadata?: Json | null
+          timestamp?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "batches_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "automation_logs_batch_id_fkey"
+            columns: ["batch_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "batches"
             referencedColumns: ["id"]
           },
         ]
+      }
+      batches: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          platform: string
+          settings: Json | null
+          started_at: string | null
+          status: string | null
+          stopped_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          platform: string
+          settings?: Json | null
+          started_at?: string | null
+          status?: string | null
+          stopped_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          platform?: string
+          settings?: Json | null
+          started_at?: string | null
+          status?: string | null
+          stopped_at?: string | null
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          author_id: string | null
+          content: string
+          created_at: string | null
+          excerpt: string | null
+          featured_image_url: string | null
+          id: string
+          published: boolean | null
+          published_at: string | null
+          slug: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          content: string
+          created_at?: string | null
+          excerpt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          published?: boolean | null
+          published_at?: string | null
+          slug: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          content?: string
+          created_at?: string | null
+          excerpt?: string | null
+          featured_image_url?: string | null
+          id?: string
+          published?: boolean | null
+          published_at?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      newsletter_subscribers: {
+        Row: {
+          email: string
+          id: string
+          is_active: boolean | null
+          subscribed_at: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          is_active?: boolean | null
+          subscribed_at?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          is_active?: boolean | null
+          subscribed_at?: string | null
+        }
+        Relationships: []
+      }
+      platform_sessions: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          platform: string
+          session_data: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          platform: string
+          session_data?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          platform?: string
+          session_data?: Json | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -80,12 +206,93 @@ export type Database = {
         }
         Relationships: []
       }
+      prompts: {
+        Row: {
+          batch_id: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          order_index: number
+          processed_at: string | null
+          processing_started_at: string | null
+          processing_time_ms: number | null
+          prompt_text: string
+          result: string | null
+          status: string | null
+        }
+        Insert: {
+          batch_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          order_index: number
+          processed_at?: string | null
+          processing_started_at?: string | null
+          processing_time_ms?: number | null
+          prompt_text: string
+          result?: string | null
+          status?: string | null
+        }
+        Update: {
+          batch_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          order_index?: number
+          processed_at?: string | null
+          processing_started_at?: string | null
+          processing_time_ms?: number | null
+          prompt_text?: string
+          result?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompts_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_verification_status: {
+        Row: {
+          created_at: string | null
+          email_verified: boolean | null
+          id: string
+          user_id: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email_verified?: boolean | null
+          id?: string
+          user_id?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email_verified?: boolean | null
+          id?: string
+          user_id?: string | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_old_logs: {
+        Args: { days_to_keep?: number }
+        Returns: number
+      }
+      get_batch_stats: {
+        Args: { batch_uuid: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
