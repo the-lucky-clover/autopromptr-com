@@ -26,47 +26,58 @@ const UseCases = () => {
   ];
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+    <section className="py-16 gradient-bg relative">
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 blur-3xl"></div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-12 animate-on-scroll">
+          <h2 className="text-3xl font-bold text-white mb-4">
             Real-World Use Cases
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-gray-300">
             Discover how industry leaders leverage AutoPromptr to transform their AI workflows
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {useCases.map((useCase, index) => (
-            <Card key={index} className="h-full flex flex-col">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-blue-600" />
-                  {useCase.title}
-                </CardTitle>
-                <CardDescription className="text-base">
-                  {useCase.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col justify-between">
-                <div className="mb-6">
-                  <h4 className="font-semibold text-gray-900 mb-3">Key Results:</h4>
-                  <ul className="space-y-2">
-                    {useCase.metrics.map((metric, idx) => (
-                      <li key={idx} className="flex items-center text-sm text-gray-600">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-                        {metric}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <Button variant="outline" className="w-full">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download White Paper
-                </Button>
-              </CardContent>
-            </Card>
+            <div 
+              key={index} 
+              className="animate-on-scroll stagger-animation"
+              style={{"--animation-delay": `${index * 0.1 + 0.1}s`}}
+            >
+              <Card className="h-full flex flex-col glass-effect border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 hover:scale-105">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <FileText className="w-5 h-5 text-blue-400" />
+                    {useCase.title}
+                  </CardTitle>
+                  <CardDescription className="text-base text-gray-300">
+                    {useCase.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col justify-between">
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-white mb-3">Key Results:</h4>
+                    <ul className="space-y-2">
+                      {useCase.metrics.map((metric, idx) => (
+                        <li key={idx} className="flex items-center text-sm text-gray-300">
+                          <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
+                          {metric}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-purple-500/50 text-purple-300 hover:bg-purple-500/10"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download White Paper
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           ))}
         </div>
       </div>

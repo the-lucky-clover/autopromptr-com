@@ -10,8 +10,11 @@ import UseCases from "@/components/UseCases";
 import SocialProof from "@/components/SocialProof";
 import BlogPosts from "@/components/BlogPosts";
 import Footer from "@/components/Footer";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Index = () => {
+  useScrollAnimation();
+
   return (
     <div className="min-h-screen">
       <Navbar />

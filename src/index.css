@@ -51,6 +51,10 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground font-sans;
     background: linear-gradient(135deg, #1a1625 0%, #2d1b69 100%);
@@ -63,10 +67,36 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
+  .glass-navbar {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
   .gradient-text {
     background: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, #1a1625 0%, #2d1b69 100%);
+  }
+
+  /* Smooth animations for content */
+  .animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .animate-on-scroll.animate {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .stagger-animation {
+    animation-delay: var(--animation-delay, 0s);
   }
 }
