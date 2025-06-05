@@ -45,7 +45,7 @@ const Hero = () => {
           
           <div className="mt-16">
             <img 
-              src="/lovable-uploads/97e39d75-1742-44ad-854e-cb0a1edd06ba.png" 
+              src="https://images.unsplash.com/photo-1677696795198-5ac0e21060ed" 
               alt="ChatGPT Interface" 
               className="mx-auto rounded-lg shadow-2xl max-w-full h-auto"
             />
