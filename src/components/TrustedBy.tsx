@@ -50,7 +50,7 @@ const TrustedBy = () => {
         </div>
 
         {/* Scrolling logos container */}
-        <div className="relative">
+        <div className="relative overflow-hidden">
           <div className="flex animate-scroll-left">
             {/* First set */}
             {clients.map((client, index) => (
@@ -65,18 +65,10 @@ const TrustedBy = () => {
                     alt={`${client.name} logo`}
                     className="w-8 h-8 object-contain"
                     onError={(e) => {
-                      // Fallback to text if logo fails to load
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
-                      const textElement = target.nextElementSibling as HTMLElement;
-                      if (textElement) {
-                        textElement.style.display = 'block';
-                      }
                     }}
                   />
-                  <div className="text-lg font-semibold text-white hidden">
-                    {client.name}
-                  </div>
                   <div className="text-lg font-semibold text-white">
                     {client.name}
                   </div>
@@ -96,18 +88,10 @@ const TrustedBy = () => {
                     alt={`${client.name} logo`}
                     className="w-8 h-8 object-contain"
                     onError={(e) => {
-                      // Fallback to text if logo fails to load
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
-                      const textElement = target.nextElementSibling as HTMLElement;
-                      if (textElement) {
-                        textElement.style.display = 'block';
-                      }
                     }}
                   />
-                  <div className="text-lg font-semibold text-white hidden">
-                    {client.name}
-                  </div>
                   <div className="text-lg font-semibold text-white">
                     {client.name}
                   </div>
@@ -127,18 +111,10 @@ const TrustedBy = () => {
                     alt={`${client.name} logo`}
                     className="w-8 h-8 object-contain"
                     onError={(e) => {
-                      // Fallback to text if logo fails to load
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
-                      const textElement = target.nextElementSibling as HTMLElement;
-                      if (textElement) {
-                        textElement.style.display = 'block';
-                      }
                     }}
                   />
-                  <div className="text-lg font-semibold text-white hidden">
-                    {client.name}
-                  </div>
                   <div className="text-lg font-semibold text-white">
                     {client.name}
                   </div>

@@ -100,10 +100,10 @@
     animation-delay: var(--animation-delay, 0s);
   }
 
-  /* Improved scrolling animation for client logos */
+  /* Perfectly seamless scrolling animation */
   .animate-scroll-left {
-    animation: scroll-left 60s linear infinite;
-    width: calc(300% + 96px); /* Adjust based on number of sets and spacing */
+    animation: scroll-left 40s linear infinite;
+    width: max-content;
   }
 
   @keyframes scroll-left {
@@ -111,7 +111,7 @@
       transform: translateX(0);
     }
     100% {
-      transform: translateX(calc(-100% / 3));
+      transform: translateX(-33.333%);
     }
   }
 }
