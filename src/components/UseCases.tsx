@@ -44,7 +44,7 @@ const UseCases = () => {
             <div 
               key={index} 
               className="animate-on-scroll stagger-animation"
-              style={{"--animation-delay": `${index * 0.1 + 0.1}s`}}
+              style={{ "--animation-delay": `${index * 0.1 + 0.1}s` } as React.CSSProperties}
             >
               <Card className="h-full flex flex-col glass-effect border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 hover:scale-105">
                 <CardHeader>

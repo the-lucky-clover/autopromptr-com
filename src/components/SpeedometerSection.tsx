@@ -17,21 +17,21 @@ const SpeedometerSection = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          <div className="animate-on-scroll stagger-animation" style={{"--animation-delay": "0.1s"}}>
+          <div className="animate-on-scroll stagger-animation" style={{ "--animation-delay": "0.1s" } as React.CSSProperties}>
             <Speedometer 
               value={94} 
               label="Prompt Quality Score"
               color="#10b981"
             />
           </div>
-          <div className="animate-on-scroll stagger-animation" style={{"--animation-delay": "0.2s"}}>
+          <div className="animate-on-scroll stagger-animation" style={{ "--animation-delay": "0.2s" } as React.CSSProperties}>
             <Speedometer 
               value={87} 
               label="Processing Speed"
               color="#3b82f6"
             />
           </div>
-          <div className="animate-on-scroll stagger-animation" style={{"--animation-delay": "0.3s"}}>
+          <div className="animate-on-scroll stagger-animation" style={{ "--animation-delay": "0.3s" } as React.CSSProperties}>
             <Speedometer 
               value={91} 
               label="User Satisfaction"
