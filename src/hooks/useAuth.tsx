@@ -1,5 +1,5 @@
 
-import { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -25,18 +25,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
           // Check email verification status
-          const { data } = await supabase
-            .from('user_verification_status')
-            .select('email_verified')
-            .eq('user_id', session.user.id)
-            .single();
-          
-          setIsEmailVerified(data?.email_verified || false);
+          setTimeout(async () => {
+            try {
+              const { data } = await supabase
+                .from('user_verification_status')
+                .select('email_verified')
+                .eq('user_id', session.user.id)
+                .single();
+              
+              setIsEmailVerified(data?.email_verified || session.user.email_confirmed_at !== null);
+            } catch (error) {
+              console.error('Error checking verification status:', error);
+              setIsEmailVerified(session.user.email_confirmed_at !== null);
+            }
+          }, 0);
         } else {
           setIsEmailVerified(false);
         }
@@ -49,7 +57,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
+      if (!session) {
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
