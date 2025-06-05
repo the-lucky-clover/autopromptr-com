@@ -4,10 +4,11 @@ import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import CTA from "@/components/CTA";
 import AnimatedStats from "@/components/AnimatedStats";
-import SpeedometerSection from "@/components/SpeedometerSection";
+import ProvenResults from "@/components/ProvenResults";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import UseCases from "@/components/UseCases";
 import SocialProof from "@/components/SocialProof";
+import TrustedBy from "@/components/TrustedBy";
 import BlogPosts from "@/components/BlogPosts";
 import Footer from "@/components/Footer";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -20,10 +21,11 @@ const Index = () => {
       <Navbar />
       <Hero />
       <AnimatedStats />
-      <SpeedometerSection />
+      <ProvenResults />
       <Features />
       <UseCases />
       <SocialProof />
+      <TrustedBy />
       <BlogPosts />
       <NewsletterSignup />
       <CTA />

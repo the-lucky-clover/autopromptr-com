@@ -99,4 +99,18 @@
   .stagger-animation {
     animation-delay: var(--animation-delay, 0s);
   }
+
+  /* Scrolling animation for client logos */
+  .animate-scroll-left {
+    animation: scroll-left 30s linear infinite;
+  }
+
+  @keyframes scroll-left {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
 }
