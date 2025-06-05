@@ -59,19 +59,19 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar className="border-r border-purple-500/20">
+    <Sidebar className="border-r border-gray-200 bg-white">
       <SidebarHeader className="p-6">
         <Link to="/" className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">A</span>
           </div>
-          <span className="text-xl font-bold gradient-text">AutoPromptr</span>
+          <span className="text-xl font-bold text-gray-900">AutoPromptr</span>
         </Link>
       </SidebarHeader>
       
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-400 text-xs uppercase tracking-wider">
+          <SidebarGroupLabel className="text-gray-500 text-xs uppercase tracking-wider">
             Main Menu
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -81,7 +81,7 @@ export function AppSidebar() {
                   <SidebarMenuButton 
                     asChild
                     isActive={location.pathname === item.url}
-                    className="hover:bg-purple-500/10 data-[active=true]:bg-purple-500/20 data-[active=true]:text-purple-300"
+                    className="hover:bg-gray-100 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-600 text-gray-700"
                   >
                     <Link to={item.url}>
                       <item.icon className="w-4 h-4" />
@@ -103,7 +103,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     asChild
-                    className="hover:bg-purple-500/10"
+                    className="hover:bg-gray-100 text-gray-700"
                   >
                     <Link to={item.url}>
                       <item.icon className="w-4 h-4" />
@@ -116,14 +116,14 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         
-        <div className="p-4 border-t border-purple-500/20">
+        <div className="p-4 border-t border-gray-200">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
               <User className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">John Doe</p>
-              <p className="text-xs text-gray-400 truncate">john@example.com</p>
+              <p className="text-sm font-medium text-gray-900 truncate">John Doe</p>
+              <p className="text-xs text-gray-500 truncate">john@example.com</p>
             </div>
           </div>
         </div>

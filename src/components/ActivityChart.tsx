@@ -14,33 +14,33 @@ const ActivityChart = () => {
   ];
 
   return (
-    <Card className="glass-effect border-purple-500/20">
+    <Card className="bg-white border border-gray-200 shadow-sm">
       <CardHeader>
-        <CardTitle className="text-white">Weekly Activity</CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardTitle className="text-gray-900">Weekly Activity</CardTitle>
+        <CardDescription className="text-gray-600">
           Prompt executions over the last 7 days
         </CardDescription>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis 
               dataKey="name" 
-              stroke="#9CA3AF"
+              stroke="#6B7280"
               fontSize={12}
             />
             <YAxis 
-              stroke="#9CA3AF"
+              stroke="#6B7280"
               fontSize={12}
             />
             <Line 
               type="monotone" 
               dataKey="executions" 
-              stroke="#8B5CF6" 
+              stroke="#2563EB" 
               strokeWidth={3}
-              dot={{ fill: '#8B5CF6', strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6, stroke: '#8B5CF6', strokeWidth: 2 }}
+              dot={{ fill: '#2563EB', strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, stroke: '#2563EB', strokeWidth: 2 }}
             />
           </LineChart>
         </ResponsiveContainer>
