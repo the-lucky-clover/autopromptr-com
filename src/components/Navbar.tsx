@@ -36,12 +36,12 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 w-full z-40">
-      {/* Sliding background that comes down behind navbar content */}
-      <div className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+      {/* Glassmorphism background that slides down */}
+      <div className={`absolute top-0 left-0 right-0 h-20 transition-all duration-700 ease-out ${
         isScrolled 
-          ? 'transform translate-y-0 opacity-100 glass-navbar-scrolled' 
-          : 'transform -translate-y-full opacity-0'
-      }`} />
+          ? 'transform translate-y-0 opacity-100' 
+          : 'transform -translate-y-20 opacity-0'
+      } bg-black/20 backdrop-blur-xl border-b border-white/10 shadow-lg`} />
       
       {/* Navbar content - always visible */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

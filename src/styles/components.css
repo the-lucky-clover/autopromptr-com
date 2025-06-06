@@ -20,10 +20,19 @@
   }
 
   .glass-navbar-scrolled {
-    background: rgba(0, 0, 0, 0.8) !important;
+    background: rgba(0, 0, 0, 0.3) !important;
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Enhanced glassmorphism effect */
+  .glassmorphism-navbar {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.125);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
   }
 
   .gradient-text {
