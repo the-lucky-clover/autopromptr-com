@@ -35,12 +35,16 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`fixed top-0 w-full z-40 transition-all duration-500 ease-in-out ${
-      isScrolled 
-        ? 'glass-navbar-scrolled' 
-        : 'glass-navbar-transparent'
-    }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="fixed top-0 w-full z-40">
+      {/* Sliding background that comes down behind navbar content */}
+      <div className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+        isScrolled 
+          ? 'transform translate-y-0 opacity-100 glass-navbar-scrolled' 
+          : 'transform -translate-y-full opacity-0'
+      }`} />
+      
+      {/* Navbar content - always visible */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center space-x-3 group">
             <Zap className="w-8 h-8 text-white" strokeWidth={1.5} />
