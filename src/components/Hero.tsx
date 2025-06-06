@@ -32,14 +32,14 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <Button 
               size="lg" 
-              className="bg-blue-500 hover:bg-blue-600 text-white text-lg px-8 py-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2"
+              className="bg-blue-500 hover:bg-blue-600 text-white text-lg px-8 py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2"
             >
               <Zap className="w-5 h-5" />
               Start Free Trial
             </Button>
             <Button 
               size="lg" 
-              className="bg-black hover:bg-gray-800 text-white text-lg px-8 py-4 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2"
+              className="bg-black hover:bg-gray-800 text-white text-lg px-8 py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2"
             >
               Watch Demo
               <ArrowRight className="w-5 h-5" />
@@ -49,8 +49,8 @@ const Hero = () => {
           <div className="mt-16">
             <div className="relative mx-auto max-w-4xl">
               <img 
-                src="/lovable-uploads/0376b92f-80f8-4432-ae09-ddea8d0a9bd3.png" 
-                alt="ChatGPT Interface showing prompt automation" 
+                src="https://images.unsplash.com/photo-1677696795198-5ac0e21060ed" 
+                alt="AI-powered coding and automation workspace" 
                 className="mx-auto rounded-2xl shadow-2xl max-w-full h-auto"
               />
             </div>

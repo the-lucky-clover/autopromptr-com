@@ -57,21 +57,53 @@
     min-height: 100vh;
   }
 
-  /* Ensure rounded corners are applied */
-  .rounded-lg {
-    border-radius: 0.5rem !important;
-  }
-
-  .rounded-xl {
+  /* Ensure all buttons have rounded corners */
+  button {
     border-radius: 0.75rem !important;
   }
 
-  .rounded-2xl {
+  /* Ensure all images have rounded corners */
+  img {
     border-radius: 1rem !important;
   }
 
-  .rounded-3xl {
+  /* Ensure all SVG elements have rounded corners where applicable */
+  svg {
+    border-radius: 0.5rem;
+  }
+
+  /* Apply rounded corners to all form elements */
+  input, textarea, select {
+    border-radius: 0.75rem !important;
+  }
+
+  /* Ensure rounded corners are applied globally */
+  .rounded-sm {
+    border-radius: 0.375rem !important;
+  }
+
+  .rounded {
+    border-radius: 0.5rem !important;
+  }
+
+  .rounded-md {
+    border-radius: 0.5rem !important;
+  }
+
+  .rounded-lg {
+    border-radius: 0.75rem !important;
+  }
+
+  .rounded-xl {
+    border-radius: 1rem !important;
+  }
+
+  .rounded-2xl {
     border-radius: 1.5rem !important;
+  }
+
+  .rounded-3xl {
+    border-radius: 2rem !important;
   }
 
   .rounded-full {

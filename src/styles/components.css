@@ -4,7 +4,7 @@
     background: rgba(255, 255, 255, 0.05) !important;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1.5rem;
+    border-radius: 1rem !important;
   }
 
   .glass-navbar {
@@ -62,5 +62,10 @@
     transform: translateX(-100%) translateY(-100%) rotate(45deg);
     animation: glossySheen 12s ease-in-out infinite;
     pointer-events: none;
+  }
+
+  /* Ensure all cards and containers have rounded corners */
+  .card, .container, .panel {
+    border-radius: 1rem !important;
   }
 }

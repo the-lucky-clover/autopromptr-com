@@ -24,24 +24,24 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-transparent">
+    <nav className="fixed top-0 w-full z-50 glass-navbar">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center space-x-3 group">
-            <Zap className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent" />
+            <Zap className="w-8 h-8 text-white" strokeWidth={1.5} />
             <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               AutoPromptr
             </span>
           </Link>
           
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-300">Welcome back!</span>
                 <Button 
                   onClick={signOut}
                   variant="ghost" 
-                  className="text-white hover:text-gray-300 px-4 py-2"
+                  className="text-white hover:text-gray-300 px-4 py-2 rounded-lg"
                 >
                   Sign Out
                 </Button>
@@ -53,12 +53,12 @@ const Navbar = () => {
                     <Button 
                       onClick={handleAuthClick}
                       variant="ghost"
-                      className="text-white hover:text-gray-300 px-4 py-2 font-medium"
+                      className="text-white hover:text-gray-300 px-4 py-2 font-medium rounded-lg"
                     >
                       Login
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-96 glass-effect border-purple-500/30">
+                  <PopoverContent className="w-96 glass-effect border-purple-500/30 rounded-xl">
                     <AuthModal mode={authMode} onClose={() => setAuthModalOpen(false)} />
                   </PopoverContent>
                 </Popover>
@@ -78,7 +78,7 @@ const Navbar = () => {
               variant="ghost"
               size="sm"
               onClick={() => setIsOpen(!isOpen)}
-              className="text-white hover:text-purple-300"
+              className="text-white hover:text-purple-300 rounded-lg"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
@@ -94,7 +94,7 @@ const Navbar = () => {
                   <Button 
                     onClick={() => { signOut(); setIsOpen(false); }}
                     variant="ghost" 
-                    className="mx-3 text-white hover:text-gray-300"
+                    className="mx-3 text-white hover:text-gray-300 rounded-lg"
                   >
                     Sign Out
                   </Button>
@@ -104,13 +104,13 @@ const Navbar = () => {
                   <Button 
                     onClick={() => { handleAuthClick(); setIsOpen(false); }}
                     variant="ghost" 
-                    className="w-full mx-3 text-white hover:text-gray-300 justify-start"
+                    className="w-full mx-3 text-white hover:text-gray-300 justify-start rounded-lg"
                   >
                     Login
                   </Button>
                   <Button 
                     onClick={() => { handleGetStartedClick(); setIsOpen(false); }}
-                    className="w-full mx-3 bg-blue-500 hover:bg-blue-600 text-white"
+                    className="w-full mx-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
                   >
                     Get Started
                   </Button>
