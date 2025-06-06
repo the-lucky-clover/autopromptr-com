@@ -53,7 +53,28 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    background: linear-gradient(135deg, #1a1625 0%, #2d1b69 100%);
+    background: linear-gradient(135deg, #1a1625 0%, #2d1b69 100%) !important;
     min-height: 100vh;
+  }
+
+  /* Ensure rounded corners are applied */
+  .rounded-lg {
+    border-radius: 0.5rem !important;
+  }
+
+  .rounded-xl {
+    border-radius: 0.75rem !important;
+  }
+
+  .rounded-2xl {
+    border-radius: 1rem !important;
+  }
+
+  .rounded-3xl {
+    border-radius: 1.5rem !important;
+  }
+
+  .rounded-full {
+    border-radius: 9999px !important;
   }
 }
