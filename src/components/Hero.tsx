@@ -4,7 +4,7 @@ import { ArrowRight, Zap } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 md:pt-20">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-blue-900 to-purple-600"></div>
       
