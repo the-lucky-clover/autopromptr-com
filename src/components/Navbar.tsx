@@ -41,7 +41,7 @@ const Navbar = () => {
         isScrolled 
           ? 'transform translate-y-0 opacity-100' 
           : 'transform -translate-y-20 opacity-0'
-      } bg-black/20 backdrop-blur-xl border-b border-white/10 shadow-lg`} />
+      } bg-black/50 backdrop-blur-xl border-b border-white/10 shadow-lg`} />
       
       {/* Navbar content - always visible */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
