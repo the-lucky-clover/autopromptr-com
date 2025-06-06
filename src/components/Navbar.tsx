@@ -22,8 +22,8 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleAuthClick = (mode: 'signin' | 'signup') => {
-    setAuthMode(mode);
+  const handleAuthClick = () => {
+    setAuthMode('signin');
     setAuthModalOpen(true);
   };
 
@@ -83,38 +83,20 @@ const Navbar = () => {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
-                <Popover open={authModalOpen && authMode === 'signin'} onOpenChange={(open) => !open && setAuthModalOpen(false)}>
-                  <PopoverTrigger asChild>
-                    <Button 
-                      onClick={() => handleAuthClick('signin')}
-                      variant="outline" 
-                      size="sm"
-                      className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10"
-                    >
-                      Sign In
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-96 glass-effect border-purple-500/30">
-                    <AuthModal mode="signin" onClose={() => setAuthModalOpen(false)} />
-                  </PopoverContent>
-                </Popover>
-                
-                <Popover open={authModalOpen && authMode === 'signup'} onOpenChange={(open) => !open && setAuthModalOpen(false)}>
-                  <PopoverTrigger asChild>
-                    <Button 
-                      onClick={() => handleAuthClick('signup')}
-                      size="sm"
-                      className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                    >
-                      Get Started
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-96 glass-effect border-purple-500/30">
-                    <AuthModal mode="signup" onClose={() => setAuthModalOpen(false)} />
-                  </PopoverContent>
-                </Popover>
-              </div>
+              <Popover open={authModalOpen} onOpenChange={setAuthModalOpen}>
+                <PopoverTrigger asChild>
+                  <Button 
+                    onClick={handleAuthClick}
+                    size="sm"
+                    className="relative overflow-hidden bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 hover:from-purple-600 hover:via-blue-600 hover:to-purple-700 text-white font-medium px-6 py-2 rounded-md transition-all duration-300 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-100%] before:skew-x-12 before:transition-transform before:duration-700 hover:before:translate-x-[200%] animate-gradient-shift"
+                  >
+                    Login
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-96 glass-effect border-purple-500/30">
+                  <AuthModal mode={authMode} onClose={() => setAuthModalOpen(false)} />
+                </PopoverContent>
+              </Popover>
             )}
           </div>
 
@@ -175,21 +157,13 @@ const Navbar = () => {
                   </Button>
                 </div>
               ) : (
-                <div className="pt-2 space-y-2">
+                <div className="pt-2">
                   <Button 
-                    onClick={() => { handleAuthClick('signin'); setIsOpen(false); }}
-                    variant="outline" 
+                    onClick={() => { handleAuthClick(); setIsOpen(false); }}
                     size="sm" 
-                    className="w-full mx-3 border-purple-500/50 text-purple-300 hover:bg-purple-500/10"
+                    className="w-full mx-3 relative overflow-hidden bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 hover:from-purple-600 hover:via-blue-600 hover:to-purple-700 text-white font-medium before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-100%] before:skew-x-12 before:transition-transform before:duration-700 hover:before:translate-x-[200%]"
                   >
-                    Sign In
-                  </Button>
-                  <Button 
-                    onClick={() => { handleAuthClick('signup'); setIsOpen(false); }}
-                    size="sm" 
-                    className="w-full mx-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                  >
-                    Get Started
+                    Login
                   </Button>
                 </div>
               )}
