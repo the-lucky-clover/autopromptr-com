@@ -13,14 +13,14 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .glass-navbar-hidden {
+  .glass-navbar-transparent {
     background: transparent !important;
     backdrop-filter: none;
     border-bottom: none;
   }
 
   .glass-navbar-scrolled {
-    background: rgba(0, 0, 0, 0.7) !important;
+    background: rgba(0, 0, 0, 0.8) !important;
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
