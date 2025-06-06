@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -138,10 +139,35 @@
     width: max-content;
   }
 
-  /* Animated gradient background */
-  .animate-gradient-shift {
-    background-size: 200% 200%;
-    animation: gradientShift 3s ease-in-out infinite;
+  /* Subtle animated gradient background for login button */
+  .animate-gradient-subtle {
+    background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #a855f7 100%);
+    background-size: 300% 300%;
+    animation: gradientShiftSubtle 8s ease-in-out infinite;
+  }
+
+  /* Rare glossy sheen effect */
+  .glossy-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glossy-sheen::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 60%
+    );
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    animation: glossySheen 12s ease-in-out infinite;
+    pointer-events: none;
   }
 
   @keyframes fadeInUp {
@@ -193,12 +219,23 @@
     }
   }
 
-  @keyframes gradientShift {
+  @keyframes gradientShiftSubtle {
     0%, 100% {
       background-position: 0% 50%;
     }
     50% {
       background-position: 100% 50%;
+    }
+  }
+
+  @keyframes glossySheen {
+    0%, 90%, 100% {
+      transform: translateX(-100%) translateY(-100%) rotate(45deg);
+      opacity: 0;
+    }
+    5%, 15% {
+      transform: translateX(100%) translateY(100%) rotate(45deg);
+      opacity: 1;
     }
   }
 

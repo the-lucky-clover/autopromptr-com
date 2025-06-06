@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="pt-32 pb-20 relative overflow-hidden">
+    <section className="pt-20 pb-20 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 blur-3xl"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

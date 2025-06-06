@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap } from "lucide-react";
@@ -28,7 +29,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 ${
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
       isScrolled ? 'glass-navbar shadow-lg' : 'glass-navbar'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -88,7 +89,7 @@ const Navbar = () => {
                   <Button 
                     onClick={handleAuthClick}
                     size="sm"
-                    className="relative overflow-hidden bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 hover:from-purple-600 hover:via-blue-600 hover:to-purple-700 text-white font-medium px-6 py-2 rounded-md transition-all duration-300 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-100%] before:skew-x-12 before:transition-transform before:duration-700 hover:before:translate-x-[200%] animate-gradient-shift"
+                    className="relative overflow-hidden animate-gradient-subtle glossy-sheen text-white font-medium px-6 py-2 rounded-md transition-all duration-300 hover:scale-105 border-0"
                   >
                     Login
                   </Button>
@@ -161,7 +162,7 @@ const Navbar = () => {
                   <Button 
                     onClick={() => { handleAuthClick(); setIsOpen(false); }}
                     size="sm" 
-                    className="w-full mx-3 relative overflow-hidden bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 hover:from-purple-600 hover:via-blue-600 hover:to-purple-700 text-white font-medium before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-100%] before:skew-x-12 before:transition-transform before:duration-700 hover:before:translate-x-[200%]"
+                    className="w-full mx-3 relative overflow-hidden animate-gradient-subtle glossy-sheen text-white font-medium"
                   >
                     Login
                   </Button>
