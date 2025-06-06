@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap } from "lucide-react";
@@ -11,7 +10,18 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const [isScrolled, setIsScrolled] = useState(false);
   const { user, signOut } = useAuth();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleAuthClick = () => {
     setAuthMode('signin');
@@ -24,7 +34,11 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 glass-navbar">
+    <nav className={`fixed top-0 w-full z-40 transition-all duration-500 ease-in-out ${
+      isScrolled 
+        ? 'transform translate-y-0 glass-navbar-scrolled' 
+        : 'transform -translate-y-full glass-navbar-hidden'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center space-x-3 group">
