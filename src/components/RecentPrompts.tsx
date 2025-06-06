@@ -57,21 +57,21 @@ const RecentPrompts = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-500/20 text-green-300 border-green-500/30";
       case "paused":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-yellow-500/20 text-yellow-300 border-yellow-500/30";
       case "draft":
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-500/20 text-gray-300 border-gray-500/30";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-500/20 text-gray-300 border-gray-500/30";
     }
   };
 
   return (
-    <Card className="bg-white border border-gray-200 shadow-sm">
+    <Card className="glass-effect border-purple-500/30">
       <CardHeader>
-        <CardTitle className="text-gray-900">Recent Prompts</CardTitle>
-        <CardDescription className="text-gray-600">
+        <CardTitle className="text-white">Recent Prompts</CardTitle>
+        <CardDescription className="text-gray-300">
           Your most recently used AI prompts and workflows
         </CardDescription>
       </CardHeader>
@@ -80,17 +80,17 @@ const RecentPrompts = () => {
           {prompts.map((prompt) => (
             <div
               key={prompt.id}
-              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors bg-gray-50"
+              className="flex items-center justify-between p-4 rounded-lg glass-effect border-purple-500/20 hover:border-purple-500/40 transition-colors"
             >
               <div className="flex-1">
                 <div className="flex items-center space-x-3 mb-1">
-                  <h4 className="font-medium text-gray-900">{prompt.name}</h4>
+                  <h4 className="font-medium text-white">{prompt.name}</h4>
                   <Badge className={getStatusColor(prompt.status)}>
                     {prompt.status}
                   </Badge>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">{prompt.description}</p>
-                <div className="flex items-center space-x-4 text-xs text-gray-500">
+                <p className="text-sm text-gray-300 mb-2">{prompt.description}</p>
+                <div className="flex items-center space-x-4 text-xs text-gray-400">
                   <span>Last run: {prompt.lastRun}</span>
                   <span>•</span>
                   <span>{prompt.executions} executions</span>
@@ -98,22 +98,22 @@ const RecentPrompts = () => {
               </div>
               <div className="flex items-center space-x-2">
                 {prompt.status === "active" && (
-                  <Button size="sm" variant="ghost" className="text-green-600 hover:text-green-700 hover:bg-green-50">
+                  <Button size="sm" variant="ghost" className="text-green-400 hover:text-green-300 hover:bg-green-500/10">
                     <Play className="h-4 w-4" />
                   </Button>
                 )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="text-gray-400 hover:text-gray-600">
+                    <Button size="sm" variant="ghost" className="text-gray-400 hover:text-gray-300">
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-white border border-gray-200">
-                    <DropdownMenuItem className="text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                  <DropdownMenuContent className="glass-effect border-purple-500/30">
+                    <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-purple-500/10">
                       <Edit className="h-4 w-4 mr-2" />
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                    <DropdownMenuItem className="text-red-400 hover:text-red-300 hover:bg-red-500/10">
                       <Trash2 className="h-4 w-4 mr-2" />
                       Delete
                     </DropdownMenuItem>
