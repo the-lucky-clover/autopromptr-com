@@ -1,0 +1,59 @@
+
+@layer base {
+  :root {
+    --background: 222 47% 11%;
+    --foreground: 0 0% 98%;
+
+    --card: 225 47% 15%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 225 47% 15%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 263 85% 70%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 225 47% 20%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 225 47% 20%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 263 85% 70%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 225 47% 20%;
+    --input: 225 47% 20%;
+    --ring: 263 85% 70%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 225 47% 12%;
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 263 85% 70%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 225 47% 18%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 225 47% 20%;
+    --sidebar-ring: 263 85% 70%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    background: linear-gradient(135deg, #1a1625 0%, #2d1b69 100%);
+    min-height: 100vh;
+  }
+}
