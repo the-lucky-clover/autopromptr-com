@@ -9,95 +9,67 @@ import AuthModal from "@/components/AuthModal";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const { user, signOut } = useAuth();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleAuthClick = () => {
     setAuthMode('signin');
     setAuthModalOpen(true);
   };
 
+  const handleGetStartedClick = () => {
+    setAuthMode('signup');
+    setAuthModalOpen(true);
+  };
+
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-      isScrolled ? 'glass-navbar shadow-lg' : 'glass-navbar'
-    }`}>
+    <nav className="fixed top-0 w-full z-50 bg-transparent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center space-x-2 group">
-            <Zap className="w-8 h-8 text-purple-400 group-hover:text-blue-400 transition-colors duration-300" 
-                 style={{
-                   background: 'linear-gradient(135deg, #a855f7 0%, #3b82f6 100%)',
-                   WebkitBackgroundClip: 'text',
-                   WebkitTextFillColor: 'transparent',
-                   backgroundClip: 'text'
-                 }} />
-            <span className="text-xl font-bold gradient-text">AutoPromptr</span>
+        <div className="flex justify-between items-center h-20">
+          <Link to="/" className="flex items-center space-x-3 group">
+            <Zap className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent" />
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              AutoPromptr
+            </span>
           </Link>
           
-          <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/dashboard" 
-              className="text-gray-300 hover:text-white transition-colors duration-200"
-            >
-              Dashboard
-            </Link>
-            <Link 
-              to="/blog" 
-              className="text-gray-300 hover:text-white transition-colors duration-200"
-            >
-              Blog
-            </Link>
-            <a 
-              href="#features" 
-              className="text-gray-300 hover:text-white transition-colors duration-200"
-            >
-              Features
-            </a>
-            <a 
-              href="#" 
-              className="text-gray-300 hover:text-white transition-colors duration-200"
-            >
-              Pricing
-            </a>
-            
+          <div className="hidden md:flex items-center space-x-6">
             {user ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-300">Welcome back!</span>
                 <Button 
                   onClick={signOut}
-                  variant="outline" 
-                  size="sm"
-                  className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10"
+                  variant="ghost" 
+                  className="text-white hover:text-gray-300 px-4 py-2"
                 >
                   Sign Out
                 </Button>
               </div>
             ) : (
-              <Popover open={authModalOpen} onOpenChange={setAuthModalOpen}>
-                <PopoverTrigger asChild>
-                  <Button 
-                    onClick={handleAuthClick}
-                    size="sm"
-                    className="relative overflow-hidden animate-gradient-subtle glossy-sheen text-white font-medium px-6 py-2 rounded-md transition-all duration-300 hover:scale-105 border-0"
-                  >
-                    Login
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-96 glass-effect border-purple-500/30">
-                  <AuthModal mode={authMode} onClose={() => setAuthModalOpen(false)} />
-                </PopoverContent>
-              </Popover>
+              <div className="flex items-center space-x-4">
+                <Popover open={authModalOpen} onOpenChange={setAuthModalOpen}>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      onClick={handleAuthClick}
+                      variant="ghost"
+                      className="text-white hover:text-gray-300 px-4 py-2 font-medium"
+                    >
+                      Login
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-96 glass-effect border-purple-500/30">
+                    <AuthModal mode={authMode} onClose={() => setAuthModalOpen(false)} />
+                  </PopoverContent>
+                </Popover>
+                
+                <Button 
+                  onClick={handleGetStartedClick}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200"
+                >
+                  Get Started
+                </Button>
+              </div>
             )}
           </div>
 
@@ -116,55 +88,31 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 glass-effect border-t border-white/10 mt-2 rounded-lg">
-              <Link
-                to="/dashboard"
-                className="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/blog"
-                className="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Blog
-              </Link>
-              <a
-                href="#features"
-                className="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Features
-              </a>
-              <a
-                href="#"
-                className="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Pricing
-              </a>
-              
               {user ? (
                 <div className="pt-2 space-y-2">
                   <div className="px-3 py-2 text-sm text-gray-300">Welcome back!</div>
                   <Button 
                     onClick={() => { signOut(); setIsOpen(false); }}
-                    variant="outline" 
-                    size="sm"
-                    className="mx-3 border-purple-500/50 text-purple-300 hover:bg-purple-500/10"
+                    variant="ghost" 
+                    className="mx-3 text-white hover:text-gray-300"
                   >
                     Sign Out
                   </Button>
                 </div>
               ) : (
-                <div className="pt-2">
+                <div className="pt-2 space-y-3">
                   <Button 
                     onClick={() => { handleAuthClick(); setIsOpen(false); }}
-                    size="sm" 
-                    className="w-full mx-3 relative overflow-hidden animate-gradient-subtle glossy-sheen text-white font-medium"
+                    variant="ghost" 
+                    className="w-full mx-3 text-white hover:text-gray-300 justify-start"
                   >
                     Login
+                  </Button>
+                  <Button 
+                    onClick={() => { handleGetStartedClick(); setIsOpen(false); }}
+                    className="w-full mx-3 bg-blue-500 hover:bg-blue-600 text-white"
+                  >
+                    Get Started
                   </Button>
                 </div>
               )}
