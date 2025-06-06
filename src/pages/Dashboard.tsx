@@ -4,9 +4,11 @@ import { AppSidebar } from "@/components/AppSidebar";
 import DashboardStats from "@/components/DashboardStats";
 import RecentPrompts from "@/components/RecentPrompts";
 import ActivityChart from "@/components/ActivityChart";
+import BatchManager from "@/components/BatchManager";
 import { Button } from "@/components/ui/button";
 import { Plus, Bell, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Dashboard = () => {
   return (
@@ -43,14 +45,27 @@ const Dashboard = () => {
 
           <DashboardStats />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <RecentPrompts />
-            </div>
-            <div>
-              <ActivityChart />
-            </div>
-          </div>
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="batches">Batch Manager</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <RecentPrompts />
+                </div>
+                <div>
+                  <ActivityChart />
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="batches">
+              <BatchManager />
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
     </SidebarProvider>

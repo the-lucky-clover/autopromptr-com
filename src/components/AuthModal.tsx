@@ -11,9 +11,10 @@ import { useToast } from '@/hooks/use-toast';
 interface AuthModalProps {
   mode: 'signin' | 'signup';
   onClose: () => void;
+  isMobile?: boolean;
 }
 
-const AuthModal = ({ mode: initialMode, onClose }: AuthModalProps) => {
+const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,7 +40,7 @@ const AuthModal = ({ mode: initialMode, onClose }: AuthModalProps) => {
       setShowEmailSent(true);
       toast({
         title: "Check your email",
-        description: "We've sent you a verification link.",
+        description: "We've sent you a verification link to complete registration.",
       });
     }
     
@@ -61,7 +62,7 @@ const AuthModal = ({ mode: initialMode, onClose }: AuthModalProps) => {
     } else if (user && !isEmailVerified) {
       toast({
         title: "Email not verified",
-        description: "Please check your email and verify your account.",
+        description: "Please check your email and verify your account first.",
         variant: "destructive",
       });
     } else {
@@ -74,19 +75,21 @@ const AuthModal = ({ mode: initialMode, onClose }: AuthModalProps) => {
   if (showEmailSent) {
     return (
       <div className="p-6 text-center">
-        <Button
-          onClick={onClose}
-          variant="ghost"
-          size="sm"
-          className="absolute top-2 right-2 text-gray-400 hover:text-white"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+        {!isMobile && (
+          <Button
+            onClick={onClose}
+            variant="ghost"
+            size="sm"
+            className="absolute top-2 right-2 text-gray-400 hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
         <div className="mx-auto mb-4 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
           <CheckCircle className="w-6 h-6 text-green-600" />
         </div>
         <h3 className="text-lg font-semibold text-white mb-2">Check Your Email</h3>
-        <p className="text-gray-300 mb-4">
+        <p className="text-gray-300 mb-4 text-sm">
           We've sent you a verification link. Please check your email and click the link to complete your registration.
         </p>
         <Button 
@@ -101,7 +104,7 @@ const AuthModal = ({ mode: initialMode, onClose }: AuthModalProps) => {
   }
 
   return (
-    <div className="p-6">
+    <div className={`${isMobile ? 'p-4' : 'p-6'}`}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
@@ -114,14 +117,16 @@ const AuthModal = ({ mode: initialMode, onClose }: AuthModalProps) => {
             </p>
           </div>
         </div>
-        <Button
-          onClick={onClose}
-          variant="ghost"
-          size="sm"
-          className="text-gray-400 hover:text-white"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+        {!isMobile && (
+          <Button
+            onClick={onClose}
+            variant="ghost"
+            size="sm"
+            className="text-gray-400 hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       <Tabs value={mode} onValueChange={(value) => setMode(value as 'signin' | 'signup')} className="w-full">
@@ -182,6 +187,9 @@ const AuthModal = ({ mode: initialMode, onClose }: AuthModalProps) => {
             >
               {loading ? "Signing in..." : "Sign In"}
             </Button>
+            <p className="text-xs text-gray-400 text-center">
+              Forgot password? Check your email for magic link login.
+            </p>
           </form>
         </TabsContent>
         
@@ -235,7 +243,7 @@ const AuthModal = ({ mode: initialMode, onClose }: AuthModalProps) => {
               {loading ? "Creating account..." : "Create Account"}
             </Button>
             <p className="text-xs text-gray-400 text-center">
-              You'll receive an email to verify your account
+              Check your email after signup to verify your account.
             </p>
           </form>
         </TabsContent>
