@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Zap, Mail, CheckCircle, X, Eye, EyeOff } from 'lucide-react';
+import { Zap, Mail, CheckCircle, X, Eye, EyeOff, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface AuthModalProps {
@@ -21,6 +21,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
   const [showEmailSent, setShowEmailSent] = useState(false);
   const [mode, setMode] = useState(initialMode);
   const [showPassword, setShowPassword] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
   const { signUp, signIn, user, isEmailVerified } = useAuth();
   const { toast } = useToast();
 
@@ -72,6 +73,46 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
     setLoading(false);
   };
 
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    const { error } = await signUp(email, password);
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Email resent",
+        description: "We've sent another verification link to your email.",
+      });
+    }
+    setResendLoading(false);
+  };
+
+  const openEmailProvider = (provider: string) => {
+    let url = '';
+    const searchTerm = 'AutoPromptr verification';
+    
+    switch (provider) {
+      case 'gmail':
+        url = `https://mail.google.com/mail/u/0/#search/${encodeURIComponent(searchTerm)}`;
+        break;
+      case 'outlook':
+        url = `https://outlook.live.com/mail/0/search?q=${encodeURIComponent(searchTerm)}`;
+        break;
+      case 'yahoo':
+        url = `https://mail.yahoo.com/d/search/keyword=${encodeURIComponent(searchTerm)}`;
+        break;
+    }
+    
+    if (url) {
+      window.open(url, '_blank');
+    }
+  };
+
   if (showEmailSent) {
     return (
       <div className="bg-gray-900/95 backdrop-blur-xl border border-gray-700 rounded-xl p-6 text-center">
@@ -88,17 +129,84 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
         <div className="mx-auto mb-4 w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
           <CheckCircle className="w-6 h-6 text-green-600" />
         </div>
-        <h3 className="text-lg font-semibold text-white mb-2">Check Your Email</h3>
+        <h3 className="text-lg font-semibold text-white mb-2">Check your email</h3>
         <p className="text-gray-300 mb-4 text-sm">
-          We've sent you a verification link. Please check your email and click the link to complete your registration.
+          We'll email you a link for a password free sign in.
         </p>
-        <Button 
-          onClick={() => setShowEmailSent(false)}
-          variant="outline" 
-          className="w-full border-purple-500/50 text-purple-300 hover:bg-purple-500/10 rounded-xl"
-        >
-          Back to Sign In
-        </Button>
+        
+        {/* Email Provider Quick Links */}
+        <div className="space-y-3 mb-6">
+          <Button
+            onClick={() => openEmailProvider('gmail')}
+            variant="outline"
+            className="w-full flex items-center justify-center space-x-3 bg-white/5 border-gray-600 text-white hover:bg-white/10 rounded-xl py-3"
+          >
+            <div className="w-5 h-5 bg-red-500 rounded flex items-center justify-center text-white text-xs font-bold">M</div>
+            <span>Open Gmail</span>
+          </Button>
+          
+          <Button
+            onClick={() => openEmailProvider('outlook')}
+            variant="outline"
+            className="w-full flex items-center justify-center space-x-3 bg-white/5 border-gray-600 text-white hover:bg-white/10 rounded-xl py-3"
+          >
+            <div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center text-white text-xs font-bold">□</div>
+            <span>Open Outlook</span>
+          </Button>
+          
+          <Button
+            onClick={() => openEmailProvider('yahoo')}
+            variant="outline"
+            className="w-full flex items-center justify-center space-x-3 bg-white/5 border-gray-600 text-white hover:bg-white/10 rounded-xl py-3"
+          >
+            <div className="w-5 h-5 bg-purple-600 rounded flex items-center justify-center text-white text-xs font-bold">Y!</div>
+            <span>Open Yahoo!</span>
+          </Button>
+        </div>
+
+        <p className="text-gray-400 text-sm mb-4">Not seeing it in your inbox?</p>
+        
+        <div className="flex flex-col space-y-2">
+          <Button 
+            onClick={handleResendVerification}
+            disabled={resendLoading}
+            variant="outline" 
+            className="w-full border-purple-500/50 text-purple-300 hover:bg-purple-500/10 rounded-xl"
+          >
+            {resendLoading ? (
+              <>
+                <RotateCcw className="w-4 h-4 mr-2 animate-spin" />
+                Resending...
+              </>
+            ) : (
+              'Resend the link'
+            )}
+          </Button>
+          
+          <p className="text-gray-400 text-xs">or</p>
+          
+          <Button
+            onClick={() => setShowEmailSent(false)}
+            variant="ghost"
+            className="text-purple-300 hover:bg-purple-500/10 rounded-xl"
+          >
+            Change your email
+          </Button>
+        </div>
+
+        <div className="mt-6 pt-4 border-t border-gray-700">
+          <p className="text-gray-400 text-sm mb-2">New to Create?</p>
+          <Button
+            onClick={() => {
+              setShowEmailSent(false);
+              setMode('signup');
+            }}
+            variant="ghost"
+            className="text-purple-300 hover:bg-purple-500/10 rounded-xl font-semibold"
+          >
+            Sign up
+          </Button>
+        </div>
       </div>
     );
   }
