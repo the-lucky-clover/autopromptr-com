@@ -89,6 +89,10 @@ export const usePersistentBatches = () => {
           });
         }
       }
+      
+      // Automatically run comprehensive search for lost data on every page load
+      performAutomaticDataSearch();
+      
     } catch (error) {
       console.error('Failed to load batches from localStorage:', error);
       
@@ -109,6 +113,27 @@ export const usePersistentBatches = () => {
       }
     }
   }, []);
+
+  // Automatic comprehensive data search function
+  const performAutomaticDataSearch = () => {
+    console.log('=== AUTOMATIC SEARCH FOR LOST BATCHES ===');
+    console.log('All localStorage keys:', Object.keys(localStorage));
+    
+    Object.keys(localStorage).forEach(key => {
+      try {
+        const value = localStorage.getItem(key);
+        if (value) {
+          const parsed = JSON.parse(value);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            console.log(`Key "${key}" contains array with ${parsed.length} items:`, parsed);
+          }
+        }
+      } catch (e) {
+        // Not JSON, skip
+      }
+    });
+    console.log('=== END AUTOMATIC SEARCH ===');
+  };
 
   // Save batches to localStorage whenever batches change
   useEffect(() => {
@@ -157,23 +182,7 @@ export const usePersistentBatches = () => {
 
   // Debug function to manually search for lost data
   const searchForLostBatches = () => {
-    console.log('=== MANUAL SEARCH FOR LOST BATCHES ===');
-    console.log('All localStorage keys:', Object.keys(localStorage));
-    
-    Object.keys(localStorage).forEach(key => {
-      try {
-        const value = localStorage.getItem(key);
-        if (value) {
-          const parsed = JSON.parse(value);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            console.log(`Key "${key}" contains array with ${parsed.length} items:`, parsed);
-          }
-        }
-      } catch (e) {
-        // Not JSON, skip
-      }
-    });
-    console.log('=== END SEARCH ===');
+    performAutomaticDataSearch();
   };
 
   return {
