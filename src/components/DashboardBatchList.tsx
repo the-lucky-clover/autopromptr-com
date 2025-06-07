@@ -158,20 +158,20 @@ const DashboardBatchList = ({
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl">
+                  <AlertDialogContent className="bg-black/40 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl">
                     <AlertDialogHeader>
-                      <AlertDialogTitle className="text-gray-900 dark:text-white">Delete Batch</AlertDialogTitle>
-                      <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
+                      <AlertDialogTitle className="text-white">Delete Batch</AlertDialogTitle>
+                      <AlertDialogDescription className="text-white/70">
                         Are you sure you want to delete "{batch.name}"? This action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel className="rounded-xl border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <AlertDialogCancel className="rounded-xl border-white/30 bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm">
                         Cancel
                       </AlertDialogCancel>
                       <AlertDialogAction 
                         onClick={() => onDelete(batch.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
+                        className="bg-red-600/80 hover:bg-red-700/90 text-white rounded-xl backdrop-blur-sm"
                       >
                         Delete
                       </AlertDialogAction>
