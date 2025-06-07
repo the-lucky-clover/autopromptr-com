@@ -57,19 +57,19 @@
     min-height: 100vh;
   }
 
-  /* Dark theme for all sections - much darker backgrounds */
+  /* Much darker theme for all sections */
   section {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%) !important;
+    background: linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 50%, #1e1b4b 100%) !important;
   }
 
-  /* Override any light backgrounds with dark gradients */
+  /* Override any light backgrounds with very dark gradients */
   .bg-white, .bg-gray-50, .bg-gray-100, .bg-gray-200 {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    background: linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 100%) !important;
   }
 
-  /* Ensure main content areas are dark */
+  /* Ensure main content areas are very dark */
   main {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%) !important;
+    background: linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 50%, #1e1b4b 100%) !important;
   }
 
   /* Override any remaining light elements */

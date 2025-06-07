@@ -1,7 +1,7 @@
 
 @layer base {
   .glass-effect {
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: rgba(0, 0, 0, 0.2) !important;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 1rem !important;
@@ -43,7 +43,7 @@
   }
 
   .gradient-bg {
-    background: linear-gradient(135deg, #1a1625 0%, #2d1b69 100%) !important;
+    background: linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 100%) !important;
   }
 
   /* Interactive Elements */
