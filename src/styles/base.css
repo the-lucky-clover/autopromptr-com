@@ -89,9 +89,14 @@
     color: #94a3b8 !important;
   }
 
-  /* Ensure all buttons have rounded corners */
-  button {
+  /* Ensure ALL buttons have rounded corners */
+  button, .btn, [role="button"] {
     border-radius: 0.75rem !important;
+  }
+
+  /* Ensure ALL cards have rounded corners */
+  .card, [data-card], .glass-effect {
+    border-radius: 1rem !important;
   }
 
   /* Ensure all images have rounded corners */
@@ -99,31 +104,26 @@
     border-radius: 1rem !important;
   }
 
-  /* Ensure all SVG elements have rounded corners where applicable */
-  svg {
-    border-radius: 0.5rem;
-  }
-
   /* Apply rounded corners to all form elements */
   input, textarea, select {
     border-radius: 0.75rem !important;
   }
 
-  /* Ensure rounded corners are applied globally */
+  /* Ensure rounded corners are applied globally with higher specificity */
   .rounded-sm {
-    border-radius: 0.375rem !important;
+    border-radius: 0.75rem !important;
   }
 
   .rounded {
-    border-radius: 0.5rem !important;
+    border-radius: 0.75rem !important;
   }
 
   .rounded-md {
-    border-radius: 0.5rem !important;
+    border-radius: 0.75rem !important;
   }
 
   .rounded-lg {
-    border-radius: 0.75rem !important;
+    border-radius: 1rem !important;
   }
 
   .rounded-xl {
@@ -140,5 +140,10 @@
 
   .rounded-full {
     border-radius: 9999px !important;
+  }
+
+  /* Force rounded corners on all interactive elements */
+  a, button, input, textarea, select, .card, .glass-effect, [data-radix-collection-item] {
+    border-radius: var(--radius) !important;
   }
 }

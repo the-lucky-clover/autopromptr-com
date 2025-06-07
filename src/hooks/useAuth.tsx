@@ -32,17 +32,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (session?.user) {
           console.log('User email_confirmed_at:', session.user.email_confirmed_at);
-          console.log('User confirmation status:', session.user.email_confirmed_at !== null);
           
           // Check email verification status
           const verified = session.user.email_confirmed_at !== null;
           console.log('Email verification status:', verified);
           setIsEmailVerified(verified);
 
-          // If user is verified and we're on auth page, redirect to dashboard
-          if (verified && window.location.pathname === '/auth') {
-            console.log('Redirecting verified user to dashboard');
-            window.location.href = '/dashboard';
+          // Auto-redirect to dashboard for verified users on successful login
+          if (verified && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+            console.log('Auto-redirecting verified user to dashboard');
+            setTimeout(() => {
+              window.location.href = '/dashboard';
+            }, 100);
           }
         } else {
           setIsEmailVerified(false);
@@ -57,6 +58,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Initial session check:', session);
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) {
+        const verified = session.user.email_confirmed_at !== null;
+        setIsEmailVerified(verified);
+      }
       if (!session) {
         setLoading(false);
       }
@@ -122,11 +127,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { error };
     }
 
-    // If sign-in was successful and user is verified, the onAuthStateChange will handle redirect
-    if (data?.user && data.user.email_confirmed_at) {
-      console.log('Sign-in successful for verified user');
-    }
-    
+    // The onAuthStateChange will handle the redirect
     return { error: null };
   };
 

@@ -4,7 +4,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Zap, X } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
-import { useNavigate } from 'react-router-dom';
 import EmailVerificationScreen from './auth/EmailVerificationScreen';
 import AuthForm from './auth/AuthForm';
 
@@ -24,8 +23,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
   const [progressStep, setProgressStep] = useState<'idle' | 'creating' | 'sending' | 'complete' | 'error'>('idle');
   const [progressMessage, setProgressMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const { signUp, signIn, user, isEmailVerified, resendVerification } = useAuth();
-  const navigate = useNavigate();
+  const { signUp, signIn, resendVerification } = useAuth();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,9 +103,8 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
       setProgressStep('complete');
       setProgressMessage('Welcome back! Redirecting...');
       
-      // Wait a moment for the progress animation, then redirect
+      // The auth hook will handle the redirect, so just close the modal
       setTimeout(() => {
-        navigate('/dashboard');
         onClose();
       }, 1000);
     }
