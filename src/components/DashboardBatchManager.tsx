@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useBatchAutomation } from '@/hooks/useBatchAutomation';
+import { usePersistentBatches } from '@/hooks/usePersistentBatches';
 import { Batch } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 import BatchModal from './BatchModal';
@@ -19,7 +20,7 @@ interface DashboardBatchManagerProps {
 }
 
 const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) => {
-  const [batches, setBatches] = useState<Batch[]>([]);
+  const { batches, setBatches } = usePersistentBatches();
   const [showModal, setShowModal] = useState(false);
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
@@ -27,17 +28,17 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
   const { status: batchStatus, loading: automationLoading, runBatch, stopBatch } = useBatchAutomation(selectedBatchId || undefined);
 
   // Update stats whenever batches change
-  const updateStats = (updatedBatches: Batch[]) => {
+  useEffect(() => {
     if (onStatsUpdate) {
       const stats = {
-        totalBatches: updatedBatches.length,
-        activeBatches: updatedBatches.filter(b => b.status === 'running').length,
-        completedBatches: updatedBatches.filter(b => b.status === 'completed').length,
-        totalPrompts: updatedBatches.reduce((sum, batch) => sum + batch.prompts.length, 0)
+        totalBatches: batches.length,
+        activeBatches: batches.filter(b => b.status === 'running').length,
+        completedBatches: batches.filter(b => b.status === 'completed').length,
+        totalPrompts: batches.reduce((sum, batch) => sum + batch.prompts.length, 0)
       };
       onStatsUpdate(stats);
     }
-  };
+  }, [batches, onStatsUpdate]);
 
   const handleCreateBatch = (batchData: Omit<Batch, 'id' | 'createdAt'>) => {
     // Auto-detect platform from target URL
@@ -51,9 +52,7 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
       platform: detectedPlatform
     };
 
-    const updatedBatches = [...batches, newBatch];
-    setBatches(updatedBatches);
-    updateStats(updatedBatches);
+    setBatches(prev => [...prev, newBatch]);
     setShowModal(false);
 
     toast({
@@ -70,11 +69,9 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
       platform: detectedPlatform
     };
 
-    const updatedBatches = batches.map(batch => 
+    setBatches(prev => prev.map(batch => 
       batch.id === batchWithPlatform.id ? batchWithPlatform : batch
-    );
-    setBatches(updatedBatches);
-    updateStats(updatedBatches);
+    ));
     setShowModal(false);
     setEditingBatch(null);
 
@@ -86,9 +83,7 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
   };
 
   const handleDeleteBatch = (batchId: string) => {
-    const updatedBatches = batches.filter(batch => batch.id !== batchId);
-    setBatches(updatedBatches);
-    updateStats(updatedBatches);
+    setBatches(prev => prev.filter(batch => batch.id !== batchId));
   };
 
   const handleEditBatch = (batch: Batch) => {
@@ -112,21 +107,18 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
 
     // Update batch with detected platform
     const updatedBatch = { ...batch, platform: detectedPlatform };
-    const updatedBatches = batches.map(b => 
+    setBatches(prev => prev.map(b => 
       b.id === batch.id ? updatedBatch : b
-    );
-    setBatches(updatedBatches);
+    ));
 
     setSelectedBatchId(batch.id);
     
     try {
       await runBatch(detectedPlatform, batch.settings);
       
-      const finalUpdatedBatches = batches.map(b => 
+      setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform } : b
-      );
-      setBatches(finalUpdatedBatches);
-      updateStats(finalUpdatedBatches);
+      ));
       
       toast({
         title: "Batch started",
@@ -145,11 +137,9 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
     try {
       await stopBatch();
       
-      const updatedBatches = batches.map(b => 
+      setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'failed' as const } : b
-      );
-      setBatches(updatedBatches);
-      updateStats(updatedBatches);
+      ));
       
       toast({
         title: "Batch stopped",
