@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [hasRedirected, setHasRedirected] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener
@@ -39,14 +40,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setIsEmailVerified(verified);
 
           // Auto-redirect to dashboard for verified users on successful login
-          if (verified && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          // Only redirect once and only for specific events
+          if (verified && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && !hasRedirected) {
             console.log('Auto-redirecting verified user to dashboard');
+            setHasRedirected(true);
+            // Use setTimeout to prevent immediate redirect conflicts
             setTimeout(() => {
-              window.location.href = '/dashboard';
+              if (window.location.pathname !== '/dashboard') {
+                window.location.href = '/dashboard';
+              }
             }, 100);
           }
         } else {
           setIsEmailVerified(false);
+          setHasRedirected(false);
         }
         
         setLoading(false);
@@ -133,6 +140,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     console.log('Signing out...');
+    setHasRedirected(false);
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);

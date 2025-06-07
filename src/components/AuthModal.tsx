@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -103,7 +102,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
       setProgressStep('complete');
       setProgressMessage('Welcome back! Redirecting...');
       
-      // The auth hook will handle the redirect, so just close the modal
+      // Close the modal immediately and let the auth hook handle redirect
       setTimeout(() => {
         onClose();
       }, 1000);
