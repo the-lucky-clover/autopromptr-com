@@ -5,6 +5,7 @@ import { usePersistentBatches } from '@/hooks/usePersistentBatches';
 import { AutoPromptr } from '@/services/autoPromptr';
 import { Batch } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useDashboardBatchManager = () => {
   // All hooks must be called in the same order every time
@@ -15,7 +16,54 @@ export const useDashboardBatchManager = () => {
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const [automationLoading, setAutomationLoading] = useState(false);
 
-  const handleCreateBatch = (batchData: Omit<Batch, 'id' | 'createdAt'>) => {
+  const saveBatchToDatabase = async (batch: Batch) => {
+    try {
+      console.log('Saving batch to database:', batch);
+      
+      // Save batch to Supabase
+      const { error: batchError } = await supabase
+        .from('batches')
+        .upsert({
+          id: batch.id,
+          name: batch.name,
+          platform: batch.platform,
+          description: batch.description || '',
+          status: batch.status,
+          settings: batch.settings || {},
+          created_at: batch.createdAt.toISOString()
+        });
+
+      if (batchError) {
+        console.error('Error saving batch:', batchError);
+        throw batchError;
+      }
+
+      // Save prompts to Supabase
+      for (const prompt of batch.prompts) {
+        const { error: promptError } = await supabase
+          .from('prompts')
+          .upsert({
+            id: prompt.id,
+            batch_id: batch.id,
+            prompt_text: prompt.text,
+            order_index: prompt.order,
+            status: 'pending'
+          });
+
+        if (promptError) {
+          console.error('Error saving prompt:', promptError);
+          throw promptError;
+        }
+      }
+
+      console.log('Batch and prompts saved to database successfully');
+    } catch (error) {
+      console.error('Failed to save batch to database:', error);
+      throw error;
+    }
+  };
+
+  const handleCreateBatch = async (batchData: Omit<Batch, 'id' | 'createdAt'>) => {
     const detectedPlatform = detectPlatformFromUrl(batchData.targetUrl);
     const platformName = getPlatformName(detectedPlatform);
 
@@ -26,33 +74,57 @@ export const useDashboardBatchManager = () => {
       platform: detectedPlatform
     };
 
-    setBatches(prev => [...prev, newBatch]);
-    setShowModal(false);
+    try {
+      // Save to database first
+      await saveBatchToDatabase(newBatch);
+      
+      // Then update local state
+      setBatches(prev => [...prev, newBatch]);
+      setShowModal(false);
 
-    toast({
-      title: "Batch created",
-      description: `Batch created with auto-detected platform: ${platformName}`,
-    });
+      toast({
+        title: "Batch created",
+        description: `Batch created with auto-detected platform: ${platformName}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to create batch",
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleUpdateBatch = (updatedBatch: Batch) => {
+  const handleUpdateBatch = async (updatedBatch: Batch) => {
     const detectedPlatform = detectPlatformFromUrl(updatedBatch.targetUrl);
     const batchWithPlatform = {
       ...updatedBatch,
       platform: detectedPlatform
     };
 
-    setBatches(prev => prev.map(batch => 
-      batch.id === batchWithPlatform.id ? batchWithPlatform : batch
-    ));
-    setShowModal(false);
-    setEditingBatch(null);
+    try {
+      // Save to database first
+      await saveBatchToDatabase(batchWithPlatform);
+      
+      // Then update local state
+      setBatches(prev => prev.map(batch => 
+        batch.id === batchWithPlatform.id ? batchWithPlatform : batch
+      ));
+      setShowModal(false);
+      setEditingBatch(null);
 
-    const platformName = getPlatformName(detectedPlatform);
-    toast({
-      title: "Batch updated",
-      description: `Batch updated with platform: ${platformName}`,
-    });
+      const platformName = getPlatformName(detectedPlatform);
+      toast({
+        title: "Batch updated",
+        description: `Batch updated with platform: ${platformName}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to update batch",
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDeleteBatch = (batchId: string) => {
@@ -85,6 +157,9 @@ export const useDashboardBatchManager = () => {
     setAutomationLoading(true);
     
     try {
+      // Ensure batch is saved to database before running
+      await saveBatchToDatabase(batch);
+      
       // Update batch status to running immediately
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform } : b
@@ -158,16 +233,30 @@ export const useDashboardBatchManager = () => {
     }
   };
 
-  const handleRewindBatch = (batch: Batch) => {
-    // Reset batch to pending status to allow restart
-    setBatches(prev => prev.map(b => 
-      b.id === batch.id ? { ...b, status: 'pending' as const } : b
-    ));
-    
-    toast({
-      title: "Batch rewound",
-      description: `Batch "${batch.name}" has been reset to pending status.`,
-    });
+  const handleRewindBatch = async (batch: Batch) => {
+    try {
+      // Reset batch to pending status to allow restart
+      const rewindBatch = { ...batch, status: 'pending' as const };
+      
+      // Save to database
+      await saveBatchToDatabase(rewindBatch);
+      
+      // Update local state
+      setBatches(prev => prev.map(b => 
+        b.id === batch.id ? rewindBatch : b
+      ));
+      
+      toast({
+        title: "Batch rewound",
+        description: `Batch "${batch.name}" has been reset to pending status.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to rewind batch",
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: "destructive",
+      });
+    }
   };
 
   const handleNewBatch = () => {
