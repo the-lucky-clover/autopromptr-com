@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
@@ -7,28 +8,39 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import DashboardBatchManager from "@/components/DashboardBatchManager";
 
 const Dashboard = () => {
-  const stats = [
+  const [stats, setStats] = useState({
+    totalBatches: 0,
+    activeBatches: 0,
+    completedBatches: 0,
+    totalPrompts: 0
+  });
+
+  const handleStatsUpdate = (newStats: typeof stats) => {
+    setStats(newStats);
+  };
+
+  const statsData = [
     {
       title: "Total Batches",
-      value: "0",
+      value: stats.totalBatches.toString(),
       icon: "📊",
       color: "bg-blue-500"
     },
     {
       title: "Active Batches", 
-      value: "0",
+      value: stats.activeBatches.toString(),
       icon: "⚡",
       color: "bg-orange-500"
     },
     {
       title: "Completed",
-      value: "0", 
+      value: stats.completedBatches.toString(), 
       icon: "✅",
       color: "bg-green-500"
     },
     {
       title: "Total Prompts",
-      value: "0",
+      value: stats.totalPrompts.toString(),
       icon: "🎯", 
       color: "bg-purple-500"
     }
@@ -73,7 +85,7 @@ const Dashboard = () => {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat, index) => (
+            {statsData.map((stat, index) => (
               <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
@@ -101,7 +113,7 @@ const Dashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <DashboardBatchManager />
+                  <DashboardBatchManager onStatsUpdate={handleStatsUpdate} />
                 </CardContent>
               </Card>
             </div>
