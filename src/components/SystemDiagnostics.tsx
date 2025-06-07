@@ -57,30 +57,20 @@ export const useSystemDiagnostics = ({ batches, addLog, setSystemStatus }: Syste
     }
   };
 
-  const checkRenderTargetHandshake = async () => {
+  const checkRenderTargetHandshake = async (targetUrl: string) => {
     try {
-      addLog('info', 'Render-Target', 'Testing target URL connections...');
+      addLog('info', 'Render-Target', `Testing connectivity to target URL: ${targetUrl}...`);
       
-      // Get unique target URLs from batches
-      const targetUrls = [...new Set(batches.map(batch => batch.targetUrl).filter(Boolean))];
-      
-      if (targetUrls.length === 0) {
-        addLog('warning', 'Render-Target', 'No target URLs to test', 'Create a batch with a target URL first');
-        return;
-      }
-
-      for (const url of targetUrls) {
-        try {
-          // Basic connectivity test (note: CORS may block this, but we'll log the attempt)
-          const response = await fetch(url, { mode: 'no-cors' });
-          addLog('info', 'Render-Target', `Testing connectivity to ${url}`, 'CORS may prevent full validation');
-        } catch (error) {
-          addLog('warning', 'Render-Target', `Cannot directly test ${url}`, 'CORS restrictions - backend will handle actual connections');
-        }
+      try {
+        // Basic connectivity test (note: CORS may block this, but we'll log the attempt)
+        const response = await fetch(targetUrl, { mode: 'no-cors' });
+        addLog('info', 'Render-Target', `Testing connectivity to ${targetUrl}`, 'CORS may prevent full validation');
+      } catch (error) {
+        addLog('warning', 'Render-Target', `Cannot directly test ${targetUrl}`, 'CORS restrictions - backend will handle actual connections');
       }
       
       setSystemStatus((prev: any) => ({ ...prev, renderTarget: 'tested' }));
-      addLog('success', 'Render-Target', 'Target URL testing completed', `Tested ${targetUrls.length} unique URLs`);
+      addLog('success', 'Render-Target', `Target URL testing completed for ${targetUrl}`, 'Backend will handle actual automation connections');
     } catch (error) {
       setSystemStatus((prev: any) => ({ ...prev, renderTarget: 'error' }));
       addLog('error', 'Render-Target', 'Target URL testing failed', error instanceof Error ? error.message : 'Unknown error');
@@ -93,14 +83,28 @@ export const useSystemDiagnostics = ({ batches, addLog, setSystemStatus }: Syste
       return;
     }
 
-    addLog('info', 'System', 'Starting system diagnostics for active batch processing...');
+    // Find the currently processing batch
+    const processingBatch = batches.find(batch => batch.status === 'running');
+    
+    if (!processingBatch) {
+      addLog('warning', 'System', 'No processing batch found despite hasActiveBatch being true');
+      return;
+    }
+
+    addLog('info', 'System', `Starting system diagnostics for active batch: "${processingBatch.name}"...`);
     addLog('info', 'System', 'Backend URL configured: https://autopromptr-backend.onrender.com');
     
     await checkLovableSupabaseHandshake();
     await checkSupabaseRenderHandshake();
-    await checkRenderTargetHandshake();
     
-    addLog('success', 'System', 'System diagnostics completed');
+    // Only test the target URL of the currently processing batch
+    if (processingBatch.targetUrl) {
+      await checkRenderTargetHandshake(processingBatch.targetUrl);
+    } else {
+      addLog('warning', 'Render-Target', 'No target URL found for processing batch', `Batch: ${processingBatch.name}`);
+    }
+    
+    addLog('success', 'System', `System diagnostics completed for batch: "${processingBatch.name}"`);
   };
 
   return {

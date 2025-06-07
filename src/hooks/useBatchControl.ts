@@ -25,6 +25,24 @@ export const useBatchControl = () => {
       return;
     }
 
+    // Check if any batch is already running - only allow one batch at a time
+    const runningBatch = await new Promise<Batch[]>((resolve) => {
+      setBatches(prev => {
+        const running = prev.filter(b => b.status === 'running');
+        resolve(running);
+        return prev;
+      });
+    });
+
+    if (runningBatch.length > 0) {
+      toast({
+        title: "Batch already running",
+        description: `Cannot start "${batch.name}" because "${runningBatch[0].name}" is already processing. Only one batch can run at a time.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     console.log('Running batch:', batch.id, 'with platform:', detectedPlatform);
     console.log('Batch data:', batch);
 
@@ -53,7 +71,7 @@ export const useBatchControl = () => {
       
       toast({
         title: "Batch started",
-        description: `Automation started for "${batch.name}" using ${platformName}.`,
+        description: `Automation started for "${batch.name}" using ${platformName}. Only this batch will be processed.`,
       });
     } catch (err) {
       console.error('Failed to start batch:', err);
