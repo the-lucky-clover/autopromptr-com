@@ -81,10 +81,15 @@ export const useDashboardBatchManager = () => {
       b.id === batch.id ? updatedBatch : b
     ));
 
+    // Set the selected batch ID FIRST, then run the batch
     setSelectedBatchId(batch.id);
     
     try {
-      await runBatch(detectedPlatform, batch.settings);
+      // Create a new AutoPromptr instance specifically for this batch
+      const { AutoPromptr } = await import('@/services/autoPromptr');
+      const autoPromptr = new AutoPromptr();
+      
+      await autoPromptr.runBatch(batch.id, detectedPlatform, batch.settings);
       
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform } : b
