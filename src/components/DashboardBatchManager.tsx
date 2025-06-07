@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -25,7 +24,7 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const { toast } = useToast();
-  const { status: batchStatus, loading: automationLoading, runBatch } = useBatchAutomation(selectedBatchId || undefined);
+  const { status: batchStatus, loading: automationLoading, runBatch, stopBatch } = useBatchAutomation(selectedBatchId || undefined);
 
   // Update stats whenever batches change
   const updateStats = (updatedBatches: Batch[]) => {
@@ -142,6 +141,29 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
     }
   };
 
+  const handleStopBatch = async (batch: Batch) => {
+    try {
+      await stopBatch();
+      
+      const updatedBatches = batches.map(b => 
+        b.id === batch.id ? { ...b, status: 'failed' as const } : b
+      );
+      setBatches(updatedBatches);
+      updateStats(updatedBatches);
+      
+      toast({
+        title: "Batch stopped",
+        description: `Automation stopped for "${batch.name}".`,
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to stop batch",
+        description: err instanceof Error ? err.message : 'Unknown error',
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleNewBatch = () => {
     setEditingBatch(null);
     setShowModal(true);
@@ -182,6 +204,9 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
               onEdit={handleEditBatch}
               onDelete={handleDeleteBatch}
               onRun={handleRunBatch}
+              onStop={handleStopBatch}
+              selectedBatchId={selectedBatchId}
+              automationLoading={automationLoading}
             />
           </>
         )}

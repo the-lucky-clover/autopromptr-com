@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Edit2, Trash2, Play } from 'lucide-react';
+import { Edit2, Trash2, Play, Square } from 'lucide-react';
 import { Batch } from '@/types/batch';
 
 interface DashboardBatchListProps {
@@ -10,9 +10,20 @@ interface DashboardBatchListProps {
   onEdit: (batch: Batch) => void;
   onDelete: (batchId: string) => void;
   onRun: (batch: Batch) => void;
+  onStop?: (batch: Batch) => void;
+  selectedBatchId?: string | null;
+  automationLoading?: boolean;
 }
 
-const DashboardBatchList = ({ batches, onEdit, onDelete, onRun }: DashboardBatchListProps) => {
+const DashboardBatchList = ({ 
+  batches, 
+  onEdit, 
+  onDelete, 
+  onRun, 
+  onStop, 
+  selectedBatchId, 
+  automationLoading 
+}: DashboardBatchListProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-500';
@@ -46,9 +57,21 @@ const DashboardBatchList = ({ batches, onEdit, onDelete, onRun }: DashboardBatch
                     variant="ghost"
                     size="sm"
                     onClick={() => onRun(batch)}
-                    className="text-green-400 hover:text-green-300"
+                    disabled={automationLoading}
+                    className="text-green-400 hover:text-green-300 disabled:opacity-50"
                   >
                     <Play className="w-4 h-4" />
+                  </Button>
+                )}
+
+                {batch.status === 'running' && selectedBatchId === batch.id && onStop && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onStop(batch)}
+                    className="text-orange-400 hover:text-orange-300"
+                  >
+                    <Square className="w-4 h-4" />
                   </Button>
                 )}
                 
