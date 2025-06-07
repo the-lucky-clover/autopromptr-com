@@ -5,6 +5,11 @@ import { useBatchControl } from './useBatchControl';
 
 export const useDashboardBatchManager = () => {
   const { batches, setBatches } = usePersistentBatches();
+  
+  // Initialize all hooks at the top level consistently
+  const batchCrud = useBatchCrud();
+  const batchControl = useBatchControl();
+
   const {
     showModal,
     setShowModal,
@@ -15,7 +20,7 @@ export const useDashboardBatchManager = () => {
     handleDeleteBatch: deleteBatch,
     handleEditBatch,
     handleNewBatch
-  } = useBatchCrud();
+  } = batchCrud;
 
   const {
     selectedBatchId,
@@ -24,7 +29,7 @@ export const useDashboardBatchManager = () => {
     handleStopBatch: stopBatch,
     handlePauseBatch: pauseBatch,
     handleRewindBatch: rewindBatch
-  } = useBatchControl();
+  } = batchControl;
 
   // Wrapper functions to pass setBatches to the handlers
   const handleCreateBatch = (batchData: Parameters<typeof createBatch>[0]) => {
