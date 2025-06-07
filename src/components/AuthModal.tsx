@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -99,6 +100,13 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
     setResendLoading(false);
   };
 
+  const handleForgotPassword = () => {
+    toast({
+      title: "Forgot Password",
+      description: "Password reset functionality will be available soon. Please contact support if needed.",
+    });
+  };
+
   const openEmailProvider = (provider: string) => {
     let url = '';
     const searchTerm = 'AutoPromptr verification';
@@ -138,7 +146,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
         </div>
         <h3 className="text-lg font-semibold text-white mb-2">Check your email</h3>
         <p className="text-gray-300 mb-4 text-sm">
-          We'll email you a link for a password free sign in.
+          We've sent you a verification link to complete your registration.
         </p>
         
         {/* Email Provider Quick Links */}
@@ -302,9 +310,16 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
             >
               {loading ? "Signing in..." : "Sign In"}
             </Button>
-            <p className="text-xs text-gray-400 text-center">
-              Forgot password? Check your email for magic link login.
-            </p>
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleForgotPassword}
+                className="text-sm text-purple-300 hover:text-purple-200 hover:bg-purple-500/10 rounded-xl"
+              >
+                Forgot password?
+              </Button>
+            </div>
           </form>
         </TabsContent>
         
