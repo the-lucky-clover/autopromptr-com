@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -16,7 +15,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showEmailSent, setShowEmailSent] = useState(false);
-  const { signUp, signIn, user, isEmailVerified } = useAuth();
+  const { signUp, signIn, user, isEmailVerified, resendVerification } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -33,11 +32,19 @@ const Auth = () => {
     const { error } = await signUp(email, password);
     
     if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      if (error.message.includes('already registered')) {
+        toast({
+          title: "Account exists",
+          description: "This email is already registered. Try signing in instead.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     } else {
       setShowEmailSent(true);
       toast({
@@ -72,6 +79,23 @@ const Auth = () => {
     setLoading(false);
   };
 
+  const handleResendVerification = async () => {
+    const { error } = await resendVerification(email);
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Email resent",
+        description: "We've sent another verification link to your email.",
+      });
+    }
+  };
+
   if (user && !isEmailVerified) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -85,7 +109,14 @@ const Auth = () => {
               We've sent a verification link to {user.email}. Please check your email and click the link to verify your account.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
+            <Button 
+              onClick={handleResendVerification}
+              variant="outline" 
+              className="w-full"
+            >
+              Resend Verification Email
+            </Button>
             <Button 
               onClick={() => window.location.href = '/'}
               variant="outline" 
@@ -112,7 +143,14 @@ const Auth = () => {
               We've sent you a verification link. Please check your email and click the link to complete your registration.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
+            <Button 
+              onClick={handleResendVerification}
+              variant="outline" 
+              className="w-full"
+            >
+              Resend Verification Email
+            </Button>
             <Button 
               onClick={() => setShowEmailSent(false)}
               variant="outline" 

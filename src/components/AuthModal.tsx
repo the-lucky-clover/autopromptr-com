@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -22,7 +21,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
   const [mode, setMode] = useState(initialMode);
   const [showPassword, setShowPassword] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-  const { signUp, signIn, user, isEmailVerified } = useAuth();
+  const { signUp, signIn, user, isEmailVerified, resendVerification } = useAuth();
   const { toast } = useToast();
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -32,11 +31,19 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
     const { error } = await signUp(email, password);
     
     if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      if (error.message.includes('already registered')) {
+        toast({
+          title: "Account exists",
+          description: "This email is already registered. Try signing in instead.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     } else {
       setShowEmailSent(true);
       toast({
@@ -75,7 +82,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
 
   const handleResendVerification = async () => {
     setResendLoading(true);
-    const { error } = await signUp(email, password);
+    const { error } = await resendVerification(email);
     
     if (error) {
       toast({
