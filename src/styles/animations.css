@@ -40,9 +40,9 @@
     animation: float 6s ease-in-out infinite;
   }
 
-  /* Perfectly seamless scrolling animation */
+  /* Slower, more visible scrolling animation */
   .animate-scroll-left {
-    animation: scroll-left 40s linear infinite;
+    animation: scroll-left 60s linear infinite;
     width: max-content;
   }
 
@@ -103,7 +103,7 @@
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-33.33%);
   }
 }
 
