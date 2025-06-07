@@ -59,13 +59,15 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar className="border-r border-gray-200 bg-white">
+    <Sidebar className="border-r border-gray-200 bg-gradient-to-b from-gray-50 to-gray-100">
       <SidebarHeader className="p-6">
-        <Link to="/" className="flex items-center space-x-2">
+        <Link to="/" className="flex items-center space-x-3 group">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">A</span>
+            <Zap className="w-5 h-5 text-white" strokeWidth={2} />
           </div>
-          <span className="text-xl font-bold text-gray-900">AutoPromptr</span>
+          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            AutoPromptr
+          </span>
         </Link>
       </SidebarHeader>
       
@@ -81,7 +83,7 @@ export function AppSidebar() {
                   <SidebarMenuButton 
                     asChild
                     isActive={location.pathname === item.url}
-                    className="hover:bg-gray-100 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-600 text-gray-700"
+                    className="hover:bg-white/70 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-600 text-gray-700 rounded-xl"
                   >
                     <Link to={item.url}>
                       <item.icon className="w-4 h-4" />
@@ -103,7 +105,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     asChild
-                    className="hover:bg-gray-100 text-gray-700"
+                    className="hover:bg-white/70 text-gray-700 rounded-xl"
                   >
                     <Link to={item.url}>
                       <item.icon className="w-4 h-4" />

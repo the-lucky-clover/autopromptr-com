@@ -50,7 +50,7 @@ const DashboardBatchManager = () => {
           <p className="text-white/70 mb-4">No batches created yet</p>
           <Button 
             onClick={handleNewBatch}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Your First Batch
@@ -63,7 +63,7 @@ const DashboardBatchManager = () => {
             <Button 
               onClick={handleNewBatch}
               size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Batch

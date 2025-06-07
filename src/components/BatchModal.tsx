@@ -119,67 +119,70 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent className="max-w-4xl max-h-[85vh] rounded-xl">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-2xl font-semibold text-left">
               {editingBatch ? 'Edit Batch' : 'Create New Batch'}
             </DialogTitle>
           </DialogHeader>
           
-          <ScrollArea className="max-h-[60vh] pr-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="batch-name">Batch Name *</Label>
+          <ScrollArea className="max-h-[65vh] pr-4">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <Label htmlFor="batch-name" className="text-lg font-medium text-left block">Batch Name *</Label>
                 <Input
                   id="batch-name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter batch name"
+                  className="text-base rounded-xl"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="target-url">Project Target URL *</Label>
+              <div className="space-y-3">
+                <Label htmlFor="target-url" className="text-lg font-medium text-left block">Project Target URL *</Label>
                 <Input
                   id="target-url"
                   value={targetUrl}
                   onChange={(e) => setTargetUrl(e.target.value)}
                   placeholder="https://example.com"
+                  className="text-base rounded-xl"
                 />
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label>Text Prompts *</Label>
+                  <Label className="text-lg font-medium text-left">Text Prompts *</Label>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={handleAddPrompt}
+                    className="rounded-xl"
                   >
                     <Plus className="w-4 h-4 mr-1" />
                     Add Prompt
                   </Button>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {prompts.map((prompt, index) => (
                     <div
                       key={prompt.id}
-                      className="flex items-start space-x-2 p-3 border rounded-lg bg-gray-50"
+                      className="flex items-start space-x-3 p-4 border rounded-xl bg-gray-50"
                       draggable
                       onDragStart={() => handleDragStart(index)}
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, index)}
                     >
-                      <GripVertical className="w-4 h-4 text-gray-400 cursor-move mt-2" />
+                      <GripVertical className="w-5 h-5 text-gray-400 cursor-move mt-3" />
                       <div className="flex-1">
                         <Textarea
                           value={prompt.text}
                           onChange={(e) => handlePromptChange(prompt.id, e.target.value)}
                           placeholder={`Prompt ${index + 1}`}
-                          rows={2}
-                          className="w-full"
+                          rows={3}
+                          className="w-full text-base rounded-xl"
                         />
                       </div>
                       {prompts.length > 1 && (
@@ -188,7 +191,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemovePrompt(prompt.id)}
-                          className="text-red-600 hover:text-red-700"
+                          className="text-red-600 hover:text-red-700 rounded-xl"
                         >
                           <Minus className="w-4 h-4" />
                         </Button>
@@ -200,14 +203,14 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
             </div>
           </ScrollArea>
 
-          <div className="flex justify-end space-x-2 pt-4 border-t">
-            <Button variant="outline" onClick={onClose}>
+          <div className="flex justify-end space-x-3 pt-6 border-t">
+            <Button variant="outline" onClick={onClose} className="rounded-xl">
               Cancel
             </Button>
             <Button 
               onClick={handleSave}
               disabled={!isValid}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
             >
               Save Batch
             </Button>
@@ -216,7 +219,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
       </Dialog>
 
       <AlertDialog open={!!deletePromptId} onOpenChange={() => setDeletePromptId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Remove Prompt</AlertDialogTitle>
             <AlertDialogDescription>
@@ -224,10 +227,10 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
             <AlertDialogAction 
               onClick={confirmRemovePrompt}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 rounded-xl"
             >
               Remove
             </AlertDialogAction>
