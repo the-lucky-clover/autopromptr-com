@@ -9,9 +9,10 @@ interface DashboardBatchListProps {
   batches: Batch[];
   onEdit: (batch: Batch) => void;
   onDelete: (batchId: string) => void;
+  onRun: (batch: Batch) => void;
 }
 
-const DashboardBatchList = ({ batches, onEdit, onDelete }: DashboardBatchListProps) => {
+const DashboardBatchList = ({ batches, onEdit, onDelete, onRun }: DashboardBatchListProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-500';
@@ -44,6 +45,7 @@ const DashboardBatchList = ({ batches, onEdit, onDelete }: DashboardBatchListPro
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => onRun(batch)}
                     className="text-green-400 hover:text-green-300"
                   >
                     <Play className="w-4 h-4" />

@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { Batch } from '@/types/batch';
 import BatchModal from './BatchModal';
 import DashboardBatchList from './DashboardBatchList';
@@ -10,6 +12,9 @@ const DashboardBatchManager = () => {
   const [batches, setBatches] = useState<Batch[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
+  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
+  const { toast } = useToast();
+  const { status: batchStatus, loading: automationLoading, runBatch } = useBatchAutomation(selectedBatchId || undefined);
 
   const handleCreateBatch = (batchData: Omit<Batch, 'id' | 'createdAt'>) => {
     const newBatch: Batch = {
@@ -36,6 +41,38 @@ const DashboardBatchManager = () => {
   const handleEditBatch = (batch: Batch) => {
     setEditingBatch(batch);
     setShowModal(true);
+  };
+
+  const handleRunBatch = async (batch: Batch) => {
+    if (!batch.platform) {
+      toast({
+        title: "No platform selected",
+        description: "Please edit the batch and select an automation platform.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSelectedBatchId(batch.id);
+    
+    try {
+      await runBatch(batch.platform, batch.settings);
+      
+      setBatches(prev => prev.map(b => 
+        b.id === batch.id ? { ...b, status: 'running' } : b
+      ));
+      
+      toast({
+        title: "Batch started",
+        description: `Automation started for "${batch.name}".`,
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to start batch",
+        description: err instanceof Error ? err.message : 'Unknown error',
+        variant: "destructive",
+      });
+    }
   };
 
   const handleNewBatch = () => {
@@ -73,6 +110,7 @@ const DashboardBatchManager = () => {
             batches={batches}
             onEdit={handleEditBatch}
             onDelete={handleDeleteBatch}
+            onRun={handleRunBatch}
           />
         </>
       )}
