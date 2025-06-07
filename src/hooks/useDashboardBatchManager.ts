@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useBatchAutomation } from '@/hooks/useBatchAutomation';
@@ -85,21 +84,23 @@ export const useDashboardBatchManager = () => {
     setSelectedBatchId(batch.id);
     
     try {
-      // Create a new AutoPromptr instance specifically for this batch
-      const { AutoPromptr } = await import('@/services/autoPromptr');
-      const autoPromptr = new AutoPromptr();
-      
-      await autoPromptr.runBatch(batch.id, detectedPlatform, batch.settings);
-      
+      // Update batch status to running immediately
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform } : b
       ));
+      
+      // Use the hook's runBatch function with the proper parameters
+      await runBatch(detectedPlatform, batch.settings);
       
       toast({
         title: "Batch started",
         description: `Automation started for "${batch.name}" using ${platformName}.`,
       });
     } catch (err) {
+      console.error('Failed to start batch:', err);
+      setBatches(prev => prev.map(b => 
+        b.id === batch.id ? { ...b, status: 'failed' as const } : b
+      ));
       toast({
         title: "Failed to start batch",
         description: err instanceof Error ? err.message : 'Unknown error',

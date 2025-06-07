@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 // Configuration
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://autopromptr-backend.onrender.com'  // Replace with your Render.com URL
+  ? 'https://autopromptr-backend.onrender.com'  // Your actual Render.com backend URL
   : 'http://localhost:3001';
 
 // API Service Class
@@ -23,6 +23,9 @@ export class AutoPromptr {
 
   // Start batch processing
   async runBatch(batchId: string, platform: string, options: { delay?: number; maxRetries?: number } = {}) {
+    console.log('Starting batch with:', { batchId, platform, options });
+    console.log('Backend URL:', this.apiBaseUrl);
+    
     const response = await fetch(`${this.apiBaseUrl}/api/run-batch`, {
       method: 'POST',
       headers: {
@@ -38,6 +41,7 @@ export class AutoPromptr {
     
     if (!response.ok) {
       const error = await response.json();
+      console.error('Backend error response:', error);
       throw new Error(error.error || 'Failed to start batch');
     }
     
@@ -70,6 +74,7 @@ export class AutoPromptr {
 
   // Health check
   async healthCheck() {
+    console.log('Checking backend health at:', this.apiBaseUrl);
     const response = await fetch(`${this.apiBaseUrl}/health`);
     if (!response.ok) throw new Error('Backend is not healthy');
     return response.json();
@@ -100,6 +105,7 @@ export function useBatchAutomation(batchId?: string) {
         // Continue polling every 5 seconds
         setTimeout(pollStatus, 5000);
       } catch (err) {
+        console.error('Status polling error:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
       }
     };
@@ -114,10 +120,13 @@ export function useBatchAutomation(batchId?: string) {
     setError(null);
     
     try {
+      console.log('Running batch:', batchId, 'on platform:', platform);
       const result = await autoPromptr.runBatch(batchId, platform, options);
+      console.log('Batch run result:', result);
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      console.error('Run batch error:', errorMessage);
       setError(errorMessage);
       throw err;
     } finally {
