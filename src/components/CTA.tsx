@@ -4,7 +4,7 @@ import { ArrowRight, Star } from "lucide-react";
 
 const CTA = () => {
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section className="py-20 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 100%)' }}>
       <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 blur-3xl"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
