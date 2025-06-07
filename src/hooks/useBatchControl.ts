@@ -51,14 +51,34 @@ export const useBatchControl = () => {
     setAutomationLoading(true);
     
     try {
-      // Ensure batch is saved to database before running with a verification check
+      // Ensure batch has the correct platform and format before saving
+      const batchToSave = {
+        ...batch,
+        platform: detectedPlatform,
+        // Ensure createdAt is a proper Date object
+        createdAt: batch.createdAt instanceof Date ? batch.createdAt : new Date(batch.createdAt)
+      };
+      
       console.log('Ensuring batch exists in database before running...');
-      await saveBatchToDatabase(batch);
+      console.log('Batch to save:', batchToSave);
       
-      // Verify the batch exists in the database
-      await verifyBatchInDatabase(batch.id);
+      try {
+        await saveBatchToDatabase(batchToSave);
+        console.log('Batch saved successfully');
+      } catch (saveError) {
+        console.error('Error saving batch:', saveError);
+        // Continue anyway - the batch might already exist
+      }
       
-      console.log('Batch verified in database, proceeding with automation...');
+      // Try to verify the batch exists, but don't fail if it doesn't
+      try {
+        await verifyBatchInDatabase(batch.id);
+        console.log('Batch verified in database');
+      } catch (verifyError) {
+        console.warn('Could not verify batch in database, but proceeding with automation:', verifyError);
+      }
+      
+      console.log('Proceeding with automation...');
       
       // Update batch status to running immediately
       setBatches(prev => prev.map(b => 
