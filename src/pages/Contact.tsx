@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Shield } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -17,6 +18,7 @@ const Contact = () => {
     subject: "",
     message: ""
   });
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -33,30 +35,42 @@ const Contact = () => {
     setIsLoading(true);
 
     try {
-      // Here you would typically send the email using a Supabase Edge Function
-      // For now, we'll simulate the email sending
-      console.log("Sending email to thepremiumbrand@gmail.com with data:", formData);
+      console.log("Submitting contact form with data:", formData);
       
-      // Simulate API call
-      setTimeout(() => {
-        toast({
-          title: "Message Sent!",
-          description: "Thank you for your message. We'll get back to you soon.",
-        });
-        setFormData({
-          name: "",
-          email: "",
-          subject: "",
-          message: ""
-        });
-        setIsLoading(false);
-      }, 1000);
-    } catch (error) {
+      const { data, error } = await supabase.functions.invoke('send-contact-email', {
+        body: {
+          ...formData,
+          captcha: parseInt(captchaAnswer)
+        }
+      });
+
+      if (error) {
+        console.error("Supabase function error:", error);
+        throw error;
+      }
+
+      console.log("Contact form submitted successfully:", data);
+
+      toast({
+        title: "Message Sent!",
+        description: "Thank you for your message. We'll get back to you soon.",
+      });
+      
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: ""
+      });
+      setCaptchaAnswer("");
+    } catch (error: any) {
+      console.error("Contact form submission error:", error);
       toast({
         title: "Error",
-        description: "Failed to send message. Please try again.",
+        description: error.message || "Failed to send message. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -168,6 +182,23 @@ const Contact = () => {
                         rows={6}
                         className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
                         placeholder="Tell us more about your inquiry..."
+                        required
+                      />
+                    </div>
+
+                    {/* Simple Captcha */}
+                    <div>
+                      <Label htmlFor="captcha" className="text-gray-300 flex items-center space-x-2">
+                        <Shield className="w-4 h-4" />
+                        <span>Security Check: What is 7 + 3?</span>
+                      </Label>
+                      <Input
+                        id="captcha"
+                        type="number"
+                        value={captchaAnswer}
+                        onChange={(e) => setCaptchaAnswer(e.target.value)}
+                        className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                        placeholder="Enter the answer"
                         required
                       />
                     </div>
