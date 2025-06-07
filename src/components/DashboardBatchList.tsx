@@ -158,7 +158,7 @@ const DashboardBatchList = ({
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-black/40 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl">
+                  <AlertDialogContent className="bg-black/40 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl">
                     <AlertDialogHeader>
                       <AlertDialogTitle className="text-white">Delete Batch</AlertDialogTitle>
                       <AlertDialogDescription className="text-white/70">
