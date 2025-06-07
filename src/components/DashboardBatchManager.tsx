@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { Batch } from '@/types/batch';
+import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 import BatchModal from './BatchModal';
 import DashboardBatchList from './DashboardBatchList';
 import SystemLogsPanel from './SystemLogsPanel';
@@ -40,25 +41,49 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
   };
 
   const handleCreateBatch = (batchData: Omit<Batch, 'id' | 'createdAt'>) => {
+    // Auto-detect platform from target URL
+    const detectedPlatform = detectPlatformFromUrl(batchData.targetUrl);
+    const platformName = getPlatformName(detectedPlatform);
+
     const newBatch: Batch = {
       ...batchData,
       id: crypto.randomUUID(),
       createdAt: new Date(),
+      platform: detectedPlatform
     };
+
     const updatedBatches = [...batches, newBatch];
     setBatches(updatedBatches);
     updateStats(updatedBatches);
     setShowModal(false);
+
+    toast({
+      title: "Batch created",
+      description: `Batch created with auto-detected platform: ${platformName}`,
+    });
   };
 
   const handleUpdateBatch = (updatedBatch: Batch) => {
+    // Auto-detect platform from target URL if it changed
+    const detectedPlatform = detectPlatformFromUrl(updatedBatch.targetUrl);
+    const batchWithPlatform = {
+      ...updatedBatch,
+      platform: detectedPlatform
+    };
+
     const updatedBatches = batches.map(batch => 
-      batch.id === updatedBatch.id ? updatedBatch : batch
+      batch.id === batchWithPlatform.id ? batchWithPlatform : batch
     );
     setBatches(updatedBatches);
     updateStats(updatedBatches);
     setShowModal(false);
     setEditingBatch(null);
+
+    const platformName = getPlatformName(detectedPlatform);
+    toast({
+      title: "Batch updated",
+      description: `Batch updated with platform: ${platformName}`,
+    });
   };
 
   const handleDeleteBatch = (batchId: string) => {
@@ -73,29 +98,40 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
   };
 
   const handleRunBatch = async (batch: Batch) => {
-    if (!batch.platform) {
+    // Auto-detect platform if not set or if URL changed
+    const detectedPlatform = detectPlatformFromUrl(batch.targetUrl);
+    const platformName = getPlatformName(detectedPlatform);
+
+    if (!detectedPlatform) {
       toast({
-        title: "No platform selected",
-        description: "Please edit the batch and select an automation platform.",
+        title: "Cannot detect platform",
+        description: "Unable to determine automation platform from the target URL. Please check the URL format.",
         variant: "destructive",
       });
       return;
     }
 
+    // Update batch with detected platform
+    const updatedBatch = { ...batch, platform: detectedPlatform };
+    const updatedBatches = batches.map(b => 
+      b.id === batch.id ? updatedBatch : b
+    );
+    setBatches(updatedBatches);
+
     setSelectedBatchId(batch.id);
     
     try {
-      await runBatch(batch.platform, batch.settings);
+      await runBatch(detectedPlatform, batch.settings);
       
-      const updatedBatches = batches.map(b => 
-        b.id === batch.id ? { ...b, status: 'running' as const } : b
+      const finalUpdatedBatches = batches.map(b => 
+        b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform } : b
       );
-      setBatches(updatedBatches);
-      updateStats(updatedBatches);
+      setBatches(finalUpdatedBatches);
+      updateStats(finalUpdatedBatches);
       
       toast({
         title: "Batch started",
-        description: `Automation started for "${batch.name}".`,
+        description: `Automation started for "${batch.name}" using ${platformName}.`,
       });
     } catch (err) {
       toast({

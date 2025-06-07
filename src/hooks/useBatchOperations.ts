@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { Batch, BatchFormData, TextPrompt } from '@/types/batch';
+import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 
 export const useBatchOperations = () => {
   const [batches, setBatches] = useState<Batch[]>([]);
@@ -11,6 +12,10 @@ export const useBatchOperations = () => {
   const { status: batchStatus, loading: automationLoading, error: automationError, runBatch, stopBatch } = useBatchAutomation(selectedBatchId || undefined);
 
   const createBatch = (formData: BatchFormData) => {
+    // Auto-detect platform from target URL
+    const detectedPlatform = detectPlatformFromUrl(formData.targetUrl);
+    const platformName = getPlatformName(detectedPlatform);
+
     const batch: Batch = {
       id: crypto.randomUUID(),
       name: formData.name,
@@ -23,7 +28,7 @@ export const useBatchOperations = () => {
       }],
       status: 'pending',
       createdAt: new Date(),
-      platform: formData.platform,
+      platform: detectedPlatform,
       settings: {
         delay: formData.delay,
         maxRetries: formData.maxRetries
@@ -34,7 +39,7 @@ export const useBatchOperations = () => {
     
     toast({
       title: "Batch created",
-      description: `Batch "${batch.name}" has been created successfully.`,
+      description: `Batch "${batch.name}" created with auto-detected platform: ${platformName}.`,
     });
   };
 
@@ -50,10 +55,14 @@ export const useBatchOperations = () => {
   };
 
   const handleRunBatch = async (batch: Batch) => {
-    if (!batch.platform) {
+    // Auto-detect platform if not set or if URL changed
+    const detectedPlatform = detectPlatformFromUrl(batch.targetUrl);
+    const platformName = getPlatformName(detectedPlatform);
+
+    if (!detectedPlatform) {
       toast({
-        title: "No platform selected",
-        description: "Please edit the batch and select an automation platform.",
+        title: "Cannot detect platform",
+        description: "Unable to determine automation platform from the target URL. Please check the URL format.",
         variant: "destructive",
       });
       return;
@@ -62,15 +71,15 @@ export const useBatchOperations = () => {
     setSelectedBatchId(batch.id);
     
     try {
-      await runBatch(batch.platform, batch.settings);
+      await runBatch(detectedPlatform, batch.settings);
       
       setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { ...b, status: 'running' } : b
+        b.id === batch.id ? { ...b, status: 'running', platform: detectedPlatform } : b
       ));
       
       toast({
         title: "Batch started",
-        description: `Automation started for "${batch.name}".`,
+        description: `Automation started for "${batch.name}" using ${platformName}.`,
       });
     } catch (err) {
       toast({
