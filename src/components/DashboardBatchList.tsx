@@ -158,7 +158,7 @@ const DashboardBatchList = ({
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent className="bg-background border border-border rounded-lg">
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Batch</AlertDialogTitle>
                       <AlertDialogDescription>
@@ -166,10 +166,10 @@ const DashboardBatchList = ({
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel className="rounded-lg">Cancel</AlertDialogCancel>
                       <AlertDialogAction 
                         onClick={() => onDelete(batch.id)}
-                        className="bg-red-600 hover:bg-red-700"
+                        className="bg-red-600 hover:bg-red-700 rounded-lg"
                       >
                         Delete
                       </AlertDialogAction>
