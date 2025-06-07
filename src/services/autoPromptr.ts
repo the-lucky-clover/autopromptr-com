@@ -4,26 +4,169 @@ import { useState, useEffect } from 'react';
 // Configuration - Always use the production Render.com URL
 const API_BASE_URL = 'https://autopromptr-backend.onrender.com';
 
-// API Service Class
+// Enhanced error handling with specific error types
+export class AutoPromtrError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public statusCode?: number,
+    public retryable: boolean = false
+  ) {
+    super(message);
+    this.name = 'AutoPromtrError';
+  }
+}
+
+// API Service Class with enhanced reliability
 export class AutoPromptr {
   private apiBaseUrl: string;
+  private maxRetries: number = 3;
+  private retryDelay: number = 1000;
 
   constructor(apiBaseUrl = API_BASE_URL) {
     this.apiBaseUrl = apiBaseUrl;
   }
 
+  // Enhanced health check with timeout and retry
+  async healthCheck(retries = 3): Promise<any> {
+    console.log('Checking backend health at:', this.apiBaseUrl);
+    
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
+        const response = await fetch(`${this.apiBaseUrl}/health`, {
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new AutoPromtrError(
+            `Health check failed with status ${response.status}`,
+            'HEALTH_CHECK_FAILED',
+            response.status,
+            true
+          );
+        }
+        
+        const result = await response.json();
+        console.log(`Health check successful on attempt ${attempt}:`, result);
+        return result;
+      } catch (err) {
+        console.error(`Health check attempt ${attempt} failed:`, err);
+        
+        if (attempt === retries) {
+          if (err instanceof AutoPromtrError) {
+            throw err;
+          }
+          throw new AutoPromtrError(
+            'Backend service is not available after multiple attempts',
+            'SERVICE_UNAVAILABLE',
+            503,
+            true
+          );
+        }
+        
+        // Wait before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, this.retryDelay * attempt));
+      }
+    }
+  }
+
+  // Enhanced batch verification with backend confirmation
+  async verifyBatchExists(batchId: string, retries = 3): Promise<boolean> {
+    console.log(`Verifying batch exists in backend: ${batchId}`);
+    
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+        
+        const response = await fetch(`${this.apiBaseUrl}/api/batch-exists/${batchId}`, {
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (response.ok) {
+          const result = await response.json();
+          console.log(`Batch verification result (attempt ${attempt}):`, result);
+          return result.exists === true;
+        } else if (response.status === 404) {
+          console.log(`Batch not found in backend (attempt ${attempt})`);
+          return false;
+        } else {
+          throw new AutoPromtrError(
+            `Batch verification failed with status ${response.status}`,
+            'VERIFICATION_FAILED',
+            response.status,
+            true
+          );
+        }
+      } catch (err) {
+        console.error(`Batch verification attempt ${attempt} failed:`, err);
+        
+        if (attempt === retries) {
+          console.warn('Batch verification failed after all retries, proceeding anyway');
+          return false; // Default to false rather than throwing
+        }
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      }
+    }
+    
+    return false;
+  }
+
   // Get supported platforms
   async getPlatforms() {
     const response = await fetch(`${this.apiBaseUrl}/api/platforms`);
-    if (!response.ok) throw new Error('Failed to fetch platforms');
+    if (!response.ok) {
+      throw new AutoPromtrError(
+        'Failed to fetch platforms',
+        'PLATFORMS_FETCH_FAILED',
+        response.status
+      );
+    }
     return response.json();
   }
 
-  // Start batch processing - Fixed to send proper payload structure
+  // Enhanced batch running with comprehensive error handling
   async runBatch(batchId: string, platform: string, options: { delay?: number; maxRetries?: number } = {}) {
-    console.log('Starting batch with:', { batchId, platform, options });
+    console.log('Starting enhanced batch run process:', { batchId, platform, options });
     console.log('Backend URL:', this.apiBaseUrl);
     
+    // Step 1: Ensure backend is healthy
+    try {
+      await this.healthCheck();
+    } catch (err) {
+      if (err instanceof AutoPromtrError && err.code === 'SERVICE_UNAVAILABLE') {
+        throw new AutoPromtrError(
+          'Backend service is starting up. Please wait 30-60 seconds and try again.',
+          'BACKEND_COLD_START',
+          503,
+          true
+        );
+      }
+      throw err;
+    }
+    
+    // Step 2: Verify batch exists in backend (with retries)
+    const batchExists = await this.verifyBatchExists(batchId);
+    if (!batchExists) {
+      console.warn(`Batch ${batchId} not found in backend, will proceed but this may cause issues`);
+    }
+    
+    // Step 3: Attempt to run the batch
     const payload = {
       batch_id: batchId,
       platform: platform,
@@ -31,77 +174,191 @@ export class AutoPromptr {
       max_retries: options.maxRetries || 3
     };
     
-    console.log('Sending payload:', payload);
+    console.log('Sending enhanced payload:', payload);
     
-    const response = await fetch(`${this.apiBaseUrl}/api/run-batch`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
-    });
-    
-    console.log('Response status:', response.status);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Backend error response:', errorText);
-      let errorMessage = 'Failed to start batch';
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
-      try {
-        const errorJson = JSON.parse(errorText);
-        errorMessage = errorJson.error || errorMessage;
-      } catch (e) {
-        errorMessage = errorText || errorMessage;
+      const response = await fetch(`${this.apiBaseUrl}/api/run-batch`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      console.log('Enhanced response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Backend error response:', errorText);
+        
+        let errorMessage = 'Failed to start batch';
+        let errorCode = 'BATCH_START_FAILED';
+        let retryable = false;
+        
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.error || errorMessage;
+          errorCode = errorJson.code || errorCode;
+          retryable = errorJson.retryable || false;
+        } catch (e) {
+          errorMessage = errorText || errorMessage;
+        }
+        
+        // Handle specific error cases
+        if (response.status === 404 && errorText.includes('Batch not found')) {
+          errorCode = 'BATCH_NOT_FOUND';
+          errorMessage = 'Batch not found in backend database. Please try creating the batch again.';
+          retryable = true;
+        } else if (response.status === 503) {
+          errorCode = 'BACKEND_OVERLOADED';
+          errorMessage = 'Backend service is overloaded. Please try again in a few moments.';
+          retryable = true;
+        }
+        
+        throw new AutoPromtrError(errorMessage, errorCode, response.status, retryable);
       }
       
-      throw new Error(errorMessage);
+      const result = await response.json();
+      console.log('Enhanced batch run successful:', result);
+      return result;
+    } catch (err) {
+      if (err instanceof AutoPromtrError) {
+        throw err;
+      }
+      
+      // Handle network errors
+      if (err.name === 'AbortError') {
+        throw new AutoPromtrError(
+          'Request timed out. The backend may be starting up.',
+          'REQUEST_TIMEOUT',
+          408,
+          true
+        );
+      }
+      
+      throw new AutoPromtrError(
+        `Network error: ${err.message}`,
+        'NETWORK_ERROR',
+        0,
+        true
+      );
     }
-    
-    return response.json();
   }
 
-  // Stop batch processing
+  // Stop batch processing with enhanced error handling
   async stopBatch(batchId: string) {
-    const response = await fetch(`${this.apiBaseUrl}/api/stop-batch/${batchId}`, {
-      method: 'POST'
-    });
-    
-    if (!response.ok) throw new Error('Failed to stop batch');
-    return response.json();
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      
+      const response = await fetch(`${this.apiBaseUrl}/api/stop-batch/${batchId}`, {
+        method: 'POST',
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new AutoPromtrError(
+          'Failed to stop batch',
+          'BATCH_STOP_FAILED',
+          response.status
+        );
+      }
+      
+      return response.json();
+    } catch (err) {
+      if (err instanceof AutoPromtrError) {
+        throw err;
+      }
+      throw new AutoPromtrError(
+        `Failed to stop batch: ${err.message}`,
+        'BATCH_STOP_ERROR',
+        0
+      );
+    }
   }
 
-  // Get batch status and progress
+  // Get batch status and progress with timeout
   async getBatchStatus(batchId: string) {
-    const response = await fetch(`${this.apiBaseUrl}/api/batch-status/${batchId}`);
-    if (!response.ok) throw new Error('Failed to get batch status');
-    return response.json();
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(`${this.apiBaseUrl}/api/batch-status/${batchId}`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new AutoPromtrError(
+          'Failed to get batch status',
+          'STATUS_FETCH_FAILED',
+          response.status
+        );
+      }
+      
+      return response.json();
+    } catch (err) {
+      if (err instanceof AutoPromtrError) {
+        throw err;
+      }
+      throw new AutoPromtrError(
+        `Failed to get batch status: ${err.message}`,
+        'STATUS_FETCH_ERROR',
+        0
+      );
+    }
   }
 
-  // Get detailed batch results
+  // Get detailed batch results with timeout
   async getBatchResults(batchId: string) {
-    const response = await fetch(`${this.apiBaseUrl}/api/batch-results/${batchId}`);
-    if (!response.ok) throw new Error('Failed to get batch results');
-    return response.json();
-  }
-
-  // Health check
-  async healthCheck() {
-    console.log('Checking backend health at:', this.apiBaseUrl);
-    const response = await fetch(`${this.apiBaseUrl}/health`);
-    if (!response.ok) throw new Error('Backend is not healthy');
-    return response.json();
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(`${this.apiBaseUrl}/api/batch-results/${batchId}`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new AutoPromtrError(
+          'Failed to get batch results',
+          'RESULTS_FETCH_FAILED',
+          response.status
+        );
+      }
+      
+      return response.json();
+    } catch (err) {
+      if (err instanceof AutoPromtrError) {
+        throw err;
+      }
+      throw new AutoPromtrError(
+        `Failed to get batch results: ${err.message}`,
+        'RESULTS_FETCH_ERROR',
+        0
+      );
+    }
   }
 }
 
-// React Hook for batch automation
+// Enhanced React Hook for batch automation
 export function useBatchAutomation(batchId?: string) {
   const [status, setStatus] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [autoPromptr] = useState(new AutoPromptr());
 
-  // Poll for status updates
+  // Poll for status updates with enhanced error handling
   useEffect(() => {
     if (!batchId) return;
 
@@ -109,6 +366,7 @@ export function useBatchAutomation(batchId?: string) {
       try {
         const statusData = await autoPromptr.getBatchStatus(batchId);
         setStatus(statusData);
+        setError(null); // Clear any previous errors
         
         // Stop polling if batch is completed or failed
         if (['completed', 'failed', 'stopped'].includes(statusData.status)) {
@@ -119,7 +377,11 @@ export function useBatchAutomation(batchId?: string) {
         setTimeout(pollStatus, 5000);
       } catch (err) {
         console.error('Status polling error:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        const errorMessage = err instanceof AutoPromtrError ? err.message : 'Unknown polling error';
+        setError(errorMessage);
+        
+        // Continue polling even on error (might be temporary)
+        setTimeout(pollStatus, 10000); // Wait longer on error
       }
     };
 
@@ -127,18 +389,18 @@ export function useBatchAutomation(batchId?: string) {
   }, [batchId, autoPromptr]);
 
   const runBatch = async (platform: string, options?: { delay?: number; maxRetries?: number }) => {
-    if (!batchId) throw new Error('No batch ID provided');
+    if (!batchId) throw new AutoPromtrError('No batch ID provided', 'NO_BATCH_ID');
     
     setLoading(true);
     setError(null);
     
     try {
-      console.log('Running batch:', batchId, 'on platform:', platform);
+      console.log('Running batch with enhanced error handling:', batchId, 'on platform:', platform);
       const result = await autoPromptr.runBatch(batchId, platform, options);
-      console.log('Batch run result:', result);
+      console.log('Enhanced batch run result:', result);
       return result;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      const errorMessage = err instanceof AutoPromtrError ? err.message : 'Unknown error';
       console.error('Run batch error:', errorMessage);
       setError(errorMessage);
       throw err;
@@ -148,12 +410,13 @@ export function useBatchAutomation(batchId?: string) {
   };
 
   const stopBatch = async () => {
-    if (!batchId) throw new Error('No batch ID provided');
+    if (!batchId) throw new AutoPromtrError('No batch ID provided', 'NO_BATCH_ID');
     
     try {
       await autoPromptr.stopBatch(batchId);
+      setError(null);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      const errorMessage = err instanceof AutoPromtrError ? err.message : 'Unknown error';
       setError(errorMessage);
       throw err;
     }

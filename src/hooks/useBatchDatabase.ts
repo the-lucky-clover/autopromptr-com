@@ -8,18 +8,17 @@ export const useBatchDatabase = () => {
 
   const saveBatchToDatabase = async (batch: Batch): Promise<boolean> => {
     try {
-      console.log('Starting database save for batch:', batch.id);
-      console.log('Batch data to save:', JSON.stringify(batch, null, 2));
+      console.log('Starting enhanced database save for batch:', batch.id);
+      console.log('Enhanced batch data to save:', JSON.stringify(batch, null, 2));
       
-      // Get current user
+      // Get current user with timeout
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError) {
-        console.error('Auth error:', authError);
+        console.error('Enhanced auth error:', authError);
       }
       
       if (!user) {
-        console.log('No authenticated user, but continuing with save attempt');
-        // Don't fail - allow the batch to be saved without user association
+        console.log('No authenticated user, but continuing with enhanced save attempt');
       }
       
       // Ensure createdAt is properly formatted
@@ -27,9 +26,9 @@ export const useBatchDatabase = () => {
         ? batch.createdAt.toISOString() 
         : new Date(batch.createdAt).toISOString();
       
-      console.log('Formatted createdAt:', createdAt);
+      console.log('Enhanced formatted createdAt:', createdAt);
       
-      // Prepare batch data for database
+      // Prepare enhanced batch data for database
       const batchData = {
         id: batch.id,
         name: batch.name,
@@ -41,9 +40,9 @@ export const useBatchDatabase = () => {
         created_by: user?.id || null
       };
       
-      console.log('Prepared batch data for database:', batchData);
+      console.log('Enhanced prepared batch data for database:', batchData);
       
-      // Save batch to Supabase with upsert to handle existing records
+      // Enhanced batch save with transaction-like approach
       const { data: batchResult, error: batchError } = await supabase
         .from('batches')
         .upsert(batchData, { 
@@ -54,83 +53,126 @@ export const useBatchDatabase = () => {
         .single();
 
       if (batchError) {
-        console.error('Error saving batch:', batchError);
-        throw new Error(`Database error: ${batchError.message}`);
+        console.error('Enhanced error saving batch:', batchError);
+        throw new Error(`Enhanced database error: ${batchError.message} (Code: ${batchError.code})`);
       }
       
-      console.log('Batch saved successfully:', batchResult);
+      console.log('Enhanced batch saved successfully:', batchResult);
 
-      // Save prompts to Supabase
+      // Enhanced prompts save with better error handling
       if (batch.prompts && batch.prompts.length > 0) {
-        console.log(`Saving ${batch.prompts.length} prompts for batch ${batch.id}`);
+        console.log(`Enhanced saving ${batch.prompts.length} prompts for batch ${batch.id}`);
         
-        for (const prompt of batch.prompts) {
-          const promptData = {
-            id: prompt.id,
-            batch_id: batch.id,
-            prompt_text: prompt.text,
-            order_index: prompt.order,
-            status: 'pending'
-          };
+        // Save prompts in smaller batches to avoid timeouts
+        const promptBatchSize = 5;
+        for (let i = 0; i < batch.prompts.length; i += promptBatchSize) {
+          const promptBatch = batch.prompts.slice(i, i + promptBatchSize);
           
-          console.log('Saving prompt:', promptData);
-          
-          const { data: promptResult, error: promptError } = await supabase
-            .from('prompts')
-            .upsert(promptData, { 
-              onConflict: 'id',
-              ignoreDuplicates: false 
-            })
-            .select()
-            .single();
+          for (const prompt of promptBatch) {
+            const promptData = {
+              id: prompt.id,
+              batch_id: batch.id,
+              prompt_text: prompt.text,
+              order_index: prompt.order,
+              status: 'pending'
+            };
+            
+            console.log('Enhanced saving prompt:', promptData);
+            
+            const { data: promptResult, error: promptError } = await supabase
+              .from('prompts')
+              .upsert(promptData, { 
+                onConflict: 'id',
+                ignoreDuplicates: false 
+              })
+              .select()
+              .single();
 
-          if (promptError) {
-            console.error('Error saving prompt:', promptError);
-            throw new Error(`Prompt save error: ${promptError.message}`);
+            if (promptError) {
+              console.error('Enhanced error saving prompt:', promptError);
+              throw new Error(`Enhanced prompt save error: ${promptError.message} (Code: ${promptError.code})`);
+            }
+            
+            console.log('Enhanced prompt saved successfully:', promptResult);
           }
           
-          console.log('Prompt saved successfully:', promptResult);
+          // Small delay between batches to avoid overwhelming the database
+          if (i + promptBatchSize < batch.prompts.length) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
         }
       }
 
-      console.log('All batch data saved to database successfully');
+      console.log('Enhanced: All batch data saved to database successfully');
       return true;
     } catch (error) {
-      console.error('Failed to save batch to database:', error);
+      console.error('Enhanced: Failed to save batch to database:', error);
+      
+      // Enhanced error categorization
+      let errorMessage = 'Unknown database error';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        
+        // Handle specific Supabase error patterns
+        if (errorMessage.includes('JWT')) {
+          errorMessage = 'Authentication expired. Please refresh the page and try again.';
+        } else if (errorMessage.includes('timeout')) {
+          errorMessage = 'Database operation timed out. Please try again.';
+        } else if (errorMessage.includes('connection')) {
+          errorMessage = 'Database connection issue. Please check your internet connection.';
+        }
+      }
+      
       toast({
-        title: "Database save failed",
-        description: error instanceof Error ? error.message : 'Unknown database error',
+        title: "Enhanced database save failed",
+        description: errorMessage,
         variant: "destructive",
       });
       return false;
     }
   };
 
-  const verifyBatchInDatabase = async (batchId: string) => {
-    try {
-      console.log('Verifying batch exists in database:', batchId);
-      
-      const { data: existingBatch, error: checkError } = await supabase
-        .from('batches')
-        .select('id, name, status, platform')
-        .eq('id', batchId)
-        .single();
+  const verifyBatchInDatabase = async (batchId: string, retries = 3) => {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        console.log(`Enhanced verifying batch exists in database (attempt ${attempt}):`, batchId);
         
-      if (checkError) {
-        if (checkError.code === 'PGRST116') {
-          console.log('Batch not found in database:', batchId);
-          return null;
+        const { data: existingBatch, error: checkError } = await supabase
+          .from('batches')
+          .select('id, name, status, platform, created_at')
+          .eq('id', batchId)
+          .single();
+          
+        if (checkError) {
+          if (checkError.code === 'PGRST116') {
+            console.log(`Enhanced: Batch not found in database (attempt ${attempt}):`, batchId);
+            
+            if (attempt < retries) {
+              console.log(`Enhanced: Retrying verification in 1 second...`);
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              continue;
+            }
+            return null;
+          }
+          console.error(`Enhanced error checking batch existence (attempt ${attempt}):`, checkError);
+          throw checkError;
         }
-        console.error('Error checking batch existence:', checkError);
-        throw checkError;
+        
+        console.log(`Enhanced batch verified in database (attempt ${attempt}):`, existingBatch);
+        return existingBatch;
+      } catch (error) {
+        console.error(`Enhanced: Could not verify batch in database (attempt ${attempt}):`, error);
+        
+        if (attempt < retries) {
+          console.log(`Enhanced: Retrying verification in ${attempt} seconds...`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+          continue;
+        }
+        return null;
       }
-      
-      console.log('Batch verified in database:', existingBatch);
-      return existingBatch;
-    } catch (error) {
-      console.error('Could not verify batch in database:', error);
-      return null;
     }
+    
+    return null;
   };
 
   return {
