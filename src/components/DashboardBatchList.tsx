@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Edit2, Trash2, Play, Square } from 'lucide-react';
+import { Edit2, Trash2, Play, Square, Pause, Rewind } from 'lucide-react';
 import { Batch } from '@/types/batch';
 
 interface DashboardBatchListProps {
@@ -11,6 +11,8 @@ interface DashboardBatchListProps {
   onDelete: (batchId: string) => void;
   onRun: (batch: Batch) => void;
   onStop?: (batch: Batch) => void;
+  onPause?: (batch: Batch) => void;
+  onRewind?: (batch: Batch) => void;
   selectedBatchId?: string | null;
   automationLoading?: boolean;
 }
@@ -21,6 +23,8 @@ const DashboardBatchList = ({
   onDelete, 
   onRun, 
   onStop, 
+  onPause,
+  onRewind,
   selectedBatchId, 
   automationLoading 
 }: DashboardBatchListProps) => {
@@ -30,6 +34,7 @@ const DashboardBatchList = ({
       case 'running': return 'bg-blue-500';
       case 'completed': return 'bg-green-500';
       case 'failed': return 'bg-red-500';
+      case 'paused': return 'bg-orange-500';
       default: return 'bg-gray-500';
     }
   };
@@ -52,34 +57,81 @@ const DashboardBatchList = ({
               </div>
               
               <div className="flex items-center space-x-2">
-                {batch.status === 'pending' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onRun(batch)}
-                    disabled={automationLoading}
-                    className="text-green-400 hover:text-green-300 disabled:opacity-50"
-                  >
-                    <Play className="w-4 h-4" />
-                  </Button>
-                )}
+                {/* Play Controls */}
+                <div className="flex items-center space-x-1 mr-2">
+                  {batch.status === 'pending' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onRun(batch)}
+                      disabled={automationLoading}
+                      className="text-green-400 hover:text-green-300 disabled:opacity-50"
+                      title="Play"
+                    >
+                      <Play className="w-4 h-4" />
+                    </Button>
+                  )}
 
-                {batch.status === 'running' && selectedBatchId === batch.id && onStop && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onStop(batch)}
-                    className="text-orange-400 hover:text-orange-300"
-                  >
-                    <Square className="w-4 h-4" />
-                  </Button>
-                )}
+                  {batch.status === 'running' && selectedBatchId === batch.id && (
+                    <>
+                      {onPause && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onPause(batch)}
+                          className="text-yellow-400 hover:text-yellow-300"
+                          title="Pause"
+                        >
+                          <Pause className="w-4 h-4" />
+                        </Button>
+                      )}
+                      {onStop && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onStop(batch)}
+                          className="text-red-400 hover:text-red-300"
+                          title="Stop"
+                        >
+                          <Square className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </>
+                  )}
+
+                  {(batch.status === 'paused' || batch.status === 'completed' || batch.status === 'failed') && onRewind && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onRewind(batch)}
+                      className="text-purple-400 hover:text-purple-300"
+                      title="Rewind"
+                    >
+                      <Rewind className="w-4 h-4" />
+                    </Button>
+                  )}
+
+                  {batch.status === 'paused' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onRun(batch)}
+                      disabled={automationLoading}
+                      className="text-green-400 hover:text-green-300 disabled:opacity-50"
+                      title="Resume"
+                    >
+                      <Play className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
                 
+                {/* Edit and Delete Controls */}
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => onEdit(batch)}
                   className="text-blue-400 hover:text-blue-300"
+                  title="Edit"
                 >
                   <Edit2 className="w-4 h-4" />
                 </Button>
@@ -90,6 +142,7 @@ const DashboardBatchList = ({
                       variant="ghost"
                       size="sm"
                       className="text-red-400 hover:text-red-300"
+                      title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

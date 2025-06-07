@@ -31,6 +31,8 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
     handleEditBatch,
     handleRunBatch,
     handleStopBatch,
+    handlePauseBatch,
+    handleRewindBatch,
     handleNewBatch
   } = useDashboardBatchManager();
 
@@ -64,6 +66,8 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
               onDelete={handleDeleteBatch}
               onRun={handleRunBatch}
               onStop={handleStopBatch}
+              onPause={handlePauseBatch}
+              onRewind={handleRewindBatch}
               selectedBatchId={selectedBatchId}
               automationLoading={automationLoading}
             />

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useBatchAutomation } from '@/hooks/useBatchAutomation';
@@ -128,6 +129,40 @@ export const useDashboardBatchManager = () => {
     }
   };
 
+  const handlePauseBatch = async (batch: Batch) => {
+    try {
+      // For now, we'll use the stop functionality but set status to paused
+      await stopBatch();
+      
+      setBatches(prev => prev.map(b => 
+        b.id === batch.id ? { ...b, status: 'paused' as const } : b
+      ));
+      
+      toast({
+        title: "Batch paused",
+        description: `Automation paused for "${batch.name}".`,
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to pause batch",
+        description: err instanceof Error ? err.message : 'Unknown error',
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRewindBatch = (batch: Batch) => {
+    // Reset batch to pending status to allow restart
+    setBatches(prev => prev.map(b => 
+      b.id === batch.id ? { ...b, status: 'pending' as const } : b
+    ));
+    
+    toast({
+      title: "Batch rewound",
+      description: `Batch "${batch.name}" has been reset to pending status.`,
+    });
+  };
+
   const handleNewBatch = () => {
     setEditingBatch(null);
     setShowModal(true);
@@ -147,6 +182,8 @@ export const useDashboardBatchManager = () => {
     handleEditBatch,
     handleRunBatch,
     handleStopBatch,
+    handlePauseBatch,
+    handleRewindBatch,
     handleNewBatch
   };
 };

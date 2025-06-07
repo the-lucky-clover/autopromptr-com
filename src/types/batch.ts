@@ -11,7 +11,7 @@ export interface Batch {
   targetUrl: string;
   description?: string;
   prompts: TextPrompt[];
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'stopped';
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'stopped' | 'paused';
   createdAt: Date;
   platform?: string;
   settings?: {
