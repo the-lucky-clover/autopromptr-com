@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
 
-// Configuration
+// Configuration - Updated to use the correct AutoPromptr backend URL
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://autopromptr-backend.onrender.com'  // Your actual Render.com backend URL
+  ? 'https://autopromptr-backend.onrender.com'
   : 'http://localhost:3001';
 
 // API Service Class
@@ -21,28 +21,43 @@ export class AutoPromptr {
     return response.json();
   }
 
-  // Start batch processing
+  // Start batch processing - Fixed to send proper payload structure
   async runBatch(batchId: string, platform: string, options: { delay?: number; maxRetries?: number } = {}) {
     console.log('Starting batch with:', { batchId, platform, options });
     console.log('Backend URL:', this.apiBaseUrl);
+    
+    const payload = {
+      batch_id: batchId,
+      platform: platform,
+      delay_between_prompts: options.delay || 5000,
+      max_retries: options.maxRetries || 3
+    };
+    
+    console.log('Sending payload:', payload);
     
     const response = await fetch(`${this.apiBaseUrl}/api/run-batch`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        batch_id: batchId,
-        platform: platform,
-        delay_between_prompts: options.delay || 5000,
-        max_retries: options.maxRetries || 3
-      })
+      body: JSON.stringify(payload)
     });
     
+    console.log('Response status:', response.status);
+    
     if (!response.ok) {
-      const error = await response.json();
-      console.error('Backend error response:', error);
-      throw new Error(error.error || 'Failed to start batch');
+      const errorText = await response.text();
+      console.error('Backend error response:', errorText);
+      let errorMessage = 'Failed to start batch';
+      
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.error || errorMessage;
+      } catch (e) {
+        errorMessage = errorText || errorMessage;
+      }
+      
+      throw new Error(errorMessage);
     }
     
     return response.json();

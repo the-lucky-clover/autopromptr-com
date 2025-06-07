@@ -75,12 +75,10 @@ export const useDashboardBatchManager = () => {
       return;
     }
 
-    const updatedBatch = { ...batch, platform: detectedPlatform };
-    setBatches(prev => prev.map(b => 
-      b.id === batch.id ? updatedBatch : b
-    ));
+    console.log('Running batch:', batch.id, 'with platform:', detectedPlatform);
+    console.log('Batch data:', batch);
 
-    // Set the selected batch ID FIRST, then run the batch
+    // Set the selected batch ID FIRST
     setSelectedBatchId(batch.id);
     
     try {
@@ -89,8 +87,8 @@ export const useDashboardBatchManager = () => {
         b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform } : b
       ));
       
-      // Use the hook's runBatch function with the proper parameters
-      await runBatch(detectedPlatform, batch.settings);
+      // Use the hook's runBatch function with proper parameters
+      await runBatch(detectedPlatform, batch.settings || { delay: 5000, maxRetries: 3 });
       
       toast({
         title: "Batch started",
