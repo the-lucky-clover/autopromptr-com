@@ -1,6 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Edit2, Trash2, Play, Square, Pause, Rewind, Loader2 } from 'lucide-react';
 import { Batch } from '@/types/batch';
@@ -77,6 +78,20 @@ const DashboardBatchList = ({
                   {batch.prompts.length} prompt{batch.prompts.length !== 1 ? 's' : ''}
                   {batch.platform && ` • Platform: ${batch.platform}`}
                 </p>
+
+                {/* Batch Startup Progress Bar */}
+                {automationLoading && selectedBatchId === batch.id && batch.status === 'pending' && (
+                  <div className="mt-3 p-3 bg-blue-500/20 rounded-lg border border-blue-500/30">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
+                      <span className="text-blue-300 font-medium text-sm">Starting batch automation...</span>
+                    </div>
+                    <Progress value={75} className="h-2 bg-blue-900/30" />
+                    <div className="text-blue-300/80 text-xs mt-2">
+                      Initializing automation engine and preparing prompts for execution
+                    </div>
+                  </div>
+                )}
               </div>
               
               <div className="flex items-center space-x-2">
@@ -92,7 +107,11 @@ const DashboardBatchList = ({
                       className="text-green-400 hover:text-green-300 hover:bg-green-400/20 disabled:opacity-50"
                       title={batch.status === 'paused' ? 'Resume' : 'Play'}
                     >
-                      <Play className="w-4 h-4" />
+                      {automationLoading && selectedBatchId === batch.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Play className="w-4 h-4" />
+                      )}
                     </Button>
                   )}
 

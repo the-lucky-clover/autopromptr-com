@@ -44,11 +44,16 @@ export const useBatchControl = () => {
 
     console.log('Starting batch run process for:', batch.id, 'with platform:', detectedPlatform);
 
-    // Set the selected batch ID and loading state
+    // Set the selected batch ID and loading state immediately
     setSelectedBatchId(batch.id);
     setAutomationLoading(true);
     
     try {
+      // Update batch status to show it's starting up
+      setBatches(prev => prev.map(b => 
+        b.id === batch.id ? { ...b, status: 'pending' as const } : b
+      ));
+
       // Ensure batch has the correct platform and format before saving
       const batchToRun = {
         ...batch,
@@ -60,33 +65,64 @@ export const useBatchControl = () => {
       console.log('Ensuring batch exists in database before running...');
       console.log('Batch data being saved:', JSON.stringify(batchToRun, null, 2));
       
-      // Force save the batch to ensure it exists in the database
-      try {
-        const saveResult = await saveBatchToDatabase(batchToRun);
-        console.log('Pre-run database save result:', saveResult);
+      // Force save the batch to ensure it exists in the database with proper retry logic
+      let saveAttempts = 0;
+      const maxSaveAttempts = 3;
+      let saveResult = false;
+      
+      while (!saveResult && saveAttempts < maxSaveAttempts) {
+        saveAttempts++;
+        console.log(`Database save attempt ${saveAttempts}/${maxSaveAttempts}`);
         
-        if (!saveResult) {
-          throw new Error('Failed to save batch to database before running');
+        try {
+          saveResult = await saveBatchToDatabase(batchToRun);
+          
+          if (saveResult) {
+            console.log('Database save successful on attempt', saveAttempts);
+            break;
+          }
+        } catch (saveError) {
+          console.error(`Save attempt ${saveAttempts} failed:`, saveError);
+          if (saveAttempts === maxSaveAttempts) {
+            throw new Error(`Failed to save batch after ${maxSaveAttempts} attempts: ${saveError instanceof Error ? saveError.message : 'Unknown error'}`);
+          }
+          // Wait before retrying
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+      
+      if (!saveResult) {
+        throw new Error('Failed to save batch to database after multiple attempts');
+      }
+      
+      // Add delay to ensure database consistency and verify the batch exists
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const verificationResult = await verifyBatchInDatabase(batch.id);
+      console.log('Batch verification result:', verificationResult);
+      
+      if (!verificationResult) {
+        // Try one more save attempt with additional delay
+        console.warn('Batch verification failed, attempting final save...');
+        await new Promise(resolve => setTimeout(resolve, 300));
+        const finalSaveResult = await saveBatchToDatabase(batchToRun);
+        
+        if (!finalSaveResult) {
+          throw new Error('Batch verification failed and final save attempt unsuccessful');
         }
         
-        // Add delay to ensure database consistency
-        await new Promise(resolve => setTimeout(resolve, 200));
+        // Verify again after final save
+        await new Promise(resolve => setTimeout(resolve, 300));
+        const finalVerification = await verifyBatchInDatabase(batch.id);
         
-        // Verify the batch exists in the database
-        const verificationResult = await verifyBatchInDatabase(batch.id);
-        console.log('Batch verification result:', verificationResult);
-        
-        if (!verificationResult) {
-          console.warn('Batch verification failed, but proceeding with automation');
+        if (!finalVerification) {
+          throw new Error('Batch still not found in database after final verification');
         }
-      } catch (saveError) {
-        console.error('Error in pre-run batch save/verification:', saveError);
-        throw new Error(`Failed to prepare batch for execution: ${saveError instanceof Error ? saveError.message : 'Unknown error'}`);
       }
       
       console.log('Batch verification complete, proceeding with automation...');
       
-      // Update batch status to running immediately
+      // Update batch status to running immediately before starting automation
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform } : b
       ));
