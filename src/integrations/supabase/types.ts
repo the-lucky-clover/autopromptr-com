@@ -256,6 +256,62 @@ export type Database = {
           },
         ]
       }
+      render_syslog: {
+        Row: {
+          app_name: string | null
+          batch_id: string | null
+          created_at: string
+          facility: number
+          hostname: string | null
+          id: string
+          message: string
+          msg_id: string | null
+          proc_id: string | null
+          raw_message: string | null
+          severity: number
+          structured_data: Json | null
+          timestamp: string
+        }
+        Insert: {
+          app_name?: string | null
+          batch_id?: string | null
+          created_at?: string
+          facility?: number
+          hostname?: string | null
+          id?: string
+          message: string
+          msg_id?: string | null
+          proc_id?: string | null
+          raw_message?: string | null
+          severity?: number
+          structured_data?: Json | null
+          timestamp?: string
+        }
+        Update: {
+          app_name?: string | null
+          batch_id?: string | null
+          created_at?: string
+          facility?: number
+          hostname?: string | null
+          id?: string
+          message?: string
+          msg_id?: string | null
+          proc_id?: string | null
+          raw_message?: string | null
+          severity?: number
+          structured_data?: Json | null
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "render_syslog_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_verification_status: {
         Row: {
           created_at: string | null

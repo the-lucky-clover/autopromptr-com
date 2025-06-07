@@ -2,10 +2,12 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { RefreshCw, Info } from 'lucide-react';
 import { Batch } from '@/types/batch';
 import SystemStatusOverview from './SystemStatusOverview';
 import SystemLogsDisplay from './SystemLogsDisplay';
+import RenderSyslogDisplay from './RenderSyslogDisplay';
 import { useSystemDiagnostics } from './SystemDiagnostics';
 
 interface SystemLogsProps {
@@ -30,6 +32,9 @@ const SystemLogsPanel = ({ batches, hasActiveBatch }: SystemLogsProps) => {
     supabaseRender: 'unknown',
     renderTarget: 'unknown'
   });
+
+  // Get the active batch ID for filtering syslog entries
+  const activeBatchId = batches.find(batch => batch.status === 'running')?.id || null;
 
   const addLog = (type: LogEntry['type'], system: string, message: string, details?: string) => {
     const newLog: LogEntry = {
@@ -78,7 +83,7 @@ const SystemLogsPanel = ({ batches, hasActiveBatch }: SystemLogsProps) => {
             <CardTitle className="text-white">System Diagnostics & Logs</CardTitle>
             <CardDescription className="text-purple-200">
               {hasActiveBatch 
-                ? "Real-time monitoring of system handshakes during batch processing" 
+                ? "Real-time monitoring of system handshakes and render logs during batch processing" 
                 : "System in standby mode - diagnostics will run when batches are active"}
             </CardDescription>
           </div>
@@ -95,7 +100,33 @@ const SystemLogsPanel = ({ batches, hasActiveBatch }: SystemLogsProps) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <SystemStatusOverview systemStatus={systemStatus} />
-        <SystemLogsDisplay logs={logs} hasActiveBatch={hasActiveBatch} />
+        
+        <Tabs defaultValue="system" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 bg-white/10">
+            <TabsTrigger value="system" className="text-white data-[state=active]:bg-white/20">
+              System Logs
+            </TabsTrigger>
+            <TabsTrigger value="render" className="text-white data-[state=active]:bg-white/20">
+              Render Syslog
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="system" className="mt-4">
+            <SystemLogsDisplay logs={logs} hasActiveBatch={hasActiveBatch} />
+          </TabsContent>
+          
+          <TabsContent value="render" className="mt-4">
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2 text-white/80 text-sm">
+                <Info className="w-4 h-4" />
+                <span>
+                  Syslog endpoint: {window.location.origin.replace('https://', 'https://raahpoyciwuyhwlcenpy.supabase.co')}/functions/v1/syslog-receiver
+                </span>
+              </div>
+              <RenderSyslogDisplay batchId={activeBatchId} />
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
