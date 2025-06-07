@@ -1,4 +1,5 @@
 
+
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -223,7 +224,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
           {progressStep !== 'error' && (
             <div className="flex justify-center">
               <div className="flex space-x-1">
-                <div className={`w-2 h-2 rounded-full ${progressStep === 'creating' ? 'bg-purple-400 animate-pulse' : progressStep !== 'idle' ? 'bg-purple-600' : 'bg-gray-600'}`} />
+                <div className={`w-2 h-2 rounded-full ${progressStep === 'creating' ? 'bg-purple-400 animate-pulse' : (progressStep === 'sending' || progressStep === 'complete') ? 'bg-purple-600' : 'bg-gray-600'}`} />
                 <div className={`w-2 h-2 rounded-full ${progressStep === 'sending' ? 'bg-blue-400 animate-pulse' : progressStep === 'complete' ? 'bg-blue-600' : 'bg-gray-600'}`} />
                 <div className={`w-2 h-2 rounded-full ${progressStep === 'complete' ? 'bg-green-400 animate-pulse' : 'bg-gray-600'}`} />
               </div>
@@ -256,3 +257,4 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
 };
 
 export default AuthModal;
+
