@@ -1,6 +1,6 @@
 
 import { Button } from '@/components/ui/button';
-import { Plus, RefreshCw } from 'lucide-react';
+import { Plus, RefreshCw, Search } from 'lucide-react';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
 import { useToast } from '@/hooks/use-toast';
 
@@ -9,7 +9,7 @@ interface DashboardEmptyStateProps {
 }
 
 const DashboardEmptyState = ({ onNewBatch }: DashboardEmptyStateProps) => {
-  const { recoverFromBackup } = usePersistentBatches();
+  const { recoverFromBackup, searchForLostBatches } = usePersistentBatches();
   const { toast } = useToast();
 
   const handleRecoverData = () => {
@@ -28,6 +28,14 @@ const DashboardEmptyState = ({ onNewBatch }: DashboardEmptyStateProps) => {
     }
   };
 
+  const handleSearchForLostData = () => {
+    searchForLostBatches();
+    toast({
+      title: "Search completed",
+      description: "Check the browser console (F12) for detailed search results.",
+    });
+  };
+
   return (
     <div className="text-center py-8">
       <p className="text-white/70 mb-4">No batches found</p>
@@ -39,7 +47,7 @@ const DashboardEmptyState = ({ onNewBatch }: DashboardEmptyStateProps) => {
           <Plus className="w-4 h-4 mr-2" />
           Create Your First Batch
         </Button>
-        <div>
+        <div className="flex gap-2 justify-center">
           <Button 
             onClick={handleRecoverData}
             variant="outline"
@@ -47,7 +55,16 @@ const DashboardEmptyState = ({ onNewBatch }: DashboardEmptyStateProps) => {
             className="text-white/70 border-white/20 hover:bg-white/10"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
-            Recover Lost Data
+            Recover from Backup
+          </Button>
+          <Button 
+            onClick={handleSearchForLostData}
+            variant="outline"
+            size="sm"
+            className="text-white/70 border-white/20 hover:bg-white/10"
+          >
+            <Search className="w-4 h-4 mr-2" />
+            Search for Lost Data
           </Button>
         </div>
       </div>
