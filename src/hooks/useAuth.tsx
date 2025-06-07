@@ -32,6 +32,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (session?.user) {
           // Check email verification status
+          console.log('User email_confirmed_at:', session.user.email_confirmed_at);
+          console.log('User confirmation status:', session.user.email_confirmed_at !== null);
+          
           setTimeout(async () => {
             try {
               const { data } = await supabase
@@ -40,10 +43,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .eq('user_id', session.user.id)
                 .single();
               
-              setIsEmailVerified(data?.email_verified || session.user.email_confirmed_at !== null);
+              console.log('Database verification status:', data);
+              const verified = data?.email_verified || session.user.email_confirmed_at !== null;
+              console.log('Final verification status:', verified);
+              setIsEmailVerified(verified);
             } catch (error) {
               console.error('Error checking verification status:', error);
-              setIsEmailVerified(session.user.email_confirmed_at !== null);
+              const verified = session.user.email_confirmed_at !== null;
+              console.log('Fallback verification status:', verified);
+              setIsEmailVerified(verified);
             }
           }, 0);
         } else {
@@ -56,6 +64,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session);
       setSession(session);
       setUser(session?.user ?? null);
       if (!session) {
@@ -67,36 +76,60 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string) => {
+    console.log('Starting signup process for:', email);
+    
     // Clear any existing session first
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.log('No existing session to clear');
+    }
     
+    // Use the current origin for redirect
     const redirectUrl = `${window.location.origin}/auth/callback`;
+    console.log('Using redirect URL:', redirectUrl);
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: redirectUrl
       }
     });
+    
+    console.log('Signup response:', { data, error });
+    
+    if (data?.user && !error) {
+      console.log('User created successfully:', data.user);
+      console.log('Email confirmation required:', !data.user.email_confirmed_at);
+    }
+    
     return { error };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    console.log('Starting signin process for:', email);
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    
+    console.log('Signin response:', { data, error });
     return { error };
   };
 
   const signOut = async () => {
+    console.log('Signing out...');
     await supabase.auth.signOut();
     window.location.href = '/';
   };
 
   const resendVerification = async (email: string) => {
+    console.log('Resending verification email to:', email);
+    
     const redirectUrl = `${window.location.origin}/auth/callback`;
+    console.log('Using redirect URL for resend:', redirectUrl);
     
     const { error } = await supabase.auth.resend({
       type: 'signup',
@@ -105,6 +138,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         emailRedirectTo: redirectUrl
       }
     });
+    
+    console.log('Resend verification response:', { error });
     return { error };
   };
 
