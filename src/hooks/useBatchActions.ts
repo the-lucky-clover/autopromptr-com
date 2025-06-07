@@ -5,6 +5,7 @@ import { Batch } from '@/types/batch';
 import { useBatchDatabase } from './useBatchDatabase';
 
 export const useBatchActions = () => {
+  // Always call hooks at the top level, never conditionally
   const { toast } = useToast();
   const { saveBatchToDatabase } = useBatchDatabase();
 

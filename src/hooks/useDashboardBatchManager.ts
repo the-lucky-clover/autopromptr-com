@@ -4,12 +4,12 @@ import { useBatchCrud } from './useBatchCrud';
 import { useBatchControl } from './useBatchControl';
 
 export const useDashboardBatchManager = () => {
+  // Always call hooks in the same order at the top level
   const { batches, setBatches } = usePersistentBatches();
-  
-  // Initialize all hooks at the top level consistently
   const batchCrud = useBatchCrud();
   const batchControl = useBatchControl();
 
+  // Destructure after all hooks are called
   const {
     showModal,
     setShowModal,
