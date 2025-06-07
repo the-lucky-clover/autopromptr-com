@@ -41,7 +41,7 @@ const Navbar = () => {
         isScrolled 
           ? 'transform translate-y-0 opacity-100' 
           : 'transform -translate-y-20 opacity-0'
-      } bg-black/60 backdrop-blur-xl border-b border-white/10 shadow-lg`} />
+      } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg`} />
       
       {/* Navbar content - always visible */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -60,7 +60,7 @@ const Navbar = () => {
                 <Button 
                   onClick={signOut}
                   variant="ghost" 
-                  className="text-white hover:text-gray-300 px-4 py-2 rounded-lg"
+                  className="text-white hover:text-gray-300 px-4 py-2 rounded-xl"
                 >
                   Sign Out
                 </Button>
@@ -70,14 +70,14 @@ const Navbar = () => {
                 <Button 
                   onClick={handleAuthClick}
                   variant="ghost"
-                  className="text-white hover:text-gray-300 px-4 py-2 font-medium rounded-lg"
+                  className="text-white hover:text-gray-300 px-4 py-2 font-medium rounded-xl"
                 >
                   Login
                 </Button>
                 
                 <Button 
                   onClick={handleGetStartedClick}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200"
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200"
                 >
                   Get Started
                 </Button>
@@ -92,24 +92,24 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-white hover:text-purple-300 rounded-lg"
+                  className="text-white hover:text-purple-300 rounded-xl"
                 >
                   {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                 </Button>
               </PopoverTrigger>
               <PopoverContent 
-                className="w-80 glass-effect border-purple-500/30 rounded-xl mr-4"
+                className="w-80 bg-gray-900/95 backdrop-blur-xl border-gray-700 rounded-xl mr-4"
                 align="end"
                 sideOffset={8}
               >
-                <div className="bg-black/70 backdrop-blur-xl rounded-xl p-4">
+                <div className="p-4">
                   {user ? (
                     <div className="space-y-4">
                       <div className="text-sm text-gray-300 text-center">Welcome back!</div>
                       <Button 
                         onClick={() => { signOut(); setIsOpen(false); }}
                         variant="ghost" 
-                        className="w-full text-white hover:text-gray-300 rounded-lg"
+                        className="w-full text-white hover:text-gray-300 rounded-xl"
                       >
                         Sign Out
                       </Button>
@@ -133,7 +133,7 @@ const Navbar = () => {
         <PopoverTrigger asChild>
           <div className="hidden" />
         </PopoverTrigger>
-        <PopoverContent className="w-96 glass-effect border-purple-500/30 rounded-xl">
+        <PopoverContent className="w-96 bg-gray-900/95 backdrop-blur-xl border-gray-700 rounded-xl">
           <AuthModal mode={authMode} onClose={() => setAuthModalOpen(false)} />
         </PopoverContent>
       </Popover>
