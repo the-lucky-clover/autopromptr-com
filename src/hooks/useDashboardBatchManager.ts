@@ -20,6 +20,12 @@ export const useDashboardBatchManager = () => {
     try {
       console.log('Saving batch to database:', batch);
       
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+      
       // Save batch to Supabase
       const { error: batchError } = await supabase
         .from('batches')
@@ -30,7 +36,8 @@ export const useDashboardBatchManager = () => {
           description: batch.description || '',
           status: batch.status,
           settings: batch.settings || {},
-          created_at: batch.createdAt.toISOString()
+          created_at: batch.createdAt.toISOString(),
+          created_by: user.id
         });
 
       if (batchError) {
