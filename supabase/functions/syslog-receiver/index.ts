@@ -20,6 +20,37 @@ interface SyslogMessage {
   batch_id?: string;
 }
 
+// Validate authentication token
+function validateAuthToken(authHeader: string | null): boolean {
+  const expectedToken = Deno.env.get('SYSLOG_AUTH_TOKEN');
+  
+  if (!expectedToken) {
+    console.error('SYSLOG_AUTH_TOKEN not configured');
+    return false;
+  }
+
+  if (!authHeader) {
+    console.warn('Missing Authorization header');
+    return false;
+  }
+
+  // Check for Bearer token format
+  const bearerMatch = authHeader.match(/^Bearer\s+(.+)$/);
+  if (!bearerMatch) {
+    console.warn('Invalid Authorization header format - expected Bearer token');
+    return false;
+  }
+
+  const providedToken = bearerMatch[1];
+  const isValid = providedToken === expectedToken;
+  
+  if (!isValid) {
+    console.warn('Invalid authentication token provided');
+  }
+
+  return isValid;
+}
+
 // Parse RFC 5424 syslog format
 function parseSyslogMessage(rawMessage: string): SyslogMessage {
   console.log('Parsing syslog message:', rawMessage);
@@ -62,6 +93,25 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Validate authentication for all requests
+    const authHeader = req.headers.get('authorization');
+    const clientIP = req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for') || 'unknown';
+    
+    console.log(`Syslog request from ${clientIP}, method: ${req.method}`);
+    
+    if (!validateAuthToken(authHeader)) {
+      console.error(`Unauthorized syslog access attempt from ${clientIP}`);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - valid Bearer token required' }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    console.log(`Authenticated syslog request from ${clientIP}`);
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -117,7 +167,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      console.log('Successfully stored syslog message:', data);
+      console.log('Successfully stored authenticated syslog message:', data);
 
       return new Response(
         JSON.stringify({ success: true, id: data?.[0]?.id }),
