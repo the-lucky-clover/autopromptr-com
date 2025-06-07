@@ -195,7 +195,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
         </div>
 
         <div className="mt-6 pt-4 border-t border-gray-700">
-          <p className="text-gray-400 text-sm mb-2">New to Create?</p>
+          <p className="text-gray-400 text-sm mb-2">New to AutoPromptr?</p>
           <Button
             onClick={() => {
               setShowEmailSent(false);
