@@ -1,23 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { AutoPromptr } from '@/services/autoPromptr';
-
-interface BatchStatus {
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'stopped';
-  platform: string;
-  progress: {
-    completed: number;
-    total: number;
-    percentage: number;
-    failed: number;
-    processing: number;
-    pending: number;
-  };
-  recent_logs?: Array<{
-    level: string;
-    message: string;
-  }>;
-}
+import { BatchStatus } from '@/types/batch';
 
 // React Hook for batch automation
 export function useBatchAutomation(batchId?: string) {

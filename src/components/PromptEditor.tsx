@@ -1,14 +1,8 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Trash2, GripVertical, Edit2, Save, X } from 'lucide-react';
-
-interface TextPrompt {
-  id: string;
-  text: string;
-  order: number;
-}
+import { TextPrompt } from '@/types/batch';
 
 interface PromptEditorProps {
   prompts: TextPrompt[];

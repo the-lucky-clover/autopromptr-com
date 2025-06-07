@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,45 +5,9 @@ import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { AutoPromptr } from '@/services/autoPromptr';
+import { Batch, Platform, BatchFormData, TextPrompt } from '@/types/batch';
 import BatchForm from './BatchForm';
 import BatchCard from './BatchCard';
-
-interface TextPrompt {
-  id: string;
-  text: string;
-  order: number;
-}
-
-interface Batch {
-  id: string;
-  name: string;
-  targetUrl: string;
-  description?: string;
-  prompts: TextPrompt[];
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'stopped';
-  createdAt: Date;
-  platform?: string;
-  settings?: {
-    delay: number;
-    maxRetries: number;
-  };
-}
-
-interface Platform {
-  id: string;
-  name: string;
-  type: string;
-}
-
-interface BatchFormData {
-  name: string;
-  targetUrl: string;
-  description: string;
-  initialPrompt: string;
-  platform: string;
-  delay: number;
-  maxRetries: number;
-}
 
 const BatchManager = () => {
   const [batches, setBatches] = useState<Batch[]>([]);

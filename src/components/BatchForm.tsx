@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,22 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { AutoPromptr } from '@/services/autoPromptr';
-
-interface Platform {
-  id: string;
-  name: string;
-  type: string;
-}
-
-interface BatchFormData {
-  name: string;
-  targetUrl: string;
-  description: string;
-  initialPrompt: string;
-  platform: string;
-  delay: number;
-  maxRetries: number;
-}
+import { Platform, BatchFormData } from '@/types/batch';
 
 interface BatchFormProps {
   onSubmit: (data: BatchFormData) => void;

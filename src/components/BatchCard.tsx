@@ -1,53 +1,9 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { GripVertical, Play, Square, Trash2 } from 'lucide-react';
+import { Batch, Platform, BatchStatus } from '@/types/batch';
 import PromptEditor from './PromptEditor';
 import ProgressDisplay from './ProgressDisplay';
-
-interface TextPrompt {
-  id: string;
-  text: string;
-  order: number;
-}
-
-interface Batch {
-  id: string;
-  name: string;
-  targetUrl: string;
-  description?: string;
-  prompts: TextPrompt[];
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'stopped';
-  createdAt: Date;
-  platform?: string;
-  settings?: {
-    delay: number;
-    maxRetries: number;
-  };
-}
-
-interface Platform {
-  id: string;
-  name: string;
-  type: string;
-}
-
-interface BatchStatus {
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'stopped';
-  platform: string;
-  progress: {
-    completed: number;
-    total: number;
-    percentage: number;
-    failed: number;
-    processing: number;
-    pending: number;
-  };
-  recent_logs?: Array<{
-    level: string;
-    message: string;
-  }>;
-}
 
 interface BatchCardProps {
   batch: Batch;

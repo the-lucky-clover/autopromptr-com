@@ -1,20 +1,4 @@
-
-interface BatchStatus {
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'stopped';
-  platform: string;
-  progress: {
-    completed: number;
-    total: number;
-    percentage: number;
-    failed: number;
-    processing: number;
-    pending: number;
-  };
-  recent_logs?: Array<{
-    level: string;
-    message: string;
-  }>;
-}
+import { BatchStatus } from '@/types/batch';
 
 interface ProgressDisplayProps {
   status: BatchStatus;
