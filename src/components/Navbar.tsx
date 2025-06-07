@@ -24,11 +24,6 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleAuthClick = () => {
-    setAuthMode('signin');
-    setAuthModalOpen(true);
-  };
-
   const handleGetStartedClick = () => {
     setAuthMode('signup');
     setAuthModalOpen(true);
@@ -66,22 +61,12 @@ const Navbar = () => {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-4">
-                <Button 
-                  onClick={handleAuthClick}
-                  variant="ghost"
-                  className="text-white hover:text-gray-300 px-4 py-2 font-medium rounded-xl"
-                >
-                  Login
-                </Button>
-                
-                <Button 
-                  onClick={handleGetStartedClick}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200"
-                >
-                  Get Started
-                </Button>
-              </div>
+              <Button 
+                onClick={handleGetStartedClick}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold transition-all duration-200"
+              >
+                Sign In / Register
+              </Button>
             )}
           </div>
 
