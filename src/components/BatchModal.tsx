@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -118,7 +117,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[85vh] rounded-2xl bg-white border border-gray-200 shadow-2xl">
+        <DialogContent className="max-w-4xl max-h-[85vh] rounded-3xl bg-white border-2 border-gray-300 shadow-2xl">
           <DialogHeader className="text-left pb-4">
             <DialogTitle className="text-2xl font-semibold text-left text-gray-900">
               {editingBatch ? 'Edit Batch' : 'Create New Batch'}
@@ -233,7 +232,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </Dialog>
     </>
   );
 };
