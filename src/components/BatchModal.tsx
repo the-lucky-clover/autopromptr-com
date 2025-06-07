@@ -232,7 +232,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </Dialog>
+      </AlertDialog>
     </>
   );
 };
