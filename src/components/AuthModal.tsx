@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Zap, X } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { useNavigate } from 'react-router-dom';
 import EmailVerificationScreen from './auth/EmailVerificationScreen';
 import AuthForm from './auth/AuthForm';
 
@@ -24,6 +25,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
   const [progressMessage, setProgressMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const { signUp, signIn, user, isEmailVerified, resendVerification } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,17 +101,13 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
         setProgressStep('idle');
         setErrorMessage('');
       }, 4000);
-    } else if (user && !isEmailVerified) {
-      setProgressStep('error');
-      setErrorMessage('Please check your email and verify your account first.');
-      setTimeout(() => {
-        setProgressStep('idle');
-        setErrorMessage('');
-      }, 4000);
     } else {
       setProgressStep('complete');
-      setProgressMessage('Welcome back!');
+      setProgressMessage('Welcome back! Redirecting...');
+      
+      // Wait a moment for the progress animation, then redirect
       setTimeout(() => {
+        navigate('/dashboard');
         onClose();
       }, 1000);
     }

@@ -38,6 +38,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const verified = session.user.email_confirmed_at !== null;
           console.log('Email verification status:', verified);
           setIsEmailVerified(verified);
+
+          // If user is verified and we're on auth page, redirect to dashboard
+          if (verified && window.location.pathname === '/auth') {
+            console.log('Redirecting verified user to dashboard');
+            window.location.href = '/dashboard';
+          }
         } else {
           setIsEmailVerified(false);
         }
@@ -113,9 +119,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     if (error) {
       console.error('Signin error:', error);
+      return { error };
+    }
+
+    // If sign-in was successful and user is verified, the onAuthStateChange will handle redirect
+    if (data?.user && data.user.email_confirmed_at) {
+      console.log('Sign-in successful for verified user');
     }
     
-    return { error };
+    return { error: null };
   };
 
   const signOut = async () => {
