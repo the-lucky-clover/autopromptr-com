@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
+import { AutoPromptr } from '@/services/autoPromptr';
 import { Batch } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 
@@ -11,8 +11,8 @@ export const useDashboardBatchManager = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
+  const [automationLoading, setAutomationLoading] = useState(false);
   const { toast } = useToast();
-  const { status: batchStatus, loading: automationLoading, runBatch, stopBatch } = useBatchAutomation(selectedBatchId || undefined);
 
   const handleCreateBatch = (batchData: Omit<Batch, 'id' | 'createdAt'>) => {
     const detectedPlatform = detectPlatformFromUrl(batchData.targetUrl);
@@ -79,8 +79,9 @@ export const useDashboardBatchManager = () => {
     console.log('Running batch:', batch.id, 'with platform:', detectedPlatform);
     console.log('Batch data:', batch);
 
-    // Set the selected batch ID FIRST
+    // Set the selected batch ID and loading state
     setSelectedBatchId(batch.id);
+    setAutomationLoading(true);
     
     try {
       // Update batch status to running immediately
@@ -88,8 +89,9 @@ export const useDashboardBatchManager = () => {
         b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform } : b
       ));
       
-      // Use the hook's runBatch function with proper parameters
-      await runBatch(detectedPlatform, batch.settings || { delay: 5000, maxRetries: 3 });
+      // Create a new AutoPromptr instance and run the batch directly
+      const autoPromptr = new AutoPromptr();
+      await autoPromptr.runBatch(batch.id, detectedPlatform, batch.settings || { delay: 5000, maxRetries: 3 });
       
       toast({
         title: "Batch started",
@@ -105,12 +107,15 @@ export const useDashboardBatchManager = () => {
         description: err instanceof Error ? err.message : 'Unknown error',
         variant: "destructive",
       });
+    } finally {
+      setAutomationLoading(false);
     }
   };
 
   const handleStopBatch = async (batch: Batch) => {
     try {
-      await stopBatch();
+      const autoPromptr = new AutoPromptr();
+      await autoPromptr.stopBatch(batch.id);
       
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'failed' as const } : b
@@ -132,7 +137,8 @@ export const useDashboardBatchManager = () => {
   const handlePauseBatch = async (batch: Batch) => {
     try {
       // For now, we'll use the stop functionality but set status to paused
-      await stopBatch();
+      const autoPromptr = new AutoPromptr();
+      await autoPromptr.stopBatch(batch.id);
       
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'paused' as const } : b
