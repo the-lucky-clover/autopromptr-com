@@ -44,16 +44,16 @@ export const useSystemDiagnostics = ({ batches, addLog, setSystemStatus }: Syste
 
   const checkSupabaseRenderHandshake = async () => {
     try {
-      addLog('info', 'Supabase-Render', 'Testing backend connection...');
+      addLog('info', 'Supabase-Render', 'Testing AutoPromptr backend connection at https://autopromptr-backend.onrender.com...');
       
       const autoPromptr = new AutoPromptr();
       const healthCheck = await autoPromptr.healthCheck();
       
       setSystemStatus((prev: any) => ({ ...prev, supabaseRender: 'connected' }));
-      addLog('success', 'Supabase-Render', 'Backend connection established', `Health check: ${JSON.stringify(healthCheck)}`);
+      addLog('success', 'Supabase-Render', 'AutoPromptr backend connection established', `Health check: ${JSON.stringify(healthCheck)}`);
     } catch (error) {
       setSystemStatus((prev: any) => ({ ...prev, supabaseRender: 'error' }));
-      addLog('error', 'Supabase-Render', 'Backend connection failed', error instanceof Error ? error.message : 'Unknown error');
+      addLog('error', 'Supabase-Render', 'AutoPromptr backend connection failed', error instanceof Error ? error.message : 'Render.com service may be sleeping - try running a batch to wake it up');
     }
   };
 
@@ -94,6 +94,7 @@ export const useSystemDiagnostics = ({ batches, addLog, setSystemStatus }: Syste
     }
 
     addLog('info', 'System', 'Starting system diagnostics for active batch processing...');
+    addLog('info', 'System', 'Backend URL configured: https://autopromptr-backend.onrender.com');
     
     await checkLovableSupabaseHandshake();
     await checkSupabaseRenderHandshake();

@@ -1,10 +1,8 @@
 
 import { useState, useEffect } from 'react';
 
-// Configuration - Updated to use the correct AutoPromptr backend URL
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://autopromptr-backend.onrender.com'
-  : 'http://localhost:3001';
+// Configuration - Always use the production Render.com URL
+const API_BASE_URL = 'https://autopromptr-backend.onrender.com';
 
 // API Service Class
 export class AutoPromptr {
