@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { Plus, BarChart3 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import DashboardBatchManager from "@/components/DashboardBatchManager";
 
 const Dashboard = () => {
   const stats = [
@@ -64,7 +65,7 @@ const Dashboard = () => {
             <div className="flex items-center space-x-4">
               <SidebarTrigger className="text-white hover:text-purple-200 rounded-xl" />
               <div>
-                <h1 className="text-2xl font-semibold text-white">Welcome back, !</h1>
+                <h1 className="text-2xl font-semibold text-white">Welcome back!</h1>
                 <p className="text-purple-200">Here's what's happening with your prompt batches today.</p>
               </div>
             </div>
@@ -90,31 +91,17 @@ const Dashboard = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Recent Batches */}
+            {/* Batch Processor */}
             <div className="lg:col-span-2">
               <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle className="text-white">Recent Batches</CardTitle>
-                    <CardDescription className="text-purple-200">
-                      Your latest prompt batch activities
-                    </CardDescription>
-                  </div>
-                  <Button variant="outline" className="text-white border-white/20 hover:bg-white/10 rounded-xl">
-                    View All
-                  </Button>
+                <CardHeader>
+                  <CardTitle className="text-white">Batch Processor</CardTitle>
+                  <CardDescription className="text-purple-200">
+                    Create and manage your prompt batches
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <div className="w-20 h-20 bg-white/10 rounded-xl flex items-center justify-center mb-4">
-                      <BarChart3 className="w-10 h-10 text-purple-300" />
-                    </div>
-                    <p className="text-purple-200 mb-4">No batches yet</p>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Your First Batch
-                    </Button>
-                  </div>
+                  <DashboardBatchManager />
                 </CardContent>
               </Card>
             </div>
