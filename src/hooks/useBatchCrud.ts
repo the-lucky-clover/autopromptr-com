@@ -22,28 +22,39 @@ export const useBatchCrud = () => {
       ...batchData,
       id: crypto.randomUUID(),
       createdAt: new Date(),
-      platform: detectedPlatform
+      platform: detectedPlatform,
+      status: 'pending'
     };
 
+    console.log('Creating new batch with all required fields:', newBatch);
+
     try {
-      console.log('Creating new batch:', newBatch);
+      // Save to database with explicit error handling
+      const saveResult = await saveBatchToDatabase(newBatch);
+      console.log('Database save result:', saveResult);
       
-      // Save to database first and wait for completion
-      await saveBatchToDatabase(newBatch);
+      if (!saveResult) {
+        throw new Error('Failed to save batch to database');
+      }
+      
+      // Add a small delay to ensure database consistency
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Only update local state after successful database save
       setBatches(prev => [...prev, newBatch]);
       setShowModal(false);
 
       toast({
-        title: "Batch created",
-        description: `Batch created with auto-detected platform: ${platformName}`,
+        title: "Batch created successfully",
+        description: `Batch "${newBatch.name}" created with platform: ${platformName}`,
       });
+
+      console.log('Batch creation completed successfully');
     } catch (error) {
       console.error('Failed to create batch:', error);
       toast({
         title: "Failed to create batch",
-        description: error instanceof Error ? error.message : 'Unknown error',
+        description: error instanceof Error ? error.message : 'Unknown error occurred',
         variant: "destructive",
       });
     }
@@ -61,7 +72,11 @@ export const useBatchCrud = () => {
 
     try {
       // Save to database first
-      await saveBatchToDatabase(batchWithPlatform);
+      const saveResult = await saveBatchToDatabase(batchWithPlatform);
+      
+      if (!saveResult) {
+        throw new Error('Failed to update batch in database');
+      }
       
       // Then update local state
       setBatches(prev => prev.map(batch => 

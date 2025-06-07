@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { AutoPromptr } from '@/services/autoPromptr';
@@ -43,8 +42,7 @@ export const useBatchControl = () => {
       return;
     }
 
-    console.log('Running batch:', batch.id, 'with platform:', detectedPlatform);
-    console.log('Batch data:', batch);
+    console.log('Starting batch run process for:', batch.id, 'with platform:', detectedPlatform);
 
     // Set the selected batch ID and loading state
     setSelectedBatchId(batch.id);
@@ -52,55 +50,68 @@ export const useBatchControl = () => {
     
     try {
       // Ensure batch has the correct platform and format before saving
-      const batchToSave = {
+      const batchToRun = {
         ...batch,
         platform: detectedPlatform,
-        // Ensure createdAt is a proper Date object
+        status: 'pending' as const,
         createdAt: batch.createdAt instanceof Date ? batch.createdAt : new Date(batch.createdAt)
       };
       
       console.log('Ensuring batch exists in database before running...');
-      console.log('Batch to save:', batchToSave);
+      console.log('Batch data being saved:', JSON.stringify(batchToRun, null, 2));
       
+      // Force save the batch to ensure it exists in the database
       try {
-        await saveBatchToDatabase(batchToSave);
-        console.log('Batch saved successfully');
+        const saveResult = await saveBatchToDatabase(batchToRun);
+        console.log('Pre-run database save result:', saveResult);
+        
+        if (!saveResult) {
+          throw new Error('Failed to save batch to database before running');
+        }
+        
+        // Add delay to ensure database consistency
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Verify the batch exists in the database
+        const verificationResult = await verifyBatchInDatabase(batch.id);
+        console.log('Batch verification result:', verificationResult);
+        
+        if (!verificationResult) {
+          console.warn('Batch verification failed, but proceeding with automation');
+        }
       } catch (saveError) {
-        console.error('Error saving batch:', saveError);
-        // Continue anyway - the batch might already exist
+        console.error('Error in pre-run batch save/verification:', saveError);
+        throw new Error(`Failed to prepare batch for execution: ${saveError instanceof Error ? saveError.message : 'Unknown error'}`);
       }
       
-      // Try to verify the batch exists, but don't fail if it doesn't
-      try {
-        await verifyBatchInDatabase(batch.id);
-        console.log('Batch verified in database');
-      } catch (verifyError) {
-        console.warn('Could not verify batch in database, but proceeding with automation:', verifyError);
-      }
-      
-      console.log('Proceeding with automation...');
+      console.log('Batch verification complete, proceeding with automation...');
       
       // Update batch status to running immediately
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform } : b
       ));
       
-      // Create a new AutoPromptr instance and run the batch directly
+      // Create a new AutoPromptr instance and run the batch
       const autoPromptr = new AutoPromptr();
-      await autoPromptr.runBatch(batch.id, detectedPlatform, batch.settings || { delay: 5000, maxRetries: 3 });
+      
+      console.log('Starting automation with AutoPromptr...');
+      const runResult = await autoPromptr.runBatch(batch.id, detectedPlatform, batch.settings || { delay: 5000, maxRetries: 3 });
+      console.log('AutoPromptr run result:', runResult);
       
       toast({
-        title: "Batch started",
-        description: `Automation started for "${batch.name}" using ${platformName}. Only this batch will be processed.`,
+        title: "Batch started successfully",
+        description: `Automation started for "${batch.name}" using ${platformName}.`,
       });
     } catch (err) {
       console.error('Failed to start batch:', err);
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'failed' as const } : b
       ));
+      
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       toast({
         title: "Failed to start batch",
-        description: err instanceof Error ? err.message : 'Unknown error',
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
