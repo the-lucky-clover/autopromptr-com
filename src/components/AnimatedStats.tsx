@@ -57,32 +57,42 @@ const AnimatedStat = ({ endValue, label, prefix = "", suffix = "" }: StatProps) 
 
   return (
     <div ref={ref} className="text-center">
-      <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">
+      <div className="text-4xl md:text-5xl font-bold gradient-text mb-2">
         {prefix}{value.toLocaleString()}{suffix}
       </div>
-      <div className="text-gray-600 font-medium">{label}</div>
+      <div className="text-gray-300 font-medium">{label}</div>
     </div>
   );
 };
 
 const AnimatedStats = () => {
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+    <section className="py-16 gradient-bg relative">
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 blur-3xl"></div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-12 animate-on-scroll">
+          <h2 className="text-3xl font-bold text-white mb-4">
             Proven Results Across Industries
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-gray-300">
             See how AutoPromptr transforms AI workflows worldwide
           </p>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <AnimatedStat endValue={92} label="Accuracy Improvement" suffix="%" />
-          <AnimatedStat endValue={75} label="Time Savings" suffix="%" />
-          <AnimatedStat endValue={10000} label="Prompts Processed" suffix="+" />
-          <AnimatedStat endValue={500} label="Enterprise Clients" suffix="+" />
+          <div className="animate-on-scroll stagger-animation" style={{ "--animation-delay": "0.1s" } as React.CSSProperties}>
+            <AnimatedStat endValue={92} label="Accuracy Improvement" suffix="%" />
+          </div>
+          <div className="animate-on-scroll stagger-animation" style={{ "--animation-delay": "0.2s" } as React.CSSProperties}>
+            <AnimatedStat endValue={75} label="Time Savings" suffix="%" />
+          </div>
+          <div className="animate-on-scroll stagger-animation" style={{ "--animation-delay": "0.3s" } as React.CSSProperties}>
+            <AnimatedStat endValue={10000} label="Prompts Processed" suffix="+" />
+          </div>
+          <div className="animate-on-scroll stagger-animation" style={{ "--animation-delay": "0.4s" } as React.CSSProperties}>
+            <AnimatedStat endValue={500} label="Enterprise Clients" suffix="+" />
+          </div>
         </div>
       </div>
     </section>
