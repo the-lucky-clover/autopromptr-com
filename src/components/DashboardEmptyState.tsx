@@ -1,6 +1,6 @@
 
 import { Button } from '@/components/ui/button';
-import { Plus, RefreshCw, Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
 import { useToast } from '@/hooks/use-toast';
 
@@ -9,24 +9,8 @@ interface DashboardEmptyStateProps {
 }
 
 const DashboardEmptyState = ({ onNewBatch }: DashboardEmptyStateProps) => {
-  const { recoverFromBackup, searchForLostBatches } = usePersistentBatches();
+  const { searchForLostBatches } = usePersistentBatches();
   const { toast } = useToast();
-
-  const handleRecoverData = () => {
-    const recovered = recoverFromBackup();
-    if (recovered) {
-      toast({
-        title: "Data recovered",
-        description: "Your batches have been restored from backup.",
-      });
-    } else {
-      toast({
-        title: "No backup found",
-        description: "No backup data was found to recover.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleSearchForLostData = () => {
     searchForLostBatches();
@@ -48,15 +32,6 @@ const DashboardEmptyState = ({ onNewBatch }: DashboardEmptyStateProps) => {
           Create Your First Batch
         </Button>
         <div className="flex gap-2 justify-center">
-          <Button 
-            onClick={handleRecoverData}
-            variant="outline"
-            size="sm"
-            className="text-white/70 border-white/20 hover:bg-white/10"
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Recover from Backup
-          </Button>
           <Button 
             onClick={handleSearchForLostData}
             variant="outline"

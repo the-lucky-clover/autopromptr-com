@@ -48,13 +48,13 @@ export const usePersistentBatches = () => {
         // Create a backup
         localStorage.setItem(BACKUP_STORAGE_KEY, JSON.stringify(batchesWithDates));
       } else {
-        // Try to recover from backup
-        console.log('No batches found in main storage, checking backup...');
+        // Automatically try to recover from backup on page load
+        console.log('No batches found in main storage, automatically checking backup...');
         const backupBatches = localStorage.getItem(BACKUP_STORAGE_KEY);
         console.log('Backup batches found:', backupBatches);
         
         if (backupBatches) {
-          console.log('Found backup batches, restoring...');
+          console.log('Found backup batches, automatically restoring...');
           const parsedBackup = JSON.parse(backupBatches);
           const batchesWithDates = parsedBackup.map((batch: any) => ({
             ...batch,
@@ -63,12 +63,12 @@ export const usePersistentBatches = () => {
           setBatches(batchesWithDates);
           // Restore to main storage
           localStorage.setItem(STORAGE_KEY, JSON.stringify(batchesWithDates));
-          console.log('Restored from backup successfully');
+          console.log('Automatically restored from backup successfully');
         } else {
           console.log('No backup found either. Starting fresh.');
           
-          // Last resort: check for any data that looks like batches under any key
-          console.log('Searching all localStorage for batch-like data...');
+          // Automatically search for any data that looks like batches under any key
+          console.log('Automatically searching all localStorage for batch-like data...');
           Object.keys(localStorage).forEach(key => {
             try {
               const value = localStorage.getItem(key);
@@ -92,11 +92,11 @@ export const usePersistentBatches = () => {
     } catch (error) {
       console.error('Failed to load batches from localStorage:', error);
       
-      // Try to recover from backup on error
+      // Automatically try to recover from backup on error
       try {
         const backupBatches = localStorage.getItem(BACKUP_STORAGE_KEY);
         if (backupBatches) {
-          console.log('Attempting recovery from backup due to error...');
+          console.log('Attempting automatic recovery from backup due to error...');
           const parsedBackup = JSON.parse(backupBatches);
           const batchesWithDates = parsedBackup.map((batch: any) => ({
             ...batch,
@@ -105,7 +105,7 @@ export const usePersistentBatches = () => {
           setBatches(batchesWithDates);
         }
       } catch (backupError) {
-        console.error('Backup recovery also failed:', backupError);
+        console.error('Automatic backup recovery also failed:', backupError);
       }
     }
   }, []);
