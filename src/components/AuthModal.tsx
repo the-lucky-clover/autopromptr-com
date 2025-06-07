@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -144,6 +145,14 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
     }
   };
 
+  const getProgressBarColor = () => {
+    switch (progressStep) {
+      case 'error': return 'bg-red-500';
+      case 'complete': return 'bg-green-500';
+      default: return 'bg-gradient-to-r from-purple-500 to-blue-500';
+    }
+  };
+
   if (showEmailSent) {
     return (
       <EmailVerificationScreen
@@ -188,20 +197,38 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
         )}
       </div>
 
-      {/* Progress Bar Section */}
+      {/* Enhanced Progress Bar Section */}
       {progressStep !== 'idle' && (
         <div className="mb-6 space-y-3">
-          <Progress 
-            value={getProgressValue()} 
-            className={`h-2 ${progressStep === 'error' ? 'bg-red-900' : 'bg-gray-700'}`}
-          />
+          <div className="relative">
+            <Progress 
+              value={getProgressValue()} 
+              className="h-3 bg-gray-700 overflow-hidden rounded-full"
+            />
+            <div 
+              className={`absolute top-0 left-0 h-full ${getProgressBarColor()} transition-all duration-1000 ease-out rounded-full`}
+              style={{ 
+                width: `${getProgressValue()}%`,
+                transition: 'width 1s ease-out'
+              }}
+            />
+          </div>
           <div className="text-center">
             {progressStep === 'error' ? (
-              <p className="text-red-400 text-sm">{errorMessage}</p>
+              <p className="text-red-400 text-sm animate-pulse">{errorMessage}</p>
             ) : (
-              <p className="text-purple-300 text-sm">{progressMessage}</p>
+              <p className="text-purple-300 text-sm animate-pulse">{progressMessage}</p>
             )}
           </div>
+          {progressStep !== 'error' && (
+            <div className="flex justify-center">
+              <div className="flex space-x-1">
+                <div className={`w-2 h-2 rounded-full ${progressStep === 'creating' ? 'bg-purple-400 animate-pulse' : progressStep !== 'idle' ? 'bg-purple-600' : 'bg-gray-600'}`} />
+                <div className={`w-2 h-2 rounded-full ${progressStep === 'sending' ? 'bg-blue-400 animate-pulse' : progressStep === 'complete' ? 'bg-blue-600' : 'bg-gray-600'}`} />
+                <div className={`w-2 h-2 rounded-full ${progressStep === 'complete' ? 'bg-green-400 animate-pulse' : 'bg-gray-600'}`} />
+              </div>
+            </div>
+          )}
         </div>
       )}
 
