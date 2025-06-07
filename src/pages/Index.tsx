@@ -3,7 +3,6 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import CTA from "@/components/CTA";
-import AnimatedStats from "@/components/AnimatedStats";
 import ProvenResults from "@/components/ProvenResults";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import UseCases from "@/components/UseCases";
@@ -20,7 +19,6 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <Hero />
-      <AnimatedStats />
       <ProvenResults />
       <Features />
       <UseCases />

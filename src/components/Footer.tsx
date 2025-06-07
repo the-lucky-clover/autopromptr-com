@@ -58,9 +58,10 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <ul className="space-y-3 text-sm text-gray-300">
+              <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
               <li className="flex items-center space-x-2">
                 <Mail className="w-4 h-4" />
-                <span>hello@autopromptr.com</span>
+                <span>thepremiumbrand@gmail.com</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone className="w-4 h-4" />
