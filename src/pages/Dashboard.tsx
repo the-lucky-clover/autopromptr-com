@@ -13,16 +13,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const Dashboard = () => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50">
+      <div className="min-h-screen flex w-full">
         <AppSidebar />
         <main className="flex-1 p-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-4">
-              <SidebarTrigger className="text-gray-600 hover:text-gray-900" />
+              <SidebarTrigger className="text-gray-400 hover:text-white" />
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-                <p className="text-gray-600">Welcome back! Here's what's happening with your AI prompts.</p>
+                <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
+                <p className="text-gray-400">Welcome back! Here's what's happening with your AI prompts.</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -30,10 +30,10 @@ const Dashboard = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input 
                   placeholder="Search..." 
-                  className="pl-10 w-64 bg-white border-gray-200"
+                  className="pl-10 w-64 bg-gray-800 border-gray-600 text-white"
                 />
               </div>
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
                 <Bell className="h-5 w-5" />
               </Button>
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">

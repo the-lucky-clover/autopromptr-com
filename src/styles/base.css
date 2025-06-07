@@ -57,14 +57,36 @@
     min-height: 100vh;
   }
 
-  /* Dark theme for all sections */
+  /* Dark theme for all sections - much darker backgrounds */
   section {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%) !important;
   }
 
-  /* Override any light backgrounds */
-  .bg-white, .bg-gray-50, .bg-gray-100 {
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+  /* Override any light backgrounds with dark gradients */
+  .bg-white, .bg-gray-50, .bg-gray-100, .bg-gray-200 {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  }
+
+  /* Ensure main content areas are dark */
+  main {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%) !important;
+  }
+
+  /* Override any remaining light elements */
+  .text-gray-900 {
+    color: white !important;
+  }
+
+  .text-gray-800 {
+    color: #e2e8f0 !important;
+  }
+
+  .text-gray-700 {
+    color: #cbd5e1 !important;
+  }
+
+  .text-gray-600 {
+    color: #94a3b8 !important;
   }
 
   /* Ensure all buttons have rounded corners */
