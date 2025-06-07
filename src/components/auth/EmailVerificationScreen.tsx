@@ -10,6 +10,8 @@ interface EmailVerificationScreenProps {
   onSignUpClick: () => void;
   resendLoading: boolean;
   isMobile?: boolean;
+  errorMessage?: string;
+  onErrorClear?: () => void;
 }
 
 const EmailVerificationScreen = ({
@@ -18,7 +20,9 @@ const EmailVerificationScreen = ({
   onChangeEmail,
   onSignUpClick,
   resendLoading,
-  isMobile = false
+  isMobile = false,
+  errorMessage,
+  onErrorClear
 }: EmailVerificationScreenProps) => {
   const openEmailProvider = (provider: string) => {
     let url = '';
@@ -41,6 +45,11 @@ const EmailVerificationScreen = ({
     }
   };
 
+  const handleResendVerification = async () => {
+    if (onErrorClear) onErrorClear();
+    await onResendVerification();
+  };
+
   return (
     <div className="bg-gray-900/95 backdrop-blur-xl border border-gray-700 rounded-xl p-6 text-center">
       {!isMobile && (
@@ -53,13 +62,22 @@ const EmailVerificationScreen = ({
           <X className="h-4 w-4" />
         </Button>
       )}
+      
       <div className="mx-auto mb-4 w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
         <CheckCircle className="w-6 h-6 text-green-600" />
       </div>
+      
       <h3 className="text-lg font-semibold text-white mb-2">Check your email</h3>
       <p className="text-gray-300 mb-4 text-sm">
         We've sent you a verification link to complete your registration.
       </p>
+      
+      {/* Error Message Display */}
+      {errorMessage && (
+        <div className="mb-4 p-3 bg-red-900/50 border border-red-500 rounded-xl">
+          <p className="text-red-300 text-sm">{errorMessage}</p>
+        </div>
+      )}
       
       <EmailProviderLinks onProviderClick={openEmailProvider} />
 
@@ -67,7 +85,7 @@ const EmailVerificationScreen = ({
       
       <div className="flex flex-col space-y-2">
         <Button 
-          onClick={onResendVerification}
+          onClick={handleResendVerification}
           disabled={resendLoading}
           variant="outline" 
           className="w-full border-purple-500/50 text-purple-300 hover:bg-purple-500/10 rounded-xl"

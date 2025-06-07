@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Zap, X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Progress } from '@/components/ui/progress';
 import EmailVerificationScreen from './auth/EmailVerificationScreen';
 import AuthForm from './auth/AuthForm';
 
@@ -20,35 +20,46 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
   const [showEmailSent, setShowEmailSent] = useState(false);
   const [mode, setMode] = useState(initialMode);
   const [resendLoading, setResendLoading] = useState(false);
+  const [progressStep, setProgressStep] = useState<'idle' | 'creating' | 'sending' | 'complete' | 'error'>('idle');
+  const [progressMessage, setProgressMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const { signUp, signIn, user, isEmailVerified, resendVerification } = useAuth();
-  const { toast } = useToast();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setProgressStep('creating');
+    setProgressMessage('Creating your account...');
+    setErrorMessage('');
+    
+    await new Promise(resolve => setTimeout(resolve, 800)); // Show progress
     
     const { error } = await signUp(email, password);
     
     if (error) {
+      setProgressStep('error');
       if (error.message.includes('already registered')) {
-        toast({
-          title: "Account exists",
-          description: "This email is already registered. Try signing in instead.",
-          variant: "destructive",
-        });
+        setErrorMessage('This email is already registered. Try signing in instead.');
       } else {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
+        setErrorMessage(error.message);
       }
+      setTimeout(() => {
+        setProgressStep('idle');
+        setErrorMessage('');
+      }, 3000);
     } else {
-      setShowEmailSent(true);
-      toast({
-        title: "Check your email",
-        description: "We've sent you a verification link to complete registration.",
-      });
+      setProgressStep('sending');
+      setProgressMessage('Sending verification email...');
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setProgressStep('complete');
+      setProgressMessage('Check your email for verification link!');
+      
+      setTimeout(() => {
+        setShowEmailSent(true);
+        setProgressStep('idle');
+      }, 1500);
     }
     
     setLoading(false);
@@ -57,23 +68,34 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setProgressStep('creating');
+    setProgressMessage('Signing you in...');
+    setErrorMessage('');
+    
+    await new Promise(resolve => setTimeout(resolve, 600));
     
     const { error } = await signIn(email, password);
     
     if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      setProgressStep('error');
+      setErrorMessage(error.message);
+      setTimeout(() => {
+        setProgressStep('idle');
+        setErrorMessage('');
+      }, 3000);
     } else if (user && !isEmailVerified) {
-      toast({
-        title: "Email not verified",
-        description: "Please check your email and verify your account first.",
-        variant: "destructive",
-      });
+      setProgressStep('error');
+      setErrorMessage('Please check your email and verify your account first.');
+      setTimeout(() => {
+        setProgressStep('idle');
+        setErrorMessage('');
+      }, 3000);
     } else {
-      onClose();
+      setProgressStep('complete');
+      setProgressMessage('Welcome back!');
+      setTimeout(() => {
+        onClose();
+      }, 1000);
     }
     
     setLoading(false);
@@ -84,25 +106,26 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
     const { error } = await resendVerification(email);
     
     if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Email resent",
-        description: "We've sent another verification link to your email.",
-      });
+      setErrorMessage(error.message);
     }
     setResendLoading(false);
   };
 
   const handleForgotPassword = () => {
-    toast({
-      title: "Forgot Password",
-      description: "Password reset functionality will be available soon. Please contact support if needed.",
-    });
+    setErrorMessage("Password reset functionality will be available soon. Please contact support if needed.");
+    setTimeout(() => {
+      setErrorMessage('');
+    }, 3000);
+  };
+
+  const getProgressValue = () => {
+    switch (progressStep) {
+      case 'creating': return 30;
+      case 'sending': return 70;
+      case 'complete': return 100;
+      case 'error': return 100;
+      default: return 0;
+    }
   };
 
   if (showEmailSent) {
@@ -117,6 +140,8 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
         }}
         resendLoading={resendLoading}
         isMobile={isMobile}
+        errorMessage={errorMessage}
+        onErrorClear={() => setErrorMessage('')}
       />
     );
   }
@@ -146,6 +171,30 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
           </Button>
         )}
       </div>
+
+      {/* Progress Bar Section */}
+      {progressStep !== 'idle' && (
+        <div className="mb-6 space-y-3">
+          <Progress 
+            value={getProgressValue()} 
+            className={`h-2 ${progressStep === 'error' ? 'bg-red-900' : 'bg-gray-700'}`}
+          />
+          <div className="text-center">
+            {progressStep === 'error' ? (
+              <p className="text-red-400 text-sm">{errorMessage}</p>
+            ) : (
+              <p className="text-purple-300 text-sm">{progressMessage}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Error Message Display */}
+      {errorMessage && progressStep === 'idle' && (
+        <div className="mb-4 p-3 bg-red-900/50 border border-red-500 rounded-xl">
+          <p className="text-red-300 text-sm text-center">{errorMessage}</p>
+        </div>
+      )}
 
       <AuthForm
         mode={mode}
