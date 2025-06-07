@@ -32,24 +32,31 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
     setProgressMessage('Creating your account...');
     setErrorMessage('');
     
-    await new Promise(resolve => setTimeout(resolve, 800)); // Show progress
+    await new Promise(resolve => setTimeout(resolve, 800));
     
     const { error } = await signUp(email, password);
     
     if (error) {
       setProgressStep('error');
-      if (error.message.includes('already registered')) {
+      console.error('Signup error details:', error);
+      
+      if (error.message.includes('already registered') || error.message.includes('User already registered')) {
         setErrorMessage('This email is already registered. Try signing in instead.');
+      } else if (error.message.includes('Invalid email')) {
+        setErrorMessage('Please enter a valid email address.');
+      } else if (error.message.includes('Password')) {
+        setErrorMessage('Password must be at least 6 characters long.');
       } else {
-        setErrorMessage(error.message);
+        setErrorMessage(`Signup failed: ${error.message}`);
       }
+      
       setTimeout(() => {
         setProgressStep('idle');
         setErrorMessage('');
-      }, 3000);
+      }, 4000);
     } else {
       setProgressStep('sending');
-      setProgressMessage('Sending verification email...');
+      setProgressMessage('Account created! Sending verification email...');
       
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -78,18 +85,27 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
     
     if (error) {
       setProgressStep('error');
-      setErrorMessage(error.message);
+      console.error('Signin error details:', error);
+      
+      if (error.message.includes('Invalid login credentials')) {
+        setErrorMessage('Invalid email or password. Please check your credentials.');
+      } else if (error.message.includes('Email not confirmed')) {
+        setErrorMessage('Please check your email and verify your account first.');
+      } else {
+        setErrorMessage(`Sign in failed: ${error.message}`);
+      }
+      
       setTimeout(() => {
         setProgressStep('idle');
         setErrorMessage('');
-      }, 3000);
+      }, 4000);
     } else if (user && !isEmailVerified) {
       setProgressStep('error');
       setErrorMessage('Please check your email and verify your account first.');
       setTimeout(() => {
         setProgressStep('idle');
         setErrorMessage('');
-      }, 3000);
+      }, 4000);
     } else {
       setProgressStep('complete');
       setProgressMessage('Welcome back!');
@@ -103,10 +119,16 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
 
   const handleResendVerification = async () => {
     setResendLoading(true);
+    console.log('Attempting to resend verification for:', email);
+    
     const { error } = await resendVerification(email);
     
     if (error) {
-      setErrorMessage(error.message);
+      console.error('Resend verification error:', error);
+      setErrorMessage(`Failed to resend verification: ${error.message}`);
+    } else {
+      setErrorMessage('');
+      console.log('Verification email resent successfully');
     }
     setResendLoading(false);
   };
