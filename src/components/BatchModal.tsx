@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -119,46 +118,44 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[85vh] rounded-xl">
-          <DialogHeader className="text-left">
-            <DialogTitle className="text-2xl font-semibold text-left">
+        <DialogContent className="max-w-4xl max-h-[85vh] rounded-2xl bg-white border border-gray-200 shadow-2xl">
+          <DialogHeader className="text-left pb-4">
+            <DialogTitle className="text-2xl font-semibold text-left text-gray-900">
               {editingBatch ? 'Edit Batch' : 'Create New Batch'}
             </DialogTitle>
           </DialogHeader>
           
           <ScrollArea className="max-h-[65vh] pr-4">
             <div className="space-y-6">
-              <div className="space-y-3">
-                <Label htmlFor="batch-name" className="text-lg font-medium text-left block">Batch Name *</Label>
+              <div className="space-y-2">
                 <Input
                   id="batch-name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter batch name"
-                  className="text-base rounded-xl"
+                  placeholder="Enter a descriptive name for your batch (e.g., 'Product Research Q4 2024')"
+                  className="text-base rounded-xl bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
 
-              <div className="space-y-3">
-                <Label htmlFor="target-url" className="text-lg font-medium text-left block">Project Target URL *</Label>
+              <div className="space-y-2">
                 <Input
                   id="target-url"
                   value={targetUrl}
                   onChange={(e) => setTargetUrl(e.target.value)}
-                  placeholder="https://example.com"
-                  className="text-base rounded-xl"
+                  placeholder="Enter your project URL where prompts will be executed (e.g., https://chat.openai.com)"
+                  className="text-base rounded-xl bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label className="text-lg font-medium text-left">Text Prompts *</Label>
+                  <h3 className="text-lg font-medium text-gray-900">Prompts</h3>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={handleAddPrompt}
-                    className="rounded-xl"
+                    className="rounded-xl border-gray-200 hover:bg-gray-50"
                   >
                     <Plus className="w-4 h-4 mr-1" />
                     Add Prompt
@@ -169,7 +166,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
                   {prompts.map((prompt, index) => (
                     <div
                       key={prompt.id}
-                      className="flex items-start space-x-3 p-4 border rounded-xl bg-gray-50"
+                      className="flex items-start space-x-3 p-4 border border-gray-200 rounded-xl bg-gray-50/50"
                       draggable
                       onDragStart={() => handleDragStart(index)}
                       onDragOver={handleDragOver}
@@ -180,9 +177,9 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
                         <Textarea
                           value={prompt.text}
                           onChange={(e) => handlePromptChange(prompt.id, e.target.value)}
-                          placeholder={`Prompt ${index + 1}`}
+                          placeholder={`Enter your prompt here (e.g., "Analyze the following data and provide insights about customer behavior patterns")`}
                           rows={3}
-                          className="w-full text-base rounded-xl"
+                          className="w-full text-base rounded-xl bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                         />
                       </div>
                       {prompts.length > 1 && (
@@ -191,7 +188,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemovePrompt(prompt.id)}
-                          className="text-red-600 hover:text-red-700 rounded-xl"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl"
                         >
                           <Minus className="w-4 h-4" />
                         </Button>
@@ -203,14 +200,14 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
             </div>
           </ScrollArea>
 
-          <div className="flex justify-end space-x-3 pt-6 border-t">
-            <Button variant="outline" onClick={onClose} className="rounded-xl">
+          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+            <Button variant="outline" onClick={onClose} className="rounded-xl border-gray-200 hover:bg-gray-50">
               Cancel
             </Button>
             <Button 
               onClick={handleSave}
               disabled={!isValid}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50"
             >
               Save Batch
             </Button>
@@ -219,7 +216,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
       </Dialog>
 
       <AlertDialog open={!!deletePromptId} onOpenChange={() => setDeletePromptId(null)}>
-        <AlertDialogContent className="rounded-xl">
+        <AlertDialogContent className="rounded-xl bg-white">
           <AlertDialogHeader>
             <AlertDialogTitle>Remove Prompt</AlertDialogTitle>
             <AlertDialogDescription>
