@@ -17,7 +17,7 @@ const CTA = () => {
             </div>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 gradient-text">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-100">
             Ready to Transform Your AI Workflow?
           </h2>
           

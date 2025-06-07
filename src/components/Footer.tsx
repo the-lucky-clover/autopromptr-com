@@ -4,7 +4,7 @@ import { Zap, Mail, Phone, MapPin, Linkedin, Twitter, Github } from 'lucide-reac
 
 const Footer = () => {
   return (
-    <footer className="gradient-bg text-white relative">
+    <footer className="text-white relative" style={{ background: 'linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 100%)' }}>
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 blur-3xl"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

@@ -24,7 +24,7 @@ const ProvenResults = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12 animate-on-scroll">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-gray-100 mb-4">
             Proven Results Across Industries
           </h2>
           <p className="text-xl text-gray-300">
