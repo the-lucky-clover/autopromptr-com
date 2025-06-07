@@ -10,11 +10,12 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { Home, FileText, BarChart3, Settings, User, Zap, Upload, Package, LogOut, UserCog } from "lucide-react";
+import { Home, FileText, BarChart3, Settings, LogOut, UserCog, Zap, Upload, Package } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const menuItems = [
   {
@@ -55,6 +56,12 @@ export function AppSidebar() {
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  // Get the first letter of the email for the avatar
+  const getAvatarLetter = () => {
+    if (!user?.email) return 'U';
+    return user.email.charAt(0).toUpperCase();
   };
 
   return (
@@ -102,14 +109,16 @@ export function AppSidebar() {
                 className="w-full justify-start p-3 h-auto hover:bg-gray-800 rounded-xl"
               >
                 <div className="flex items-center space-x-3 w-full">
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-white" />
-                  </div>
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback className="bg-blue-600 text-white text-sm font-medium">
+                      {getAvatarLetter()}
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="flex-1 min-w-0 text-left">
                     <p className="text-sm font-medium text-gray-200 truncate">
-                      {user?.email?.split('@')[0] || 'User'}
+                      {user?.email || 'user@example.com'}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">{user?.email || 'user@example.com'}</p>
+                    <p className="text-xs text-gray-400 truncate">Online</p>
                   </div>
                 </div>
               </Button>
