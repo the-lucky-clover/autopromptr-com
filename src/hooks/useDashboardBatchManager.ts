@@ -7,12 +7,13 @@ import { Batch } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 
 export const useDashboardBatchManager = () => {
+  // All hooks must be called in the same order every time
   const { batches, setBatches } = usePersistentBatches();
+  const { toast } = useToast();
   const [showModal, setShowModal] = useState(false);
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const [automationLoading, setAutomationLoading] = useState(false);
-  const { toast } = useToast();
 
   const handleCreateBatch = (batchData: Omit<Batch, 'id' | 'createdAt'>) => {
     const detectedPlatform = detectPlatformFromUrl(batchData.targetUrl);
