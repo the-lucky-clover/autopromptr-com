@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
@@ -64,6 +63,7 @@ export const useDashboardBatchManager = () => {
       }
 
       console.log('Batch and prompts saved to database successfully');
+      return true;
     } catch (error) {
       console.error('Failed to save batch to database:', error);
       throw error;
@@ -82,10 +82,12 @@ export const useDashboardBatchManager = () => {
     };
 
     try {
-      // Save to database first
+      console.log('Creating new batch:', newBatch);
+      
+      // Save to database first and wait for completion
       await saveBatchToDatabase(newBatch);
       
-      // Then update local state
+      // Only update local state after successful database save
       setBatches(prev => [...prev, newBatch]);
       setShowModal(false);
 
@@ -94,6 +96,7 @@ export const useDashboardBatchManager = () => {
         description: `Batch created with auto-detected platform: ${platformName}`,
       });
     } catch (error) {
+      console.error('Failed to create batch:', error);
       toast({
         title: "Failed to create batch",
         description: error instanceof Error ? error.message : 'Unknown error',
@@ -164,8 +167,22 @@ export const useDashboardBatchManager = () => {
     setAutomationLoading(true);
     
     try {
-      // Ensure batch is saved to database before running
+      // Ensure batch is saved to database before running with a verification check
+      console.log('Ensuring batch exists in database before running...');
       await saveBatchToDatabase(batch);
+      
+      // Verify the batch exists in the database
+      const { data: existingBatch, error: checkError } = await supabase
+        .from('batches')
+        .select('id')
+        .eq('id', batch.id)
+        .single();
+        
+      if (checkError || !existingBatch) {
+        throw new Error(`Batch ${batch.id} not found in database after save attempt`);
+      }
+      
+      console.log('Batch verified in database, proceeding with automation...');
       
       // Update batch status to running immediately
       setBatches(prev => prev.map(b => 
