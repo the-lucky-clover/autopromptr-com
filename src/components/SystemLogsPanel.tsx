@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -10,6 +9,7 @@ import { AutoPromptr } from '@/services/autoPromptr';
 
 interface SystemLogsProps {
   batches: Batch[];
+  hasActiveBatch: boolean;
 }
 
 interface LogEntry {
@@ -21,7 +21,7 @@ interface LogEntry {
   details?: string;
 }
 
-const SystemLogsPanel = ({ batches }: SystemLogsProps) => {
+const SystemLogsPanel = ({ batches, hasActiveBatch }: SystemLogsProps) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [systemStatus, setSystemStatus] = useState({
@@ -112,8 +112,13 @@ const SystemLogsPanel = ({ batches }: SystemLogsProps) => {
   };
 
   const runSystemDiagnostics = async () => {
+    if (!hasActiveBatch) {
+      addLog('info', 'System', 'No active batches - skipping system diagnostics');
+      return;
+    }
+
     setIsRefreshing(true);
-    addLog('info', 'System', 'Starting comprehensive system diagnostics...');
+    addLog('info', 'System', 'Starting system diagnostics for active batch processing...');
     
     await checkLovableSupabaseHandshake();
     await checkSupabaseRenderHandshake();
@@ -123,10 +128,15 @@ const SystemLogsPanel = ({ batches }: SystemLogsProps) => {
     setIsRefreshing(false);
   };
 
+  // Only run diagnostics when there are active batches
   useEffect(() => {
-    // Run initial diagnostics
-    runSystemDiagnostics();
-  }, []);
+    if (hasActiveBatch) {
+      addLog('info', 'System', 'Active batch detected - initializing system diagnostics...');
+      runSystemDiagnostics();
+    } else {
+      addLog('info', 'System', 'No active batches - system in standby mode');
+    }
+  }, [hasActiveBatch]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -150,7 +160,7 @@ const SystemLogsPanel = ({ batches }: SystemLogsProps) => {
       case 'error':
         return <Badge variant="outline" className="text-red-600 border-red-300">Error</Badge>;
       default:
-        return <Badge variant="outline" className="text-yellow-600 border-yellow-300">Unknown</Badge>;
+        return <Badge variant="outline" className="text-yellow-600 border-yellow-300">Standby</Badge>;
     }
   };
 
@@ -174,17 +184,19 @@ const SystemLogsPanel = ({ batches }: SystemLogsProps) => {
           <div>
             <CardTitle className="text-white">System Diagnostics & Logs</CardTitle>
             <CardDescription className="text-purple-200">
-              Real-time monitoring of system handshakes and communications
+              {hasActiveBatch 
+                ? "Real-time monitoring of system handshakes during batch processing" 
+                : "System in standby mode - diagnostics will run when batches are active"}
             </CardDescription>
           </div>
           <Button
             onClick={runSystemDiagnostics}
-            disabled={isRefreshing}
+            disabled={isRefreshing || !hasActiveBatch}
             size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            {hasActiveBatch ? 'Refresh' : 'No Active Batch'}
           </Button>
         </div>
       </CardHeader>
@@ -221,7 +233,11 @@ const SystemLogsPanel = ({ batches }: SystemLogsProps) => {
           <h4 className="text-white font-medium mb-3">System Logs</h4>
           <ScrollArea className="h-64 bg-white/5 rounded-xl p-3">
             {logs.length === 0 ? (
-              <p className="text-white/60 text-sm">No logs yet. Run diagnostics to see system status.</p>
+              <p className="text-white/60 text-sm">
+                {hasActiveBatch 
+                  ? "Starting diagnostics for active batch..." 
+                  : "No active batches. System logs will appear when batches are being processed."}
+              </p>
             ) : (
               <div className="space-y-2">
                 {logs.map((log) => (

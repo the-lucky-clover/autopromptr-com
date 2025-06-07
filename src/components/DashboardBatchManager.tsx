@@ -88,7 +88,7 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
       await runBatch(batch.platform, batch.settings);
       
       const updatedBatches = batches.map(b => 
-        b.id === batch.id ? { ...b, status: 'running' } : b
+        b.id === batch.id ? { ...b, status: 'running' as const } : b
       );
       setBatches(updatedBatches);
       updateStats(updatedBatches);
@@ -110,6 +110,9 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
     setEditingBatch(null);
     setShowModal(true);
   };
+
+  // Check if any batch is currently being processed
+  const hasActiveBatch = batches.some(batch => batch.status === 'running');
 
   return (
     <div className="space-y-6">
@@ -158,8 +161,8 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
         />
       </div>
 
-      {/* System Logs Panel */}
-      <SystemLogsPanel batches={batches} />
+      {/* System Logs Panel - only show diagnostics when there are active batches */}
+      <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} />
     </div>
   );
 };
