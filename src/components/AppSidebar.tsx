@@ -5,13 +5,12 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { Home, FileText, BarChart3, Settings, User, Zap, BookOpen, HelpCircle } from "lucide-react";
+import { Home, FileText, BarChart3, Settings, User, Zap, Upload, Package } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
@@ -21,32 +20,24 @@ const menuItems = [
     icon: Home,
   },
   {
-    title: "Prompts",
-    url: "/dashboard/prompts",
-    icon: FileText,
+    title: "Batches",
+    url: "/dashboard/batches",
+    icon: Package,
+  },
+  {
+    title: "Batch Extractor",
+    url: "/dashboard/extractor",
+    icon: Zap,
+  },
+  {
+    title: "Upload/Import",
+    url: "/dashboard/upload",
+    icon: Upload,
   },
   {
     title: "Analytics",
     url: "/dashboard/analytics",
     icon: BarChart3,
-  },
-  {
-    title: "Workflows",
-    url: "/dashboard/workflows",
-    icon: Zap,
-  },
-];
-
-const bottomItems = [
-  {
-    title: "Documentation",
-    url: "/docs",
-    icon: BookOpen,
-  },
-  {
-    title: "Help & Support",
-    url: "/support",
-    icon: HelpCircle,
   },
   {
     title: "Settings",
@@ -59,13 +50,13 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar className="border-r border-gray-200 bg-gradient-to-b from-gray-50 to-gray-100">
-      <SidebarHeader className="p-6">
-        <Link to="/" className="flex items-center space-x-3 group">
+    <Sidebar className="border-r border-gray-700 bg-gray-900">
+      <SidebarHeader className="p-6 flex items-center justify-center">
+        <Link to="/" className="flex items-center space-x-3 group justify-center">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <Zap className="w-5 h-5 text-white" strokeWidth={2} />
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             AutoPromptr
           </span>
         </Link>
@@ -73,9 +64,6 @@ export function AppSidebar() {
       
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-500 text-xs uppercase tracking-wider">
-            Main Menu
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -83,7 +71,7 @@ export function AppSidebar() {
                   <SidebarMenuButton 
                     asChild
                     isActive={location.pathname === item.url}
-                    className="hover:bg-white/70 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-600 text-gray-700 rounded-xl"
+                    className="hover:bg-gray-800 data-[active=true]:bg-blue-600 data-[active=true]:text-white text-gray-300 rounded-xl"
                   >
                     <Link to={item.url}>
                       <item.icon className="w-4 h-4" />
@@ -98,34 +86,14 @@ export function AppSidebar() {
       </SidebarContent>
       
       <SidebarFooter>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {bottomItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild
-                    className="hover:bg-white/70 text-gray-700 rounded-xl"
-                  >
-                    <Link to={item.url}>
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-700">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
               <User className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">John Doe</p>
-              <p className="text-xs text-gray-500 truncate">john@example.com</p>
+              <p className="text-sm font-medium text-gray-200 truncate">John Doe</p>
+              <p className="text-xs text-gray-400 truncate">john@example.com</p>
             </div>
           </div>
         </div>
