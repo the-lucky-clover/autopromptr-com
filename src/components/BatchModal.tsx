@@ -4,14 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Progress } from '@/components/ui/progress';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Plus, Minus, GripVertical } from 'lucide-react';
+import { Plus, Minus, GripVertical, Save } from 'lucide-react';
 import { Batch, TextPrompt } from '@/types/batch';
 
 interface BatchModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (batch: Batch | Omit<Batch, 'id' | 'createdAt'>) => void;
+  onSave: (batch: Batch | Omit<Batch, 'id' | 'createdAt'>) => Promise<void> | void;
   editingBatch?: Batch | null;
 }
 
@@ -21,6 +22,8 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
   const [prompts, setPrompts] = useState<TextPrompt[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [deletePromptId, setDeletePromptId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveProgress, setSaveProgress] = useState(0);
 
   useEffect(() => {
     if (editingBatch) {
@@ -89,26 +92,54 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
     setDraggedIndex(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim() || !targetUrl.trim() || prompts.some(p => !p.text.trim())) {
       return; // Don't save if required fields are empty
     }
 
-    const batchData = {
-      name: name.trim(),
-      targetUrl: targetUrl.trim(),
-      prompts: prompts.filter(p => p.text.trim()),
-      status: 'pending' as const,
-      description: ''
-    };
+    setIsSaving(true);
+    setSaveProgress(0);
 
-    if (editingBatch) {
-      onSave({
-        ...editingBatch,
-        ...batchData
-      });
-    } else {
-      onSave(batchData);
+    // Simulate progress steps
+    const progressSteps = [
+      { step: 20, delay: 100, message: 'Validating batch data...' },
+      { step: 40, delay: 200, message: 'Preparing prompts...' },
+      { step: 60, delay: 150, message: 'Saving to database...' },
+      { step: 80, delay: 200, message: 'Finalizing...' },
+      { step: 100, delay: 100, message: 'Complete!' }
+    ];
+
+    try {
+      // Animate progress
+      for (const { step, delay } of progressSteps) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+        setSaveProgress(step);
+      }
+
+      const batchData = {
+        name: name.trim(),
+        targetUrl: targetUrl.trim(),
+        prompts: prompts.filter(p => p.text.trim()),
+        status: 'pending' as const,
+        description: ''
+      };
+
+      if (editingBatch) {
+        await onSave({
+          ...editingBatch,
+          ...batchData
+        });
+      } else {
+        await onSave(batchData);
+      }
+
+      // Small delay to show completion
+      await new Promise(resolve => setTimeout(resolve, 300));
+    } catch (error) {
+      console.error('Error saving batch:', error);
+    } finally {
+      setIsSaving(false);
+      setSaveProgress(0);
     }
   };
 
@@ -125,6 +156,24 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
           </DialogHeader>
           
           <ScrollArea className="max-h-[65vh] pr-4">
+            {isSaving && (
+              <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                <div className="flex items-center space-x-3 mb-3">
+                  <Save className="w-5 h-5 text-blue-600 animate-pulse" />
+                  <span className="text-blue-900 font-medium">Saving batch...</span>
+                </div>
+                <Progress value={saveProgress} className="h-2" />
+                <div className="text-sm text-blue-700 mt-2">
+                  {saveProgress < 20 && "Validating batch data..."}
+                  {saveProgress >= 20 && saveProgress < 40 && "Preparing prompts..."}
+                  {saveProgress >= 40 && saveProgress < 60 && "Saving to database..."}
+                  {saveProgress >= 60 && saveProgress < 80 && "Finalizing..."}
+                  {saveProgress >= 80 && saveProgress < 100 && "Almost done..."}
+                  {saveProgress === 100 && "Complete!"}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-6">
               <div className="space-y-2">
                 <Input
@@ -133,6 +182,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter a descriptive name for your batch (e.g., 'Product Research Q4 2024')"
                   className="text-base rounded-xl bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  disabled={isSaving}
                 />
               </div>
 
@@ -143,6 +193,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
                   onChange={(e) => setTargetUrl(e.target.value)}
                   placeholder="Enter your project URL where prompts will be executed (e.g., https://chat.openai.com)"
                   className="text-base rounded-xl bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  disabled={isSaving}
                 />
               </div>
 
@@ -155,6 +206,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
                     size="sm"
                     onClick={handleAddPrompt}
                     className="rounded-xl border-gray-200 hover:bg-gray-50"
+                    disabled={isSaving}
                   >
                     <Plus className="w-4 h-4 mr-1" />
                     Add Prompt
@@ -166,7 +218,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
                     <div
                       key={prompt.id}
                       className="flex items-start space-x-3 p-4 border border-gray-200 rounded-xl bg-gray-50/50"
-                      draggable
+                      draggable={!isSaving}
                       onDragStart={() => handleDragStart(index)}
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, index)}
@@ -179,6 +231,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
                           placeholder={`Enter your prompt here (e.g., "Analyze the following data and provide insights about customer behavior patterns")`}
                           rows={3}
                           className="w-full text-base rounded-xl bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                          disabled={isSaving}
                         />
                       </div>
                       {prompts.length > 1 && (
@@ -188,6 +241,7 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
                           size="sm"
                           onClick={() => handleRemovePrompt(prompt.id)}
                           className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl"
+                          disabled={isSaving}
                         >
                           <Minus className="w-4 h-4" />
                         </Button>
@@ -200,15 +254,27 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
           </ScrollArea>
 
           <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-            <Button variant="outline" onClick={onClose} className="rounded-xl border-gray-200 hover:bg-gray-50">
+            <Button 
+              variant="outline" 
+              onClick={onClose} 
+              className="rounded-xl border-gray-200 hover:bg-gray-50"
+              disabled={isSaving}
+            >
               Cancel
             </Button>
             <Button 
               onClick={handleSave}
-              disabled={!isValid}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50"
+              disabled={!isValid || isSaving}
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50 min-w-[120px]"
             >
-              Save Batch
+              {isSaving ? (
+                <div className="flex items-center space-x-2">
+                  <Save className="w-4 h-4 animate-pulse" />
+                  <span>Saving...</span>
+                </div>
+              ) : (
+                'Save Batch'
+              )}
             </Button>
           </div>
         </DialogContent>

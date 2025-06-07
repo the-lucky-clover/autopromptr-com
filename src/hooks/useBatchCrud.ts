@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Batch } from '@/types/batch';
@@ -43,6 +42,7 @@ export const useBatchCrud = () => {
       // Only update local state after successful database save
       setBatches(prev => [...prev, newBatch]);
       setShowModal(false);
+      setEditingBatch(null);
 
       toast({
         title: "Batch created successfully",
@@ -57,6 +57,7 @@ export const useBatchCrud = () => {
         description: error instanceof Error ? error.message : 'Unknown error occurred',
         variant: "destructive",
       });
+      throw error; // Re-throw to let the modal handle it
     }
   };
 
@@ -96,6 +97,7 @@ export const useBatchCrud = () => {
         description: error instanceof Error ? error.message : 'Unknown error',
         variant: "destructive",
       });
+      throw error; // Re-throw to let the modal handle it
     }
   };
 
