@@ -32,7 +32,8 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <Button 
               size="lg" 
-              className="bg-blue-500 hover:bg-blue-600 text-white text-lg px-8 py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2"
+              className="text-white text-lg px-8 py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2"
+              style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%)' }}
             >
               <Zap className="w-5 h-5" />
               Start Free Trial
