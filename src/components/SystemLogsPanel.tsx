@@ -120,7 +120,7 @@ const SystemLogsPanel = ({ batches, hasActiveBatch }: SystemLogsProps) => {
               <div className="flex items-center space-x-2 text-white/80 text-sm">
                 <Info className="w-4 h-4" />
                 <span>
-                  Syslog endpoint: {window.location.origin.replace('https://', 'https://raahpoyciwuyhwlcenpy.supabase.co')}/functions/v1/syslog-receiver
+                  Syslog endpoint: raahpoyciwuyhwlcenpy.supabase.co:443/functions/v1/syslog-receiver
                 </span>
               </div>
               <RenderSyslogDisplay batchId={activeBatchId} />
