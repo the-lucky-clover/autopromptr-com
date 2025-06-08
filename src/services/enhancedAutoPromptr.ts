@@ -1,9 +1,9 @@
 
-import { AutoPromtr, AutoPromtrError } from './autoPromptr';
+import { AutoPromptr, AutoPromtrError } from './autoPromptr';
 import { Batch } from '@/types/batch';
 
 // Enhanced AutoPromptr service with improved backend communication
-export class EnhancedAutoPromptr extends AutoPromtr {
+export class EnhancedAutoPromptr extends AutoPromptr {
   private enhancedRetryAttempts = 5;
   private enhancedRetryDelay = 2000;
 
@@ -198,7 +198,7 @@ export class EnhancedAutoPromptr extends AutoPromtr {
         // Check if message was sent (input should be cleared or new message appears)
         const isCleared = await page.evaluate(() => {
           const inputs = Array.from(document.querySelectorAll('textarea, input, [contenteditable="true"]'));
-          return inputs.some(input => input.value === '' || input.textContent === '');
+          return inputs.some(input => (input as HTMLInputElement).value === '' || input.textContent === '');
         });
         
         if (isCleared) {
@@ -274,7 +274,10 @@ export class EnhancedAutoPromptr extends AutoPromtr {
         headers['X-API-Key'] = apiKey;
       }
       
-      const response = await fetch(`${this.apiBaseUrl}/api/batch-status/${batchId}`, {
+      // Get the API base URL from the parent class
+      const baseUrl = this.apiBaseUrl || 'https://autopromptr-backend.onrender.com';
+      
+      const response = await fetch(`${baseUrl}/api/batch-status/${batchId}`, {
         signal: controller.signal,
         headers
       });
@@ -314,5 +317,11 @@ export class EnhancedAutoPromptr extends AutoPromtr {
         true
       );
     }
+  }
+
+  // Get the apiBaseUrl from parent class
+  private get apiBaseUrl(): string {
+    // Access the private property through a type assertion
+    return (this as any).apiBaseUrl || 'https://autopromptr-backend.onrender.com';
   }
 }

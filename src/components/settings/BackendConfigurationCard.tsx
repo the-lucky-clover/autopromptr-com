@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Server, Check, X, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
-import { AutoPromtr } from "@/services/autoPromptr";
+import { AutoPromptr } from "@/services/autoPromptr";
 import { useToast } from "@/hooks/use-toast";
 
 export const BackendConfigurationCard = () => {
@@ -21,7 +21,7 @@ export const BackendConfigurationCard = () => {
   const testConnection = async () => {
     setTesting(true);
     try {
-      const autoPromptr = new AutoPromtr(backendUrl);
+      const autoPromptr = new AutoPromptr(backendUrl);
       await autoPromptr.healthCheck();
       setConnectionStatus('connected');
       toast({
