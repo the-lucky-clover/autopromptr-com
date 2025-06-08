@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 
-// Configuration - Always use the production Render.com URL
+// Configuration - Use Supabase Edge Function for batch-exists endpoint
 const API_BASE_URL = 'https://autopromptr-backend.onrender.com';
+const SUPABASE_URL = 'https://raahpoyciwuyhwlcenpy.supabase.co';
 
 // Enhanced error handling with specific error types
 export class AutoPromtrError extends Error {
@@ -20,11 +20,13 @@ export class AutoPromtrError extends Error {
 // API Service Class with enhanced reliability
 export class AutoPromptr {
   private apiBaseUrl: string;
+  private supabaseUrl: string;
   private maxRetries: number = 3;
   private retryDelay: number = 1000;
 
-  constructor(apiBaseUrl = API_BASE_URL) {
+  constructor(apiBaseUrl = API_BASE_URL, supabaseUrl = SUPABASE_URL) {
     this.apiBaseUrl = apiBaseUrl;
+    this.supabaseUrl = supabaseUrl;
   }
 
   // Enhanced health check with timeout and retry
@@ -78,19 +80,21 @@ export class AutoPromptr {
     }
   }
 
-  // Enhanced batch verification with backend confirmation
+  // Enhanced batch verification using Supabase Edge Function
   async verifyBatchExists(batchId: string, retries = 3): Promise<boolean> {
-    console.log(`Verifying batch exists in backend: ${batchId}`);
+    console.log(`Verifying batch exists using Supabase Edge Function: ${batchId}`);
     
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
         
-        const response = await fetch(`${this.apiBaseUrl}/api/batch-exists/${batchId}`, {
+        // Use Supabase Edge Function instead of external backend
+        const response = await fetch(`${this.supabaseUrl}/functions/v1/batch-exists/${batchId}`, {
           signal: controller.signal,
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhYWhwb3ljaXd1eWh3bGNlbnB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5Njc4NTAsImV4cCI6MjA2NDU0Mzg1MH0.lAzBUV4PumqVGQqJNhS-5snJIt_qnSAARSYKb5WEUQo`
           }
         });
         
@@ -101,7 +105,7 @@ export class AutoPromptr {
           console.log(`Batch verification result (attempt ${attempt}):`, result);
           return result.exists === true;
         } else if (response.status === 404) {
-          console.log(`Batch not found in backend (attempt ${attempt})`);
+          console.log(`Batch not found in database (attempt ${attempt})`);
           return false;
         } else {
           throw new AutoPromtrError(
