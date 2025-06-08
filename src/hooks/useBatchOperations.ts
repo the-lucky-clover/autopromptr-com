@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useBatchAutomation } from '@/hooks/useBatchAutomation';
+import { useBatchAutomation } from '@/services/autoPromptr';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
 import { Batch, BatchFormData, TextPrompt } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
@@ -71,7 +71,13 @@ export const useBatchOperations = () => {
     setSelectedBatchId(batch.id);
     
     try {
-      await runBatch(detectedPlatform, batch.settings);
+      // Pass the complete batch object with platform information
+      const batchWithPlatform = {
+        ...batch,
+        platform: detectedPlatform
+      };
+      
+      await runBatch(batchWithPlatform, detectedPlatform, batch.settings);
       
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'running', platform: detectedPlatform } : b

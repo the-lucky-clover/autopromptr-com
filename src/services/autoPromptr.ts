@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 // Configuration - Use Supabase Edge Function for batch-exists endpoint
@@ -80,57 +81,6 @@ export class AutoPromptr {
     }
   }
 
-  // Enhanced batch verification using Supabase Edge Function
-  async verifyBatchExists(batchId: string, retries = 3): Promise<boolean> {
-    console.log(`Verifying batch exists using Supabase Edge Function: ${batchId}`);
-    
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
-        
-        // Use Supabase Edge Function instead of external backend
-        const response = await fetch(`${this.supabaseUrl}/functions/v1/batch-exists/${batchId}`, {
-          signal: controller.signal,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhYWhwb3ljaXd1eWh3bGNlbnB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5Njc4NTAsImV4cCI6MjA2NDU0Mzg1MH0.lAzBUV4PumqVGQqJNhS-5snJIt_qnSAARSYKb5WEUQo`
-          }
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (response.ok) {
-          const result = await response.json();
-          console.log(`Batch verification result (attempt ${attempt}):`, result);
-          return result.exists === true;
-        } else if (response.status === 404) {
-          console.log(`Batch not found in database (attempt ${attempt})`);
-          return false;
-        } else {
-          throw new AutoPromtrError(
-            `Batch verification failed with status ${response.status}`,
-            'VERIFICATION_FAILED',
-            response.status,
-            true
-          );
-        }
-      } catch (err) {
-        console.error(`Batch verification attempt ${attempt} failed:`, err);
-        
-        if (attempt === retries) {
-          console.warn('Batch verification failed after all retries, proceeding anyway');
-          return false; // Default to false rather than throwing
-        }
-        
-        // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-      }
-    }
-    
-    return false;
-  }
-
   // Get supported platforms
   async getPlatforms() {
     const response = await fetch(`${this.apiBaseUrl}/api/platforms`);
@@ -144,9 +94,9 @@ export class AutoPromptr {
     return response.json();
   }
 
-  // Enhanced batch running with comprehensive error handling
-  async runBatch(batchId: string, platform: string, options: { delay?: number; maxRetries?: number } = {}) {
-    console.log('Starting enhanced batch run process:', { batchId, platform, options });
+  // Enhanced batch running with complete batch data
+  async runBatch(batch: any, platform: string, options: { delay?: number; maxRetries?: number } = {}) {
+    console.log('Starting enhanced batch run process with complete batch data:', { batch, platform, options });
     console.log('Backend URL:', this.apiBaseUrl);
     
     // Step 1: Ensure backend is healthy
@@ -164,21 +114,27 @@ export class AutoPromptr {
       throw err;
     }
     
-    // Step 2: Verify batch exists in backend (with retries)
-    const batchExists = await this.verifyBatchExists(batchId);
-    if (!batchExists) {
-      console.warn(`Batch ${batchId} not found in backend, will proceed but this may cause issues`);
-    }
-    
-    // Step 3: Attempt to run the batch
+    // Step 2: Prepare payload with complete batch data
     const payload = {
-      batch_id: batchId,
+      batch: {
+        id: batch.id,
+        name: batch.name,
+        targetUrl: batch.targetUrl,
+        description: batch.description || '',
+        platform: batch.platform || platform,
+        settings: batch.settings,
+        prompts: batch.prompts.map((prompt: any) => ({
+          id: prompt.id,
+          text: prompt.text,
+          order: prompt.order
+        }))
+      },
       platform: platform,
       delay_between_prompts: options.delay || 5000,
       max_retries: options.maxRetries || 3
     };
     
-    console.log('Sending enhanced payload:', payload);
+    console.log('Sending enhanced payload with complete batch data:', payload);
     
     try {
       const controller = new AbortController();
@@ -214,11 +170,7 @@ export class AutoPromptr {
         }
         
         // Handle specific error cases
-        if (response.status === 404 && errorText.includes('Batch not found')) {
-          errorCode = 'BATCH_NOT_FOUND';
-          errorMessage = 'Batch not found in backend database. Please try creating the batch again.';
-          retryable = true;
-        } else if (response.status === 503) {
+        if (response.status === 503) {
           errorCode = 'BACKEND_OVERLOADED';
           errorMessage = 'Backend service is overloaded. Please try again in a few moments.';
           retryable = true;
@@ -392,15 +344,15 @@ export function useBatchAutomation(batchId?: string) {
     pollStatus();
   }, [batchId, autoPromptr]);
 
-  const runBatch = async (platform: string, options?: { delay?: number; maxRetries?: number }) => {
-    if (!batchId) throw new AutoPromtrError('No batch ID provided', 'NO_BATCH_ID');
+  const runBatch = async (batch: any, platform: string, options?: { delay?: number; maxRetries?: number }) => {
+    if (!batch || !batch.id) throw new AutoPromtrError('No batch provided', 'NO_BATCH_PROVIDED');
     
     setLoading(true);
     setError(null);
     
     try {
-      console.log('Running batch with enhanced error handling:', batchId, 'on platform:', platform);
-      const result = await autoPromptr.runBatch(batchId, platform, options);
+      console.log('Running batch with complete batch data:', batch, 'on platform:', platform);
+      const result = await autoPromptr.runBatch(batch, platform, options);
       console.log('Enhanced batch run result:', result);
       return result;
     } catch (err) {
