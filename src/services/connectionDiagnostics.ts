@@ -1,5 +1,4 @@
-
-import { AutoPromtr, AutoPromtrError } from './autoPromptr';
+import { AutoPromptr, AutoPromtrError } from './autoPromptr';
 
 export interface ConnectionTestResult {
   endpoint: string;
