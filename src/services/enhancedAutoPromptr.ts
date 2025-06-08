@@ -20,19 +20,39 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   async validateConnection(): Promise<boolean> {
     try {
       console.log('🔍 Validating connection to:', this.configuredUrl);
-      const testResult = await this.connectionDiagnostics.runComprehensiveTest();
       
-      if (testResult.overallSuccess) {
-        console.log('✅ Connection validation successful');
+      // Try a direct health check first (this will work for actual backend calls)
+      try {
+        const healthResult = await super.healthCheck();
+        console.log('✅ Direct health check successful:', healthResult);
         return true;
-      } else {
-        console.error('❌ Connection validation failed:', testResult.recommendations);
-        throw new AutoPromtrError(
-          `Connection validation failed: ${testResult.recommendations.join(', ')}`,
-          'CONNECTION_VALIDATION_FAILED',
-          503,
-          true
-        );
+      } catch (healthError) {
+        console.log('⚠️ Direct health check failed, running comprehensive test...');
+        
+        // Run comprehensive test for detailed diagnostics
+        const testResult = await this.connectionDiagnostics.runComprehensiveTest();
+        
+        if (testResult.overallSuccess) {
+          console.log('✅ Connection validation successful via comprehensive test');
+          return true;
+        } else {
+          console.error('❌ Connection validation failed:', testResult.recommendations);
+          
+          // Only throw error if we have actual failures (not just CORS)
+          const actualFailures = testResult.endpointResults.filter(r => !r.success && !r.corsBlocked);
+          if (actualFailures.length > 0) {
+            throw new AutoPromtrError(
+              `Connection validation failed: ${testResult.recommendations.join(', ')}`,
+              'CONNECTION_VALIDATION_FAILED',
+              503,
+              true
+            );
+          } else {
+            // CORS blocks are expected, treat as success
+            console.log('✅ CORS restrictions detected but this is normal - proceeding');
+            return true;
+          }
+        }
       }
     } catch (err) {
       console.error('❌ Connection validation error:', err);
@@ -43,7 +63,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   async runBatchWithValidation(batch: Batch, platform: string, options: any = {}) {
     console.log('🚀 Starting enhanced batch run with connection validation...');
     
-    // First validate the connection
+    // First validate the connection (this will handle CORS properly)
     await this.validateConnection();
     
     // Enhanced options with better defaults

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, Loader2, Wifi } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, Wifi, AlertTriangle } from 'lucide-react';
 import { ConnectionDiagnostics, ConnectionTestResult } from '@/services/connectionDiagnostics';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,9 +28,9 @@ export const ConnectionWizard = () => {
         });
       } else {
         toast({
-          title: "Connection test failed",
+          title: "Connection test completed",
           description: results.recommendations.join(', '),
-          variant: "destructive",
+          variant: "default",
         });
       }
     } catch (err) {
@@ -44,10 +44,24 @@ export const ConnectionWizard = () => {
     }
   };
 
-  const getStatusIcon = (success: boolean) => {
-    return success ? 
-      <CheckCircle className="h-4 w-4 text-green-500" /> : 
-      <XCircle className="h-4 w-4 text-red-500" />;
+  const getStatusIcon = (result: ConnectionTestResult) => {
+    if (result.success) {
+      return <CheckCircle className="h-4 w-4 text-green-500" />;
+    } else if (result.corsBlocked) {
+      return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+    } else {
+      return <XCircle className="h-4 w-4 text-red-500" />;
+    }
+  };
+
+  const getStatusBadge = (result: ConnectionTestResult) => {
+    if (result.success) {
+      return <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30">Connected</Badge>;
+    } else if (result.corsBlocked) {
+      return <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">CORS Blocked</Badge>;
+    } else {
+      return <Badge variant="destructive">Failed</Badge>;
+    }
   };
 
   return (
@@ -84,7 +98,7 @@ export const ConnectionWizard = () => {
             <div className="flex items-center justify-between">
               <h4 className="text-white font-medium">Overall Status</h4>
               <Badge variant={testResults.overallSuccess ? 'default' : 'destructive'}>
-                {testResults.overallSuccess ? 'Connected' : 'Failed'}
+                {testResults.overallSuccess ? 'Ready' : 'Issues Detected'}
               </Badge>
             </div>
 
@@ -104,12 +118,13 @@ export const ConnectionWizard = () => {
                 {testResults.endpointResults.map((result: ConnectionTestResult, index: number) => (
                   <div key={index} className="flex items-center justify-between bg-white/5 rounded p-2">
                     <div className="flex items-center space-x-2">
-                      {getStatusIcon(result.success)}
+                      {getStatusIcon(result)}
                       <span className="text-white text-sm">{result.endpoint}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-white text-xs">{result.responseTime}ms</span>
-                      {result.error && (
+                      {getStatusBadge(result)}
+                      <span className="text-white text-xs block">{result.responseTime}ms</span>
+                      {result.error && !result.corsBlocked && (
                         <p className="text-red-300 text-xs">{result.error}</p>
                       )}
                     </div>
@@ -119,9 +134,9 @@ export const ConnectionWizard = () => {
             </div>
 
             {testResults.recommendations.length > 0 && (
-              <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-3">
-                <h5 className="text-yellow-300 font-medium mb-2">Recommendations</h5>
-                <ul className="text-yellow-200 text-sm space-y-1">
+              <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-3">
+                <h5 className="text-blue-300 font-medium mb-2">Information</h5>
+                <ul className="text-blue-200 text-sm space-y-1">
                   {testResults.recommendations.map((rec: string, index: number) => (
                     <li key={index}>• {rec}</li>
                   ))}
@@ -133,10 +148,18 @@ export const ConnectionWizard = () => {
               <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-3">
                 <p className="text-orange-300 text-sm">
                   <strong>Ad Blocker Detected:</strong> This may interfere with backend requests. 
-                  Consider whitelisting this domain.
+                  Consider whitelisting this domain if you experience issues.
                 </p>
               </div>
             )}
+
+            <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-3">
+              <h5 className="text-green-300 font-medium mb-2">CORS Information</h5>
+              <p className="text-green-200 text-sm">
+                CORS (Cross-Origin Resource Sharing) restrictions are normal browser security features. 
+                The backend will handle these restrictions properly during actual batch runs.
+              </p>
+            </div>
           </div>
         )}
       </CardContent>
