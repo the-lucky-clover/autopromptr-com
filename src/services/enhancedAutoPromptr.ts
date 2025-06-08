@@ -8,9 +8,9 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   private enhancedRetryAttempts = 5;
   private enhancedRetryDelay = 2000;
 
-  // Enhanced batch running with intelligent cold start detection
+  // Enhanced batch running with better error handling
   async runBatchWithEnhancements(batch: Batch, platform: string, options: any = {}) {
-    console.log('🚀 Starting enhanced batch run with intelligent backend handling...');
+    console.log('🚀 Starting enhanced batch run with improved error handling...');
     
     const enhancedOptions = {
       waitForIdle: options.waitForIdle ?? true,
@@ -21,10 +21,10 @@ export class EnhancedAutoPromptr extends AutoPromptr {
       ...options
     };
     
-    console.log('🔧 Enhanced options with intelligent handling:', enhancedOptions);
+    console.log('🔧 Enhanced options:', enhancedOptions);
     
     try {
-      // Use the parent class method with enhanced error categorization
+      // Use the parent class method with improved error handling
       const result = await super.runBatch(batch, platform, enhancedOptions);
       console.log('✅ Enhanced batch run completed successfully');
       return result;
@@ -32,30 +32,30 @@ export class EnhancedAutoPromptr extends AutoPromptr {
     } catch (err) {
       console.error('❌ Enhanced batch run failed:', err);
       
-      // Enhanced error categorization with better context
+      // Enhanced error categorization with clearer messages
       if (err instanceof AutoPromtrError) {
-        // Provide more helpful error messages
-        if (err.code === 'BACKEND_COLD_START') {
+        // Provide more specific error messages based on error codes
+        if (err.code === 'NETWORK_CONNECTION_FAILED') {
           throw new AutoPromtrError(
-            'Backend service is starting up. This usually takes 30-60 seconds. Please wait and try again.',
+            'Cannot connect to the automation backend. Please check your internet connection and try again.',
             err.code,
             err.statusCode,
             true
           );
         }
         
-        if (err.code === 'BACKEND_TEMPORARILY_BUSY') {
+        if (err.code === 'REQUEST_TIMEOUT') {
           throw new AutoPromtrError(
-            'Backend is temporarily busy processing other requests. Please wait a moment and try again.',
+            'Backend request timed out. The service may be under heavy load. Please wait a moment and try again.',
             err.code,
             err.statusCode,
             true
           );
         }
         
-        if (err.code === 'GATEWAY_ERROR') {
+        if (err.code === 'SERVICE_TEMPORARILY_UNAVAILABLE') {
           throw new AutoPromtrError(
-            'Gateway timeout occurred. The backend may be under load. Please try again.',
+            'Backend service is temporarily unavailable. Please wait a few minutes and try again.',
             err.code,
             err.statusCode,
             true

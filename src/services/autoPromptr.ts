@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 // Configuration - Use Supabase Edge Function for batch-exists endpoint
@@ -30,15 +29,14 @@ export class AutoPromptr {
     this.supabaseUrl = supabaseUrl;
   }
 
-  // Enhanced health check with better cold start detection
+  // Enhanced health check with better error classification
   async healthCheck(retries = 3): Promise<any> {
     console.log('Checking backend health at:', this.apiBaseUrl);
     
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         const controller = new AbortController();
-        // Increased timeout for slow responses
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // Increased timeout
         
         const response = await fetch(`${this.apiBaseUrl}/health`, {
           signal: controller.signal,
@@ -50,17 +48,16 @@ export class AutoPromptr {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-          // More specific error handling for different status codes
           if (response.status === 503) {
             throw new AutoPromtrError(
-              `Backend is temporarily unavailable (${response.status})`,
+              `Backend is temporarily unavailable (${response.status}). The service may be restarting.`,
               'SERVICE_TEMPORARILY_UNAVAILABLE',
               response.status,
               true
             );
           } else if (response.status >= 500) {
             throw new AutoPromtrError(
-              `Backend server error (${response.status})`,
+              `Backend server error (${response.status}). Please try again.`,
               'SERVER_ERROR',
               response.status,
               true
@@ -83,34 +80,32 @@ export class AutoPromptr {
         console.error(`❌ Health check attempt ${attempt} failed:`, err);
         
         if (attempt === retries) {
-          // Only throw cold start error if we get connection refused or timeout
-          if (err.name === 'AbortError' || err.message.includes('fetch')) {
-            // Check if this might be a genuine cold start vs network issue
-            const isLikelyColdStart = err.message.includes('refused') || err.name === 'AbortError';
-            
-            if (isLikelyColdStart) {
-              throw new AutoPromtrError(
-                'Backend service appears to be starting up. Please wait 30-60 seconds and try again.',
-                'BACKEND_COLD_START',
-                503,
-                true
-              );
-            } else {
-              throw new AutoPromtrError(
-                'Backend service is not responding. Please check your connection and try again.',
-                'SERVICE_UNAVAILABLE',
-                503,
-                true
-              );
-            }
+          // Better error classification based on actual error types
+          if (err.name === 'AbortError') {
+            throw new AutoPromtrError(
+              'Backend request timed out. The service may be experiencing high load or network issues.',
+              'REQUEST_TIMEOUT',
+              408,
+              true
+            );
+          }
+          
+          if (err.message === 'Load failed' || err.message.includes('fetch')) {
+            throw new AutoPromtrError(
+              'Unable to connect to backend service. Please check your internet connection and try again.',
+              'NETWORK_CONNECTION_FAILED',
+              0,
+              true
+            );
           }
           
           if (err instanceof AutoPromtrError) {
             throw err;
           }
           
+          // Generic network error
           throw new AutoPromtrError(
-            'Backend health check failed after multiple attempts',
+            'Backend service is not responding. Please check your connection and try again.',
             'SERVICE_UNAVAILABLE',
             503,
             true
