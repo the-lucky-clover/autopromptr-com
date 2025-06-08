@@ -1,4 +1,3 @@
-
 import {
   Sidebar,
   SidebarContent,
@@ -68,9 +67,7 @@ export function AppSidebar() {
     <Sidebar className="border-r border-gray-700 bg-gray-900">
       <SidebarHeader className="p-6 flex items-center justify-center">
         <Link to="/" className="flex items-center space-x-3 group justify-center">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <Zap className="w-5 h-5 text-white" strokeWidth={2} />
-          </div>
+          <Zap className="w-8 h-8 text-white" strokeWidth={2} />
           <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             AutoPromptr
           </span>
