@@ -5,7 +5,6 @@ import BatchModal from './BatchModal';
 import DashboardBatchList from './DashboardBatchList';
 import DashboardEmptyState from './DashboardEmptyState';
 import DashboardBatchHeader from './DashboardBatchHeader';
-import SystemLogsPanel from './SystemLogsPanel';
 
 interface DashboardBatchManagerProps {
   onStatsUpdate?: (stats: {
@@ -14,9 +13,10 @@ interface DashboardBatchManagerProps {
     completedBatches: number;
     totalPrompts: number;
   }) => void;
+  onBatchesUpdate?: (batches: any[]) => void;
 }
 
-const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) => {
+const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate }: DashboardBatchManagerProps) => {
   const {
     batches,
     showModal,
@@ -49,8 +49,12 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
     }
   }, [batches, onStatsUpdate]);
 
-  // Check if any batch is currently being processed
-  const hasActiveBatch = batches.some(batch => batch.status === 'running');
+  // Update batches for parent component
+  useEffect(() => {
+    if (onBatchesUpdate) {
+      onBatchesUpdate(batches);
+    }
+  }, [batches, onBatchesUpdate]);
 
   return (
     <div className="space-y-6">
@@ -84,8 +88,6 @@ const DashboardBatchManager = ({ onStatsUpdate }: DashboardBatchManagerProps) =>
           editingBatch={editingBatch}
         />
       </div>
-
-      <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} />
     </div>
   );
 };
