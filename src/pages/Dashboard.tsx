@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -68,31 +69,31 @@ const Dashboard = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
+      <div className="min-h-screen flex w-full overflow-x-hidden" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
         <AppSidebar />
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8 min-w-0">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-4">
-              <SidebarTrigger className="text-white hover:text-purple-200 rounded-xl" />
-              <div>
-                <h1 className="text-2xl font-semibold text-white">Welcome back!</h1>
-                <p className="text-purple-200">Here's what's happening with your prompt batches today.</p>
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <div className="flex items-center space-x-4 min-w-0">
+              <SidebarTrigger className="text-white hover:text-purple-200 rounded-xl flex-shrink-0" />
+              <div className="min-w-0">
+                <h1 className="text-xl md:text-2xl font-semibold text-white truncate">Welcome back!</h1>
+                <p className="text-purple-200 text-sm md:text-base">Here's what's happening with your prompt batches today.</p>
               </div>
             </div>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
             {statsData.map((stat, index) => (
               <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-                <CardContent className="p-6">
+                <CardContent className="p-3 md:p-6">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-purple-200 text-sm font-medium">{stat.title}</p>
-                      <p className="text-3xl font-bold text-white mt-2">{stat.value}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-purple-200 text-xs md:text-sm font-medium truncate">{stat.title}</p>
+                      <p className="text-xl md:text-3xl font-bold text-white mt-1 md:mt-2">{stat.value}</p>
                     </div>
-                    <div className={`w-12 h-12 ${stat.color} rounded-xl flex items-center justify-center text-white text-xl`}>
+                    <div className={`w-8 h-8 md:w-12 md:h-12 ${stat.color} rounded-xl flex items-center justify-center text-white text-sm md:text-xl flex-shrink-0 ml-2`}>
                       {stat.icon}
                     </div>
                   </div>
@@ -101,9 +102,9 @@ const Dashboard = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
             {/* Batch Processor */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 min-w-0">
               <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
                 <CardHeader>
                   <CardTitle className="text-white">Batch Processor</CardTitle>
@@ -111,32 +112,31 @@ const Dashboard = () => {
                     Create and manage your prompt batches
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-6">
+                <CardContent className="p-3 md:p-6">
                   <DashboardBatchManager onStatsUpdate={handleStatsUpdate} />
                 </CardContent>
               </Card>
             </div>
 
             {/* Quick Actions & Backend Health */}
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6 min-w-0">
               {/* Quick Actions */}
               {quickActions.map((action, index) => (
                 <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-                  <CardHeader>
-                    <CardTitle className="text-white">Quick Actions</CardTitle>
-                    <CardDescription className="text-purple-200">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-white text-sm md:text-base">Quick Actions</CardTitle>
+                    <CardDescription className="text-purple-200 text-xs md:text-sm">
                       Get started with common tasks
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardContent className="pt-0">
                     <Button
-                      key={index}
                       variant="ghost"
-                      className={`w-full justify-start text-left h-auto p-4 ${action.color} text-white rounded-xl`}
+                      className={`w-full justify-start text-left h-auto p-3 md:p-4 ${action.color} text-white rounded-xl`}
                     >
-                      <action.icon className="w-5 h-5 mr-3" />
-                      <div>
-                        <div className="font-medium">{action.title}</div>
+                      <action.icon className="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <div className="font-medium text-sm md:text-base truncate">{action.title}</div>
                       </div>
                     </Button>
                   </CardContent>
@@ -145,47 +145,82 @@ const Dashboard = () => {
 
               {/* Backend Health Frame */}
               <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-white">Backend Health</CardTitle>
-                      <CardDescription className="text-purple-200">
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="text-white text-sm md:text-base">Backend Health</CardTitle>
+                      <CardDescription className="text-purple-200 text-xs md:text-sm">
                         Live backend status check
                       </CardDescription>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-white hover:text-purple-200"
+                      className="text-white hover:text-purple-200 flex-shrink-0"
                       onClick={() => window.open('https://autopromptr-backend.onrender.com/health', '_blank')}
                     >
                       <ExternalLink className="w-4 h-4" />
                     </Button>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                   <div className="bg-black/20 border border-white/10 rounded-xl overflow-hidden">
                     <iframe
                       src="https://autopromptr-backend.onrender.com/health"
-                      className="w-full h-48 border-0"
+                      className="w-full h-32 md:h-48 border-0"
                       title="Backend Health Check"
                     />
                   </div>
-                  <p className="text-xs text-purple-300 mt-2">
+                  <p className="text-xs text-purple-300 mt-2 break-all">
                     URL: https://autopromptr-backend.onrender.com/health
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Render.com Logs Frame */}
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="text-white text-sm md:text-base">Render.com Logs</CardTitle>
+                      <CardDescription className="text-purple-200 text-xs md:text-sm">
+                        Live server logs dashboard
+                      </CardDescription>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:text-purple-200 flex-shrink-0"
+                      onClick={() => window.open('https://dashboard.render.com/web/srv-d112caili9vc738aumtg/logs', '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="bg-black/20 border border-white/10 rounded-xl overflow-hidden">
+                    <iframe
+                      src="https://dashboard.render.com/web/srv-d112caili9vc738aumtg/logs"
+                      className="w-full h-64 md:h-80 border-0"
+                      title="Render.com Logs Dashboard"
+                      sandbox="allow-same-origin allow-scripts allow-forms"
+                    />
+                  </div>
+                  <p className="text-xs text-purple-300 mt-2 break-all">
+                    URL: https://dashboard.render.com/web/srv-d112caili9vc738aumtg/logs
                   </p>
                 </CardContent>
               </Card>
 
               {/* Subscription */}
               <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-                <CardHeader>
-                  <CardTitle className="text-white">Subscription</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-white text-sm md:text-base">Subscription</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="bg-green-600/20 border border-green-500/30 rounded-xl p-4 text-center">
-                    <p className="text-green-300 font-medium mb-1">Plan</p>
-                    <p className="text-white text-sm">Limited to 5 batches per month</p>
+                <CardContent className="pt-0">
+                  <div className="bg-green-600/20 border border-green-500/30 rounded-xl p-3 md:p-4 text-center">
+                    <p className="text-green-300 font-medium mb-1 text-sm">Plan</p>
+                    <p className="text-white text-xs md:text-sm">Limited to 5 batches per month</p>
                   </div>
                 </CardContent>
               </Card>
