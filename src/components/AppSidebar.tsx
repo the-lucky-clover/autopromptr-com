@@ -1,4 +1,3 @@
-
 import {
   Sidebar,
   SidebarContent,
@@ -67,7 +66,7 @@ export function AppSidebar() {
   return (
     <Sidebar className="border-r border-gray-700 bg-gray-900">
       <SidebarHeader className="p-6 flex items-center justify-center">
-        <Link to="/" className="flex items-center space-x-2 group justify-center">
+        <Link to="/" className="flex items-center space-x-1 group justify-center">
           <div className="relative animate-shimmer">
             <Zap className="w-8 h-8 text-blue-400 drop-shadow-lg" strokeWidth={2} style={{
               filter: 'drop-shadow(0 0 8px rgba(96, 165, 250, 0.6))'
