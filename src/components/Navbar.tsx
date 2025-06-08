@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap } from "lucide-react";
@@ -40,7 +41,7 @@ const Navbar = () => {
       {/* Navbar content - always visible */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          <Link to="/" className="flex items-center space-x-2 group">
+          <Link to="/" className="flex items-center space-x-1 group">
             <Zap className="w-9 h-9 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text" strokeWidth={1.5} style={{ color: 'transparent', stroke: 'url(#gradient)' }} />
             <svg width="0" height="0">
               <defs>
