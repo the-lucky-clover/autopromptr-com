@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { AutoPromptr } from '@/services/autoPromptr';
-import { BatchStatus } from '@/types/batch';
+import { BatchStatus, Batch } from '@/types/batch';
 
 // React Hook for batch automation
 export function useBatchAutomation(batchId?: string) {
@@ -33,14 +34,14 @@ export function useBatchAutomation(batchId?: string) {
     pollStatus();
   }, [batchId, autoPromptr]);
 
-  const runBatch = async (platform: string, options?: { delay?: number; maxRetries?: number }) => {
-    if (!batchId) throw new Error('No batch ID provided');
+  const runBatch = async (batch: Batch, platform: string, options?: { delay?: number; maxRetries?: number }) => {
+    if (!batch || !batch.id) throw new Error('No batch provided');
     
     setLoading(true);
     setError(null);
     
     try {
-      const result = await autoPromptr.runBatch(batchId, platform, options);
+      const result = await autoPromptr.runBatch(batch, platform, options);
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
