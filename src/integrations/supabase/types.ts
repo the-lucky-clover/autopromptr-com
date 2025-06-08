@@ -312,6 +312,45 @@ export type Database = {
           },
         ]
       }
+      screenshots: {
+        Row: {
+          created_at: string
+          file_path: string
+          file_size: number | null
+          filename: string
+          id: string
+          metadata: Json | null
+          prompt: string | null
+          session_id: string
+          url: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_path: string
+          file_size?: number | null
+          filename: string
+          id?: string
+          metadata?: Json | null
+          prompt?: string | null
+          session_id: string
+          url: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_path?: string
+          file_size?: number | null
+          filename?: string
+          id?: string
+          metadata?: Json | null
+          prompt?: string | null
+          session_id?: string
+          url?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_verification_status: {
         Row: {
           created_at: string | null

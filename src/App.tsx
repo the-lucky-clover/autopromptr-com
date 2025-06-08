@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
+import Screenshots from "./pages/Screenshots";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import Blog from "./pages/Blog";
@@ -44,6 +45,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Settings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/screenshots" 
+              element={
+                <ProtectedRoute>
+                  <Screenshots />
                 </ProtectedRoute>
               } 
             />
