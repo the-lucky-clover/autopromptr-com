@@ -1,54 +1,63 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, BarChart3 } from "lucide-react";
+import { Zap, Upload, FileText, BarChart3 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const DashboardQuickActions = () => {
   const quickActions = [
     {
-      title: "Create New Batch",
-      icon: Plus,
-      color: "bg-blue-600 hover:bg-blue-700",
-      description: "Get started with common tasks"
+      title: "Batch Extractor",
+      description: "Extract and process multiple prompts",
+      icon: Zap,
+      href: "/dashboard/extractor",
+      color: "text-blue-400 hover:text-blue-300"
     },
     {
-      title: "Use Batcher Tool", 
+      title: "Upload/Import", 
+      description: "Import prompt batches from files",
+      icon: Upload,
+      href: "/dashboard/upload",
+      color: "text-green-400 hover:text-green-300"
+    },
+    {
+      title: "Analytics",
+      description: "View batch performance metrics",
       icon: BarChart3,
-      color: "bg-gray-800 hover:bg-gray-700",
-      description: "Batch processing tool"
-    },
-    {
-      title: "View Analytics",
-      icon: BarChart3, 
-      color: "bg-purple-600 hover:bg-purple-700",
-      description: "View detailed analytics"
+      href: "/dashboard/analytics", 
+      color: "text-purple-400 hover:text-purple-300"
     }
   ];
 
   return (
-    <>
-      {quickActions.map((action, index) => (
-        <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-white text-sm md:text-base">Quick Actions</CardTitle>
-            <CardDescription className="text-purple-200 text-xs md:text-sm">
-              Get started with common tasks
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <Button
-              variant="ghost"
-              className={`w-full justify-start text-left h-auto p-3 md:p-4 ${action.color} text-white rounded-xl`}
-            >
-              <action.icon className="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3 flex-shrink-0" />
-              <div className="min-w-0">
-                <div className="font-medium text-sm md:text-base truncate">{action.title}</div>
+    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-white text-sm md:text-base">Quick Actions</CardTitle>
+        <CardDescription className="text-purple-200 text-xs md:text-sm">
+          Shortcuts to common tasks
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="pt-0 space-y-2">
+        {quickActions.map((action) => (
+          <Button
+            key={action.title}
+            asChild
+            variant="ghost"
+            className="w-full justify-start h-auto p-3 bg-white/5 hover:bg-white/10 border-none rounded-xl"
+          >
+            <Link to={action.href}>
+              <div className="flex items-center space-x-3 w-full">
+                <action.icon className={`w-4 h-4 flex-shrink-0 ${action.color}`} />
+                <div className="flex-1 text-left min-w-0">
+                  <div className="text-white font-medium text-sm">{action.title}</div>
+                  <div className="text-white/60 text-xs truncate">{action.description}</div>
+                </div>
               </div>
-            </Button>
-          </CardContent>
-        </Card>
-      ))}
-    </>
+            </Link>
+          </Button>
+        ))}
+      </CardContent>
+    </Card>
   );
 };
 

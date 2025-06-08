@@ -77,9 +77,9 @@ const BackendHealthMetrics = () => {
   if (error) {
     return (
       <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-        <CardHeader>
+        <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="min-w-0">
               <CardTitle className="text-white text-sm md:text-base">Backend Health</CardTitle>
               <CardDescription className="text-purple-200 text-xs md:text-sm">
                 Live backend monitoring
@@ -90,19 +90,19 @@ const BackendHealthMetrics = () => {
               disabled={loading}
               size="sm"
               variant="ghost"
-              className="text-white hover:text-purple-200"
+              className="text-white hover:text-purple-200 flex-shrink-0"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="bg-red-500/20 border border-red-500/30 rounded-xl p-4">
+        <CardContent className="pt-0">
+          <div className="bg-red-500/20 border border-red-500/30 rounded-xl p-3">
             <div className="flex items-center space-x-2 text-red-300">
-              <WifiOff className="w-5 h-5" />
-              <span className="font-medium">Connection Failed</span>
+              <WifiOff className="w-4 h-4 flex-shrink-0" />
+              <span className="font-medium text-sm">Connection Failed</span>
             </div>
-            <p className="text-red-200 text-sm mt-2">{error}</p>
+            <p className="text-red-200 text-xs mt-2 break-words">{error}</p>
           </div>
         </CardContent>
       </Card>
@@ -111,9 +111,9 @@ const BackendHealthMetrics = () => {
 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-      <CardHeader>
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="min-w-0">
             <CardTitle className="text-white text-sm md:text-base">Backend Health</CardTitle>
             <CardDescription className="text-purple-200 text-xs md:text-sm">
               Live backend monitoring
@@ -124,22 +124,22 @@ const BackendHealthMetrics = () => {
             disabled={loading}
             size="sm"
             variant="ghost"
-            className="text-white hover:text-purple-200"
+            className="text-white hover:text-purple-200 flex-shrink-0"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="pt-0 space-y-3">
         {/* Main Status */}
-        <div className="bg-white/5 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
+        <div className="bg-white/5 rounded-xl p-3">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
               {healthData && getStatusIcon(healthData.status)}
-              <span className="text-white font-medium">System Status</span>
+              <span className="text-white font-medium text-sm">System Status</span>
             </div>
             {healthData && (
-              <Badge className={getStatusColor(healthData.status)}>
+              <Badge className={`${getStatusColor(healthData.status)} text-xs px-2 py-0.5`}>
                 {healthData.status.toUpperCase()}
               </Badge>
             )}
@@ -148,33 +148,33 @@ const BackendHealthMetrics = () => {
           {loading && (
             <div className="flex items-center space-x-2 text-purple-200">
               <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-              <span className="text-sm">Checking status...</span>
+              <span className="text-xs">Checking status...</span>
             </div>
           )}
         </div>
 
         {healthData && (
           <>
-            {/* Metrics Grid */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* Metrics Grid - Stack on mobile */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {/* Response Time */}
               <div className="bg-white/5 rounded-xl p-3">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Zap className="w-4 h-4 text-blue-400" />
-                  <span className="text-white text-sm font-medium">Response</span>
+                <div className="flex items-center space-x-2 mb-1">
+                  <Zap className="w-3 h-3 text-blue-400 flex-shrink-0" />
+                  <span className="text-white text-xs font-medium">Response</span>
                 </div>
-                <div className="text-xl font-bold text-blue-400">
+                <div className="text-lg font-bold text-blue-400">
                   {formatResponseTime(healthData.responseTime)}
                 </div>
               </div>
 
               {/* Uptime */}
               <div className="bg-white/5 rounded-xl p-3">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Clock className="w-4 h-4 text-green-400" />
-                  <span className="text-white text-sm font-medium">Uptime</span>
+                <div className="flex items-center space-x-2 mb-1">
+                  <Clock className="w-3 h-3 text-green-400 flex-shrink-0" />
+                  <span className="text-white text-xs font-medium">Uptime</span>
                 </div>
-                <div className="text-sm font-medium text-green-400">
+                <div className="text-sm font-medium text-green-400 truncate">
                   {healthData.uptime}
                 </div>
               </div>
@@ -184,13 +184,13 @@ const BackendHealthMetrics = () => {
             {healthData.database && (
               <div className="bg-white/5 rounded-xl p-3">
                 <div className="flex items-center space-x-2 mb-2">
-                  <Database className="w-4 h-4 text-purple-400" />
-                  <span className="text-white text-sm font-medium">Database</span>
+                  <Database className="w-3 h-3 text-purple-400 flex-shrink-0" />
+                  <span className="text-white text-xs font-medium">Database</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-purple-200 text-sm">{healthData.database.status}</span>
+                  <span className="text-purple-200 text-xs">{healthData.database.status}</span>
                   {healthData.database.responseTime && (
-                    <span className="text-purple-400 text-sm">
+                    <span className="text-purple-400 text-xs">
                       {formatResponseTime(healthData.database.responseTime)}
                     </span>
                   )}
@@ -201,13 +201,13 @@ const BackendHealthMetrics = () => {
             {healthData.memory && (
               <div className="bg-white/5 rounded-xl p-3">
                 <div className="flex items-center space-x-2 mb-2">
-                  <Cpu className="w-4 h-4 text-orange-400" />
-                  <span className="text-white text-sm font-medium">Memory Usage</span>
+                  <Cpu className="w-3 h-3 text-orange-400 flex-shrink-0" />
+                  <span className="text-white text-xs font-medium">Memory Usage</span>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <Progress 
                     value={healthData.memory.percentage} 
-                    className="h-2 bg-white/10"
+                    className="h-1.5 bg-white/10"
                   />
                   <div className="flex justify-between text-xs text-orange-200">
                     <span>{healthData.memory.used}MB used</span>
@@ -219,7 +219,7 @@ const BackendHealthMetrics = () => {
 
             {/* Last Updated */}
             {lastUpdated && (
-              <div className="text-xs text-purple-300 text-center">
+              <div className="text-xs text-purple-300 text-center pt-1">
                 Last updated: {lastUpdated.toLocaleTimeString()}
               </div>
             )}

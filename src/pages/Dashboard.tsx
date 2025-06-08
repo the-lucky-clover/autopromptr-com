@@ -25,14 +25,14 @@ const Dashboard = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full overflow-x-hidden" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
         <AppSidebar />
-        <main className="flex-1 p-4 md:p-8 min-w-0">
+        <main className="flex-1 p-3 md:p-6 lg:p-8 min-w-0">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6 md:mb-8">
-            <div className="flex items-center space-x-4 min-w-0">
+          <div className="flex items-center justify-between mb-4 md:mb-6 lg:mb-8">
+            <div className="flex items-center space-x-3 md:space-x-4 min-w-0">
               <SidebarTrigger className="text-white hover:text-purple-200 rounded-xl flex-shrink-0" />
               <div className="min-w-0">
-                <h1 className="text-xl md:text-2xl font-semibold text-white truncate">Welcome back!</h1>
-                <p className="text-purple-200 text-sm md:text-base">Here's what's happening with your prompt batches today.</p>
+                <h1 className="text-lg md:text-xl lg:text-2xl font-semibold text-white truncate">Welcome back!</h1>
+                <p className="text-purple-200 text-xs md:text-sm lg:text-base">Here's what's happening with your prompt batches today.</p>
               </div>
             </div>
             <ConnectionStatus />
@@ -41,24 +41,24 @@ const Dashboard = () => {
           {/* Stats Cards */}
           <DashboardStatsCards stats={stats} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
             {/* Batch Processor */}
             <div className="lg:col-span-2 min-w-0">
               <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-                <CardHeader>
-                  <CardTitle className="text-white">Batch Processor</CardTitle>
-                  <CardDescription className="text-purple-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-white text-base md:text-lg">Batch Processor</CardTitle>
+                  <CardDescription className="text-purple-200 text-xs md:text-sm">
                     Create and manage your prompt batches
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-3 md:p-6">
+                <CardContent className="p-3 md:p-4 lg:p-6">
                   <DashboardBatchManager onStatsUpdate={handleStatsUpdate} />
                 </CardContent>
               </Card>
             </div>
 
             {/* Quick Actions & Backend Health */}
-            <div className="space-y-4 md:space-y-6 min-w-0">
+            <div className="space-y-3 md:space-y-4 lg:space-y-6 min-w-0">
               {/* Quick Actions */}
               <DashboardQuickActions />
 
