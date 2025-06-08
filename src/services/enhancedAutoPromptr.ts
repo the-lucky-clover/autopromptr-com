@@ -274,8 +274,8 @@ export class EnhancedAutoPromptr extends AutoPromptr {
         headers['X-API-Key'] = apiKey;
       }
       
-      // Get the API base URL from the parent class
-      const baseUrl = this.apiBaseUrl || 'https://autopromptr-backend.onrender.com';
+      // Access the parent's apiBaseUrl through type assertion since it's private
+      const baseUrl = (this as any).apiBaseUrl || 'https://autopromptr-backend.onrender.com';
       
       const response = await fetch(`${baseUrl}/api/batch-status/${batchId}`, {
         signal: controller.signal,
@@ -317,11 +317,5 @@ export class EnhancedAutoPromptr extends AutoPromptr {
         true
       );
     }
-  }
-
-  // Get the apiBaseUrl from parent class
-  private get apiBaseUrl(): string {
-    // Access the private property through a type assertion
-    return (this as any).apiBaseUrl || 'https://autopromptr-backend.onrender.com';
   }
 }
