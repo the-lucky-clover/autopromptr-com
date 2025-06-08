@@ -10,7 +10,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   private readonly VALIDATION_CACHE_DURATION = 60000; // 1 minute cache
 
   constructor() {
-    const savedUrl = 'https://puppeteer-backend-da0o.onrender.com';
+    const savedUrl = 'https://autopromptr-backend.onrender.com';
     super(savedUrl);
     this.configuredUrl = savedUrl;
     this.connectionDiagnostics = new ConnectionDiagnostics(savedUrl);

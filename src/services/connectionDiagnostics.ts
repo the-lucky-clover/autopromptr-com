@@ -1,4 +1,3 @@
-
 import { AutoPromptr, AutoPromtrError } from './autoPromptr';
 
 export interface ConnectionTestResult {
@@ -21,7 +20,7 @@ export class ConnectionDiagnostics {
   private baseUrl: string;
   
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || 'https://puppeteer-backend-da0o.onrender.com';
+    this.baseUrl = baseUrl || 'https://autopromptr-backend.onrender.com';
   }
 
   async testSingleEndpoint(endpoint: string): Promise<ConnectionTestResult> {

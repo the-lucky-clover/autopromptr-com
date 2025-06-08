@@ -23,7 +23,7 @@ export class HealthDataService {
   private cachedData: HealthMetrics | null = null;
   private readonly CACHE_DURATION = 30000; // 30 seconds cache
   
-  constructor(baseUrl = 'https://puppeteer-backend-da0o.onrender.com') {
+  constructor(baseUrl = 'https://autopromptr-backend.onrender.com') {
     this.baseUrl = baseUrl;
   }
 

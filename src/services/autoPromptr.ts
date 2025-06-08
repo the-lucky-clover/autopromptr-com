@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
 
-// Configuration - Use your working Puppeteer backend
-const API_BASE_URL = 'https://puppeteer-backend-da0o.onrender.com';
+// Configuration - Use your working AutoPromptr backend
+const API_BASE_URL = 'https://autopromptr-backend.onrender.com';
 const SUPABASE_URL = 'https://raahpoyciwuyhwlcenpy.supabase.co';
 
 // Enhanced error handling with specific error types
