@@ -5,12 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
+import { Copy, Eye, EyeOff, User, Key, Settings as SettingsIcon, Bell } from "lucide-react";
+import { useState } from "react";
 
 const Settings = () => {
   const { user } = useAuth();
+  const [showApiKey, setShowApiKey] = useState(false);
 
   return (
     <SidebarProvider>
@@ -28,16 +31,28 @@ const Settings = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Profile Settings */}
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
               <CardHeader>
-                <CardTitle className="text-white">Profile Settings</CardTitle>
+                <div className="flex items-center space-x-2">
+                  <User className="h-5 w-5 text-white" />
+                  <CardTitle className="text-white">Profile Settings</CardTitle>
+                </div>
                 <CardDescription className="text-purple-200">
                   Update your profile information
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName" className="text-white">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Enter your full name"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-white">Email</Label>
                   <Input
@@ -45,17 +60,31 @@ const Settings = () => {
                     type="email"
                     value={user?.email || ''}
                     disabled
-                    className="bg-white/10 border-white/20 text-white"
+                    className="bg-white/5 border-white/10 text-gray-400"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-white">Display Name</Label>
+                  <Label htmlFor="company" className="text-white">Company (Optional)</Label>
                   <Input
-                    id="name"
+                    id="company"
                     type="text"
-                    placeholder="Enter your display name"
+                    placeholder="Enter your company name"
                     className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="timezone" className="text-white">Timezone</Label>
+                  <Select defaultValue="utc">
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      <SelectItem value="utc">UTC (GMT+0)</SelectItem>
+                      <SelectItem value="est">EST (GMT-5)</SelectItem>
+                      <SelectItem value="pst">PST (GMT-8)</SelectItem>
+                      <SelectItem value="cet">CET (GMT+1)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl">
                   Update Profile
@@ -63,59 +92,48 @@ const Settings = () => {
               </CardContent>
             </Card>
 
-            {/* Application Settings */}
+            {/* API Configuration */}
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
               <CardHeader>
-                <CardTitle className="text-white">Application Settings</CardTitle>
+                <div className="flex items-center space-x-2">
+                  <Key className="h-5 w-5 text-white" />
+                  <CardTitle className="text-white">API Configuration</CardTitle>
+                </div>
                 <CardDescription className="text-purple-200">
-                  Configure your application preferences
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-white">Email Notifications</Label>
-                    <p className="text-sm text-purple-200">Receive notifications about batch updates</p>
-                  </div>
-                  <Switch />
-                </div>
-                <Separator className="bg-white/20" />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-white">Auto-save Batches</Label>
-                    <p className="text-sm text-purple-200">Automatically save batch progress</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <Separator className="bg-white/20" />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-white">Dark Mode</Label>
-                    <p className="text-sm text-purple-200">Use dark theme</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* API Settings */}
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-              <CardHeader>
-                <CardTitle className="text-white">API Settings</CardTitle>
-                <CardDescription className="text-purple-200">
-                  Configure your API keys and integrations
+                  Manage your API keys and settings
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="apiKey" className="text-white">OpenAI API Key</Label>
-                  <Input
-                    id="apiKey"
-                    type="password"
-                    placeholder="sk-..."
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                  />
+                  <Label htmlFor="apiKey" className="text-white">API Key</Label>
+                  <div className="flex space-x-2">
+                    <Input
+                      id="apiKey"
+                      type={showApiKey ? "text" : "password"}
+                      value="sk-proj-1234567890abcdef..."
+                      disabled
+                      className="bg-white/5 border-white/10 text-gray-400 flex-1"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setShowApiKey(!showApiKey)}
+                      className="border-white/20 text-white hover:bg-white/10"
+                    >
+                      {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="border-white/20 text-white hover:bg-white/10"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
+                <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/10 rounded-xl">
+                  Generate New Key
+                </Button>
                 <div className="space-y-2">
                   <Label htmlFor="webhookUrl" className="text-white">Webhook URL</Label>
                   <Input
@@ -125,27 +143,114 @@ const Settings = () => {
                     className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="rateLimitTier" className="text-white">Rate Limit Tier</Label>
+                  <Select defaultValue="standard">
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      <SelectItem value="basic">Basic - 100 req/min</SelectItem>
+                      <SelectItem value="standard">Standard - 500 req/min</SelectItem>
+                      <SelectItem value="premium">Premium - 1000 req/min</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl">
                   Save API Settings
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Danger Zone */}
-            <Card className="bg-red-500/10 backdrop-blur-sm border-red-500/20 rounded-xl">
+            {/* Preferences */}
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
               <CardHeader>
-                <CardTitle className="text-red-400">Danger Zone</CardTitle>
-                <CardDescription className="text-red-300">
-                  Actions that cannot be undone
+                <div className="flex items-center space-x-2">
+                  <SettingsIcon className="h-5 w-5 text-white" />
+                  <CardTitle className="text-white">Preferences</CardTitle>
+                </div>
+                <CardDescription className="text-purple-200">
+                  Customize your application experience
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <Button variant="outline" className="w-full border-red-500/50 text-red-400 hover:bg-red-500/20 rounded-xl">
-                  Delete All Batches
-                </Button>
-                <Button variant="outline" className="w-full border-red-500/50 text-red-400 hover:bg-red-500/20 rounded-xl">
-                  Delete Account
-                </Button>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="defaultPlatform" className="text-white">Default Platform</Label>
+                  <Select defaultValue="openai">
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      <SelectItem value="openai">ChatGPT</SelectItem>
+                      <SelectItem value="claude">Claude</SelectItem>
+                      <SelectItem value="gemini">Gemini</SelectItem>
+                      <SelectItem value="perplexity">Perplexity</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-white">Auto-enhance prompts</Label>
+                    <p className="text-sm text-purple-200">Automatically improve prompt quality</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="theme" className="text-white">Theme</Label>
+                  <Select defaultValue="dark">
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      <SelectItem value="light">Light Mode</SelectItem>
+                      <SelectItem value="dark">Dark Mode</SelectItem>
+                      <SelectItem value="auto">Auto</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Notifications */}
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+              <CardHeader>
+                <div className="flex items-center space-x-2">
+                  <Bell className="h-5 w-5 text-white" />
+                  <CardTitle className="text-white">Notifications</CardTitle>
+                </div>
+                <CardDescription className="text-purple-200">
+                  Control how you receive notifications
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-white">Email Notifications</Label>
+                    <p className="text-sm text-purple-200">Receive notifications via email</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-white">Batch Completion</Label>
+                    <p className="text-sm text-purple-200">Notify when batches complete</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-white">System Updates</Label>
+                    <p className="text-sm text-purple-200">Important system announcements</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-white">Marketing Emails</Label>
+                    <p className="text-sm text-purple-200">Product updates and tips</p>
+                  </div>
+                  <Switch />
+                </div>
               </CardContent>
             </Card>
           </div>
