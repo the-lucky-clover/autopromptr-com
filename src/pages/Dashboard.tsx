@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
-import { Plus, BarChart3 } from "lucide-react";
+import { Plus, BarChart3, ExternalLink } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardBatchManager from "@/components/DashboardBatchManager";
 
@@ -118,18 +117,18 @@ const Dashboard = () => {
               </Card>
             </div>
 
-            {/* Quick Actions & Subscription */}
+            {/* Quick Actions & Backend Health */}
             <div className="space-y-6">
               {/* Quick Actions */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-                <CardHeader>
-                  <CardTitle className="text-white">Quick Actions</CardTitle>
-                  <CardDescription className="text-purple-200">
-                    Get started with common tasks
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {quickActions.map((action, index) => (
+              {quickActions.map((action, index) => (
+                <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+                  <CardHeader>
+                    <CardTitle className="text-white">Quick Actions</CardTitle>
+                    <CardDescription className="text-purple-200">
+                      Get started with common tasks
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
                     <Button
                       key={index}
                       variant="ghost"
@@ -140,7 +139,41 @@ const Dashboard = () => {
                         <div className="font-medium">{action.title}</div>
                       </div>
                     </Button>
-                  ))}
+                  </CardContent>
+                </Card>
+              ))}
+
+              {/* Backend Health Frame */}
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-white">Backend Health</CardTitle>
+                      <CardDescription className="text-purple-200">
+                        Live backend status check
+                      </CardDescription>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:text-purple-200"
+                      onClick={() => window.open('https://autopromptr-backend.onrender.com/health', '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-black/20 border border-white/10 rounded-xl overflow-hidden">
+                    <iframe
+                      src="https://autopromptr-backend.onrender.com/health"
+                      className="w-full h-48 border-0"
+                      title="Backend Health Check"
+                    />
+                  </div>
+                  <p className="text-xs text-purple-300 mt-2">
+                    URL: https://autopromptr-backend.onrender.com/health
+                  </p>
                 </CardContent>
               </Card>
 
