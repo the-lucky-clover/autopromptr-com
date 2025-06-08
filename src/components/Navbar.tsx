@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap } from "lucide-react";
@@ -41,9 +40,17 @@ const Navbar = () => {
       {/* Navbar content - always visible */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          <Link to="/" className="flex items-center space-x-3 group">
-            <Zap className="w-8 h-8 text-white" strokeWidth={1.5} />
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <Link to="/" className="flex items-center space-x-2 group">
+            <Zap className="w-9 h-9 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text" strokeWidth={1.5} style={{ color: 'transparent', stroke: 'url(#gradient)' }} />
+            <svg width="0" height="0">
+              <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#60a5fa" />
+                  <stop offset="100%" stopColor="#a78bfa" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               AutoPromptr
             </span>
           </Link>
