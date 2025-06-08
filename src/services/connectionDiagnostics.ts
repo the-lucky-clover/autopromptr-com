@@ -20,17 +20,13 @@ export class ConnectionDiagnostics {
   private baseUrl: string;
   
   constructor(baseUrl?: string) {
-    // Load from localStorage or use default
-    this.baseUrl = baseUrl || 
-      localStorage.getItem('autopromptr_backend_url') || 
-      'https://autopromptr-backend.onrender.com';
+    // Use your working Puppeteer backend
+    this.baseUrl = baseUrl || 'https://puppeteer-backend-da0o.onrender.com';
   }
 
   async testAllEndpoints(): Promise<ConnectionTestResult[]> {
     const endpoints = [
-      '/health',
-      '/api/platforms',
-      '/api/batch-status/test'
+      '/api/run-puppeteer'
     ];
 
     const results: ConnectionTestResult[] = [];
@@ -52,11 +48,15 @@ export class ConnectionDiagnostics {
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
       const response = await fetch(fullUrl, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
+        body: JSON.stringify({
+          url: 'https://example.com',
+          prompt: 'test connection'
+        }),
         signal: controller.signal
       });
       
@@ -83,7 +83,6 @@ export class ConnectionDiagnostics {
       const responseTime = Date.now() - startTime;
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       
-      // Check if this is a CORS error
       const isCorsError = errorMessage.includes('CORS') || 
                          errorMessage.includes('Access-Control-Allow-Origin') ||
                          errorMessage.includes('preflight');
@@ -119,10 +118,9 @@ export class ConnectionDiagnostics {
 
   private async detectCorsIssues(): Promise<boolean> {
     try {
-      // Use a simple HEAD request to minimize CORS impact
-      await fetch(`${this.baseUrl}/health`, { 
+      await fetch(`${this.baseUrl}/api/run-puppeteer`, { 
         method: 'HEAD',
-        mode: 'no-cors' // This will help bypass CORS for detection
+        mode: 'no-cors'
       });
       return false;
     } catch (err) {
@@ -149,18 +147,15 @@ export class ConnectionDiagnostics {
     const networkEnvironment = await this.detectNetworkEnvironment();
     const recommendations: string[] = [];
     
-    // Count successful tests and CORS-blocked tests separately
     const successfulTests = endpointResults.filter(r => r.success);
     const corsBlockedTests = endpointResults.filter(r => r.corsBlocked);
     const actualFailures = endpointResults.filter(r => !r.success && !r.corsBlocked);
     
-    // If we have CORS blocks but no actual failures, consider it a success
     const overallSuccess = successfulTests.length > 0 || 
                           (corsBlockedTests.length > 0 && actualFailures.length === 0);
     
-    // Generate more accurate recommendations
     if (!overallSuccess && actualFailures.length > 0) {
-      recommendations.push('Backend service appears to be unreachable');
+      recommendations.push('Puppeteer backend service appears to be unreachable');
       if (!networkEnvironment.isOnline) {
         recommendations.push('Check your internet connection');
       }

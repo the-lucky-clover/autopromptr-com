@@ -8,20 +8,19 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   private connectionDiagnostics: ConnectionDiagnostics;
 
   constructor() {
-    // Load configuration from localStorage with fallback
-    const savedUrl = localStorage.getItem('autopromptr_backend_url') || 'https://autopromptr-backend.onrender.com';
+    // Use your working Puppeteer backend URL
+    const savedUrl = 'https://puppeteer-backend-da0o.onrender.com';
     super(savedUrl);
     this.configuredUrl = savedUrl;
     this.connectionDiagnostics = new ConnectionDiagnostics(savedUrl);
     
-    console.log('🔧 Enhanced AutoPromptr initialized with URL:', savedUrl);
+    console.log('🔧 Enhanced AutoPromptr initialized with Puppeteer backend URL:', savedUrl);
   }
 
   async validateConnection(): Promise<boolean> {
     try {
-      console.log('🔍 Validating connection to:', this.configuredUrl);
+      console.log('🔍 Validating connection to Puppeteer backend:', this.configuredUrl);
       
-      // Try a direct health check first (this will work for actual backend calls)
       try {
         const healthResult = await super.healthCheck();
         console.log('✅ Direct health check successful:', healthResult);
@@ -29,7 +28,6 @@ export class EnhancedAutoPromptr extends AutoPromptr {
       } catch (healthError) {
         console.log('⚠️ Direct health check failed, running comprehensive test...');
         
-        // Run comprehensive test for detailed diagnostics
         const testResult = await this.connectionDiagnostics.runComprehensiveTest();
         
         if (testResult.overallSuccess) {
@@ -38,7 +36,6 @@ export class EnhancedAutoPromptr extends AutoPromptr {
         } else {
           console.error('❌ Connection validation failed:', testResult.recommendations);
           
-          // Only throw error if we have actual failures (not just CORS)
           const actualFailures = testResult.endpointResults.filter(r => !r.success && !r.corsBlocked);
           if (actualFailures.length > 0) {
             throw new AutoPromtrError(
@@ -48,7 +45,6 @@ export class EnhancedAutoPromptr extends AutoPromptr {
               true
             );
           } else {
-            // CORS blocks are expected, treat as success
             console.log('✅ CORS restrictions detected but this is normal - proceeding');
             return true;
           }
@@ -61,12 +57,10 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   }
 
   async runBatchWithValidation(batch: Batch, platform: string, options: any = {}) {
-    console.log('🚀 Starting enhanced batch run with connection validation...');
+    console.log('🚀 Starting enhanced batch run with Puppeteer backend validation...');
     
-    // First validate the connection (this will handle CORS properly)
     await this.validateConnection();
     
-    // Enhanced options with better defaults
     const enhancedOptions = {
       waitForIdle: options.waitForIdle ?? true,
       maxRetries: Math.max(options.maxRetries ?? 3, 3),
@@ -76,23 +70,20 @@ export class EnhancedAutoPromptr extends AutoPromptr {
       ...options
     };
     
-    console.log('🔧 Enhanced options:', enhancedOptions);
+    console.log('🔧 Enhanced options for Puppeteer backend:', enhancedOptions);
     
     try {
-      // Use the parent class method with validated connection
       const result = await super.runBatch(batch, platform, enhancedOptions);
-      console.log('✅ Enhanced batch run completed successfully');
+      console.log('✅ Enhanced batch run completed successfully with Puppeteer backend');
       return result;
       
     } catch (err) {
       console.error('❌ Enhanced batch run failed:', err);
       
-      // Enhanced error categorization
       if (err instanceof AutoPromtrError) {
-        // Provide more specific error messages
         if (err.code === 'NETWORK_CONNECTION_FAILED') {
           throw new AutoPromtrError(
-            'Cannot connect to the automation backend. Please check the Backend Configuration in Settings.',
+            'Cannot connect to the Puppeteer backend. Please check if the service is running.',
             err.code,
             err.statusCode,
             true
@@ -101,7 +92,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
         
         if (err.code === 'REQUEST_TIMEOUT') {
           throw new AutoPromtrError(
-            'Backend request timed out. The service may be under heavy load. Please try again.',
+            'Puppeteer backend request timed out. The service may be under heavy load.',
             err.code,
             err.statusCode,
             true
