@@ -150,16 +150,19 @@ export const useBatchRunner = () => {
         b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform } : b
       ));
       
-      // Create enhanced AutoPromptr instance and run the batch
+      // Create enhanced AutoPromptr instance and run the batch with idle detection settings
       const autoPromptr = new AutoPromptr();
       
       console.log('Starting enhanced automation with AutoPromptr...');
-      const runResult = await autoPromptr.runBatch(batch.id, detectedPlatform, batch.settings || { delay: 5000, maxRetries: 3 });
+      const runResult = await autoPromptr.runBatch(batch.id, detectedPlatform, {
+        waitForIdle: batch.settings?.waitForIdle ?? true,
+        maxRetries: batch.settings?.maxRetries ?? 0
+      });
       console.log('Enhanced AutoPromptr run result:', runResult);
       
       toast({
         title: "Batch started successfully",
-        description: `Automation started for "${batch.name}" using ${platformName}.`,
+        description: `Automation started for "${batch.name}" using ${platformName} with idle detection.`,
       });
     } catch (err) {
       console.error('Enhanced batch run failed:', err);
