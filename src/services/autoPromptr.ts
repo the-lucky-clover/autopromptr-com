@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 // Configuration - Use your working Puppeteer backend
@@ -17,70 +18,67 @@ export class AutoPromtrError extends Error {
   }
 }
 
-// API Service Class with enhanced reliability
+// API Service Class with optimized health checks
 export class AutoPromptr {
   private apiBaseUrl: string;
   private supabaseUrl: string;
-  private maxRetries: number = 3;
-  private retryDelay: number = 1000;
+  private maxRetries: number = 2; // Reduced retries
+  private retryDelay: number = 2000; // Increased delay between retries
+  private lastHealthCheck: number = 0;
+  private healthCheckCache: any = null;
+  private readonly HEALTH_CHECK_INTERVAL = 30000; // 30 seconds minimum between health checks
 
   constructor(apiBaseUrl = API_BASE_URL, supabaseUrl = SUPABASE_URL) {
     this.apiBaseUrl = apiBaseUrl;
     this.supabaseUrl = supabaseUrl;
   }
 
-  // Enhanced health check with better error classification
-  async healthCheck(retries = 3): Promise<any> {
-    console.log('Checking backend health at:', this.apiBaseUrl);
+  // Simplified health check with caching to reduce requests
+  async healthCheck(retries = 2): Promise<any> {
+    const now = Date.now();
+    
+    // Return cached result if recent
+    if (this.healthCheckCache && (now - this.lastHealthCheck) < this.HEALTH_CHECK_INTERVAL) {
+      console.log('Using cached health check result');
+      return this.healthCheckCache;
+    }
+
+    console.log('Performing new health check at:', this.apiBaseUrl);
     
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000);
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         
-        // Test the /api/run-puppeteer endpoint since that's what works
-        const response = await fetch(`${this.apiBaseUrl}/api/run-puppeteer`, {
-          method: 'POST',
+        // Simple GET request to test connectivity - no complex POST with body
+        const response = await fetch(`${this.apiBaseUrl}/`, {
+          method: 'GET',
           signal: controller.signal,
           headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            url: 'https://example.com',
-            prompt: 'health check test'
-          })
+            'Accept': 'text/html,application/json,*/*'
+          }
         });
         
         clearTimeout(timeoutId);
         
-        if (!response.ok) {
-          if (response.status === 503) {
-            throw new AutoPromtrError(
-              `Backend is temporarily unavailable (${response.status}). The service may be restarting.`,
-              'SERVICE_TEMPORARILY_UNAVAILABLE',
-              response.status,
-              true
-            );
-          } else if (response.status >= 500) {
-            throw new AutoPromtrError(
-              `Backend server error (${response.status}). Please try again.`,
-              'SERVER_ERROR',
-              response.status,
-              true
-            );
-          } else {
-            throw new AutoPromtrError(
-              `Health check failed with status ${response.status}`,
-              'HEALTH_CHECK_FAILED',
-              response.status,
-              attempt < retries
-            );
-          }
+        if (response.ok || response.status === 404) {
+          // Even 404 means the server is responding
+          const result = { status: 'healthy', backend: 'puppeteer', attempt };
+          console.log(`✅ Health check successful on attempt ${attempt}:`, result);
+          
+          // Cache the result
+          this.healthCheckCache = result;
+          this.lastHealthCheck = now;
+          
+          return result;
+        } else {
+          throw new AutoPromtrError(
+            `Health check failed with status ${response.status}`,
+            'HEALTH_CHECK_FAILED',
+            response.status,
+            attempt < retries
+          );
         }
-        
-        const result = await response.json();
-        console.log(`✅ Backend health check successful on attempt ${attempt}:`, result);
-        return { status: 'healthy', backend: 'puppeteer' };
         
       } catch (err) {
         console.error(`❌ Health check attempt ${attempt} failed:`, err);
@@ -88,19 +86,10 @@ export class AutoPromptr {
         if (attempt === retries) {
           if (err.name === 'AbortError') {
             throw new AutoPromtrError(
-              'Backend request timed out. The service may be experiencing high load or network issues.',
+              'Health check timed out. The service may be experiencing high load.',
               'REQUEST_TIMEOUT',
               408,
-              true
-            );
-          }
-          
-          if (err.message === 'Load failed' || err.message.includes('fetch')) {
-            throw new AutoPromtrError(
-              'Unable to connect to backend service. Please check your internet connection and try again.',
-              'NETWORK_CONNECTION_FAILED',
-              0,
-              true
+              false
             );
           }
           
@@ -109,10 +98,10 @@ export class AutoPromptr {
           }
           
           throw new AutoPromtrError(
-            'Backend service is not responding. Please check your connection and try again.',
+            'Backend service is not responding.',
             'SERVICE_UNAVAILABLE',
             503,
-            true
+            false
           );
         }
         
@@ -128,73 +117,63 @@ export class AutoPromptr {
     ];
   }
 
-  // Enhanced batch running adapted for Puppeteer backend
+  // Optimized batch running with better error handling
   async runBatch(batch: any, platform: string, options: { waitForIdle?: boolean; maxRetries?: number } = {}) {
-    console.log('Starting batch run process with Puppeteer backend:', { batch, platform, options });
-    console.log('Backend URL:', this.apiBaseUrl);
+    console.log('Starting optimized batch run:', { batch: batch.id, platform, options });
     
-    // Step 1: Health check
-    try {
-      const healthResult = await this.healthCheck();
-      console.log('✅ Backend health confirmed:', healthResult);
-    } catch (err) {
-      console.error('❌ Backend health check failed:', err);
-      throw err;
+    // Skip redundant health check if we have a recent one
+    const now = Date.now();
+    if (!this.healthCheckCache || (now - this.lastHealthCheck) >= this.HEALTH_CHECK_INTERVAL) {
+      try {
+        await this.healthCheck();
+      } catch (err) {
+        console.error('❌ Health check failed, but continuing with batch run:', err);
+        // Continue anyway - the actual request might still work
+      }
     }
     
-    // Step 2: Process each prompt in the batch
+    // Process each prompt with optimized error handling
     const results = [];
     
     for (const prompt of batch.prompts || []) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 45000);
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // Reduced timeout
+        
+        const requestBody = {
+          url: batch.targetUrl,
+          prompt: prompt.text
+        };
+        
+        console.log('Sending prompt request:', requestBody);
         
         const response = await fetch(`${this.apiBaseUrl}/api/run-puppeteer`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json'
           },
-          body: JSON.stringify({
-            url: batch.targetUrl,
-            prompt: prompt.text
-          }),
+          body: JSON.stringify(requestBody),
           signal: controller.signal
         });
         
         clearTimeout(timeoutId);
-        console.log('Prompt response status:', response.status);
         
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Backend error response:', errorText);
-          
-          let errorMessage = 'Failed to process prompt';
-          let errorCode = 'PROMPT_PROCESSING_FAILED';
-          let retryable = false;
-          
-          if (response.status === 503) {
-            errorCode = 'BACKEND_TEMPORARILY_BUSY';
-            errorMessage = 'Backend is temporarily busy processing other requests. Please try again in a moment.';
-            retryable = true;
-          } else if (response.status === 502 || response.status === 504) {
-            errorCode = 'GATEWAY_ERROR';
-            errorMessage = 'Gateway timeout - the backend may be under heavy load. Please try again.';
-            retryable = true;
-          }
+          console.error('Backend error response:', response.status, errorText);
           
           results.push({
             promptId: prompt.id,
             success: false,
-            error: errorMessage,
-            errorCode
+            error: `Backend error: ${response.status}`,
+            errorCode: 'BACKEND_ERROR'
           });
-          
           continue;
         }
         
         const result = await response.json();
-        console.log('✅ Prompt processed successfully:', result);
+        console.log('✅ Prompt processed successfully');
         
         results.push({
           promptId: prompt.id,
@@ -209,7 +188,7 @@ export class AutoPromptr {
         results.push({
           promptId: prompt.id,
           success: false,
-          error: err instanceof Error ? err.message : 'Unknown error',
+          error: err instanceof Error ? err.message : 'Network error',
           errorCode: 'NETWORK_ERROR'
         });
       }
@@ -223,9 +202,8 @@ export class AutoPromptr {
     };
   }
 
-  // Stop batch processing - simplified for Puppeteer backend
+  // Simplified batch control methods
   async stopBatch(batchId: string) {
-    console.log('Stop batch requested for:', batchId);
     return {
       batchId,
       status: 'stopped',
@@ -233,7 +211,6 @@ export class AutoPromptr {
     };
   }
 
-  // Get batch status - simplified for Puppeteer backend
   async getBatchStatus(batchId: string) {
     return {
       batchId,
@@ -242,7 +219,6 @@ export class AutoPromptr {
     };
   }
 
-  // Get detailed batch results - simplified for Puppeteer backend
   async getBatchResults(batchId: string) {
     return {
       batchId,
@@ -252,7 +228,7 @@ export class AutoPromptr {
   }
 }
 
-// Enhanced React Hook for batch automation
+// Optimized React Hook with reduced polling
 export function useBatchAutomation(batchId?: string) {
   const [status, setStatus] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -266,14 +242,14 @@ export function useBatchAutomation(batchId?: string) {
     setError(null);
     
     try {
-      console.log('Running batch with Puppeteer backend:', batch, 'on platform:', platform);
+      console.log('Running batch with optimized backend:', batch.id);
       const result = await autoPromptr.runBatch(batch, platform, options);
-      console.log('✅ Batch run result:', result);
+      console.log('✅ Batch completed successfully');
       setStatus(result);
       return result;
     } catch (err) {
       const errorMessage = err instanceof AutoPromtrError ? err.message : 'Unknown error';
-      console.error('Run batch error:', errorMessage);
+      console.error('Batch run error:', errorMessage);
       setError(errorMessage);
       throw err;
     } finally {
