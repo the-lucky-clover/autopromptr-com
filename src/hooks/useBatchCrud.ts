@@ -22,10 +22,14 @@ export const useBatchCrud = () => {
       id: crypto.randomUUID(),
       createdAt: new Date(),
       platform: detectedPlatform,
-      status: 'pending'
+      status: 'pending',
+      settings: {
+        waitForIdle: batchData.settings?.waitForIdle ?? true,
+        maxRetries: batchData.settings?.maxRetries ?? 0
+      }
     };
 
-    console.log('Creating new batch with all required fields:', newBatch);
+    console.log('Creating new batch with idle detection settings:', newBatch);
 
     try {
       // Save to database with explicit error handling
@@ -46,7 +50,7 @@ export const useBatchCrud = () => {
 
       toast({
         title: "Batch created successfully",
-        description: `Batch "${newBatch.name}" created with platform: ${platformName}`,
+        description: `Batch "${newBatch.name}" created with platform: ${platformName} and idle detection enabled`,
       });
 
       console.log('Batch creation completed successfully');

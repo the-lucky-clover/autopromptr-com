@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 // Configuration - Use Supabase Edge Function for batch-exists endpoint
@@ -94,9 +93,9 @@ export class AutoPromptr {
     return response.json();
   }
 
-  // Enhanced batch running with complete batch data
-  async runBatch(batch: any, platform: string, options: { delay?: number; maxRetries?: number } = {}) {
-    console.log('Starting enhanced batch run process with complete batch data:', { batch, platform, options });
+  // Enhanced batch running with idle detection instead of delays
+  async runBatch(batch: any, platform: string, options: { waitForIdle?: boolean; maxRetries?: number } = {}) {
+    console.log('Starting enhanced batch run process with idle detection:', { batch, platform, options });
     console.log('Backend URL:', this.apiBaseUrl);
     
     // Step 1: Ensure backend is healthy
@@ -114,7 +113,7 @@ export class AutoPromptr {
       throw err;
     }
     
-    // Step 2: Prepare payload with complete batch data
+    // Step 2: Prepare payload with idle detection settings
     const payload = {
       batch: {
         id: batch.id,
@@ -130,11 +129,11 @@ export class AutoPromptr {
         }))
       },
       platform: platform,
-      delay_between_prompts: options.delay || 5000,
-      max_retries: options.maxRetries || 3
+      wait_for_idle: options.waitForIdle ?? true,
+      max_retries: options.maxRetries ?? 0
     };
     
-    console.log('Sending enhanced payload with complete batch data:', payload);
+    console.log('Sending enhanced payload with idle detection:', payload);
     
     try {
       const controller = new AbortController();
@@ -180,7 +179,7 @@ export class AutoPromptr {
       }
       
       const result = await response.json();
-      console.log('Enhanced batch run successful:', result);
+      console.log('Enhanced batch run successful with idle detection:', result);
       return result;
     } catch (err) {
       if (err instanceof AutoPromtrError) {

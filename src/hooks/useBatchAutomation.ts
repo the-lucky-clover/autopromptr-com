@@ -34,7 +34,7 @@ export function useBatchAutomation(batchId?: string) {
     pollStatus();
   }, [batchId, autoPromptr]);
 
-  const runBatch = async (batch: Batch, platform: string, options?: { delay?: number; maxRetries?: number }) => {
+  const runBatch = async (batch: Batch, platform: string, options?: { waitForIdle?: boolean; maxRetries?: number }) => {
     if (!batch || !batch.id) throw new Error('No batch provided');
     
     setLoading(true);

@@ -15,7 +15,7 @@ export interface Batch {
   createdAt: Date;
   platform?: string;
   settings?: {
-    delay: number;
+    waitForIdle: boolean;
     maxRetries: number;
   };
 }
@@ -49,6 +49,6 @@ export interface BatchFormData {
   description: string;
   initialPrompt: string;
   platform: string;
-  delay: number;
+  waitForIdle: boolean;
   maxRetries: number;
 }

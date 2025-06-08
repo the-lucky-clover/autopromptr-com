@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useBatchAutomation } from '@/hooks/useBatchAutomation';
@@ -31,7 +30,7 @@ export const useBatchOperations = () => {
       createdAt: new Date(),
       platform: detectedPlatform,
       settings: {
-        delay: formData.delay,
+        waitForIdle: formData.waitForIdle,
         maxRetries: formData.maxRetries
       }
     };
@@ -40,7 +39,7 @@ export const useBatchOperations = () => {
     
     toast({
       title: "Batch created",
-      description: `Batch "${batch.name}" created with auto-detected platform: ${platformName}.`,
+      description: `Batch "${batch.name}" created with auto-detected platform: ${platformName}. Wait for idle: ${formData.waitForIdle ? 'enabled' : 'disabled'}.`,
     });
   };
 
@@ -72,13 +71,17 @@ export const useBatchOperations = () => {
     setSelectedBatchId(batch.id);
     
     try {
-      // Pass the complete batch object with platform information
+      // Pass the complete batch object with updated settings
       const batchWithPlatform = {
         ...batch,
-        platform: detectedPlatform
+        platform: detectedPlatform,
+        settings: {
+          waitForIdle: batch.settings?.waitForIdle ?? true,
+          maxRetries: batch.settings?.maxRetries ?? 0
+        }
       };
       
-      await runBatch(batchWithPlatform, detectedPlatform, batch.settings);
+      await runBatch(batchWithPlatform, detectedPlatform, batchWithPlatform.settings);
       
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'running', platform: detectedPlatform } : b
@@ -86,7 +89,7 @@ export const useBatchOperations = () => {
       
       toast({
         title: "Batch started",
-        description: `Automation started for "${batch.name}" using ${platformName}.`,
+        description: `Automation started for "${batch.name}" using ${platformName} with idle detection.`,
       });
     } catch (err) {
       toast({

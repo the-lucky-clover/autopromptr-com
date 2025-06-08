@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { AutoPromptr } from '@/services/autoPromptr';
 import { Platform, BatchFormData } from '@/types/batch';
@@ -22,8 +24,8 @@ const BatchForm = ({ onSubmit, onCancel }: BatchFormProps) => {
     description: '',
     initialPrompt: '',
     platform: '',
-    delay: 5000,
-    maxRetries: 3
+    waitForIdle: true,
+    maxRetries: 0
   });
   const { toast } = useToast();
 
@@ -60,8 +62,8 @@ const BatchForm = ({ onSubmit, onCancel }: BatchFormProps) => {
       description: '',
       initialPrompt: '',
       platform: '',
-      delay: 5000,
-      maxRetries: 3
+      waitForIdle: true,
+      maxRetries: 0
     });
   };
 
@@ -113,16 +115,17 @@ const BatchForm = ({ onSubmit, onCancel }: BatchFormProps) => {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="delay">Delay (ms)</Label>
-            <Input
-              id="delay"
-              type="number"
-              value={formData.delay}
-              onChange={(e) => setFormData({...formData, delay: parseInt(e.target.value)})}
-              min="1000"
-              max="60000"
-              step="1000"
-            />
+            <Label htmlFor="wait-for-idle">Wait for Idle State</Label>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="wait-for-idle"
+                checked={formData.waitForIdle}
+                onCheckedChange={(checked) => setFormData({...formData, waitForIdle: checked})}
+              />
+              <span className="text-sm text-gray-600">
+                {formData.waitForIdle ? 'Enabled' : 'Disabled'}
+              </span>
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="retries">Max Retries</Label>
@@ -131,8 +134,8 @@ const BatchForm = ({ onSubmit, onCancel }: BatchFormProps) => {
               type="number"
               value={formData.maxRetries}
               onChange={(e) => setFormData({...formData, maxRetries: parseInt(e.target.value)})}
-              min="1"
-              max="10"
+              min="0"
+              max="5"
             />
           </div>
         </div>
