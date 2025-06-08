@@ -17,6 +17,9 @@ export interface Batch {
   settings?: {
     waitForIdle: boolean;
     maxRetries: number;
+    automationDelay?: number;
+    elementTimeout?: number;
+    debugLevel?: 'minimal' | 'standard' | 'detailed' | 'verbose';
   };
 }
 

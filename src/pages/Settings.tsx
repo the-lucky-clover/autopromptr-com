@@ -5,6 +5,7 @@ import { ProfileSettingsCard } from "@/components/settings/ProfileSettingsCard";
 import { APIConfigurationCard } from "@/components/settings/APIConfigurationCard";
 import { PreferencesCard } from "@/components/settings/PreferencesCard";
 import { NotificationsCard } from "@/components/settings/NotificationsCard";
+import { AutomationSettingsCard } from "@/components/settings/AutomationSettingsCard";
 
 const Settings = () => {
   return (
@@ -28,6 +29,7 @@ const Settings = () => {
             <APIConfigurationCard />
             <PreferencesCard />
             <NotificationsCard />
+            <AutomationSettingsCard />
           </div>
         </main>
       </div>

@@ -55,20 +55,30 @@ export const useBatchRunner = () => {
         b.id === batch.id ? { ...b, status: 'pending' as const } : b
       ));
 
-      // Ensure batch has the correct platform and format before saving
+      // Enhanced settings with better defaults for Lovable automation
+      const enhancedSettings = {
+        waitForIdle: batch.settings?.waitForIdle ?? true,
+        maxRetries: Math.max(batch.settings?.maxRetries ?? 3, 3), // Minimum 3 retries
+        automationDelay: batch.settings?.automationDelay ?? 2000, // 2 second delay
+        elementTimeout: batch.settings?.elementTimeout ?? 10000, // 10 second timeout
+        debugLevel: batch.settings?.debugLevel ?? 'detailed'
+      };
+
+      // Ensure batch has the correct platform and enhanced settings
       const batchToRun = {
         ...batch,
         platform: detectedPlatform,
         status: 'pending' as const,
+        settings: enhancedSettings,
         createdAt: batch.createdAt instanceof Date ? batch.createdAt : new Date(batch.createdAt)
       };
       
-      console.log('Enhanced batch save process starting...');
+      console.log('Enhanced batch save process starting with improved settings:', enhancedSettings);
       console.log('Batch data being saved:', JSON.stringify(batchToRun, null, 2));
       
       // Enhanced database save with better retry logic
       let saveAttempts = 0;
-      const maxSaveAttempts = 5; // Increased from 3
+      const maxSaveAttempts = 5;
       let saveResult = false;
       
       while (!saveResult && saveAttempts < maxSaveAttempts) {
@@ -108,7 +118,7 @@ export const useBatchRunner = () => {
       
       // Enhanced database verification with longer wait
       console.log('Enhanced database verification starting...');
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Increased from 500ms
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       let verificationAttempts = 0;
       const maxVerificationAttempts = 3;
@@ -147,22 +157,19 @@ export const useBatchRunner = () => {
       
       // Update batch status to running immediately before starting automation
       setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform } : b
+        b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform, settings: enhancedSettings } : b
       ));
       
-      // Create enhanced AutoPromptr instance and run the batch with idle detection settings
+      // Create enhanced AutoPromptr instance and run the batch with improved settings
       const autoPromptr = new AutoPromptr();
       
-      console.log('Starting enhanced automation with AutoPromptr...');
-      const runResult = await autoPromptr.runBatch(batch.id, detectedPlatform, {
-        waitForIdle: batch.settings?.waitForIdle ?? true,
-        maxRetries: batch.settings?.maxRetries ?? 0
-      });
+      console.log('Starting enhanced automation with improved settings for Lovable target...');
+      const runResult = await autoPromptr.runBatch(batchToRun, detectedPlatform, enhancedSettings);
       console.log('Enhanced AutoPromptr run result:', runResult);
       
       toast({
         title: "Batch started successfully",
-        description: `Automation started for "${batch.name}" using ${platformName} with idle detection.`,
+        description: `Automation started for "${batch.name}" using ${platformName} with ${enhancedSettings.maxRetries} retries and ${enhancedSettings.debugLevel} logging.`,
       });
     } catch (err) {
       console.error('Enhanced batch run failed:', err);
