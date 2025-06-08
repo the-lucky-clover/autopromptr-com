@@ -15,6 +15,10 @@ const Settings = () => {
   const { user } = useAuth();
   const [showApiKey, setShowApiKey] = useState(false);
 
+  const handleCopyApiKey = () => {
+    navigator.clipboard.writeText("sk-proj-1234567890abcdef...");
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
@@ -125,6 +129,7 @@ const Settings = () => {
                     <Button
                       variant="outline"
                       size="icon"
+                      onClick={handleCopyApiKey}
                       className="border-white/20 text-white hover:bg-white/10"
                     >
                       <Copy className="h-4 w-4" />
