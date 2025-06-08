@@ -1,21 +1,24 @@
 
-import { AutoPromptr, AutoPromtrError } from './autoPromptr';
+import { AutoPromtr, AutoPromtrError } from './autoPromptr';
 import { ConnectionDiagnostics } from './connectionDiagnostics';
+import { RedundantAutoPromptr } from './redundantAutoPromptr';
 import { Batch } from '@/types/batch';
 
-export class EnhancedAutoPromptr extends AutoPromptr {
+export class EnhancedAutoPromptr extends AutoPromtr {
   private configuredUrl: string;
   private connectionDiagnostics: ConnectionDiagnostics;
+  private redundantSystem: RedundantAutoPromptr;
   private validationCache: { isValid: boolean; timestamp: number } | null = null;
   private readonly VALIDATION_CACHE_DURATION = 60000; // 1 minute cache
 
   constructor() {
-    const savedUrl = 'https://autopromptr-backend.onrender.com';
+    const savedUrl = 'https://puppeteer-backend-da0o.onrender.com';
     super(savedUrl);
     this.configuredUrl = savedUrl;
     this.connectionDiagnostics = new ConnectionDiagnostics(savedUrl);
+    this.redundantSystem = new RedundantAutoPromptr();
     
-    console.log('🔧 Enhanced AutoPromptr initialized');
+    console.log('🔧 Enhanced AutoPromptr initialized with redundant failover system');
   }
 
   async validateConnection(): Promise<boolean> {
@@ -28,65 +31,54 @@ export class EnhancedAutoPromptr extends AutoPromptr {
     }
 
     try {
-      console.log('🔍 Validating connection...');
+      console.log('🔍 Validating redundant connections...');
       
-      // Use the parent health check which is now optimized
-      const healthResult = await super.healthCheck(1); // Only 1 retry for validation
+      const connectionStatus = await this.redundantSystem.validateConnections();
       
-      console.log('✅ Connection validation successful');
-      this.validationCache = { isValid: true, timestamp: now };
-      return true;
+      // Consider connection valid if either backend is working
+      const isValid = connectionStatus.primary || connectionStatus.fallback;
+      
+      console.log('✅ Redundant connection validation result:', {
+        primary: connectionStatus.primary,
+        fallback: connectionStatus.fallback,
+        overall: isValid,
+        recommendation: connectionStatus.recommendation
+      });
+      
+      this.validationCache = { isValid, timestamp: now };
+      return isValid;
       
     } catch (err) {
-      console.log('⚠️ Direct validation failed, checking if server responds at all...');
-      
-      try {
-        // Very simple connectivity test
-        const controller = new AbortController();
-        setTimeout(() => controller.abort(), 5000);
-        
-        await fetch(this.configuredUrl, { 
-          method: 'HEAD',
-          signal: controller.signal 
-        });
-        
-        // If we get any response (even 404), server is reachable
-        console.log('✅ Server is reachable, caching positive result');
-        this.validationCache = { isValid: true, timestamp: now };
-        return true;
-        
-      } catch (finalErr) {
-        console.error('❌ Connection validation failed completely');
-        this.validationCache = { isValid: false, timestamp: now };
-        throw new AutoPromtrError(
-          'Cannot connect to the backend service',
-          'CONNECTION_VALIDATION_FAILED',
-          503,
-          true
-        );
-      }
+      console.error('❌ Redundant connection validation failed completely');
+      this.validationCache = { isValid: false, timestamp: now };
+      throw new AutoPromtrError(
+        'Cannot connect to any backend service',
+        'REDUNDANT_CONNECTION_VALIDATION_FAILED',
+        503,
+        true
+      );
     }
   }
 
   async runBatchWithValidation(batch: Batch, platform: string, options: any = {}) {
-    console.log('🚀 Starting enhanced batch run...');
+    console.log('🚀 Starting enhanced batch run with redundant failover...');
     
-    // Validate connection with caching
+    // Validate connections with redundancy
     await this.validateConnection();
     
     const enhancedOptions = {
       waitForIdle: options.waitForIdle ?? true,
-      maxRetries: Math.min(options.maxRetries ?? 2, 2), // Cap retries
+      maxRetries: Math.min(options.maxRetries ?? 2, 2), // This is per-backend
       ...options
     };
     
     try {
-      const result = await super.runBatch(batch, platform, enhancedOptions);
-      console.log('✅ Enhanced batch completed successfully');
+      const result = await this.redundantSystem.runBatchWithRedundancy(batch, platform, enhancedOptions);
+      console.log('✅ Enhanced redundant batch completed successfully');
       return result;
       
     } catch (err) {
-      console.error('❌ Enhanced batch failed:', err);
+      console.error('❌ Enhanced redundant batch failed:', err);
       
       // Clear validation cache on failure
       this.validationCache = null;
@@ -96,8 +88,8 @@ export class EnhancedAutoPromptr extends AutoPromptr {
       }
       
       throw new AutoPromtrError(
-        'Enhanced batch processing failed',
-        'ENHANCED_BATCH_FAILED',
+        'Enhanced redundant batch processing failed',
+        'ENHANCED_REDUNDANT_BATCH_FAILED',
         500,
         true
       );
@@ -109,6 +101,22 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   }
 
   async getDiagnostics() {
-    return await this.connectionDiagnostics.runComprehensiveTest();
+    const standardDiagnostics = await this.connectionDiagnostics.runComprehensiveTest();
+    const redundantStatus = await this.redundantSystem.validateConnections();
+    const backendConfig = this.redundantSystem.getBackendConfiguration();
+    
+    return {
+      ...standardDiagnostics,
+      redundancy: {
+        primary: redundantStatus.primary,
+        fallback: redundantStatus.fallback,
+        recommendation: redundantStatus.recommendation,
+        configuration: backendConfig
+      }
+    };
+  }
+
+  getRedundancyStatus() {
+    return this.redundantSystem.getBackendConfiguration();
   }
 }

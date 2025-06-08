@@ -43,7 +43,7 @@ export const useEnhancedBatchRunner = () => {
       return;
     }
 
-    console.log('🚀 Starting ENHANCED batch run process for:', batch.id, 'with platform:', detectedPlatform);
+    console.log('🚀 Starting ENHANCED batch run with REDUNDANT failover for:', batch.id, 'with platform:', detectedPlatform);
 
     setSelectedBatchId(batch.id);
     setAutomationLoading(true);
@@ -54,13 +54,13 @@ export const useEnhancedBatchRunner = () => {
         b.id === batch.id ? { ...b, status: 'pending' as const } : b
       ));
 
-      // ENHANCED settings optimized for Lovable
+      // ENHANCED REDUNDANT settings
       const enhancedSettings = {
         waitForIdle: batch.settings?.waitForIdle ?? true,
-        maxRetries: Math.max(batch.settings?.maxRetries ?? 5, 5), // Increased retries
-        automationDelay: batch.settings?.automationDelay ?? 3000, // Longer initial delay
-        elementTimeout: batch.settings?.elementTimeout ?? 15000, // Longer element timeout
-        debugLevel: batch.settings?.debugLevel ?? 'verbose' // More detailed logging
+        maxRetries: Math.max(batch.settings?.maxRetries ?? 2, 2), // Per backend
+        automationDelay: batch.settings?.automationDelay ?? 3000,
+        elementTimeout: batch.settings?.elementTimeout ?? 15000,
+        debugLevel: batch.settings?.debugLevel ?? 'verbose'
       };
 
       const batchToRun = {
@@ -71,7 +71,7 @@ export const useEnhancedBatchRunner = () => {
         createdAt: batch.createdAt instanceof Date ? batch.createdAt : new Date(batch.createdAt)
       };
       
-      console.log('🔧 ENHANCED batch configuration:', enhancedSettings);
+      console.log('🔧 ENHANCED REDUNDANT batch configuration:', enhancedSettings);
       
       // Enhanced database save with better retry logic
       console.log('💾 Starting enhanced database save...');
@@ -106,25 +106,28 @@ export const useEnhancedBatchRunner = () => {
         } : b
       ));
       
-      // Create ENHANCED AutoPromptr instance
+      // Create ENHANCED AutoPromptr instance with redundancy
       const enhancedAutoPromptr = new EnhancedAutoPromptr();
       
-      console.log('🎯 Starting ENHANCED automation with Lovable optimizations...');
+      console.log('🎯 Starting ENHANCED REDUNDANT automation...');
+      console.log('🔄 Failover strategy: Puppeteer Backend (3 attempts) → AutoPromptr Backend (3 attempts)');
+      console.log('⏱️ Total maximum duration: ~6 minutes with 60-second delays between attempts');
+      
       const runResult = await enhancedAutoPromptr.runBatchWithValidation(
         batchToRun, 
         detectedPlatform, 
         enhancedSettings
       );
       
-      console.log('🎉 ENHANCED automation completed:', runResult);
+      console.log('🎉 ENHANCED REDUNDANT automation completed:', runResult);
       
       toast({
-        title: "Enhanced batch started successfully",
-        description: `Advanced automation started for "${batch.name}" using ${platformName} with ${enhancedSettings.maxRetries} retries and enhanced Lovable optimization.`,
+        title: "Enhanced redundant batch started successfully",
+        description: `Advanced automation with failover started for "${batch.name}" using ${platformName}. Primary: Puppeteer Backend, Fallback: AutoPromptr Backend (3 attempts each with 60s delays).`,
       });
       
     } catch (err) {
-      console.error('💥 Enhanced batch run failed:', err);
+      console.error('💥 Enhanced redundant batch run failed:', err);
       
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'failed' as const } : b
@@ -135,7 +138,16 @@ export const useEnhancedBatchRunner = () => {
       if (err instanceof Error) {
         errorMessage = err.message;
         
-        // Enhanced error categorization
+        // Enhanced error categorization for redundant failures
+        if (errorMessage.includes('REDUNDANCY_EXHAUSTED')) {
+          toast({
+            title: "All backends exhausted",
+            description: "Both Puppeteer and AutoPromptr backends failed after 6 total attempts. Both services may be down.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
         if (errorMessage.includes('database')) {
           toast({
             title: "Database operation failed",
@@ -144,29 +156,11 @@ export const useEnhancedBatchRunner = () => {
           });
           return;
         }
-        
-        if (errorMessage.includes('CHAT_INPUT_NOT_FOUND')) {
-          toast({
-            title: "Chat input not detected",
-            description: "Enhanced element detection couldn't find the chat input. The page may not be fully loaded.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        if (errorMessage.includes('TEXT_AUTOMATION_FAILED')) {
-          toast({
-            title: "Text automation failed",
-            description: "Enhanced text entry failed after multiple attempts. Please check the target URL.",
-            variant: "destructive",
-          });
-          return;
-        }
       }
       
       toast({
-        title: "Enhanced batch failed",
-        description: `Enhanced automation failed: ${errorMessage}`,
+        title: "Enhanced redundant batch failed",
+        description: `Redundant automation failed: ${errorMessage}`,
         variant: "destructive",
       });
       
