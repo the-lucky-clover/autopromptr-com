@@ -1,7 +1,8 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { AutoPromptr, AutoPromtrError } from '@/services/autoPromptr';
+import { EnhancedAutoPromptr } from '@/services/enhancedAutoPromptr';
+import { AutoPromtrError } from '@/services/autoPromptr';
 import { Batch } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 import { useBatchDatabase } from './useBatchDatabase';
@@ -25,7 +26,7 @@ export const useBatchRunner = () => {
       return;
     }
 
-    // Check if any batch is already running - only allow one batch at a time
+    // Check if any batch is already running
     const runningBatch = await new Promise<Batch[]>((resolve) => {
       setBatches(prev => {
         const running = prev.filter(b => b.status === 'running');
@@ -43,28 +44,26 @@ export const useBatchRunner = () => {
       return;
     }
 
-    console.log('Starting enhanced batch run process for:', batch.id, 'with platform:', detectedPlatform);
+    console.log('🚀 Starting enhanced batch run with improved connectivity:', batch.id);
 
-    // Set the selected batch ID and loading state immediately
     setSelectedBatchId(batch.id);
     setAutomationLoading(true);
     
     try {
-      // Update batch status to show it's starting up
+      // Update batch status to pending
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'pending' as const } : b
       ));
 
-      // Enhanced settings with better defaults for Lovable automation
+      // Enhanced settings with better defaults
       const enhancedSettings = {
         waitForIdle: batch.settings?.waitForIdle ?? true,
-        maxRetries: Math.max(batch.settings?.maxRetries ?? 3, 3), // Minimum 3 retries
-        automationDelay: batch.settings?.automationDelay ?? 2000, // 2 second delay
-        elementTimeout: batch.settings?.elementTimeout ?? 10000, // 10 second timeout
+        maxRetries: Math.max(batch.settings?.maxRetries ?? 3, 3),
+        automationDelay: batch.settings?.automationDelay ?? 2000,
+        elementTimeout: batch.settings?.elementTimeout ?? 15000,
         debugLevel: batch.settings?.debugLevel ?? 'detailed'
       };
 
-      // Ensure batch has the correct platform and enhanced settings
       const batchToRun = {
         ...batch,
         platform: detectedPlatform,
@@ -73,79 +72,30 @@ export const useBatchRunner = () => {
         createdAt: batch.createdAt instanceof Date ? batch.createdAt : new Date(batch.createdAt)
       };
       
-      console.log('Enhanced batch save process starting with improved settings:', enhancedSettings);
-      console.log('Batch data being saved:', JSON.stringify(batchToRun, null, 2));
+      console.log('💾 Enhanced database save process starting...');
       
-      // Enhanced database save with better retry logic
-      let saveAttempts = 0;
-      const maxSaveAttempts = 5;
-      let saveResult = false;
-      
-      while (!saveResult && saveAttempts < maxSaveAttempts) {
-        saveAttempts++;
-        console.log(`Enhanced database save attempt ${saveAttempts}/${maxSaveAttempts}`);
-        
-        try {
-          saveResult = await saveBatchToDatabase(batchToRun);
-          
-          if (saveResult) {
-            console.log('Enhanced database save successful on attempt', saveAttempts);
-            break;
-          }
-        } catch (saveError) {
-          console.error(`Enhanced save attempt ${saveAttempts} failed:`, saveError);
-          if (saveAttempts === maxSaveAttempts) {
-            throw new AutoPromtrError(
-              `Failed to save batch after ${maxSaveAttempts} attempts: ${saveError instanceof Error ? saveError.message : 'Unknown error'}`,
-              'DATABASE_SAVE_FAILED',
-              500,
-              false
-            );
-          }
-          // Progressive backoff: 500ms, 1s, 2s, 4s
-          await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, saveAttempts - 1)));
-        }
-      }
-      
+      // Enhanced database save with validation
+      const saveResult = await saveBatchToDatabase(batchToRun);
       if (!saveResult) {
         throw new AutoPromtrError(
-          'Failed to save batch to database after multiple attempts',
+          'Failed to save batch to database',
           'DATABASE_SAVE_FAILED',
           500,
-          false
+          true
         );
       }
       
-      // Enhanced database verification with longer wait
-      console.log('Enhanced database verification starting...');
+      // Database verification
+      console.log('🔍 Enhanced database verification...');
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      let verificationAttempts = 0;
-      const maxVerificationAttempts = 3;
-      let verificationResult = null;
-      
-      while (!verificationResult && verificationAttempts < maxVerificationAttempts) {
-        verificationAttempts++;
-        console.log(`Enhanced verification attempt ${verificationAttempts}/${maxVerificationAttempts}`);
-        
-        verificationResult = await verifyBatchInDatabase(batch.id);
-        
-        if (!verificationResult && verificationAttempts < maxVerificationAttempts) {
-          console.warn(`Verification attempt ${verificationAttempts} failed, retrying...`);
-          await new Promise(resolve => setTimeout(resolve, 1000 * verificationAttempts));
-        }
-      }
+      const verificationResult = await verifyBatchInDatabase(batch.id);
       
       if (!verificationResult) {
-        console.warn('Database verification failed after all attempts, but proceeding with caution');
-        
-        // One final save attempt before proceeding
-        console.log('Final database save attempt before proceeding...');
+        console.warn('⚠️ Database verification failed, attempting final save...');
         const finalSaveResult = await saveBatchToDatabase(batchToRun);
-        
         if (!finalSaveResult) {
           throw new AutoPromtrError(
-            'Critical: Batch could not be verified in database and final save failed',
+            'Critical: Batch could not be verified in database',
             'DATABASE_VERIFICATION_FAILED',
             500,
             true
@@ -153,52 +103,56 @@ export const useBatchRunner = () => {
         }
       }
       
-      console.log('Enhanced database operations complete, starting backend communication...');
+      console.log('✅ Database operations complete, starting enhanced backend communication...');
       
-      // Update batch status to running immediately before starting automation
+      // Update to running status
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'running' as const, platform: detectedPlatform, settings: enhancedSettings } : b
       ));
       
-      // Create enhanced AutoPromptr instance and run the batch with improved settings
-      const autoPromptr = new AutoPromptr();
+      // Use Enhanced AutoPromptr with validation
+      const enhancedAutoPromptr = new EnhancedAutoPromptr();
       
-      console.log('Starting enhanced automation with improved settings for Lovable target...');
-      const runResult = await autoPromptr.runBatch(batchToRun, detectedPlatform, enhancedSettings);
-      console.log('Enhanced AutoPromptr run result:', runResult);
+      console.log('🎯 Starting enhanced automation with validated connectivity...');
+      const runResult = await enhancedAutoPromptr.runBatchWithValidation(
+        batchToRun, 
+        detectedPlatform, 
+        enhancedSettings
+      );
+      
+      console.log('🎉 Enhanced automation completed successfully:', runResult);
       
       toast({
         title: "Batch started successfully",
-        description: `Automation started for "${batch.name}" using ${platformName} with ${enhancedSettings.maxRetries} retries and ${enhancedSettings.debugLevel} logging.`,
+        description: `Enhanced automation started for "${batch.name}" using ${platformName} with validated connectivity.`,
       });
+      
     } catch (err) {
-      console.error('Enhanced batch run failed:', err);
+      console.error('💥 Enhanced batch run failed:', err);
       
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'failed' as const } : b
       ));
       
       let errorMessage = 'Unknown error occurred';
-      let shouldRetry = false;
       
       if (err instanceof AutoPromtrError) {
         errorMessage = err.message;
-        shouldRetry = err.retryable;
         
-        // Handle specific error cases with better user guidance
+        // Handle specific error cases with better guidance
         switch (err.code) {
-          case 'BACKEND_COLD_START':
+          case 'CONNECTION_VALIDATION_FAILED':
             toast({
-              title: "Backend is starting up",
-              description: "The backend service is initializing. Please wait 30-60 seconds and try again.",
+              title: "Connection validation failed",
+              description: "Please check your backend configuration in Settings and run the Connection Wizard.",
               variant: "destructive",
             });
             return;
             
-          case 'BATCH_NOT_FOUND':
+          case 'NETWORK_CONNECTION_FAILED':
             toast({
-              title: "Batch not found in backend",
-              description: "The batch wasn't found in the backend database. Try recreating the batch.",
+              title: "Network connection failed",
+              description: "Unable to connect to backend. Please verify the backend URL in Settings.",
               variant: "destructive",
             });
             return;
@@ -211,14 +165,6 @@ export const useBatchRunner = () => {
               variant: "destructive",
             });
             return;
-            
-          case 'REQUEST_TIMEOUT':
-            toast({
-              title: "Request timed out",
-              description: "The backend took too long to respond. It may be starting up.",
-              variant: "destructive",
-            });
-            return;
         }
       } else if (err instanceof Error) {
         errorMessage = err.message;
@@ -226,7 +172,7 @@ export const useBatchRunner = () => {
       
       toast({
         title: "Failed to start batch",
-        description: shouldRetry ? `${errorMessage} Please try again.` : errorMessage,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

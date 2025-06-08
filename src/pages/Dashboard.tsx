@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -8,6 +7,7 @@ import DashboardStatsCards from "@/components/DashboardStatsCards";
 import DashboardQuickActions from "@/components/DashboardQuickActions";
 import DashboardBackendMonitoring from "@/components/DashboardBackendMonitoring";
 import DashboardSubscription from "@/components/DashboardSubscription";
+import { ConnectionStatus } from "@/components/ConnectionStatus";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -35,6 +35,7 @@ const Dashboard = () => {
                 <p className="text-purple-200 text-sm md:text-base">Here's what's happening with your prompt batches today.</p>
               </div>
             </div>
+            <ConnectionStatus />
           </div>
 
           {/* Stats Cards */}
