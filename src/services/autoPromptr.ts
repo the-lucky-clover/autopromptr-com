@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 // Configuration - Use your working Puppeteer backend
@@ -122,12 +121,11 @@ export class AutoPromptr {
     }
   }
 
-  // Get supported platforms - simplified for Puppeteer backend
+  // Get supported platforms - return array format for compatibility
   async getPlatforms() {
-    return {
-      platforms: ['web'],
-      default: 'web'
-    };
+    return [
+      { id: 'web', name: 'Web Platform', type: 'web' }
+    ];
   }
 
   // Enhanced batch running adapted for Puppeteer backend

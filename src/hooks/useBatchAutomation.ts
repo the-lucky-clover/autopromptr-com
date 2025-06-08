@@ -17,10 +17,27 @@ export function useBatchAutomation(batchId?: string) {
     const pollStatus = async () => {
       try {
         const statusData = await autoPromptr.getBatchStatus(batchId);
-        setStatus(statusData);
+        
+        // Convert the simple response to BatchStatus format
+        const batchStatus: BatchStatus = {
+          status: statusData.status === 'completed' ? 'completed' : 
+                 statusData.status === 'stopped' ? 'stopped' : 
+                 statusData.status === 'failed' ? 'failed' : 'processing',
+          platform: 'web',
+          progress: {
+            completed: statusData.status === 'completed' ? 1 : 0,
+            total: 1,
+            percentage: statusData.status === 'completed' ? 100 : 0,
+            failed: statusData.status === 'failed' ? 1 : 0,
+            processing: statusData.status === 'processing' ? 1 : 0,
+            pending: statusData.status === 'pending' ? 1 : 0
+          }
+        };
+        
+        setStatus(batchStatus);
         
         // Stop polling if batch is completed or failed
-        if (['completed', 'failed', 'stopped'].includes(statusData.status)) {
+        if (['completed', 'failed', 'stopped'].includes(batchStatus.status)) {
           return;
         }
         

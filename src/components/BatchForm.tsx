@@ -32,8 +32,9 @@ const BatchForm = ({ onSubmit, onCancel }: BatchFormProps) => {
   useEffect(() => {
     const autoPromptr = new AutoPromptr();
     autoPromptr.getPlatforms()
-      .then((data) => {
-        setPlatforms(data.filter((p: Platform) => p.type === 'web'));
+      .then((platformArray) => {
+        // platformArray is now correctly an array
+        setPlatforms(platformArray.filter((p: Platform) => p.type === 'web'));
       })
       .catch((err) => {
         console.error('Failed to load platforms:', err);

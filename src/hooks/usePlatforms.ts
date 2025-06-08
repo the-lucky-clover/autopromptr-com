@@ -11,8 +11,9 @@ export const usePlatforms = () => {
   useEffect(() => {
     const autoPromptr = new AutoPromptr();
     autoPromptr.getPlatforms()
-      .then((data) => {
-        setPlatforms(data.filter((p: Platform) => p.type === 'web'));
+      .then((platformArray) => {
+        // Now platformArray is already an array, so we can filter directly
+        setPlatforms(platformArray.filter((p: Platform) => p.type === 'web'));
       })
       .catch((err) => {
         console.error('Failed to load platforms:', err);
