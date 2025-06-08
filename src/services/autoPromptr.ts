@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 // Configuration - Use Supabase Edge Function for batch-exists endpoint
@@ -29,14 +30,15 @@ export class AutoPromptr {
     this.supabaseUrl = supabaseUrl;
   }
 
-  // Enhanced health check with timeout and retry
+  // Enhanced health check with better cold start detection
   async healthCheck(retries = 3): Promise<any> {
     console.log('Checking backend health at:', this.apiBaseUrl);
     
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        // Increased timeout for slow responses
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
         
         const response = await fetch(`${this.apiBaseUrl}/health`, {
           signal: controller.signal,
@@ -48,33 +50,74 @@ export class AutoPromptr {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-          throw new AutoPromtrError(
-            `Health check failed with status ${response.status}`,
-            'HEALTH_CHECK_FAILED',
-            response.status,
-            true
-          );
+          // More specific error handling for different status codes
+          if (response.status === 503) {
+            throw new AutoPromtrError(
+              `Backend is temporarily unavailable (${response.status})`,
+              'SERVICE_TEMPORARILY_UNAVAILABLE',
+              response.status,
+              true
+            );
+          } else if (response.status >= 500) {
+            throw new AutoPromtrError(
+              `Backend server error (${response.status})`,
+              'SERVER_ERROR',
+              response.status,
+              true
+            );
+          } else {
+            throw new AutoPromtrError(
+              `Health check failed with status ${response.status}`,
+              'HEALTH_CHECK_FAILED',
+              response.status,
+              attempt < retries
+            );
+          }
         }
         
         const result = await response.json();
-        console.log(`Health check successful on attempt ${attempt}:`, result);
+        console.log(`✅ Backend health check successful on attempt ${attempt}:`, result);
         return result;
+        
       } catch (err) {
-        console.error(`Health check attempt ${attempt} failed:`, err);
+        console.error(`❌ Health check attempt ${attempt} failed:`, err);
         
         if (attempt === retries) {
+          // Only throw cold start error if we get connection refused or timeout
+          if (err.name === 'AbortError' || err.message.includes('fetch')) {
+            // Check if this might be a genuine cold start vs network issue
+            const isLikelyColdStart = err.message.includes('refused') || err.name === 'AbortError';
+            
+            if (isLikelyColdStart) {
+              throw new AutoPromtrError(
+                'Backend service appears to be starting up. Please wait 30-60 seconds and try again.',
+                'BACKEND_COLD_START',
+                503,
+                true
+              );
+            } else {
+              throw new AutoPromtrError(
+                'Backend service is not responding. Please check your connection and try again.',
+                'SERVICE_UNAVAILABLE',
+                503,
+                true
+              );
+            }
+          }
+          
           if (err instanceof AutoPromtrError) {
             throw err;
           }
+          
           throw new AutoPromtrError(
-            'Backend service is not available after multiple attempts',
+            'Backend health check failed after multiple attempts',
             'SERVICE_UNAVAILABLE',
             503,
             true
           );
         }
         
-        // Wait before retrying (exponential backoff)
+        // Progressive backoff delay
         await new Promise(resolve => setTimeout(resolve, this.retryDelay * attempt));
       }
     }
@@ -93,27 +136,39 @@ export class AutoPromptr {
     return response.json();
   }
 
-  // Enhanced batch running with idle detection instead of delays
+  // Enhanced batch running with better error discrimination
   async runBatch(batch: any, platform: string, options: { waitForIdle?: boolean; maxRetries?: number } = {}) {
-    console.log('Starting enhanced batch run process with idle detection:', { batch, platform, options });
+    console.log('Starting enhanced batch run process with intelligent error handling:', { batch, platform, options });
     console.log('Backend URL:', this.apiBaseUrl);
     
-    // Step 1: Ensure backend is healthy
+    // Step 1: Intelligent backend health check
     try {
-      await this.healthCheck();
+      const healthResult = await this.healthCheck();
+      console.log('✅ Backend health confirmed:', healthResult);
     } catch (err) {
-      if (err instanceof AutoPromtrError && err.code === 'SERVICE_UNAVAILABLE') {
-        throw new AutoPromtrError(
-          'Backend service is starting up. Please wait 30-60 seconds and try again.',
-          'BACKEND_COLD_START',
-          503,
-          true
-        );
+      console.error('❌ Backend health check failed:', err);
+      
+      if (err instanceof AutoPromtrError) {
+        // Only throw cold start error if we're confident it's actually starting
+        if (err.code === 'BACKEND_COLD_START') {
+          throw err;
+        }
+        
+        // For other errors, provide more helpful messaging
+        if (err.code === 'SERVICE_TEMPORARILY_UNAVAILABLE') {
+          throw new AutoPromtrError(
+            'Backend is experiencing high load. Please wait a moment and try again.',
+            'BACKEND_BUSY',
+            503,
+            true
+          );
+        }
       }
+      
       throw err;
     }
     
-    // Step 2: Prepare payload with idle detection settings
+    // Step 2: Prepare payload with enhanced settings
     const payload = {
       batch: {
         id: batch.id,
@@ -133,11 +188,12 @@ export class AutoPromptr {
       max_retries: options.maxRetries ?? 0
     };
     
-    console.log('Sending enhanced payload with idle detection:', payload);
+    console.log('Sending payload with intelligent error handling:', payload);
     
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      // Longer timeout for batch operations
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
       
       const response = await fetch(`${this.apiBaseUrl}/api/run-batch`, {
         method: 'POST',
@@ -149,7 +205,7 @@ export class AutoPromptr {
       });
       
       clearTimeout(timeoutId);
-      console.log('Enhanced response status:', response.status);
+      console.log('Batch response status:', response.status);
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -168,10 +224,14 @@ export class AutoPromptr {
           errorMessage = errorText || errorMessage;
         }
         
-        // Handle specific error cases
+        // Enhanced error handling for specific cases
         if (response.status === 503) {
-          errorCode = 'BACKEND_OVERLOADED';
-          errorMessage = 'Backend service is overloaded. Please try again in a few moments.';
+          errorCode = 'BACKEND_TEMPORARILY_BUSY';
+          errorMessage = 'Backend is temporarily busy processing other requests. Please try again in a moment.';
+          retryable = true;
+        } else if (response.status === 502 || response.status === 504) {
+          errorCode = 'GATEWAY_ERROR';
+          errorMessage = 'Gateway timeout - the backend may be under heavy load. Please try again.';
           retryable = true;
         }
         
@@ -179,17 +239,18 @@ export class AutoPromptr {
       }
       
       const result = await response.json();
-      console.log('Enhanced batch run successful with idle detection:', result);
+      console.log('✅ Batch run successful with intelligent error handling:', result);
       return result;
+      
     } catch (err) {
       if (err instanceof AutoPromtrError) {
         throw err;
       }
       
-      // Handle network errors
+      // Handle network errors with better context
       if (err.name === 'AbortError') {
         throw new AutoPromtrError(
-          'Request timed out. The backend may be starting up.',
+          'Request timed out. The backend may be processing a heavy workload.',
           'REQUEST_TIMEOUT',
           408,
           true
@@ -209,7 +270,7 @@ export class AutoPromptr {
   async stopBatch(batchId: string) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       
       const response = await fetch(`${this.apiBaseUrl}/api/stop-batch/${batchId}`, {
         method: 'POST',
@@ -239,11 +300,11 @@ export class AutoPromptr {
     }
   }
 
-  // Get batch status and progress with timeout
+  // Get batch status and progress with enhanced timeout
   async getBatchStatus(batchId: string) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
       
       const response = await fetch(`${this.apiBaseUrl}/api/batch-status/${batchId}`, {
         signal: controller.signal
@@ -276,7 +337,7 @@ export class AutoPromptr {
   async getBatchResults(batchId: string) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
       
       const response = await fetch(`${this.apiBaseUrl}/api/batch-results/${batchId}`, {
         signal: controller.signal
@@ -350,9 +411,9 @@ export function useBatchAutomation(batchId?: string) {
     setError(null);
     
     try {
-      console.log('Running batch with complete batch data:', batch, 'on platform:', platform);
+      console.log('Running batch with intelligent error handling:', batch, 'on platform:', platform);
       const result = await autoPromptr.runBatch(batch, platform, options);
-      console.log('Enhanced batch run result:', result);
+      console.log('✅ Enhanced batch run result:', result);
       return result;
     } catch (err) {
       const errorMessage = err instanceof AutoPromtrError ? err.message : 'Unknown error';
