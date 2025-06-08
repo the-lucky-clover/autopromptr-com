@@ -110,7 +110,7 @@ export const useEnhancedBatchRunner = () => {
       const enhancedAutoPromptr = new EnhancedAutoPromptr();
       
       console.log('🎯 Starting ENHANCED automation with Lovable optimizations...');
-      const runResult = await enhancedAutoPromptr.runBatchWithEnhancements(
+      const runResult = await enhancedAutoPromptr.runBatchWithValidation(
         batchToRun, 
         detectedPlatform, 
         enhancedSettings
@@ -131,7 +131,6 @@ export const useEnhancedBatchRunner = () => {
       ));
       
       let errorMessage = 'Unknown error occurred';
-      let shouldRetry = false;
       
       if (err instanceof Error) {
         errorMessage = err.message;

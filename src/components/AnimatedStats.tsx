@@ -6,9 +6,10 @@ interface StatProps {
   label: string;
   prefix?: string;
   suffix?: string;
+  color?: string;
 }
 
-const AnimatedStat = ({ endValue, label, prefix = "", suffix = "" }: StatProps) => {
+const AnimatedStat = ({ endValue, label, prefix = "", suffix = "", color = "from-blue-400 to-purple-500" }: StatProps) => {
   const [value, setValue] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -57,7 +58,7 @@ const AnimatedStat = ({ endValue, label, prefix = "", suffix = "" }: StatProps) 
 
   return (
     <div ref={ref} className="text-center">
-      <div className="text-4xl md:text-5xl font-bold gradient-text mb-2">
+      <div className={`text-4xl md:text-5xl font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent mb-2`}>
         {prefix}{value.toLocaleString()}{suffix}
       </div>
       <div className="text-gray-300 font-medium">{label}</div>
@@ -82,16 +83,16 @@ const AnimatedStats = () => {
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="animate-on-scroll stagger-animation" style={{ "--animation-delay": "0.1s" } as React.CSSProperties}>
-            <AnimatedStat endValue={92} label="Accuracy Improvement" suffix="%" />
+            <AnimatedStat endValue={92} label="Accuracy Improvement" suffix="%" color="from-emerald-400 to-teal-500" />
           </div>
           <div className="animate-on-scroll stagger-animation" style={{ "--animation-delay": "0.2s" } as React.CSSProperties}>
-            <AnimatedStat endValue={75} label="Time Savings" suffix="%" />
+            <AnimatedStat endValue={75} label="Time Savings" suffix="%" color="from-blue-400 to-indigo-500" />
           </div>
           <div className="animate-on-scroll stagger-animation" style={{ "--animation-delay": "0.3s" } as React.CSSProperties}>
-            <AnimatedStat endValue={10000} label="Prompts Processed" suffix="+" />
+            <AnimatedStat endValue={10000} label="Prompts Processed" suffix="+" color="from-purple-400 to-pink-500" />
           </div>
           <div className="animate-on-scroll stagger-animation" style={{ "--animation-delay": "0.4s" } as React.CSSProperties}>
-            <AnimatedStat endValue={500} label="Enterprise Clients" suffix="+" />
+            <AnimatedStat endValue={500} label="Enterprise Clients" suffix="+" color="from-orange-400 to-red-500" />
           </div>
         </div>
       </div>

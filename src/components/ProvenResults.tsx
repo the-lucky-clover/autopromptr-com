@@ -4,17 +4,20 @@ const ProvenResults = () => {
     {
       metric: "300%",
       label: "Faster Content Creation",
-      description: "Streamline your workflow with AI-powered automation"
+      description: "Streamline your workflow with AI-powered automation",
+      color: "from-emerald-400 to-teal-500"
     },
     {
       metric: "95%",
       label: "Accuracy Improvement", 
-      description: "Consistent, high-quality outputs every time"
+      description: "Consistent, high-quality outputs every time",
+      color: "from-blue-400 to-indigo-500"
     },
     {
       metric: "60%",
       label: "Cost Reduction",
-      description: "Optimize resources while scaling operations"
+      description: "Optimize resources while scaling operations",
+      color: "from-purple-400 to-pink-500"
     }
   ];
 
@@ -40,7 +43,7 @@ const ProvenResults = () => {
               style={{ "--animation-delay": `${index * 0.1 + 0.1}s` } as React.CSSProperties}
             >
               <div className="glass-effect border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 hover:scale-105 p-8 rounded-lg">
-                <div className="text-4xl font-bold gradient-text mb-2">
+                <div className={`text-4xl font-bold bg-gradient-to-r ${result.color} bg-clip-text text-transparent mb-2`}>
                   {result.metric}
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-3">
