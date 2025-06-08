@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useBatchAutomation } from '@/services/autoPromptr';
+import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { Batch } from '@/types/batch';
 
 export const useBatchControl = () => {

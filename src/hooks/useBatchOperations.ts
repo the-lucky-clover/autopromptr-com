@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useBatchAutomation } from '@/services/autoPromptr';
+import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
 import { Batch, BatchFormData, TextPrompt } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
