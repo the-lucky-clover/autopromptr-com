@@ -68,11 +68,11 @@ export function AppSidebar() {
     <Sidebar className="border-r border-gray-700 bg-gray-900">
       <SidebarHeader className="p-6 flex items-center justify-center">
         <Link to="/" className="flex items-center space-x-2 group justify-center">
-          <Zap className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent animate-shimmer" strokeWidth={2} style={{
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundImage: 'linear-gradient(to right, rgb(96, 165, 250), rgb(168, 85, 247))'
-          }} />
+          <div className="relative animate-shimmer">
+            <Zap className="w-8 h-8 text-blue-400 drop-shadow-lg" strokeWidth={2} style={{
+              filter: 'drop-shadow(0 0 8px rgba(96, 165, 250, 0.6))'
+            }} />
+          </div>
           <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent animate-shimmer-delayed">
             AutoPromptr
           </span>
