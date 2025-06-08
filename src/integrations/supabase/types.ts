@@ -346,7 +346,7 @@ export type Database = {
         Returns: number
       }
       get_batch_stats: {
-        Args: { batch_uuid: string }
+        Args: Record<PropertyKey, never> | { batch_uuid: string }
         Returns: Json
       }
     }
