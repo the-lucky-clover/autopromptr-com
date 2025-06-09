@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import AuthModal from "@/components/AuthModal";
-import ClockworkGears from "@/components/ClockworkGears";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,27 +41,13 @@ const Navbar = () => {
       {/* Navbar content - always visible */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          <Link to="/" className="flex items-center space-x-2 group">
-            <Zap className="w-8 h-8 text-blue-400" strokeWidth={1.5} />
-            <ClockworkGears className="w-9 h-9" strokeWidth={1.5} />
-            <svg width="0" height="0">
-              <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#60a5fa" />
-                  <stop offset="100%" stopColor="#a78bfa" />
-                </linearGradient>
-                <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#60a5fa" />
-                  <stop offset="25%" stopColor="#a78bfa" />
-                  <stop offset="50%" stopColor="#f97316" />
-                  <stop offset="75%" stopColor="#a78bfa" />
-                  <stop offset="100%" stopColor="#60a5fa" />
-                </linearGradient>
-              </defs>
-            </svg>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent animate-shimmer-text relative overflow-hidden">
-              AutoPromptr
-            </span>
+          <Link to="/" className="flex items-center group">
+            <div className="flex items-center -space-x-1">
+              <Zap className="w-8 h-8 animate-psychedelic-bolt relative z-10" strokeWidth={1.5} />
+              <span className="text-2xl font-bold animate-psychedelic-text relative overflow-hidden pl-1">
+                AutoPromptr
+              </span>
+            </div>
           </Link>
           
           <div className="hidden md:flex items-center space-x-4">
