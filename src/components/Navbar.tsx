@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Bolt } from "lucide-react";
+import { Menu, X, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -42,7 +43,7 @@ const Navbar = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center space-x-2 group">
-            <Bolt className="w-8 h-8 text-blue-400" strokeWidth={1.5} />
+            <Zap className="w-8 h-8 text-blue-400" strokeWidth={1.5} />
             <ClockworkGears className="w-9 h-9" strokeWidth={1.5} />
             <svg width="0" height="0">
               <defs>
