@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Cog } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import AuthModal from "@/components/AuthModal";
+import ClockworkGears from "@/components/ClockworkGears";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +43,7 @@ const Navbar = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center space-x-1 group">
-            <Cog className="w-9 h-9 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text animate-pulse" strokeWidth={1.5} style={{ color: 'transparent', stroke: 'url(#gradient)' }} />
+            <ClockworkGears className="w-9 h-9" strokeWidth={1.5} />
             <svg width="0" height="0">
               <defs>
                 <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
