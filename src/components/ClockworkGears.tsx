@@ -18,121 +18,108 @@ const ClockworkGears: React.FC<ClockworkGearsProps> = ({
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <linearGradient id="gearGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <linearGradient id="gearGradient" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#60a5fa" />
-          <stop offset="100%" stopColor="#a78bfa" />
+          <stop offset="50%" stopColor="#a78bfa" />
+          <stop offset="100%" stopColor="#f97316" />
         </linearGradient>
       </defs>
       
-      {/* Large gear (golden ratio: 1.618 times smaller gear) */}
-      <g className="animate-[spin_8s_linear_infinite]" style={{ transformOrigin: '14px 18px' }}>
-        {/* Gear teeth */}
+      {/* Large gear - positioned at bottom left */}
+      <g className="animate-[spin_8s_linear_infinite]" style={{ transformOrigin: '13px 23px' }}>
+        {/* Large gear teeth - 8 teeth evenly spaced */}
         <path 
-          d="M14 6 L16 6 L16 8 L14 8 Z
-             M20 8 L22 8 L22 10 L20 10 Z
-             M24 14 L26 14 L26 16 L24 16 Z
-             M22 20 L22 22 L20 22 L20 20 Z
-             M14 24 L16 24 L16 26 L14 26 Z
-             M8 20 L8 22 L6 22 L6 20 Z
-             M4 14 L6 14 L6 16 L4 16 Z
-             M6 8 L8 8 L8 10 L6 10 Z"
+          d="M13 12 L15 12 L15 14 L13 14 Z
+             M18.5 14.5 L20.5 14.5 L20.5 16.5 L18.5 16.5 Z
+             M22 20 L24 20 L24 22 L22 22 Z
+             M20.5 25.5 L20.5 27.5 L18.5 27.5 L18.5 25.5 Z
+             M13 30 L15 30 L15 32 L13 32 Z
+             M7.5 27.5 L7.5 25.5 L5.5 25.5 L5.5 27.5 Z
+             M4 22 L2 22 L2 20 L4 20 Z
+             M5.5 16.5 L7.5 16.5 L7.5 14.5 L5.5 14.5 Z"
           stroke="url(#gearGradient)" 
           strokeWidth={strokeWidth}
           fill="none"
         />
         
-        {/* Main gear circle */}
+        {/* Large gear main circle */}
         <circle 
-          cx="14" 
-          cy="18" 
-          r="8" 
+          cx="13" 
+          cy="23" 
+          r="9" 
           stroke="url(#gearGradient)" 
           strokeWidth={strokeWidth}
           fill="none"
         />
         
-        {/* Inner circle */}
+        {/* Large gear inner circle */}
         <circle 
-          cx="14" 
-          cy="18" 
-          r="3" 
+          cx="13" 
+          cy="23" 
+          r="4" 
           stroke="url(#gearGradient)" 
           strokeWidth={strokeWidth}
           fill="none"
+        />
+        
+        {/* Large gear center hub */}
+        <circle 
+          cx="13" 
+          cy="23" 
+          r="1.5" 
+          stroke="url(#gearGradient)" 
+          strokeWidth={strokeWidth}
+          fill="url(#gearGradient)"
+          opacity="0.3"
         />
       </g>
       
-      {/* Small gear (golden ratio smaller) */}
-      <g className="animate-[spin_-5s_linear_infinite]" style={{ transformOrigin: '26px 12px' }}>
-        {/* Small gear teeth */}
+      {/* Small gear - positioned at top right, 45 degrees offset */}
+      <g className="animate-[spin_-12s_linear_infinite]" style={{ transformOrigin: '26px 13px' }}>
+        {/* Small gear teeth - 6 teeth evenly spaced */}
         <path 
-          d="M26 7 L27 7 L27 8 L26 8 Z
-             M29 9 L30 9 L30 10 L29 10 Z
-             M31 12 L32 12 L32 13 L31 13 Z
-             M29 15 L30 15 L30 16 L29 16 Z
-             M26 17 L27 17 L27 18 L26 18 Z
-             M23 15 L23 16 L22 16 L22 15 Z
-             M21 12 L22 12 L22 13 L21 13 Z
-             M23 9 L23 10 L22 10 L22 9 Z"
+          d="M26 7 L27.5 7 L27.5 8.5 L26 8.5 Z
+             M29.5 9.5 L31 9.5 L31 11 L29.5 11 Z
+             M32 13 L33.5 13 L33.5 14.5 L32 14.5 Z
+             M31 16.5 L31 18 L29.5 18 L29.5 16.5 Z
+             M26 19 L27.5 19 L27.5 20.5 L26 20.5 Z
+             M22.5 18 L22.5 16.5 L21 16.5 L21 18 Z
+             M20 14.5 L18.5 14.5 L18.5 13 L20 13 Z
+             L21 11 L22.5 11 L22.5 9.5 L21 9.5 Z"
           stroke="url(#gearGradient)" 
           strokeWidth={strokeWidth}
           fill="none"
         />
         
-        {/* Small gear circle */}
+        {/* Small gear main circle */}
         <circle 
           cx="26" 
-          cy="12" 
-          r="5" 
+          cy="13" 
+          r="6" 
           stroke="url(#gearGradient)" 
           strokeWidth={strokeWidth}
           fill="none"
         />
         
-        {/* Small inner circle */}
+        {/* Small gear inner circle */}
         <circle 
           cx="26" 
-          cy="12" 
-          r="2" 
-          stroke="url(#gearGradient)" 
-          strokeWidth={strokeWidth}
-          fill="none"
-        />
-      </g>
-      
-      {/* Tiny accent gear (golden ratio smaller than small gear) */}
-      <g className="animate-[spin_12s_linear_infinite]" style={{ transformOrigin: '8px 8px' }}>
-        {/* Tiny gear teeth */}
-        <path 
-          d="M8 5 L9 5 L9 6 L8 6 Z
-             M10 7 L11 7 L11 8 L10 8 Z
-             M11 10 L11 11 L10 11 L10 10 Z
-             M8 11 L9 11 L9 12 L8 12 Z
-             M6 10 L6 11 L5 11 L5 10 Z
-             M5 7 L5 8 L4 8 L4 7 Z"
+          cy="13" 
+          r="2.5" 
           stroke="url(#gearGradient)" 
           strokeWidth={strokeWidth}
           fill="none"
         />
         
-        {/* Tiny gear circle */}
+        {/* Small gear center hub */}
         <circle 
-          cx="8" 
-          cy="8" 
-          r="3" 
+          cx="26" 
+          cy="13" 
+          r="1" 
           stroke="url(#gearGradient)" 
           strokeWidth={strokeWidth}
-          fill="none"
-        />
-        
-        {/* Tiny inner circle */}
-        <circle 
-          cx="8" 
-          cy="8" 
-          r="1.2" 
-          stroke="url(#gearGradient)" 
-          strokeWidth={strokeWidth}
-          fill="none"
+          fill="url(#gearGradient)"
+          opacity="0.3"
         />
       </g>
     </svg>
