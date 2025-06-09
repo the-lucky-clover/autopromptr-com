@@ -43,8 +43,8 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center group">
             <div className="flex items-center -space-x-1">
-              <Zap className="w-8 h-8 animate-psychedelic-bolt relative z-10" strokeWidth={1.5} />
-              <span className="text-2xl font-bold animate-psychedelic-text relative overflow-hidden pl-1">
+              <Zap className="w-8 h-8 animate-gradient-hero relative z-10" strokeWidth={1.5} />
+              <span className="text-2xl font-bold animate-gradient-hero relative overflow-hidden pl-1">
                 AutoPromptr
               </span>
             </div>

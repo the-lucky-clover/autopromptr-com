@@ -10,6 +10,7 @@ import SocialProof from "@/components/SocialProof";
 import TrustedBy from "@/components/TrustedBy";
 import BlogPosts from "@/components/BlogPosts";
 import Footer from "@/components/Footer";
+import SpeedometerSection from "@/components/SpeedometerSection";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Index = () => {
@@ -20,6 +21,7 @@ const Index = () => {
       <Navbar />
       <Hero />
       <ProvenResults />
+      <SpeedometerSection />
       <Features />
       <UseCases />
       <SocialProof />

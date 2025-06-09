@@ -1,4 +1,3 @@
-
 @layer base {
   /* Smooth animations for content with enhanced easing */
   .animate-on-scroll {
@@ -113,6 +112,24 @@
     -webkit-text-fill-color: transparent;
     animation: shimmerText 3s ease-in-out infinite;
     filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.3));
+  }
+
+  /* Hero gradient animation matching the "Supercharge" text */
+  .animate-gradient-hero {
+    background: linear-gradient(
+      90deg,
+      #3B82F6,
+      #8B5CF6,
+      #EC4899,
+      #8B5CF6,
+      #3B82F6
+    );
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: heroGradientFlow 6s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
   }
 
   /* Psychedelic animations for the logo */
@@ -256,6 +273,22 @@
   5%, 15% {
     transform: translateX(100%) translateY(100%) rotate(45deg);
     opacity: 1;
+  }
+}
+
+/* Hero gradient keyframes matching the "Supercharge" gradient */
+@keyframes heroGradientFlow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 50% 0%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 100%;
   }
 }
 
