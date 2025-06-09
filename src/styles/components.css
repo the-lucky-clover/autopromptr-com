@@ -4,19 +4,21 @@
     background: rgba(0, 0, 0, 0.2) !important;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem !important;
+    border-radius: 1.5rem !important;
   }
 
   .glass-navbar {
     background: rgba(255, 255, 255, 0.1) !important;
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0 0 1.5rem 1.5rem !important;
   }
 
   .glass-navbar-transparent {
     background: transparent !important;
     backdrop-filter: none;
     border-bottom: none;
+    border-radius: 0 0 1.5rem 1.5rem !important;
   }
 
   .glass-navbar-scrolled {
@@ -24,6 +26,7 @@
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-radius: 0 0 1.5rem 1.5rem !important;
   }
 
   /* Enhanced glassmorphism effect */
@@ -33,6 +36,7 @@
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-bottom: 1px solid rgba(255, 255, 255, 0.125);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    border-radius: 0 0 1.5rem 1.5rem !important;
   }
 
   .gradient-text {
@@ -88,6 +92,19 @@
 
   /* Ensure all cards and containers have rounded corners */
   .card, .container, .panel {
-    border-radius: 1rem !important;
+    border-radius: 1.5rem !important;
+  }
+
+  /* Enhanced rounded corners for all interactive elements */
+  .toast, [data-toast] {
+    border-radius: 1.5rem !important;
+  }
+
+  .popover, [data-popover] {
+    border-radius: 1.5rem !important;
+  }
+
+  .modal, [data-modal] {
+    border-radius: 1.5rem !important;
   }
 }

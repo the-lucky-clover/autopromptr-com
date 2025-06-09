@@ -29,7 +29,7 @@
     --input: 225 47% 20%;
     --ring: 263 85% 70%;
 
-    --radius: 0.75rem;
+    --radius: 1.5rem;
 
     --sidebar-background: 225 47% 12%;
     --sidebar-foreground: 0 0% 85%;
@@ -91,43 +91,43 @@
 
   /* Ensure ALL buttons have rounded corners */
   button, .btn, [role="button"] {
-    border-radius: 0.75rem !important;
+    border-radius: 1.5rem !important;
   }
 
   /* Ensure ALL cards have rounded corners */
   .card, [data-card], .glass-effect {
-    border-radius: 1rem !important;
+    border-radius: 1.5rem !important;
   }
 
   /* Ensure all images have rounded corners */
   img {
-    border-radius: 1rem !important;
+    border-radius: 1.5rem !important;
   }
 
   /* Apply rounded corners to all form elements */
   input, textarea, select {
-    border-radius: 0.75rem !important;
+    border-radius: 1.5rem !important;
   }
 
   /* Ensure rounded corners are applied globally with higher specificity */
   .rounded-sm {
-    border-radius: 0.75rem !important;
+    border-radius: 1rem !important;
   }
 
   .rounded {
-    border-radius: 0.75rem !important;
+    border-radius: 1rem !important;
   }
 
   .rounded-md {
-    border-radius: 0.75rem !important;
+    border-radius: 1rem !important;
   }
 
   .rounded-lg {
-    border-radius: 1rem !important;
+    border-radius: 1.5rem !important;
   }
 
   .rounded-xl {
-    border-radius: 1rem !important;
+    border-radius: 1.5rem !important;
   }
 
   .rounded-2xl {
@@ -145,5 +145,27 @@
   /* Force rounded corners on all interactive elements */
   a, button, input, textarea, select, .card, .glass-effect, [data-radix-collection-item] {
     border-radius: var(--radius) !important;
+  }
+
+  /* Enhanced rounded corners for toast notifications */
+  [data-toast-viewport] {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    max-height: 100vh;
+    width: 390px;
+    list-style: none;
+    outline: none;
+    pointer-events: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  [data-toast] {
+    border-radius: 1.5rem !important;
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
   }
 }

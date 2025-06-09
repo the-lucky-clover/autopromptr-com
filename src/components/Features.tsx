@@ -58,15 +58,15 @@ const Features = () => {
           {features.map((feature, index) => (
             <Card 
               key={index} 
-              className={`glass-effect border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 hover-scale animate-slide-up ${feature.delay}`}
+              className={`glass-effect border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 hover-scale animate-slide-up ${feature.delay} rounded-2xl`}
             >
-              <CardHeader>
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center mb-4">
+              <CardHeader className="rounded-t-2xl">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mb-4">
                   <feature.icon className="w-6 h-6 text-white" />
                 </div>
                 <CardTitle className="text-xl text-white">{feature.title}</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="rounded-b-2xl">
                 <CardDescription className="text-gray-400 text-base leading-relaxed">
                   {feature.description}
                 </CardDescription>

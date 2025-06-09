@@ -1,3 +1,4 @@
+
 import { AutoPromptr, AutoPromtrError } from './autoPromptr';
 import { ConnectionDiagnostics } from './connectionDiagnostics';
 import { Batch } from '@/types/batch';
@@ -41,7 +42,24 @@ export class RedundantAutoPromptr {
         console.log(`📡 ${backend.name} - Attempt ${attempt}/${backend.maxRetries}`);
         
         const autoPromptr = new AutoPromptr(backend.url);
-        const result = await autoPromptr.runBatch(batch, platform, options);
+        
+        // Enhanced options to include target URL and text prompts for Lovable coding bot workflow
+        const enhancedOptions = {
+          ...options,
+          targetUrl: batch.targetUrl || 'https://lovable.dev',
+          textPrompts: batch.prompts || [],
+          automationType: 'lovable-text-input',
+          elementSelector: 'textarea, input[type="text"], [contenteditable="true"]',
+          actionType: 'type-and-enter'
+        };
+        
+        console.log(`📝 Transmitting to ${backend.name}:`, {
+          targetUrl: enhancedOptions.targetUrl,
+          promptCount: enhancedOptions.textPrompts.length,
+          automationType: enhancedOptions.automationType
+        });
+        
+        const result = await autoPromptr.runBatch(batch, platform, enhancedOptions);
         
         console.log(`✅ ${backend.name} succeeded on attempt ${attempt}`);
         return {
