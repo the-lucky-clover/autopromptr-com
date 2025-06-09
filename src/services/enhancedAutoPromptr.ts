@@ -1,10 +1,9 @@
-
-import { AutoPromtr, AutoPromtrError } from './autoPromptr';
+import { AutoPromptr, AutoPromtrError } from './autoPromptr';
 import { ConnectionDiagnostics } from './connectionDiagnostics';
 import { RedundantAutoPromptr } from './redundantAutoPromptr';
 import { Batch } from '@/types/batch';
 
-export class EnhancedAutoPromptr extends AutoPromtr {
+export class EnhancedAutoPromptr extends AutoPromptr {
   private configuredUrl: string;
   private connectionDiagnostics: ConnectionDiagnostics;
   private redundantSystem: RedundantAutoPromptr;

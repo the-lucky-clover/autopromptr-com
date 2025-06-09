@@ -1,5 +1,4 @@
-
-import { AutoPromtr, AutoPromtrError } from './autoPromptr';
+import { AutoPromptr, AutoPromtrError } from './autoPromptr';
 import { ConnectionDiagnostics } from './connectionDiagnostics';
 import { Batch } from '@/types/batch';
 
@@ -41,7 +40,7 @@ export class RedundantAutoPromptr {
       try {
         console.log(`📡 ${backend.name} - Attempt ${attempt}/${backend.maxRetries}`);
         
-        const autoPromptr = new AutoPromtr(backend.url);
+        const autoPromptr = new AutoPromptr(backend.url);
         const result = await autoPromptr.runBatch(batch, platform, options);
         
         console.log(`✅ ${backend.name} succeeded on attempt ${attempt}`);
