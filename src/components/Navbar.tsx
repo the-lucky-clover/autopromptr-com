@@ -41,64 +41,17 @@ const Navbar = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center group">
-            <div className="flex items-center -space-x-1">
-              {/* SVG with embedded gradient definition */}
-              <svg className="w-8 h-8 relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#3B82F6">
-                      <animate attributeName="stop-color" 
-                        values="#3B82F6;#8B5CF6;#EC4899;#8B5CF6;#3B82F6" 
-                        dur="6s" 
-                        repeatCount="indefinite" />
-                    </stop>
-                    <stop offset="25%" stopColor="#8B5CF6">
-                      <animate attributeName="stop-color" 
-                        values="#8B5CF6;#EC4899;#8B5CF6;#3B82F6;#8B5CF6" 
-                        dur="6s" 
-                        repeatCount="indefinite" />
-                    </stop>
-                    <stop offset="50%" stopColor="#EC4899">
-                      <animate attributeName="stop-color" 
-                        values="#EC4899;#8B5CF6;#3B82F6;#8B5CF6;#EC4899" 
-                        dur="6s" 
-                        repeatCount="indefinite" />
-                    </stop>
-                    <stop offset="75%" stopColor="#8B5CF6">
-                      <animate attributeName="stop-color" 
-                        values="#8B5CF6;#3B82F6;#8B5CF6;#EC4899;#8B5CF6" 
-                        dur="6s" 
-                        repeatCount="indefinite" />
-                    </stop>
-                    <stop offset="100%" stopColor="#3B82F6">
-                      <animate attributeName="stop-color" 
-                        values="#3B82F6;#8B5CF6;#EC4899;#8B5CF6;#3B82F6" 
-                        dur="6s" 
-                        repeatCount="indefinite" />
-                    </stop>
-                  </linearGradient>
-                </defs>
-                <path 
-                  d="m13 2-2 8H7l8-6-2-2z" 
-                  stroke="url(#heroGradient)" 
-                  strokeWidth="1.5" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  fill="none"
-                  style={{ filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))' }}
-                />
-                <path 
-                  d="m17 6-3 10H8l6-14 3 4z" 
-                  stroke="url(#heroGradient)" 
-                  strokeWidth="1.5" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  fill="none"
-                  style={{ filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))' }}
-                />
-              </svg>
+            <div className="flex items-center space-x-2">
+              <Zap 
+                className="w-8 h-8 relative z-10" 
+                strokeWidth={1.5}
+                style={{
+                  stroke: 'url(#navbarGradient)',
+                  filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
+                }}
+              />
               <span 
-                className="text-2xl font-bold relative overflow-hidden pl-1"
+                className="text-2xl font-bold relative overflow-hidden"
                 style={{
                   background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
                   backgroundSize: '300% 300%',
@@ -112,6 +65,43 @@ const Navbar = () => {
                 AutoPromptr
               </span>
             </div>
+            {/* SVG gradient definition for the Zap icon */}
+            <svg width="0" height="0" style={{ position: 'absolute' }}>
+              <defs>
+                <linearGradient id="navbarGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#3B82F6">
+                    <animate attributeName="stop-color" 
+                      values="#3B82F6;#8B5CF6;#EC4899;#8B5CF6;#3B82F6" 
+                      dur="6s" 
+                      repeatCount="indefinite" />
+                  </stop>
+                  <stop offset="25%" stopColor="#8B5CF6">
+                    <animate attributeName="stop-color" 
+                      values="#8B5CF6;#EC4899;#8B5CF6;#3B82F6;#8B5CF6" 
+                      dur="6s" 
+                      repeatCount="indefinite" />
+                  </stop>
+                  <stop offset="50%" stopColor="#EC4899">
+                    <animate attributeName="stop-color" 
+                      values="#EC4899;#8B5CF6;#3B82F6;#8B5CF6;#EC4899" 
+                      dur="6s" 
+                      repeatCount="indefinite" />
+                  </stop>
+                  <stop offset="75%" stopColor="#8B5CF6">
+                    <animate attributeName="stop-color" 
+                      values="#8B5CF6;#3B82F6;#8B5CF6;#EC4899;#8B5CF6" 
+                      dur="6s" 
+                      repeatCount="indefinite" />
+                  </stop>
+                  <stop offset="100%" stopColor="#3B82F6">
+                    <animate attributeName="stop-color" 
+                      values="#3B82F6;#8B5CF6;#EC4899;#8B5CF6;#3B82F6" 
+                      dur="6s" 
+                      repeatCount="indefinite" />
+                  </stop>
+                </linearGradient>
+              </defs>
+            </svg>
           </Link>
           
           <div className="hidden md:flex items-center space-x-4">
