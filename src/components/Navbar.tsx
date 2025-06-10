@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap } from "lucide-react";
@@ -42,16 +43,9 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center group">
             <div className="flex items-center space-x-2">
-              <Zap 
-                className="w-8 h-8 relative z-10" 
-                strokeWidth={1.5}
-                style={{
-                  stroke: 'url(#navbarGradient)',
-                  filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
-                }}
-              />
-              <span 
-                className="text-2xl font-bold relative overflow-hidden"
+              {/* Combined gradient container for mobile - spans both icon and text */}
+              <div 
+                className="flex items-center space-x-2 md:hidden"
                 style={{
                   background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
                   backgroundSize: '300% 300%',
@@ -62,10 +56,45 @@ const Navbar = () => {
                   filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
                 }}
               >
-                AutoPromptr
-              </span>
+                <Zap 
+                  className="w-8 h-8" 
+                  strokeWidth={1.5}
+                  style={{
+                    stroke: 'currentColor'
+                  }}
+                />
+                <span className="text-2xl font-bold">
+                  AutoPromptr
+                </span>
+              </div>
+
+              {/* Desktop version - separate gradients */}
+              <div className="hidden md:flex items-center space-x-2">
+                <Zap 
+                  className="w-8 h-8 relative z-10" 
+                  strokeWidth={1.5}
+                  style={{
+                    stroke: 'url(#navbarGradient)',
+                    filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
+                  }}
+                />
+                <span 
+                  className="text-2xl font-bold relative overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
+                    backgroundSize: '300% 300%',
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    color: 'transparent',
+                    animation: 'heroGradientFlow 6s ease-in-out infinite',
+                    filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
+                  }}
+                >
+                  AutoPromptr
+                </span>
+              </div>
             </div>
-            {/* SVG gradient definition for the Zap icon */}
+            {/* SVG gradient definition for desktop Zap icon */}
             <svg width="0" height="0" style={{ position: 'absolute' }}>
               <defs>
                 <linearGradient id="navbarGradient" x1="0%" y1="0%" x2="100%" y2="0%">
