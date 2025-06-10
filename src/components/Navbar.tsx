@@ -43,8 +43,31 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center group">
             <div className="flex items-center -space-x-1">
-              <Zap className="w-8 h-8 animate-gradient-hero relative z-10" strokeWidth={1.5} />
-              <span className="text-2xl font-bold animate-gradient-hero relative overflow-hidden pl-1">
+              <Zap 
+                className="w-8 h-8 relative z-10" 
+                strokeWidth={1.5}
+                style={{
+                  background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
+                  backgroundSize: '300% 300%',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                  animation: 'heroGradientFlow 6s ease-in-out infinite',
+                  filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
+                }}
+              />
+              <span 
+                className="text-2xl font-bold relative overflow-hidden pl-1"
+                style={{
+                  background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
+                  backgroundSize: '300% 300%',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                  animation: 'heroGradientFlow 6s ease-in-out infinite',
+                  filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
+                }}
+              >
                 AutoPromptr
               </span>
             </div>
