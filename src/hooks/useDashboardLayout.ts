@@ -4,17 +4,16 @@ import { useState, useEffect } from 'react';
 export interface ModuleLayout {
   id: string;
   order: number;
-  gridArea?: string;
-  span?: string;
+  visible: boolean;
 }
 
 const DEFAULT_LAYOUT: ModuleLayout[] = [
-  { id: 'batch-processor', order: 0, gridArea: 'batch', span: 'lg:col-span-2' },
-  { id: 'backend-health', order: 1, gridArea: 'health', span: 'lg:col-span-1' },
-  { id: 'system-logs', order: 2, gridArea: 'logs', span: 'lg:col-span-3' },
-  { id: 'quick-actions', order: 3, gridArea: 'actions', span: 'lg:col-span-1' },
-  { id: 'subscription', order: 4, gridArea: 'subscription', span: 'lg:col-span-1' },
-  { id: 'stats-cards', order: 5, gridArea: 'stats', span: 'lg:col-span-3' },
+  { id: 'batch-processor', order: 0, visible: true },
+  { id: 'system-logs', order: 1, visible: true },
+  { id: 'backend-health', order: 2, visible: true },
+  { id: 'quick-actions', order: 3, visible: true },
+  { id: 'subscription', order: 4, visible: true },
+  { id: 'stats-cards', order: 5, visible: true },
 ];
 
 const STORAGE_KEY = 'dashboard-layout';
@@ -41,23 +40,11 @@ export const useDashboardLayout = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newLayout));
   };
 
-  const reorderModules = (activeId: string, overId: string) => {
+  const toggleModuleVisibility = (moduleId: string) => {
     setLayout((items) => {
-      const oldIndex = items.findIndex((item) => item.id === activeId);
-      const newIndex = items.findIndex((item) => item.id === overId);
-
-      if (oldIndex === -1 || newIndex === -1) return items;
-
-      const newItems = [...items];
-      const [reorderedItem] = newItems.splice(oldIndex, 1);
-      newItems.splice(newIndex, 0, reorderedItem);
-
-      // Update order values
-      const updatedItems = newItems.map((item, index) => ({
-        ...item,
-        order: index,
-      }));
-
+      const updatedItems = items.map(item =>
+        item.id === moduleId ? { ...item, visible: !item.visible } : item
+      );
       updateLayout(updatedItems);
       return updatedItems;
     });
@@ -70,7 +57,7 @@ export const useDashboardLayout = () => {
 
   return {
     layout,
-    reorderModules,
+    toggleModuleVisibility,
     resetLayout,
   };
 };

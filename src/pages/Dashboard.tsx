@@ -2,11 +2,6 @@
 import { useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { RotateCcw, Plus } from "lucide-react";
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { ConnectionStatus } from "@/components/ConnectionStatus";
 import DashboardBatchManager from "@/components/DashboardBatchManager";
 import DashboardStatsModule from "@/components/DashboardStatsModule";
@@ -14,7 +9,6 @@ import DashboardQuickActions from "@/components/DashboardQuickActions";
 import DashboardSubscription from "@/components/DashboardSubscription";
 import SystemLogsPanel from "@/components/SystemLogsPanel";
 import HealthStatusDashboard from "@/components/HealthStatusDashboard";
-import DraggableModule from "@/components/DraggableModule";
 import { WindowManagerProvider, WindowFrame } from "@/components/WindowManager";
 import { useDashboardLayout } from "@/hooks/useDashboardLayout";
 
@@ -36,16 +30,7 @@ const Dashboard = () => {
     'stats-cards': true,
   });
 
-  const { layout, reorderModules, resetLayout } = useDashboardLayout();
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor)
-  );
+  const { layout } = useDashboardLayout();
 
   const handleStatsUpdate = (newStats: typeof stats) => {
     setStats(newStats);
@@ -55,42 +40,7 @@ const Dashboard = () => {
     setBatches(newBatches);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      reorderModules(String(active.id), String(over.id));
-    }
-  };
-
-  const toggleModule = (moduleId: string) => {
-    setOpenModules(prev => ({
-      ...prev,
-      [moduleId]: !prev[moduleId]
-    }));
-  };
-
-  const openModule = (moduleId: string) => {
-    setOpenModules(prev => ({
-      ...prev,
-      [moduleId]: true
-    }));
-  };
-
-  const resetDashboard = () => {
-    resetLayout();
-    setOpenModules({
-      'batch-processor': true,
-      'backend-health': true,
-      'system-logs': true,
-      'quick-actions': true,
-      'subscription': true,
-      'stats-cards': true,
-    });
-  };
-
   const hasActiveBatch = batches.some(batch => batch.status === 'running');
-  const closedModules = Object.entries(openModules).filter(([_, isOpen]) => !isOpen);
 
   const renderModuleContent = (moduleId: string) => {
     switch (moduleId) {
@@ -150,63 +100,89 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Button
-                  onClick={resetDashboard}
-                  variant="ghost"
-                  size="sm"
-                  className="text-white hover:text-purple-200 rounded-xl"
-                  title="Reset dashboard layout"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </Button>
                 <ConnectionStatus />
               </div>
             </div>
 
-            {/* Closed Modules Launcher */}
-            {closedModules.length > 0 && (
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl mb-6">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-white text-sm">Closed Modules</CardTitle>
-                  <CardDescription className="text-purple-200 text-xs">
-                    Click to reopen modules
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex flex-wrap gap-2">
-                    {closedModules.map(([moduleId]) => (
-                      <Button
-                        key={moduleId}
-                        onClick={() => openModule(moduleId)}
-                        variant="ghost"
-                        size="sm"
-                        className="text-white hover:bg-purple-500/20 rounded-xl border border-purple-400/30"
-                      >
-                        <Plus className="w-3 h-3 mr-1" />
-                        {getModuleTitle(moduleId)}
-                      </Button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Window-based Dashboard Modules */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {layout
-                .filter(item => openModules[item.id])
-                .sort((a, b) => a.order - b.order)
-                .map((item) => (
+            {/* Fixed Column Layout for Dashboard Modules */}
+            <div className="space-y-6">
+              {/* Batch Processor - Full width, long rectangle */}
+              {openModules['batch-processor'] && (
+                <div className="w-full">
                   <WindowFrame
-                    key={item.id}
-                    windowId={item.id}
-                    title={getModuleTitle(item.id)}
-                    className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl"
-                    onClose={() => toggleModule(item.id)}
+                    windowId="batch-processor"
+                    title={getModuleTitle('batch-processor')}
+                    className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl w-full"
+                    onClose={() => setOpenModules(prev => ({ ...prev, 'batch-processor': false }))}
                   >
-                    {renderModuleContent(item.id)}
+                    {renderModuleContent('batch-processor')}
                   </WindowFrame>
-                ))}
+                </div>
+              )}
+
+              {/* System Logs - Full width, long rectangle */}
+              {openModules['system-logs'] && (
+                <div className="w-full">
+                  <WindowFrame
+                    windowId="system-logs"
+                    title={getModuleTitle('system-logs')}
+                    className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl w-full"
+                    onClose={() => setOpenModules(prev => ({ ...prev, 'system-logs': false }))}
+                  >
+                    {renderModuleContent('system-logs')}
+                  </WindowFrame>
+                </div>
+              )}
+
+              {/* Backend Health - Full width, compact */}
+              {openModules['backend-health'] && (
+                <div className="w-full">
+                  <WindowFrame
+                    windowId="backend-health"
+                    title={getModuleTitle('backend-health')}
+                    className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl w-full"
+                    onClose={() => setOpenModules(prev => ({ ...prev, 'backend-health': false }))}
+                  >
+                    {renderModuleContent('backend-health')}
+                  </WindowFrame>
+                </div>
+              )}
+
+              {/* Bottom row - Quick Actions, Subscription, Stats */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {openModules['quick-actions'] && (
+                  <WindowFrame
+                    windowId="quick-actions"
+                    title={getModuleTitle('quick-actions')}
+                    className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl"
+                    onClose={() => setOpenModules(prev => ({ ...prev, 'quick-actions': false }))}
+                  >
+                    {renderModuleContent('quick-actions')}
+                  </WindowFrame>
+                )}
+
+                {openModules['subscription'] && (
+                  <WindowFrame
+                    windowId="subscription"
+                    title={getModuleTitle('subscription')}
+                    className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl"
+                    onClose={() => setOpenModules(prev => ({ ...prev, 'subscription': false }))}
+                  >
+                    {renderModuleContent('subscription')}
+                  </WindowFrame>
+                )}
+
+                {openModules['stats-cards'] && (
+                  <WindowFrame
+                    windowId="stats-cards"
+                    title={getModuleTitle('stats-cards')}
+                    className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl"
+                    onClose={() => setOpenModules(prev => ({ ...prev, 'stats-cards': false }))}
+                  >
+                    {renderModuleContent('stats-cards')}
+                  </WindowFrame>
+                )}
+              </div>
             </div>
           </main>
         </div>

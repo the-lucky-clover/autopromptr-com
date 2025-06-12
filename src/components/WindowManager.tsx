@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
   Minimize2, 
-  Maximize2, 
   X, 
   GripHorizontal,
   Monitor
@@ -14,12 +13,10 @@ interface WindowState {
   id: string;
   title: string;
   isMinimized: boolean;
-  isMaximized: boolean;
   isClosed: boolean;
   isFocused: boolean;
   zIndex: number;
   position: { x: number; y: number };
-  size: { width: number; height: number };
 }
 
 interface WindowManagerProps {
@@ -27,7 +24,6 @@ interface WindowManagerProps {
   windowId: string;
   title: string;
   defaultPosition?: { x: number; y: number };
-  defaultSize?: { width: number; height: number };
   onClose?: () => void;
   className?: string;
 }
@@ -36,7 +32,6 @@ interface WindowManagerContextType {
   windows: WindowState[];
   focusWindow: (id: string) => void;
   minimizeWindow: (id: string) => void;
-  maximizeWindow: (id: string) => void;
   closeWindow: (id: string) => void;
   registerWindow: (window: WindowState) => void;
   unregisterWindow: (id: string) => void;
@@ -63,13 +58,6 @@ export const WindowManagerProvider = ({ children }: { children: ReactNode }) => 
     ));
   };
 
-  const maximizeWindow = (id: string) => {
-    setWindows(prev => prev.map(w => 
-      w.id === id ? { ...w, isMaximized: !w.isMaximized, isFocused: true, zIndex: nextZIndex } : { ...w, isFocused: false }
-    ));
-    setNextZIndex(prev => prev + 1);
-  };
-
   const closeWindow = (id: string) => {
     setWindows(prev => prev.map(w => 
       w.id === id ? { ...w, isClosed: true, isFocused: false } : w
@@ -89,7 +77,6 @@ export const WindowManagerProvider = ({ children }: { children: ReactNode }) => 
       windows,
       focusWindow,
       minimizeWindow,
-      maximizeWindow,
       closeWindow,
       registerWindow,
       unregisterWindow
@@ -142,15 +129,14 @@ export const WindowFrame = ({
   children, 
   windowId, 
   title, 
-  defaultPosition = { x: 100, y: 100 },
-  defaultSize = { width: 400, height: 300 },
+  defaultPosition = { x: 0, y: 0 },
   onClose,
   className = ''
 }: WindowManagerProps) => {
   const context = React.useContext(WindowManagerContext);
   if (!context) return <div className={className}>{children}</div>;
 
-  const { windows, focusWindow, minimizeWindow, maximizeWindow, closeWindow, registerWindow } = context;
+  const { windows, focusWindow, minimizeWindow, closeWindow, registerWindow } = context;
   const window = windows.find(w => w.id === windowId);
 
   useEffect(() => {
@@ -158,12 +144,10 @@ export const WindowFrame = ({
       id: windowId,
       title,
       isMinimized: false,
-      isMaximized: false,
       isClosed: false,
       isFocused: true,
       zIndex: 1000,
-      position: defaultPosition,
-      size: defaultSize
+      position: defaultPosition
     });
   }, [windowId, title]);
 
@@ -175,69 +159,49 @@ export const WindowFrame = ({
   };
 
   return (
-    <>
-      {/* Backdrop blur for unfocused windows */}
-      {!window.isFocused && (
-        <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-[1px] z-[100]"
-          onClick={() => focusWindow(windowId)}
-        />
-      )}
-      
-      <Card 
-        className={`${className} transition-all duration-300 ${
-          window.isMinimized ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'
-        } ${
-          window.isMaximized ? 'fixed inset-4' : 'relative'
-        } ${
-          window.isFocused ? 'ring-2 ring-purple-500/50 shadow-2xl' : 'shadow-lg'
-        }`}
-        style={{ 
-          zIndex: window.zIndex,
-          transform: window.isMinimized ? 'scale(0)' : 'scale(1)'
-        }}
-        onClick={() => !window.isFocused && focusWindow(windowId)}
-      >
-        {/* Window Header */}
-        <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-t-xl border-b border-white/10">
-          <div className="flex items-center space-x-2">
-            <GripHorizontal className="w-4 h-4 text-purple-300 cursor-move" />
-            <span className="text-white font-medium text-sm">{title}</span>
-          </div>
-          
-          <div className="flex items-center space-x-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-6 h-6 p-0 text-yellow-400 hover:bg-yellow-400/20 rounded-lg"
-              onClick={() => minimizeWindow(windowId)}
-            >
-              <Minimize2 className="w-3 h-3" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-6 h-6 p-0 text-green-400 hover:bg-green-400/20 rounded-lg"
-              onClick={() => maximizeWindow(windowId)}
-            >
-              <Maximize2 className="w-3 h-3" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-6 h-6 p-0 text-red-400 hover:bg-red-400/20 rounded-lg"
-              onClick={handleClose}
-            >
-              <X className="w-3 h-3" />
-            </Button>
-          </div>
+    <Card 
+      className={`${className} transition-all duration-300 ${
+        window.isMinimized ? 'scale-0 opacity-0 pointer-events-none' : 'scale-100 opacity-100'
+      } ${
+        window.isFocused ? 'ring-2 ring-purple-500/50 shadow-2xl' : 'shadow-lg'
+      }`}
+      style={{ 
+        zIndex: window.zIndex,
+        transform: window.isMinimized ? 'scale(0)' : 'scale(1)'
+      }}
+      onClick={() => !window.isFocused && focusWindow(windowId)}
+    >
+      {/* Window Header */}
+      <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-t-xl border-b border-white/10">
+        <div className="flex items-center space-x-2">
+          <GripHorizontal className="w-4 h-4 text-purple-300 cursor-move" />
+          <span className="text-white font-medium text-sm">{title}</span>
         </div>
         
-        {/* Window Content */}
-        <div className="p-4">
-          {children}
+        <div className="flex items-center space-x-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-6 h-6 p-0 text-yellow-400 hover:bg-yellow-400/20 rounded-lg"
+            onClick={() => minimizeWindow(windowId)}
+          >
+            <Minimize2 className="w-3 h-3" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-6 h-6 p-0 text-red-400 hover:bg-red-400/20 rounded-lg"
+            onClick={handleClose}
+          >
+            <X className="w-3 h-3" />
+          </Button>
         </div>
-      </Card>
-    </>
+      </div>
+      
+      {/* Window Content */}
+      <div className="p-4">
+        {children}
+      </div>
+    </Card>
   );
 };
