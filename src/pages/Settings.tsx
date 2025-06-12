@@ -10,6 +10,7 @@ import { BackendConfigurationCard } from "@/components/settings/BackendConfigura
 import { EnhancedAutomationCard } from "@/components/settings/EnhancedAutomationCard";
 import DashboardResetCard from "@/components/settings/DashboardResetCard";
 import { LayoutSettingsCard } from "@/components/settings/LayoutSettingsCard";
+import { ThemeCustomizationCard } from "@/components/settings/ThemeCustomizationCard";
 
 const Settings = () => {
   return (
@@ -37,6 +38,7 @@ const Settings = () => {
             <BackendConfigurationCard />
             <EnhancedAutomationCard />
             <LayoutSettingsCard />
+            <ThemeCustomizationCard />
             <DashboardResetCard />
           </div>
         </main>

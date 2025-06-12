@@ -1,6 +1,7 @@
 
 import { Link } from 'react-router-dom';
-import { Zap, Mail, Phone, MapPin, Linkedin, Twitter, Github } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Twitter, Github } from 'lucide-react';
+import BrandLogo from '@/components/BrandLogo';
 
 const Footer = () => {
   return (
@@ -10,10 +11,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Zap className="w-8 h-8 text-blue-400" />
-              <span className="text-xl font-bold">AutoPromptr</span>
-            </div>
+            <BrandLogo size="medium" variant="horizontal" />
             <p className="text-gray-300 text-sm">
               Revolutionizing AI workflows through intelligent prompt engineering and automation.
             </p>

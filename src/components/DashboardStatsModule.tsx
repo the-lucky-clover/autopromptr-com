@@ -8,10 +8,11 @@ interface DashboardStatsModuleProps {
     completedBatches: number;
     totalPrompts: number;
   };
+  isCompact?: boolean;
 }
 
-const DashboardStatsModule = ({ stats }: DashboardStatsModuleProps) => {
-  return <DashboardStatsCards stats={stats} />;
+const DashboardStatsModule = ({ stats, isCompact = false }: DashboardStatsModuleProps) => {
+  return <DashboardStatsCards stats={stats} isCompact={isCompact} />;
 };
 
 export default DashboardStatsModule;

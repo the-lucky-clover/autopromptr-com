@@ -14,9 +14,10 @@ interface DashboardBatchManagerProps {
     totalPrompts: number;
   }) => void;
   onBatchesUpdate?: (batches: any[]) => void;
+  isCompact?: boolean;
 }
 
-const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate }: DashboardBatchManagerProps) => {
+const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = false }: DashboardBatchManagerProps) => {
   const {
     batches,
     showModal,
@@ -57,8 +58,8 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate }: DashboardBatc
   }, [batches, onBatchesUpdate]);
 
   return (
-    <div className="space-y-5">
-      <div className="space-y-5">
+    <div className={`space-y-5 ${isCompact ? 'space-y-3' : ''}`}>
+      <div className={`space-y-5 ${isCompact ? 'space-y-3' : ''}`}>
         {batches.length === 0 ? (
           <DashboardEmptyState onNewBatch={handleNewBatch} />
         ) : (

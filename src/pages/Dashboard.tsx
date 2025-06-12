@@ -180,13 +180,6 @@ const Dashboard = () => {
               items={visibleModules.map(m => m.id)}
               strategy={verticalListSortingStrategy}
             >
-              {/* Module Restore Panel */}
-              <ModuleRestorePanel
-                closedModules={closedModules}
-                onRestoreModule={toggleModuleVisibility}
-                onResetLayout={resetLayout}
-              />
-
               {/* Main Dashboard Layout */}
               {visibleModules.length === 0 ? (
                 <DashboardEmptyModuleState onResetLayout={resetLayout} />
@@ -195,6 +188,15 @@ const Dashboard = () => {
               )}
             </SortableContext>
           </DndContext>
+
+          {/* Module Restore Panel - Moved to Bottom */}
+          <div className="mt-8">
+            <ModuleRestorePanel
+              closedModules={closedModules}
+              onRestoreModule={toggleModuleVisibility}
+              onResetLayout={resetLayout}
+            />
+          </div>
         </main>
       </div>
     </SidebarProvider>
