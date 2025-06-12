@@ -1,12 +1,35 @@
 
 import { useState, useEffect } from 'react';
 import { Batch } from '@/types/batch';
+import { useBatchSync } from './useBatchSync';
 
 const STORAGE_KEY = 'autopromptr_batches';
 const BACKUP_STORAGE_KEY = 'autopromptr_batches_backup';
 
 export const usePersistentBatches = () => {
   const [batches, setBatches] = useState<Batch[]>([]);
+  const { triggerBatchSync, subscribeToBatchSync } = useBatchSync();
+
+  // Force reload batches from storage
+  const reloadBatches = () => {
+    try {
+      console.log('Reloading batches from localStorage...');
+      const savedBatches = localStorage.getItem(STORAGE_KEY);
+      
+      if (savedBatches) {
+        const parsedBatches = JSON.parse(savedBatches);
+        const batchesWithDates = parsedBatches.map((batch: any) => ({
+          ...batch,
+          createdAt: new Date(batch.createdAt)
+        }));
+        
+        console.log(`Reloaded ${batchesWithDates.length} batches`);
+        setBatches(batchesWithDates);
+      }
+    } catch (error) {
+      console.error('Failed to reload batches:', error);
+    }
+  };
 
   // Load batches from localStorage on mount
   useEffect(() => {
@@ -114,6 +137,16 @@ export const usePersistentBatches = () => {
     }
   }, []);
 
+  // Subscribe to sync events from other components
+  useEffect(() => {
+    const unsubscribe = subscribeToBatchSync(() => {
+      console.log('Received sync event, reloading batches...');
+      reloadBatches();
+    });
+
+    return unsubscribe;
+  }, [subscribeToBatchSync]);
+
   // Automatic comprehensive data search function
   const performAutomaticDataSearch = () => {
     console.log('=== AUTOMATIC SEARCH FOR LOST BATCHES ===');
@@ -145,11 +178,14 @@ export const usePersistentBatches = () => {
         localStorage.setItem(BACKUP_STORAGE_KEY, dataToSave);
         console.log('Batches saved successfully');
         console.log('Saved data:', dataToSave);
+        
+        // Trigger sync to other components
+        triggerBatchSync();
       } catch (error) {
         console.error('Failed to save batches to localStorage:', error);
       }
     }
-  }, [batches]);
+  }, [batches, triggerBatchSync]);
 
   const updateBatches = (newBatches: Batch[] | ((prev: Batch[]) => Batch[])) => {
     setBatches(newBatches);
@@ -159,6 +195,7 @@ export const usePersistentBatches = () => {
     setBatches([]);
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(BACKUP_STORAGE_KEY);
+    triggerBatchSync();
   };
 
   const recoverFromBackup = () => {
@@ -172,6 +209,7 @@ export const usePersistentBatches = () => {
         }));
         setBatches(batchesWithDates);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(batchesWithDates));
+        triggerBatchSync();
         return true;
       }
     } catch (error) {
@@ -190,6 +228,8 @@ export const usePersistentBatches = () => {
     setBatches: updateBatches,
     clearAllBatches,
     recoverFromBackup,
-    searchForLostBatches
+    searchForLostBatches,
+    reloadBatches,
+    triggerBatchSync
   };
 };

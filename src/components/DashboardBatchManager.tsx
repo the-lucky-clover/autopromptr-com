@@ -2,11 +2,12 @@
 import { useEffect } from 'react';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
 import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
+import { useBatchSync } from '@/hooks/useBatchSync';
 import BatchModal from './BatchModal';
 import DashboardBatchList from './DashboardBatchList';
 import DashboardEmptyState from './DashboardEmptyState';
 import { Button } from './ui/button';
-import { AlertTriangle, Plus } from 'lucide-react';
+import { AlertTriangle, Plus, RefreshCw } from 'lucide-react';
 
 interface DashboardBatchManagerProps {
   onStatsUpdate?: (stats: {
@@ -40,6 +41,13 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
   } = useDashboardBatchManager();
 
   const { detectAndFixFailedBatches } = useBatchStatusManager();
+  const { triggerBatchSync } = useBatchSync();
+
+  // Manual refresh function
+  const handleRefresh = () => {
+    console.log('Manual refresh triggered');
+    triggerBatchSync();
+  };
 
   // Update stats whenever batches change
   useEffect(() => {
@@ -94,14 +102,26 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
         ) : (
           <>
             <div className="flex items-center justify-between">
-              <Button 
-                onClick={handleNewBatch}
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                New Batch
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button 
+                  onClick={handleNewBatch}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Batch
+                </Button>
+                
+                <Button
+                  onClick={handleRefresh}
+                  size="sm"
+                  variant="outline"
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl"
+                  title="Refresh batch list"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+              </div>
               
               {stuckBatchCount > 0 && (
                 <Button

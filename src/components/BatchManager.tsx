@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useBatchOperations } from '@/hooks/useBatchOperations';
 import { usePlatforms } from '@/hooks/usePlatforms';
+import { useBatchSync } from '@/hooks/useBatchSync';
 import BatchForm from './BatchForm';
 import BatchList from './BatchList';
 import BatchManagerHeader from './BatchManagerHeader';
@@ -10,6 +11,7 @@ import AutomationErrorDisplay from './AutomationErrorDisplay';
 const BatchManager = () => {
   const [showNewBatchForm, setShowNewBatchForm] = useState(false);
   const { platforms } = usePlatforms();
+  const { triggerBatchSync } = useBatchSync();
   const {
     batches,
     setBatches,
@@ -47,6 +49,10 @@ const BatchManager = () => {
   const handleCreateBatch = (formData: any) => {
     createBatch(formData);
     setShowNewBatchForm(false);
+    // Trigger sync to update other components
+    setTimeout(() => {
+      triggerBatchSync();
+    }, 100);
   };
 
   return (
