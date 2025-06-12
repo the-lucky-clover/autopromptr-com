@@ -18,16 +18,26 @@ interface SystemLogsDisplayProps {
 
 const SystemLogsDisplay = ({ batches, isCompact = false }: SystemLogsDisplayProps) => {
   // Generate mock logs based on batches
-  const logs: LogEntryData[] = batches.flatMap(batch => [
-    {
+  const logs: LogEntryData[] = batches.flatMap(batch => {
+    let logType: 'success' | 'error' | 'warning' | 'info';
+    
+    if (batch.status === 'running') {
+      logType = 'info';
+    } else if (batch.status === 'completed') {
+      logType = 'success';
+    } else {
+      logType = 'warning';
+    }
+
+    return [{
       id: `${batch.id}-init`,
       timestamp: new Date(Date.now() - Math.random() * 3600000),
-      type: batch.status === 'running' ? 'info' : batch.status === 'completed' ? 'success' : 'warning',
+      type: logType,
       system: 'Batch Processor',
       message: `Batch "${batch.name}" ${batch.status === 'running' ? 'initialized' : batch.status === 'completed' ? 'completed successfully' : 'pending execution'}`,
       details: `${batch.prompts?.length || 0} prompts queued`
-    }
-  ]).slice(0, 10);
+    }];
+  }).slice(0, 10);
 
   const hasActiveBatch = batches.some(batch => batch.status === 'running');
 
