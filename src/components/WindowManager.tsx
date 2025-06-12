@@ -98,14 +98,14 @@ const Taskbar = () => {
 
   return (
     <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[10000]">
-      <div className="bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-2 shadow-2xl">
-        <div className="flex items-center space-x-2">
+      <div className="bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-3 shadow-2xl">
+        <div className="flex items-center space-x-3">
           {visibleWindows.map(window => (
             <Button
               key={window.id}
               variant="ghost"
               size="sm"
-              className={`text-white rounded-xl transition-all ${
+              className={`text-white rounded-xl transition-all px-3 py-2 ${
                 window.isFocused ? 'bg-purple-500/30 border border-purple-400/50' : 'hover:bg-white/10'
               } ${window.isMinimized ? 'opacity-60' : ''}`}
               onClick={() => {
@@ -171,18 +171,18 @@ export const WindowFrame = ({
       }}
       onClick={() => !window.isFocused && focusWindow(windowId)}
     >
-      {/* Window Header */}
-      <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-t-xl border-b border-white/10">
-        <div className="flex items-center space-x-2">
+      {/* Window Header with improved spacing */}
+      <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-t-xl border-b border-white/10">
+        <div className="flex items-center space-x-3">
           <GripHorizontal className="w-4 h-4 text-purple-300 cursor-move" />
           <span className="text-white font-medium text-sm">{title}</span>
         </div>
         
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
             size="sm"
-            className="w-6 h-6 p-0 text-yellow-400 hover:bg-yellow-400/20 rounded-lg"
+            className="w-7 h-7 p-0 text-yellow-400 hover:bg-yellow-400/20 rounded-lg"
             onClick={() => minimizeWindow(windowId)}
           >
             <Minimize2 className="w-3 h-3" />
@@ -190,7 +190,7 @@ export const WindowFrame = ({
           <Button
             variant="ghost"
             size="sm"
-            className="w-6 h-6 p-0 text-red-400 hover:bg-red-400/20 rounded-lg"
+            className="w-7 h-7 p-0 text-red-400 hover:bg-red-400/20 rounded-lg"
             onClick={handleClose}
           >
             <X className="w-3 h-3" />
@@ -198,8 +198,8 @@ export const WindowFrame = ({
         </div>
       </div>
       
-      {/* Window Content */}
-      <div className="p-4">
+      {/* Window Content with consistent padding */}
+      <div className="p-5">
         {children}
       </div>
     </Card>

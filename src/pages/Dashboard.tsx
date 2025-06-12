@@ -89,14 +89,14 @@ const Dashboard = () => {
       <SidebarProvider>
         <div className="min-h-screen flex w-full overflow-x-hidden" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
           <AppSidebar />
-          <main className="flex-1 p-3 md:p-6 lg:p-8 min-w-0">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4 md:mb-6 lg:mb-8">
-              <div className="flex items-center space-x-3 md:space-x-4 min-w-0">
+          <main className="flex-1 p-4 lg:p-6 min-w-0">
+            {/* Header with improved spacing */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4 min-w-0">
                 <SidebarTrigger className="text-white hover:text-purple-200 rounded-xl flex-shrink-0" />
                 <div className="min-w-0">
-                  <h1 className="text-lg md:text-xl lg:text-2xl font-semibold text-white truncate">Desktop Dashboard</h1>
-                  <p className="text-purple-200 text-xs md:text-sm lg:text-base">Advanced window management with taskbar controls</p>
+                  <h1 className="text-xl lg:text-2xl font-semibold text-white truncate">Desktop Dashboard</h1>
+                  <p className="text-purple-200 text-sm lg:text-base mt-1">Advanced window management with taskbar controls</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
@@ -104,9 +104,9 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Fixed Column Layout for Dashboard Modules */}
-            <div className="space-y-6">
-              {/* Batch Processor - Full width, long rectangle */}
+            {/* Fixed Column Layout with improved spacing */}
+            <div className="space-y-4">
+              {/* Batch Processor - Full width, better spacing */}
               {openModules['batch-processor'] && (
                 <div className="w-full">
                   <WindowFrame
@@ -120,7 +120,7 @@ const Dashboard = () => {
                 </div>
               )}
 
-              {/* System Logs - Full width, long rectangle */}
+              {/* System Logs - Full width, consistent spacing */}
               {openModules['system-logs'] && (
                 <div className="w-full">
                   <WindowFrame
@@ -148,8 +148,8 @@ const Dashboard = () => {
                 </div>
               )}
 
-              {/* Bottom row - Quick Actions, Subscription, Stats */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Bottom row - Better spacing in grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {openModules['quick-actions'] && (
                   <WindowFrame
                     windowId="quick-actions"

@@ -57,8 +57,8 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate }: DashboardBatc
   }, [batches, onBatchesUpdate]);
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
+    <div className="space-y-5">
+      <div className="space-y-5">
         {batches.length === 0 ? (
           <DashboardEmptyState onNewBatch={handleNewBatch} />
         ) : (

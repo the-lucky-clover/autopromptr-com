@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -76,10 +77,10 @@ const SystemLogsPanel = ({ batches, hasActiveBatch }: SystemLogsProps) => {
 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-      <CardHeader>
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-white">System Diagnostics & Logs</CardTitle>
+            <CardTitle className="text-white mb-2">System Diagnostics & Logs</CardTitle>
             <CardDescription className="text-purple-200">
               {hasActiveBatch 
                 ? "Real-time monitoring of system handshakes and render logs during batch processing" 
@@ -97,11 +98,11 @@ const SystemLogsPanel = ({ batches, hasActiveBatch }: SystemLogsProps) => {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         <SystemStatusOverview systemStatus={systemStatus} />
         
         <Tabs defaultValue="system" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-white/10">
+          <TabsList className="grid w-full grid-cols-2 bg-white/10 mb-4">
             <TabsTrigger value="system" className="text-white data-[state=active]:bg-white/20">
               System Logs
             </TabsTrigger>
@@ -110,14 +111,14 @@ const SystemLogsPanel = ({ batches, hasActiveBatch }: SystemLogsProps) => {
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="system" className="mt-4">
+          <TabsContent value="system" className="mt-0">
             <SystemLogsDisplay logs={logs} hasActiveBatch={hasActiveBatch} />
           </TabsContent>
           
-          <TabsContent value="render" className="mt-4">
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2 text-white/80 text-sm">
-                <Info className="w-4 h-4" />
+          <TabsContent value="render" className="mt-0">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-white/80 text-sm bg-white/5 rounded-lg p-3">
+                <Info className="w-4 h-4 flex-shrink-0" />
                 <span>
                   Syslog endpoint: raahpoyciwuyhwlcenpy.supabase.co:443
                 </span>

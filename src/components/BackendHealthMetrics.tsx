@@ -77,11 +77,11 @@ const BackendHealthMetrics = () => {
   if (error) {
     return (
       <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="min-w-0">
-              <CardTitle className="text-white text-sm md:text-base">Backend Health</CardTitle>
-              <CardDescription className="text-purple-200 text-xs md:text-sm">
+              <CardTitle className="text-white text-base mb-1">Backend Health</CardTitle>
+              <CardDescription className="text-purple-200 text-sm">
                 Live backend monitoring
               </CardDescription>
             </div>
@@ -97,12 +97,12 @@ const BackendHealthMetrics = () => {
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="bg-red-500/20 border border-red-500/30 rounded-xl p-3">
-            <div className="flex items-center space-x-2 text-red-300">
+          <div className="bg-red-500/20 border border-red-500/30 rounded-xl p-4">
+            <div className="flex items-center space-x-3 text-red-300 mb-2">
               <WifiOff className="w-4 h-4 flex-shrink-0" />
               <span className="font-medium text-sm">Connection Failed</span>
             </div>
-            <p className="text-red-200 text-xs mt-2 break-words">{error}</p>
+            <p className="text-red-200 text-xs break-words">{error}</p>
           </div>
         </CardContent>
       </Card>
@@ -111,11 +111,11 @@ const BackendHealthMetrics = () => {
 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="min-w-0">
-            <CardTitle className="text-white text-sm md:text-base">Backend Health</CardTitle>
-            <CardDescription className="text-purple-200 text-xs md:text-sm">
+            <CardTitle className="text-white text-base mb-1">Backend Health</CardTitle>
+            <CardDescription className="text-purple-200 text-sm">
               Live backend monitoring
             </CardDescription>
           </div>
@@ -130,23 +130,23 @@ const BackendHealthMetrics = () => {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="pt-0 space-y-3">
-        {/* Main Status */}
-        <div className="bg-white/5 rounded-xl p-3">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-2">
+      <CardContent className="pt-0 space-y-4">
+        {/* Main Status with improved spacing */}
+        <div className="bg-white/5 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-3">
               {healthData && getStatusIcon(healthData.status)}
               <span className="text-white font-medium text-sm">System Status</span>
             </div>
             {healthData && (
-              <Badge className={`${getStatusColor(healthData.status)} text-xs px-2 py-0.5`}>
+              <Badge className={`${getStatusColor(healthData.status)} text-xs px-3 py-1`}>
                 {healthData.status.toUpperCase()}
               </Badge>
             )}
           </div>
           
           {loading && (
-            <div className="flex items-center space-x-2 text-purple-200">
+            <div className="flex items-center space-x-3 text-purple-200">
               <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
               <span className="text-xs">Checking status...</span>
             </div>
@@ -155,12 +155,12 @@ const BackendHealthMetrics = () => {
 
         {healthData && (
           <>
-            {/* Metrics Grid - Stack on mobile */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {/* Metrics Grid with consistent spacing */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Response Time */}
-              <div className="bg-white/5 rounded-xl p-3">
-                <div className="flex items-center space-x-2 mb-1">
-                  <Zap className="w-3 h-3 text-blue-400 flex-shrink-0" />
+              <div className="bg-white/5 rounded-xl p-4">
+                <div className="flex items-center space-x-3 mb-2">
+                  <Zap className="w-4 h-4 text-blue-400 flex-shrink-0" />
                   <span className="text-white text-xs font-medium">Response</span>
                 </div>
                 <div className="text-lg font-bold text-blue-400">
@@ -169,9 +169,9 @@ const BackendHealthMetrics = () => {
               </div>
 
               {/* Uptime */}
-              <div className="bg-white/5 rounded-xl p-3">
-                <div className="flex items-center space-x-2 mb-1">
-                  <Clock className="w-3 h-3 text-green-400 flex-shrink-0" />
+              <div className="bg-white/5 rounded-xl p-4">
+                <div className="flex items-center space-x-3 mb-2">
+                  <Clock className="w-4 h-4 text-green-400 flex-shrink-0" />
                   <span className="text-white text-xs font-medium">Uptime</span>
                 </div>
                 <div className="text-sm font-medium text-green-400 truncate">
@@ -180,11 +180,11 @@ const BackendHealthMetrics = () => {
               </div>
             </div>
 
-            {/* Additional Metrics */}
+            {/* Additional Metrics with improved spacing */}
             {healthData.database && (
-              <div className="bg-white/5 rounded-xl p-3">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Database className="w-3 h-3 text-purple-400 flex-shrink-0" />
+              <div className="bg-white/5 rounded-xl p-4">
+                <div className="flex items-center space-x-3 mb-3">
+                  <Database className="w-4 h-4 text-purple-400 flex-shrink-0" />
                   <span className="text-white text-xs font-medium">Database</span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -199,15 +199,15 @@ const BackendHealthMetrics = () => {
             )}
 
             {healthData.memory && (
-              <div className="bg-white/5 rounded-xl p-3">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Cpu className="w-3 h-3 text-orange-400 flex-shrink-0" />
+              <div className="bg-white/5 rounded-xl p-4">
+                <div className="flex items-center space-x-3 mb-3">
+                  <Cpu className="w-4 h-4 text-orange-400 flex-shrink-0" />
                   <span className="text-white text-xs font-medium">Memory Usage</span>
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <Progress 
                     value={healthData.memory.percentage} 
-                    className="h-1.5 bg-white/10"
+                    className="h-2 bg-white/10"
                   />
                   <div className="flex justify-between text-xs text-orange-200">
                     <span>{healthData.memory.used}MB used</span>
@@ -217,9 +217,9 @@ const BackendHealthMetrics = () => {
               </div>
             )}
 
-            {/* Last Updated */}
+            {/* Last Updated with better spacing */}
             {lastUpdated && (
-              <div className="text-xs text-purple-300 text-center pt-1">
+              <div className="text-xs text-purple-300 text-center pt-2 border-t border-white/10">
                 Last updated: {lastUpdated.toLocaleTimeString()}
               </div>
             )}
