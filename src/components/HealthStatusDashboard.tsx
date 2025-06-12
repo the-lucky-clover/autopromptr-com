@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -45,7 +46,22 @@ const CIRCUIT_BREAKER_TIMEOUT = 300000; // 5 minutes
 const HEALTH_CHECK_INTERVAL = 120000; // 2 minutes
 
 const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps) => {
-  console.log('HealthStatusDashboard: Component instantiated - health checks will run');
+  const location = useLocation();
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // Route guard - ensure we're on a dashboard route
+  const isDashboardRoute = location.pathname === '/dashboard' || location.pathname.startsWith('/dashboard/');
+  
+  if (!isDashboardRoute) {
+    if (isDevelopment) {
+      console.log('HealthStatusDashboard: Component mounted on non-dashboard route, returning null');
+    }
+    return null;
+  }
+
+  if (isDevelopment) {
+    console.log('HealthStatusDashboard: Component instantiated - health checks will run');
+  }
 
   const { 
     isRunning, 
