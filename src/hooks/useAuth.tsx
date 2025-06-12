@@ -12,6 +12,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   resendVerification: (email: string) => Promise<{ error: any }>;
   isEmailVerified: boolean;
+  isInitialized: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Memoize email verification status to prevent unnecessary re-renders
   const isEmailVerified = useMemo(() => {
@@ -55,6 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
         
         setLoading(false);
+        setIsInitialized(true);
       }
     );
 
@@ -63,6 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Initial session check:', session);
       setSession(session);
       setUser(session?.user ?? null);
+      setIsInitialized(true);
       if (!session) {
         setLoading(false);
       }
@@ -171,8 +175,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signIn,
     signOut,
     resendVerification,
-    isEmailVerified
-  }), [user, session, loading, signUp, signIn, signOut, resendVerification, isEmailVerified]);
+    isEmailVerified,
+    isInitialized
+  }), [user, session, loading, signUp, signIn, signOut, resendVerification, isEmailVerified, isInitialized]);
+
+  // Don't render children until auth context is initialized
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-slate-900 via-blue-900 to-purple-600">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-400 mx-auto mb-4"></div>
+          <p className="text-white text-lg">Initializing...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider value={contextValue}>
@@ -184,7 +201,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    // Provide a more graceful fallback instead of throwing
+    console.warn('useAuth called outside of AuthProvider context');
+    return {
+      user: null,
+      session: null,
+      loading: true,
+      signUp: async () => ({ error: new Error('Auth not available') }),
+      signIn: async () => ({ error: new Error('Auth not available') }),
+      signOut: async () => {},
+      resendVerification: async () => ({ error: new Error('Auth not available') }),
+      isEmailVerified: false,
+      isInitialized: false
+    };
   }
   return context;
 };

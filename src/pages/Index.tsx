@@ -14,13 +14,26 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useEffect } from "react";
 
 const Index = () => {
   console.log("Index page rendering...");
   
-  const { user, isEmailVerified } = useAuth();
+  const { user, isEmailVerified, isInitialized } = useAuth();
   
   useScrollAnimation();
+
+  // Move any potential state updates to useEffect to prevent render-time updates
+  useEffect(() => {
+    if (isInitialized && user && isEmailVerified) {
+      console.log("User is authenticated and email verified");
+    }
+  }, [isInitialized, user, isEmailVerified]);
+
+  // Show loading state while auth is initializing
+  if (!isInitialized) {
+    return null; // Let AuthProvider handle the loading UI
+  }
 
   return (
     <div className="min-h-screen">

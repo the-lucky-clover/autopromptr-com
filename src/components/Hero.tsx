@@ -2,9 +2,18 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
 
 const Hero = () => {
-  const { user, isEmailVerified } = useAuth();
+  const { user, isEmailVerified, isInitialized } = useAuth();
+  const [showButtons, setShowButtons] = useState(false);
+
+  // Delay showing buttons until auth is fully initialized to prevent layout shifts
+  useEffect(() => {
+    if (isInitialized) {
+      setShowButtons(true);
+    }
+  }, [isInitialized]);
 
   const handleGetStarted = () => {
     if (user && isEmailVerified) {
@@ -37,23 +46,25 @@ const Hero = () => {
             tools.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-            <Button 
-              size="lg" 
-              onClick={handleGetStarted}
-              className="text-white text-lg px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-            >
-              <Zap className="w-5 h-5" />
-              {user && isEmailVerified ? 'Go to Dashboard' : 'Start Free Trial'}
-            </Button>
-            <Button 
-              size="lg" 
-              className="bg-black hover:bg-gray-800 text-white text-lg px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-2"
-            >
-              Watch Demo
-              <ArrowRight className="w-5 h-5" />
-            </Button>
-          </div>
+          {showButtons && (
+            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
+              <Button 
+                size="lg" 
+                onClick={handleGetStarted}
+                className="text-white text-lg px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+              >
+                <Zap className="w-5 h-5" />
+                {user && isEmailVerified ? 'Go to Dashboard' : 'Start Free Trial'}
+              </Button>
+              <Button 
+                size="lg" 
+                className="bg-black hover:bg-gray-800 text-white text-lg px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                Watch Demo
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            </div>
+          )}
           
           <div className="mt-16">
             <div className="relative mx-auto max-w-4xl">

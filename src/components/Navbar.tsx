@@ -13,7 +13,7 @@ const Navbar = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isScrolled, setIsScrolled] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user, signOut, isInitialized } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,6 +29,35 @@ const Navbar = () => {
     setAuthMode('signup');
     setAuthModalOpen(true);
   };
+
+  // Don't render auth-dependent UI until initialized
+  if (!isInitialized) {
+    return (
+      <nav className="fixed top-0 w-full z-40">
+        <div className={`absolute top-0 left-0 right-0 h-20 transition-all duration-700 ease-out ${
+          isScrolled 
+            ? 'transform translate-y-0 opacity-100' 
+            : 'transform -translate-y-20 opacity-0'
+        } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg rounded-b-2xl`} />
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <Link to="/" className="flex items-center group">
+              <BrandLogo size="medium" variant="horizontal" />
+            </Link>
+            
+            <div className="hidden md:flex items-center space-x-4">
+              <div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>
+            </div>
+
+            <div className="md:hidden">
+              <div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="fixed top-0 w-full z-40">
