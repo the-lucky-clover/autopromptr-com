@@ -1,4 +1,3 @@
-
 import { AutoPromptr, AutoPromtrError } from './autoPromptr';
 import { ConnectionDiagnostics } from './connectionDiagnostics';
 import { Batch } from '@/types/batch';
@@ -17,21 +16,21 @@ export class RedundantAutoPromptr {
 
   constructor() {
     this.primaryBackend = {
-      name: 'Puppeteer Backend',
-      url: 'https://puppeteer-backend-da0o.onrender.com',
-      maxRetries: 3,
-      retryDelay: 60000 // 60 seconds
-    };
-
-    this.fallbackBackend = {
-      name: 'AutoPromptr Backend', 
+      name: 'AutoPromptr Backend',
       url: 'https://autopromptr-backend.onrender.com',
       maxRetries: 3,
       retryDelay: 60000 // 60 seconds
     };
 
+    this.fallbackBackend = {
+      name: 'Puppeteer Backend', 
+      url: 'https://puppeteer-backend-da0o.onrender.com',
+      maxRetries: 3,
+      retryDelay: 60000 // 60 seconds
+    };
+
     this.connectionDiagnostics = new ConnectionDiagnostics();
-    console.log('🔄 Redundant AutoPromptr initialized with failover support');
+    console.log('🔄 Redundant AutoPromptr initialized with enhanced autopromptr-backend as primary');
   }
 
   private async attemptWithBackend(backend: BackendConfig, batch: Batch, platform: string, options: any = {}): Promise<any> {
@@ -43,20 +42,22 @@ export class RedundantAutoPromptr {
         
         const autoPromptr = new AutoPromptr(backend.url);
         
-        // Enhanced options to include target URL and text prompts for Lovable coding bot workflow
+        // Enhanced options optimized for autopromptr-backend features
         const enhancedOptions = {
           ...options,
           targetUrl: batch.targetUrl || 'https://lovable.dev',
           textPrompts: batch.prompts || [],
-          automationType: 'lovable-text-input',
+          automationType: 'enhanced-lovable-automation',
           elementSelector: 'textarea, input[type="text"], [contenteditable="true"]',
-          actionType: 'type-and-enter'
+          actionType: 'multi-strategy-submission',
+          enhancedFeatures: backend.name === 'AutoPromptr Backend'
         };
         
         console.log(`📝 Transmitting to ${backend.name}:`, {
           targetUrl: enhancedOptions.targetUrl,
           promptCount: enhancedOptions.textPrompts.length,
-          automationType: enhancedOptions.automationType
+          automationType: enhancedOptions.automationType,
+          enhanced: enhancedOptions.enhancedFeatures
         });
         
         const result = await autoPromptr.runBatch(batch, platform, enhancedOptions);
@@ -89,22 +90,22 @@ export class RedundantAutoPromptr {
   }
 
   async runBatchWithRedundancy(batch: Batch, platform: string, options: any = {}): Promise<any> {
-    console.log('🚀 Starting redundant batch run with failover...');
+    console.log('🚀 Starting redundant batch run with enhanced autopromptr-backend primary...');
     console.log(`📋 Batch: ${batch.name} (${batch.id})`);
     console.log(`🎯 Platform: ${platform}`);
     
     try {
-      // Try primary backend first
-      console.log('🔵 Phase 1: Attempting with primary backend...');
+      // Try enhanced autopromptr-backend first
+      console.log('🔵 Phase 1: Attempting with enhanced autopromptr-backend...');
       const primaryResult = await this.attemptWithBackend(this.primaryBackend, batch, platform, options);
       return primaryResult;
       
     } catch (primaryErr) {
-      console.warn('🟡 Primary backend exhausted, switching to fallback...');
+      console.warn('🟡 Enhanced autopromptr-backend exhausted, switching to puppeteer-backend fallback...');
       
       try {
-        // Try fallback backend
-        console.log('🟠 Phase 2: Attempting with fallback backend...');
+        // Try puppeteer-backend as fallback
+        console.log('🟠 Phase 2: Attempting with puppeteer-backend fallback...');
         const fallbackResult = await this.attemptWithBackend(this.fallbackBackend, batch, platform, options);
         return fallbackResult;
         
@@ -150,11 +151,11 @@ export class RedundantAutoPromptr {
     }
 
     if (results.primary && results.fallback) {
-      results.recommendation = 'Both backends are operational - full redundancy available';
+      results.recommendation = 'Both enhanced autopromptr-backend and puppeteer-backend are operational - full redundancy available';
     } else if (results.primary) {
-      results.recommendation = 'Primary backend operational, fallback may be unavailable';
+      results.recommendation = 'Enhanced autopromptr-backend operational, puppeteer-backend fallback may be unavailable';
     } else if (results.fallback) {
-      results.recommendation = 'Primary backend unavailable, fallback operational';
+      results.recommendation = 'Enhanced autopromptr-backend unavailable, puppeteer-backend fallback operational';
     } else {
       results.recommendation = 'Both backends may be unavailable - check connectivity';
     }

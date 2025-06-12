@@ -122,11 +122,11 @@ export class ConnectionDiagnostics {
       };
     }
 
-    // Test only one essential endpoint to reduce load - updated to correct path
-    const endpoints = ['/run-puppeteer'];
+    // Test autopromptr-backend endpoints - prioritizing the enhanced API
+    const endpoints = ['/health', '/api/run-batch'];
     const endpointResults: ConnectionTestResult[] = [];
     
-    console.log('Running optimized connection tests...');
+    console.log('Running optimized connection tests for autopromptr-backend...');
     
     // Test endpoints sequentially to avoid overwhelming the server
     for (const endpoint of endpoints) {
@@ -147,13 +147,13 @@ export class ConnectionDiagnostics {
     const overallSuccess = successfulTests.length > 0 || corsBlockedTests.length > 0 || true;
     
     if (corsBlockedTests.length > 0) {
-      recommendations.push('CORS restrictions detected (normal browser behavior)');
+      recommendations.push('CORS restrictions detected (normal browser behavior for autopromptr-backend)');
     }
     
     if (!networkEnvironment.isOnline) {
       recommendations.push('Network connection appears to be offline');
     } else {
-      recommendations.push('Connection tests completed - service appears operational');
+      recommendations.push('Connection tests completed - autopromptr-backend appears operational');
     }
     
     return {

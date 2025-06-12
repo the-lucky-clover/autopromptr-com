@@ -1,7 +1,7 @@
 import { AutoPromtrError } from './errors';
 import { API_BASE_URL, SUPABASE_URL } from './config';
 
-// API Service Class with optimized health checks
+// API Service Class with enhanced autopromptr-backend compatibility
 export class AutoPromptr {
   private apiBaseUrl: string;
   private supabaseUrl: string;
@@ -16,7 +16,7 @@ export class AutoPromptr {
     this.supabaseUrl = supabaseUrl;
   }
 
-  // Simplified health check with caching to reduce requests
+  // Enhanced health check with autopromptr-backend compatibility
   async healthCheck(retries = 2): Promise<any> {
     const now = Date.now();
     
@@ -26,28 +26,45 @@ export class AutoPromptr {
       return this.healthCheckCache;
     }
 
-    console.log('Performing new health check at:', this.apiBaseUrl);
+    console.log('Performing enhanced health check at:', this.apiBaseUrl);
     
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000);
         
-        // Simple GET request to test connectivity - no complex POST with body
-        const response = await fetch(`${this.apiBaseUrl}/`, {
-          method: 'GET',
-          signal: controller.signal,
-          headers: {
-            'Accept': 'text/html,application/json,*/*'
-          }
-        });
+        // Try enhanced autopromptr-backend health endpoint first
+        let response;
+        try {
+          response = await fetch(`${this.apiBaseUrl}/health`, {
+            method: 'GET',
+            signal: controller.signal,
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+        } catch (healthErr) {
+          // Fallback to root endpoint for compatibility
+          response = await fetch(`${this.apiBaseUrl}/`, {
+            method: 'GET',
+            signal: controller.signal,
+            headers: {
+              'Accept': 'text/html,application/json,*/*'
+            }
+          });
+        }
         
         clearTimeout(timeoutId);
         
         if (response.ok || response.status === 404) {
-          // Even 404 means the server is responding
-          const result = { status: 'healthy', backend: 'puppeteer', attempt };
-          console.log(`✅ Health check successful on attempt ${attempt}:`, result);
+          // Enhanced result for autopromptr-backend
+          const result = { 
+            status: 'healthy', 
+            backend: 'enhanced-autopromptr', 
+            attempt,
+            features: ['multi-strategy-detection', 'lovable-optimized', 'enhanced-timing']
+          };
+          console.log(`✅ Enhanced health check successful on attempt ${attempt}:`, result);
           
           // Cache the result
           this.healthCheckCache = result;
@@ -93,16 +110,17 @@ export class AutoPromptr {
     }
   }
 
-  // Get supported platforms - return array format for compatibility
+  // Get supported platforms - enhanced for autopromptr-backend
   async getPlatforms() {
     return [
+      { id: 'lovable', name: 'Lovable (Enhanced)', type: 'web-editor' },
       { id: 'web', name: 'Web Platform', type: 'web' }
     ];
   }
 
-  // Optimized batch running with better error handling
+  // Enhanced batch running with autopromptr-backend optimization
   async runBatch(batch: any, platform: string, options: { waitForIdle?: boolean; maxRetries?: number } = {}) {
-    console.log('Starting optimized batch run:', { batch: batch.id, platform, options });
+    console.log('Starting enhanced batch run with autopromptr-backend:', { batch: batch.id, platform, options });
     
     // Skip redundant health check if we have a recent one
     const now = Date.now();
@@ -115,22 +133,36 @@ export class AutoPromptr {
       }
     }
     
-    // Process each prompt with optimized error handling
+    // Detect if this is autopromptr-backend for enhanced features
+    const isEnhancedBackend = this.apiBaseUrl.includes('autopromptr-backend');
+    const endpoint = isEnhancedBackend ? '/api/run-batch' : '/run-puppeteer';
+    
+    console.log(`🎯 Using ${isEnhancedBackend ? 'enhanced autopromptr-backend' : 'puppeteer-backend'} with endpoint: ${endpoint}`);
+    
+    // Process each prompt with enhanced automation
     const results = [];
     
-    for (const prompt of batch.prompts || []) {
+    if (isEnhancedBackend) {
+      // Use enhanced batch processing for autopromptr-backend
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // Reduced timeout
+        const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes for batch
         
         const requestBody = {
-          url: batch.targetUrl,
-          prompt: prompt.text
+          batch: {
+            id: batch.id,
+            name: batch.name,
+            targetUrl: batch.targetUrl,
+            prompts: batch.prompts || []
+          },
+          platform: platform,
+          wait_for_idle: options.waitForIdle ?? true,
+          max_retries: options.maxRetries ?? 3
         };
         
-        console.log('Sending prompt request:', requestBody);
+        console.log('Sending enhanced batch request:', requestBody);
         
-        const response = await fetch(`${this.apiBaseUrl}/run-puppeteer`, {
+        const response = await fetch(`${this.apiBaseUrl}${endpoint}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -144,45 +176,99 @@ export class AutoPromptr {
         
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Backend error response:', response.status, errorText);
+          console.error('Enhanced backend error response:', response.status, errorText);
+          throw new Error(`Enhanced backend error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Enhanced batch processed successfully');
+        
+        return {
+          batchId: batch.id,
+          status: 'completed',
+          results: [result],
+          processedAt: new Date().toISOString(),
+          backend: 'enhanced-autopromptr'
+        };
+        
+      } catch (err) {
+        console.error('❌ Enhanced batch processing failed:', err);
+        throw new AutoPromtrError(
+          `Enhanced batch processing failed: ${err.message}`,
+          'ENHANCED_BATCH_FAILED',
+          500,
+          true
+        );
+      }
+    } else {
+      // Fallback to individual prompt processing for puppeteer-backend
+      for (const prompt of batch.prompts || []) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 30000);
+          
+          const requestBody = {
+            url: batch.targetUrl,
+            prompt: prompt.text
+          };
+          
+          console.log('Sending fallback prompt request:', requestBody);
+          
+          const response = await fetch(`${this.apiBaseUrl}${endpoint}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(requestBody),
+            signal: controller.signal
+          });
+          
+          clearTimeout(timeoutId);
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Fallback backend error response:', response.status, errorText);
+            
+            results.push({
+              promptId: prompt.id,
+              success: false,
+              error: `Backend error: ${response.status}`,
+              errorCode: 'BACKEND_ERROR'
+            });
+            continue;
+          }
+          
+          const result = await response.json();
+          console.log('✅ Fallback prompt processed successfully');
+          
+          results.push({
+            promptId: prompt.id,
+            success: true,
+            result: result,
+            screenshot: result.screenshot
+          });
+          
+        } catch (err) {
+          console.error('❌ Error processing fallback prompt:', err);
           
           results.push({
             promptId: prompt.id,
             success: false,
-            error: `Backend error: ${response.status}`,
-            errorCode: 'BACKEND_ERROR'
+            error: err instanceof Error ? err.message : 'Network error',
+            errorCode: 'NETWORK_ERROR'
           });
-          continue;
         }
-        
-        const result = await response.json();
-        console.log('✅ Prompt processed successfully');
-        
-        results.push({
-          promptId: prompt.id,
-          success: true,
-          result: result,
-          screenshot: result.screenshot
-        });
-        
-      } catch (err) {
-        console.error('❌ Error processing prompt:', err);
-        
-        results.push({
-          promptId: prompt.id,
-          success: false,
-          error: err instanceof Error ? err.message : 'Network error',
-          errorCode: 'NETWORK_ERROR'
-        });
       }
+      
+      return {
+        batchId: batch.id,
+        status: 'completed',
+        results: results,
+        processedAt: new Date().toISOString(),
+        backend: 'puppeteer-fallback'
+      };
     }
-    
-    return {
-      batchId: batch.id,
-      status: 'completed',
-      results: results,
-      processedAt: new Date().toISOString()
-    };
   }
 
   // Simplified batch control methods

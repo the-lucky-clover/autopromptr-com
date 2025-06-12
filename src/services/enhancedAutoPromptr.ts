@@ -1,4 +1,3 @@
-
 import { AutoPromptr, AutoPromtrError } from './autoPromptr';
 import { ConnectionDiagnostics } from './connectionDiagnostics';
 import { RedundantAutoPromptr } from './redundantAutoPromptr';
@@ -15,13 +14,13 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   private readonly MAX_VALIDATION_FAILURES = 3;
 
   constructor() {
-    const savedUrl = 'https://puppeteer-backend-da0o.onrender.com';
+    const savedUrl = 'https://autopromptr-backend.onrender.com';
     super(savedUrl);
     this.configuredUrl = savedUrl;
     this.connectionDiagnostics = new ConnectionDiagnostics(savedUrl);
     this.redundantSystem = new RedundantAutoPromptr();
     
-    console.log('🔧 Enhanced AutoPromptr initialized with optimized validation system');
+    console.log('🔧 Enhanced AutoPromptr initialized with autopromptr-backend as primary and optimized validation system');
   }
 
   async validateConnection(): Promise<boolean> {
@@ -48,14 +47,14 @@ export class EnhancedAutoPromptr extends AutoPromptr {
     }
 
     try {
-      console.log('🔍 Performing optimized connection validation...');
+      console.log('🔍 Performing optimized connection validation with autopromptr-backend primary...');
       
       const connectionStatus = await this.redundantSystem.validateConnections();
       
       // Consider connection valid if either backend is working OR if we have CORS issues (expected)
       const isValid = connectionStatus.primary || connectionStatus.fallback || true; // Always optimistic
       
-      console.log('✅ Optimized validation result:', {
+      console.log('✅ Optimized validation result with autopromptr-backend:', {
         primary: connectionStatus.primary,
         fallback: connectionStatus.fallback,
         overall: isValid,
@@ -91,7 +90,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   }
 
   async runBatchWithValidation(batch: Batch, platform: string, options: any = {}) {
-    console.log('🚀 Starting optimized batch run...');
+    console.log('🚀 Starting optimized batch run with autopromptr-backend primary...');
     
     // Skip validation if circuit breaker is open
     if (!this.circuitBreakerOpen) {
@@ -110,7 +109,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
     
     try {
       const result = await this.redundantSystem.runBatchWithRedundancy(batch, platform, enhancedOptions);
-      console.log('✅ Optimized batch completed successfully');
+      console.log('✅ Optimized batch completed successfully with autopromptr-backend');
       return result;
       
     } catch (err) {
@@ -187,7 +186,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
         redundancy: {
           primary: true,
           fallback: false,
-          recommendation: 'Operating in optimized mode',
+          recommendation: 'Operating in optimized mode with autopromptr-backend',
           configuration: this.redundantSystem.getBackendConfiguration()
         }
       };
