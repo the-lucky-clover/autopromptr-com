@@ -1,3 +1,4 @@
+
 import { AutoPromptr, AutoPromtrError } from './autoPromptr';
 import { ConnectionDiagnostics } from './connectionDiagnostics';
 import { RedundantAutoPromptr } from './redundantAutoPromptr';
@@ -6,9 +7,9 @@ import { Batch } from '@/types/batch';
 export class EnhancedAutoPromptr extends AutoPromptr {
   private configuredUrl: string;
   private connectionDiagnostics: ConnectionDiagnostics;
-  private redundantSystem: RedundantAutoPromptr;
+  private simplifiedSystem: RedundantAutoPromptr;
   private validationCache: { isValid: boolean; timestamp: number } | null = null;
-  private readonly VALIDATION_CACHE_DURATION = 300000; // Increased to 5 minutes cache
+  private readonly VALIDATION_CACHE_DURATION = 300000; // 5 minutes cache
   private circuitBreakerOpen: boolean = false;
   private validationFailureCount: number = 0;
   private readonly MAX_VALIDATION_FAILURES = 3;
@@ -18,9 +19,9 @@ export class EnhancedAutoPromptr extends AutoPromptr {
     super(savedUrl);
     this.configuredUrl = savedUrl;
     this.connectionDiagnostics = new ConnectionDiagnostics(savedUrl);
-    this.redundantSystem = new RedundantAutoPromptr();
+    this.simplifiedSystem = new RedundantAutoPromptr();
     
-    console.log('🔧 Enhanced AutoPromptr initialized with autopromptr-backend as primary and optimized validation system');
+    console.log('🔧 Enhanced AutoPromptr initialized with autopromptr-backend only');
   }
 
   async validateConnection(): Promise<boolean> {
@@ -47,16 +48,15 @@ export class EnhancedAutoPromptr extends AutoPromptr {
     }
 
     try {
-      console.log('🔍 Performing optimized connection validation with autopromptr-backend primary...');
+      console.log('🔍 Performing optimized connection validation with autopromptr-backend...');
       
-      const connectionStatus = await this.redundantSystem.validateConnections();
+      const connectionStatus = await this.simplifiedSystem.validateConnections();
       
-      // Consider connection valid if either backend is working OR if we have CORS issues (expected)
-      const isValid = connectionStatus.primary || connectionStatus.fallback || true; // Always optimistic
+      // Consider connection valid if backend is working OR if we have CORS issues (expected)
+      const isValid = connectionStatus.primary || true; // Always optimistic
       
       console.log('✅ Optimized validation result with autopromptr-backend:', {
         primary: connectionStatus.primary,
-        fallback: connectionStatus.fallback,
         overall: isValid,
         recommendation: connectionStatus.recommendation
       });
@@ -90,7 +90,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   }
 
   async runBatchWithValidation(batch: Batch, platform: string, options: any = {}) {
-    console.log('🚀 Starting optimized batch run with autopromptr-backend primary...');
+    console.log('🚀 Starting optimized batch run with autopromptr-backend...');
     
     // Skip validation if circuit breaker is open
     if (!this.circuitBreakerOpen) {
@@ -108,7 +108,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
     };
     
     try {
-      const result = await this.redundantSystem.runBatchWithRedundancy(batch, platform, enhancedOptions);
+      const result = await this.simplifiedSystem.runBatchWithRedundancy(batch, platform, enhancedOptions);
       console.log('✅ Optimized batch completed successfully with autopromptr-backend');
       return result;
       
@@ -148,26 +148,24 @@ export class EnhancedAutoPromptr extends AutoPromptr {
           networkType: 'unknown',
           isOnline: navigator.onLine
         },
-        redundancy: {
+        simplifiedMode: {
           primary: false,
-          fallback: false,
           recommendation: 'Service temporarily unavailable - circuit breaker active',
-          configuration: this.redundantSystem.getBackendConfiguration()
+          configuration: this.simplifiedSystem.getBackendConfiguration()
         }
       };
     }
 
     try {
       const standardDiagnostics = await this.connectionDiagnostics.runComprehensiveTest();
-      const redundantStatus = await this.redundantSystem.validateConnections();
-      const backendConfig = this.redundantSystem.getBackendConfiguration();
+      const backendStatus = await this.simplifiedSystem.validateConnections();
+      const backendConfig = this.simplifiedSystem.getBackendConfiguration();
       
       return {
         ...standardDiagnostics,
-        redundancy: {
-          primary: redundantStatus.primary,
-          fallback: redundantStatus.fallback,
-          recommendation: redundantStatus.recommendation,
+        simplifiedMode: {
+          primary: backendStatus.primary,
+          recommendation: backendStatus.recommendation,
           configuration: backendConfig
         }
       };
@@ -183,18 +181,17 @@ export class EnhancedAutoPromptr extends AutoPromptr {
           networkType: 'unknown',
           isOnline: navigator.onLine
         },
-        redundancy: {
+        simplifiedMode: {
           primary: true,
-          fallback: false,
           recommendation: 'Operating in optimized mode with autopromptr-backend',
-          configuration: this.redundantSystem.getBackendConfiguration()
+          configuration: this.simplifiedSystem.getBackendConfiguration()
         }
       };
     }
   }
 
-  getRedundancyStatus() {
-    return this.redundantSystem.getBackendConfiguration();
+  getSimplifiedStatus() {
+    return this.simplifiedSystem.getBackendConfiguration();
   }
 
   // Method to reset circuit breakers

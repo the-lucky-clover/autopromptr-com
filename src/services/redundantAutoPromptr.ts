@@ -1,3 +1,4 @@
+
 import { AutoPromptr, AutoPromtrError } from './autoPromptr';
 import { ConnectionDiagnostics } from './connectionDiagnostics';
 import { Batch } from '@/types/batch';
@@ -11,7 +12,6 @@ interface BackendConfig {
 
 export class RedundantAutoPromptr {
   private primaryBackend: BackendConfig;
-  private fallbackBackend: BackendConfig;
   private connectionDiagnostics: ConnectionDiagnostics;
 
   constructor() {
@@ -22,27 +22,21 @@ export class RedundantAutoPromptr {
       retryDelay: 60000 // 60 seconds
     };
 
-    this.fallbackBackend = {
-      name: 'Puppeteer Backend', 
-      url: 'https://puppeteer-backend-da0o.onrender.com',
-      maxRetries: 3,
-      retryDelay: 60000 // 60 seconds
-    };
-
     this.connectionDiagnostics = new ConnectionDiagnostics();
-    console.log('🔄 Redundant AutoPromptr initialized with enhanced autopromptr-backend as primary');
+    console.log('🔄 Simplified AutoPromptr initialized with autopromptr-backend only');
   }
 
-  private async attemptWithBackend(backend: BackendConfig, batch: Batch, platform: string, options: any = {}): Promise<any> {
-    console.log(`🎯 Attempting with ${backend.name} (${backend.url})`);
+  async runBatchWithRedundancy(batch: Batch, platform: string, options: any = {}): Promise<any> {
+    console.log('🚀 Starting batch run with autopromptr-backend...');
+    console.log(`📋 Batch: ${batch.name} (${batch.id})`);
+    console.log(`🎯 Platform: ${platform}`);
     
-    for (let attempt = 1; attempt <= backend.maxRetries; attempt++) {
+    for (let attempt = 1; attempt <= this.primaryBackend.maxRetries; attempt++) {
       try {
-        console.log(`📡 ${backend.name} - Attempt ${attempt}/${backend.maxRetries}`);
+        console.log(`📡 AutoPromptr Backend - Attempt ${attempt}/${this.primaryBackend.maxRetries}`);
         
-        const autoPromptr = new AutoPromptr(backend.url);
+        const autoPromptr = new AutoPromptr(this.primaryBackend.url);
         
-        // Enhanced options optimized for autopromptr-backend features
         const enhancedOptions = {
           ...options,
           targetUrl: batch.targetUrl || 'https://lovable.dev',
@@ -50,10 +44,10 @@ export class RedundantAutoPromptr {
           automationType: 'enhanced-lovable-automation',
           elementSelector: 'textarea, input[type="text"], [contenteditable="true"]',
           actionType: 'multi-strategy-submission',
-          enhancedFeatures: backend.name === 'AutoPromptr Backend'
+          enhancedFeatures: true
         };
         
-        console.log(`📝 Transmitting to ${backend.name}:`, {
+        console.log(`📝 Transmitting to ${this.primaryBackend.name}:`, {
           targetUrl: enhancedOptions.targetUrl,
           promptCount: enhancedOptions.textPrompts.length,
           automationType: enhancedOptions.automationType,
@@ -62,63 +56,29 @@ export class RedundantAutoPromptr {
         
         const result = await autoPromptr.runBatch(batch, platform, enhancedOptions);
         
-        console.log(`✅ ${backend.name} succeeded on attempt ${attempt}`);
+        console.log(`✅ AutoPromptr Backend succeeded on attempt ${attempt}`);
         return {
           success: true,
           result,
-          backend: backend.name,
+          backend: this.primaryBackend.name,
           attempt
         };
         
       } catch (err) {
-        console.error(`❌ ${backend.name} attempt ${attempt} failed:`, err);
+        console.error(`❌ AutoPromptr Backend attempt ${attempt} failed:`, err);
         
-        if (attempt < backend.maxRetries) {
-          console.log(`⏳ Waiting ${backend.retryDelay / 1000} seconds before retry...`);
-          await new Promise(resolve => setTimeout(resolve, backend.retryDelay));
+        if (attempt < this.primaryBackend.maxRetries) {
+          console.log(`⏳ Waiting ${this.primaryBackend.retryDelay / 1000} seconds before retry...`);
+          await new Promise(resolve => setTimeout(resolve, this.primaryBackend.retryDelay));
         } else {
-          console.error(`💥 ${backend.name} failed all ${backend.maxRetries} attempts`);
+          console.error(`💥 AutoPromptr Backend failed all ${this.primaryBackend.maxRetries} attempts`);
           throw new AutoPromtrError(
-            `${backend.name} failed after ${backend.maxRetries} attempts`,
+            `AutoPromptr Backend failed after ${this.primaryBackend.maxRetries} attempts`,
             'BACKEND_EXHAUSTED',
             503,
             false
           );
         }
-      }
-    }
-  }
-
-  async runBatchWithRedundancy(batch: Batch, platform: string, options: any = {}): Promise<any> {
-    console.log('🚀 Starting redundant batch run with enhanced autopromptr-backend primary...');
-    console.log(`📋 Batch: ${batch.name} (${batch.id})`);
-    console.log(`🎯 Platform: ${platform}`);
-    
-    try {
-      // Try enhanced autopromptr-backend first
-      console.log('🔵 Phase 1: Attempting with enhanced autopromptr-backend...');
-      const primaryResult = await this.attemptWithBackend(this.primaryBackend, batch, platform, options);
-      return primaryResult;
-      
-    } catch (primaryErr) {
-      console.warn('🟡 Enhanced autopromptr-backend exhausted, switching to puppeteer-backend fallback...');
-      
-      try {
-        // Try puppeteer-backend as fallback
-        console.log('🟠 Phase 2: Attempting with puppeteer-backend fallback...');
-        const fallbackResult = await this.attemptWithBackend(this.fallbackBackend, batch, platform, options);
-        return fallbackResult;
-        
-      } catch (fallbackErr) {
-        console.error('🔴 Both backends exhausted - complete failure');
-        
-        // Both backends failed
-        throw new AutoPromtrError(
-          `Complete automation failure: Both ${this.primaryBackend.name} and ${this.fallbackBackend.name} failed after ${this.primaryBackend.maxRetries + this.fallbackBackend.maxRetries} total attempts over ${((this.primaryBackend.maxRetries + this.fallbackBackend.maxRetries) * 60)} seconds.`,
-          'REDUNDANCY_EXHAUSTED',
-          503,
-          false
-        );
       }
     }
   }
@@ -142,22 +102,10 @@ export class RedundantAutoPromptr {
       console.warn('Primary backend validation failed:', err);
     }
 
-    try {
-      const fallbackDiagnostics = new ConnectionDiagnostics(this.fallbackBackend.url);
-      const fallbackTest = await fallbackDiagnostics.runComprehensiveTest();
-      results.fallback = fallbackTest.overallSuccess;
-    } catch (err) {
-      console.warn('Fallback backend validation failed:', err);
-    }
-
-    if (results.primary && results.fallback) {
-      results.recommendation = 'Both enhanced autopromptr-backend and puppeteer-backend are operational - full redundancy available';
-    } else if (results.primary) {
-      results.recommendation = 'Enhanced autopromptr-backend operational, puppeteer-backend fallback may be unavailable';
-    } else if (results.fallback) {
-      results.recommendation = 'Enhanced autopromptr-backend unavailable, puppeteer-backend fallback operational';
+    if (results.primary) {
+      results.recommendation = 'AutoPromptr Backend operational';
     } else {
-      results.recommendation = 'Both backends may be unavailable - check connectivity';
+      results.recommendation = 'AutoPromptr Backend may be unavailable - check connectivity';
     }
 
     return results;
@@ -166,9 +114,9 @@ export class RedundantAutoPromptr {
   getBackendConfiguration() {
     return {
       primary: this.primaryBackend,
-      fallback: this.fallbackBackend,
-      totalMaxAttempts: this.primaryBackend.maxRetries + this.fallbackBackend.maxRetries,
-      totalMaxDuration: (this.primaryBackend.maxRetries + this.fallbackBackend.maxRetries) * 60
+      fallback: null,
+      totalMaxAttempts: this.primaryBackend.maxRetries,
+      totalMaxDuration: this.primaryBackend.maxRetries * 60
     };
   }
 }
