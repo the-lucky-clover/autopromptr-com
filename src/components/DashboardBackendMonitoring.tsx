@@ -2,13 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExternalLink } from "lucide-react";
-import HealthStatusDashboard from "./HealthStatusDashboard";
+import HealthStatusDashboardWrapper from "./HealthStatusDashboardWrapper";
 
 const DashboardBackendMonitoring = () => {
   return (
     <div className="space-y-6">
       {/* Enhanced Health Status Dashboard */}
-      <HealthStatusDashboard />
+      <HealthStatusDashboardWrapper />
 
       {/* Render.com Logs Frame */}
       <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">

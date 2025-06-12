@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   DndContext,
@@ -22,7 +21,7 @@ import DashboardBatchManager from "@/components/DashboardBatchManager";
 import DashboardStatsModule from "@/components/DashboardStatsModule";
 import DashboardSubscription from "@/components/DashboardSubscription";
 import SystemLogsPanel from "@/components/SystemLogsPanel";
-import HealthStatusDashboard from "@/components/HealthStatusDashboard";
+import HealthStatusDashboardWrapper from "@/components/HealthStatusDashboardWrapper";
 import SystemReliabilityScore from "@/components/SystemReliabilityScore";
 import BatchExtractorModule from "@/components/BatchExtractorModule";
 import AnalyticsModule from "@/components/AnalyticsModule";
@@ -79,7 +78,7 @@ const Dashboard = () => {
         );
       
       case 'HealthStatusDashboard':
-        return <HealthStatusDashboard isCompact={isMinimized} />;
+        return <HealthStatusDashboardWrapper isCompact={isMinimized} />;
       
       case 'SystemLogsPanel':
         return <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} isCompact={isMinimized} />;

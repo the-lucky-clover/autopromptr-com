@@ -17,7 +17,6 @@ import {
   TestTube
 } from 'lucide-react';
 import { useBackendTesting } from '@/hooks/useBackendTesting';
-import { useAuth } from '@/hooks/useAuth';
 
 interface BackendStatus {
   name: string;
@@ -43,16 +42,10 @@ const circuitBreakerState = {
 
 const MAX_FAILURES = 3;
 const CIRCUIT_BREAKER_TIMEOUT = 300000; // 5 minutes
-const HEALTH_CHECK_INTERVAL = 120000; // 2 minutes (reduced from 30 seconds)
+const HEALTH_CHECK_INTERVAL = 120000; // 2 minutes
 
 const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps) => {
-  const { user, isEmailVerified } = useAuth();
-  
-  // Early return - don't render anything if not authenticated or not on dashboard
-  if (!user || !isEmailVerified || !window.location.pathname.includes('/dashboard')) {
-    console.log('HealthStatusDashboard: Skipping render - not authenticated or not on dashboard');
-    return null;
-  }
+  console.log('HealthStatusDashboard: Component instantiated - health checks will run');
 
   const { 
     isRunning, 
@@ -138,7 +131,7 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000); // Increased timeout
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
       
       const startTime = Date.now();
       
@@ -206,22 +199,17 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
   };
 
   useEffect(() => {
-    // Double-check we should run health checks
-    if (!user || !isEmailVerified || !window.location.pathname.includes('/dashboard')) {
-      return;
-    }
-
     console.log('HealthStatusDashboard: Starting health monitoring');
     refreshHealthData();
     
-    // Reduced frequency health checks
+    // Start health check interval
     const interval = setInterval(refreshHealthData, HEALTH_CHECK_INTERVAL);
     
     return () => {
       console.log('HealthStatusDashboard: Cleaning up health monitoring');
       clearInterval(interval);
     };
-  }, [user, isEmailVerified]);
+  }, []);
 
   useEffect(() => {
     // Calculate overall health based on actual backend status
@@ -231,8 +219,8 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
       setOverallHealth(testSummary.passRate);
     } else {
       // Base calculation on backend connectivity
-      const primaryWeight = 70; // Primary backend weight
-      const fallbackWeight = 30; // Fallback backend weight
+      const primaryWeight = 70;
+      const fallbackWeight = 30;
       
       const primaryScore = primaryBackend.isConnected ? 100 : 0;
       const fallbackScore = fallbackBackend.isConnected ? 100 : 0;
