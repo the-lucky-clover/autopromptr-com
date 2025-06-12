@@ -106,9 +106,21 @@ export const useBatchOperations = () => {
         description: `Automation started for "${batch.name}" using ${platformName} with idle detection.`,
       });
     } catch (err) {
+      let errorTitle = "Failed to start batch";
+      let errorDescription = err instanceof Error ? err.message : 'Unknown error';
+      
+      // Enhanced error handling for specific backend configuration issues
+      if (err instanceof Error && err.message.includes('AUTOMATION_ENDPOINTS_NOT_CONFIGURED')) {
+        errorTitle = "Backend not configured for automation";
+        errorDescription = "The backend service needs to be configured with automation endpoints. Please check the Settings page and verify your backend supports batch automation.";
+      } else if (err instanceof Error && err.message.includes('not found')) {
+        errorTitle = "Automation service unavailable";
+        errorDescription = "The automation service endpoints were not found. This may be a temporary issue or the backend may need updates.";
+      }
+      
       toast({
-        title: "Failed to start batch",
-        description: err instanceof Error ? err.message : 'Unknown error',
+        title: errorTitle,
+        description: errorDescription,
         variant: "destructive",
       });
     }
