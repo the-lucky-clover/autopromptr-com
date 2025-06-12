@@ -136,7 +136,14 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
   };
 
   return (
-    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl relative overflow-hidden">
+      {/* BETA Banner */}
+      <div className="absolute top-0 right-0 w-20 h-20 overflow-hidden">
+        <div className="absolute top-3 right-[-20px] bg-orange-500/90 text-white text-xs font-mono font-bold px-8 py-1 transform rotate-45 shadow-lg">
+          B E T A
+        </div>
+      </div>
+      
       <CardHeader className={isCompact ? "pb-2" : "pb-3"}>
         <CardTitle className={`text-white flex items-center space-x-2 ${isCompact ? 'text-sm' : 'text-sm md:text-base'}`}>
           <Zap className={`${isCompact ? 'w-3 h-3' : 'w-4 h-4'} text-blue-400`} />
