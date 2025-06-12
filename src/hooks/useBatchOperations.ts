@@ -1,12 +1,15 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
+import { useBatchSync } from '@/hooks/useBatchSync';
 import { Batch, BatchFormData, TextPrompt } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 
 export const useBatchOperations = () => {
   const { batches, setBatches } = usePersistentBatches();
+  const { triggerBatchSync } = useBatchSync();
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const { toast } = useToast();
   const { status: batchStatus, loading: automationLoading, error: automationError, runBatch, stopBatch } = useBatchAutomation(selectedBatchId || undefined);
@@ -37,6 +40,11 @@ export const useBatchOperations = () => {
 
     setBatches(prev => [...prev, batch]);
     
+    // Trigger sync to update all components
+    setTimeout(() => {
+      triggerBatchSync();
+    }, 100);
+    
     toast({
       title: "Batch created",
       description: `Batch "${batch.name}" created with auto-detected platform: ${platformName}. Wait for idle: ${formData.waitForIdle ? 'enabled' : 'disabled'}.`,
@@ -44,10 +52,23 @@ export const useBatchOperations = () => {
   };
 
   const deleteBatch = (batchId: string) => {
-    setBatches(prev => prev.filter(b => b.id !== batchId));
+    console.log('Deleting batch:', batchId);
+    
+    setBatches(prev => {
+      const updatedBatches = prev.filter(b => b.id !== batchId);
+      console.log('Updated batches after deletion:', updatedBatches);
+      return updatedBatches;
+    });
+    
     if (selectedBatchId === batchId) {
       setSelectedBatchId(null);
     }
+    
+    // Trigger sync to update all components immediately
+    setTimeout(() => {
+      triggerBatchSync();
+    }, 100);
+    
     toast({
       title: "Batch deleted",
       description: "Batch has been removed from the queue.",

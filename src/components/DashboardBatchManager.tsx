@@ -49,6 +49,17 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
     triggerBatchSync();
   };
 
+  // Enhanced delete handler with proper sync
+  const handleEnhancedDeleteBatch = (batchId: string) => {
+    console.log('Dashboard deleting batch:', batchId);
+    handleDeleteBatch(batchId);
+    
+    // Trigger additional sync to ensure all components update
+    setTimeout(() => {
+      triggerBatchSync();
+    }, 200);
+  };
+
   // Update stats whenever batches change
   useEffect(() => {
     if (onStatsUpdate) {
@@ -139,7 +150,7 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
             <DashboardBatchList 
               batches={batches}
               onEdit={handleEditBatch}
-              onDelete={handleDeleteBatch}
+              onDelete={handleEnhancedDeleteBatch}
               onRun={handleRunBatch}
               onStop={handleStopBatch}
               onPause={handlePauseBatch}
