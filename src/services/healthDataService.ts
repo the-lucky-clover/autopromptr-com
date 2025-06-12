@@ -27,15 +27,40 @@ export class HealthDataService {
   private baseUrl: string;
   private lastFetch: number = 0;
   private cachedData: HealthMetrics | null = null;
-  private readonly CACHE_DURATION = 30000; // Reduced to 30 seconds for more accurate reporting
+  private readonly CACHE_DURATION = 120000; // Increased to 2 minutes
   private circuitBreakerOpen: boolean = false;
   private failureCount: number = 0;
   private readonly MAX_FAILURES = 3;
+  private lastFailureTime: number = 0;
+  private readonly CIRCUIT_BREAKER_TIMEOUT = 300000; // 5 minutes
   private testingService: TestingService;
   
   constructor(baseUrl = 'https://autopromptr-backend.onrender.com') {
     this.baseUrl = baseUrl;
     this.testingService = new TestingService(baseUrl);
+  }
+
+  private shouldSkipHealthCheck(): boolean {
+    // Skip if not on dashboard pages
+    if (!window.location.pathname.includes('/dashboard')) {
+      console.log('HealthDataService: Skipping - not on dashboard');
+      return true;
+    }
+
+    // Check circuit breaker
+    if (this.circuitBreakerOpen) {
+      const now = Date.now();
+      if (now - this.lastFailureTime > this.CIRCUIT_BREAKER_TIMEOUT) {
+        console.log('HealthDataService: Circuit breaker reset after timeout');
+        this.circuitBreakerOpen = false;
+        this.failureCount = 0;
+        return false;
+      }
+      console.log('HealthDataService: Circuit breaker is open - skipping');
+      return true;
+    }
+
+    return false;
   }
 
   async fetchHealthData(): Promise<HealthMetrics> {
@@ -46,35 +71,34 @@ export class HealthDataService {
       return this.cachedData;
     }
 
-    // Check if we're on a public page - skip actual requests
-    if (!window.location.pathname.includes('/dashboard')) {
-      const healthData: HealthMetrics = {
-        status: 'healthy',
-        responseTime: 0,
-        uptime: 'Ready',
-        timestamp: new Date(),
-        connectivity: {
-          isConnected: true
-        }
-      };
-      
-      this.cachedData = healthData;
-      this.lastFetch = now;
-      return healthData;
-    }
+    // Skip if conditions aren't right
+    if (this.shouldSkipHealthCheck()) {
+      // Return fallback data for non-dashboard pages
+      if (!window.location.pathname.includes('/dashboard')) {
+        const healthData: HealthMetrics = {
+          status: 'healthy',
+          responseTime: 0,
+          uptime: 'Ready',
+          timestamp: new Date(),
+          connectivity: {
+            isConnected: true
+          }
+        };
+        
+        this.cachedData = healthData;
+        this.lastFetch = now;
+        return healthData;
+      }
 
-    // Circuit breaker pattern - don't make requests if too many failures
-    if (this.circuitBreakerOpen) {
-      console.log('Health service circuit breaker is open - using degraded status');
-      
+      // Circuit breaker fallback
       const fallbackData: HealthMetrics = {
         status: 'unhealthy',
         responseTime: 0,
-        uptime: 'Service Offline',
+        uptime: 'Service Protection Active',
         timestamp: new Date(),
         connectivity: {
           isConnected: false,
-          lastError: 'Circuit breaker active'
+          lastError: 'Circuit breaker protection active'
         }
       };
       
@@ -83,8 +107,9 @@ export class HealthDataService {
       return fallbackData;
     }
 
-    // Run actual health check using testing service
+    // Run actual health check
     try {
+      console.log('HealthDataService: Running health check');
       const quickCheck = await this.testingService.runQuickHealthCheck();
       
       // Reset failure count on success
@@ -92,16 +117,10 @@ export class HealthDataService {
         this.failureCount = 0;
         if (this.circuitBreakerOpen) {
           this.circuitBreakerOpen = false;
-          console.log('Health service circuit breaker reset');
+          console.log('HealthDataService: Circuit breaker reset on success');
         }
       } else {
-        this.failureCount++;
-        
-        // Open circuit breaker if too many failures
-        if (this.failureCount >= this.MAX_FAILURES) {
-          this.circuitBreakerOpen = true;
-          console.log('Health service circuit breaker opened due to repeated failures');
-        }
+        this.handleFailure();
       }
       
       const healthData: HealthMetrics = {
@@ -115,23 +134,14 @@ export class HealthDataService {
         }
       };
       
-      // Cache the result
       this.cachedData = healthData;
       this.lastFetch = now;
       
       return healthData;
       
     } catch (err) {
-      // Increment failure count
-      this.failureCount++;
+      this.handleFailure();
       
-      // Open circuit breaker if too many failures
-      if (this.failureCount >= this.MAX_FAILURES) {
-        this.circuitBreakerOpen = true;
-        console.log('Health service circuit breaker opened due to repeated failures');
-      }
-      
-      // Return accurate unhealthy status for actual failures
       const healthData: HealthMetrics = {
         status: 'unhealthy',
         responseTime: 0,
@@ -139,7 +149,7 @@ export class HealthDataService {
         timestamp: new Date(),
         connectivity: {
           isConnected: false,
-          lastError: err instanceof Error ? err.message : 'Unknown error'
+          lastError: err instanceof Error ? err.message : 'Service temporarily unavailable'
         }
       };
       
@@ -149,11 +159,21 @@ export class HealthDataService {
     }
   }
 
+  private handleFailure() {
+    this.failureCount++;
+    this.lastFailureTime = Date.now();
+    
+    if (this.failureCount >= this.MAX_FAILURES) {
+      this.circuitBreakerOpen = true;
+      console.log(`HealthDataService: Circuit breaker opened after ${this.failureCount} failures`);
+    }
+  }
+
   private determineStatus(isHealthy: boolean, responseTime: number): 'healthy' | 'degraded' | 'unhealthy' {
     if (!isHealthy) return 'unhealthy';
     
+    if (responseTime > 8000) return 'degraded';
     if (responseTime > 5000) return 'degraded';
-    if (responseTime > 3000) return 'degraded';
     
     return 'healthy';
   }
@@ -164,6 +184,14 @@ export class HealthDataService {
     responseTime: number;
     error?: string;
   }> {
+    if (this.shouldSkipHealthCheck()) {
+      return {
+        isConnected: false,
+        responseTime: 0,
+        error: 'Health checks disabled'
+      };
+    }
+
     try {
       const result = await this.testingService.runQuickHealthCheck();
       return {
@@ -184,7 +212,8 @@ export class HealthDataService {
   resetCircuitBreaker() {
     this.circuitBreakerOpen = false;
     this.failureCount = 0;
-    this.cachedData = null;
+    this.lastFailureTime = 0;
+    console.log('HealthDataService: Circuit breaker manually reset');
   }
 
   // Get circuit breaker status
@@ -192,7 +221,8 @@ export class HealthDataService {
     return {
       isOpen: this.circuitBreakerOpen,
       failureCount: this.failureCount,
-      maxFailures: this.MAX_FAILURES
+      maxFailures: this.MAX_FAILURES,
+      lastFailureTime: this.lastFailureTime
     };
   }
 

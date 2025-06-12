@@ -35,8 +35,25 @@ interface HealthStatusDashboardProps {
   isCompact?: boolean;
 }
 
+// Circuit breaker state management
+const circuitBreakerState = {
+  primaryBackend: { failures: 0, isOpen: false, lastFailure: 0 },
+  fallbackBackend: { failures: 0, isOpen: false, lastFailure: 0 }
+};
+
+const MAX_FAILURES = 3;
+const CIRCUIT_BREAKER_TIMEOUT = 300000; // 5 minutes
+const HEALTH_CHECK_INTERVAL = 120000; // 2 minutes (reduced from 30 seconds)
+
 const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps) => {
   const { user, isEmailVerified } = useAuth();
+  
+  // Early return - don't render anything if not authenticated or not on dashboard
+  if (!user || !isEmailVerified || !window.location.pathname.includes('/dashboard')) {
+    console.log('HealthStatusDashboard: Skipping render - not authenticated or not on dashboard');
+    return null;
+  }
+
   const { 
     isRunning, 
     lastTestResults, 
@@ -47,18 +64,6 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
   } = useBackendTesting();
 
   const [primaryBackend, setPrimaryBackend] = useState<BackendStatus>({
-    name: 'Backend Server Delta',
-    shortName: 'Delta [Δ]',
-    url: 'https://puppeteer-backend-da0o.onrender.com',
-    status: 'unhealthy',
-    responseTime: 0,
-    uptime: 'Disconnected',
-    lastChecked: new Date(),
-    icon: 'Δ',
-    isConnected: false
-  });
-
-  const [fallbackBackend, setFallbackBackend] = useState<BackendStatus>({
     name: 'Backend Server Echo',
     shortName: 'Echo [∃]',
     url: 'https://autopromptr-backend.onrender.com',
@@ -70,17 +75,70 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
     isConnected: true
   });
 
-  const [overallHealth, setOverallHealth] = useState(50);
+  const [fallbackBackend, setFallbackBackend] = useState<BackendStatus>({
+    name: 'Backup Server',
+    shortName: 'Backup [B]',
+    url: 'https://autopromptr-fallback.onrender.com',
+    status: 'healthy',
+    responseTime: 0,
+    uptime: 'Standby',
+    lastChecked: new Date(),
+    icon: 'B',
+    isConnected: false
+  });
 
-  const checkBackendHealth = async (backend: BackendStatus, setter: (status: BackendStatus) => void) => {
-    // Only check backend health for authenticated dashboard users
-    if (!user || !isEmailVerified || !window.location.pathname.includes('/dashboard')) {
+  const [overallHealth, setOverallHealth] = useState(75);
+
+  const checkCircuitBreaker = (backendKey: 'primaryBackend' | 'fallbackBackend') => {
+    const state = circuitBreakerState[backendKey];
+    const now = Date.now();
+    
+    if (state.isOpen) {
+      if (now - state.lastFailure > CIRCUIT_BREAKER_TIMEOUT) {
+        console.log(`Circuit breaker reset for ${backendKey}`);
+        state.isOpen = false;
+        state.failures = 0;
+        return false;
+      }
+      return true;
+    }
+    return false;
+  };
+
+  const recordFailure = (backendKey: 'primaryBackend' | 'fallbackBackend') => {
+    const state = circuitBreakerState[backendKey];
+    state.failures++;
+    state.lastFailure = Date.now();
+    
+    if (state.failures >= MAX_FAILURES) {
+      state.isOpen = true;
+      console.log(`Circuit breaker opened for ${backendKey} after ${state.failures} failures`);
+    }
+  };
+
+  const recordSuccess = (backendKey: 'primaryBackend' | 'fallbackBackend') => {
+    const state = circuitBreakerState[backendKey];
+    state.failures = 0;
+    state.isOpen = false;
+  };
+
+  const checkBackendHealth = async (backend: BackendStatus, setter: (status: BackendStatus) => void, backendKey: 'primaryBackend' | 'fallbackBackend') => {
+    // Skip if circuit breaker is open
+    if (checkCircuitBreaker(backendKey)) {
+      console.log(`Skipping health check for ${backend.name} - circuit breaker open`);
+      setter({
+        ...backend,
+        status: 'unhealthy',
+        uptime: 'Circuit Breaker Open',
+        isConnected: false,
+        lastChecked: new Date()
+      });
       return;
     }
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // Increased timeout
       
       const startTime = Date.now();
       
@@ -94,8 +152,14 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
       
       const isConnected = response.ok || response.status < 500;
       const status = isConnected 
-        ? (responseTime > 3000 ? 'degraded' : 'healthy')
+        ? (responseTime > 5000 ? 'degraded' : 'healthy')
         : 'unhealthy';
+      
+      if (isConnected) {
+        recordSuccess(backendKey);
+      } else {
+        recordFailure(backendKey);
+      }
       
       setter({
         ...backend,
@@ -106,7 +170,7 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
         isConnected
       });
     } catch (error) {
-      // Actual connection failure
+      recordFailure(backendKey);
       setter({
         ...backend,
         status: 'unhealthy',
@@ -119,42 +183,44 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
   };
 
   const refreshHealthData = async () => {
-    // Skip health checks entirely on public pages
-    if (!user || !isEmailVerified || !window.location.pathname.includes('/dashboard')) {
-      return;
-    }
-
-    // Run quick health checks for both backends
+    console.log('HealthStatusDashboard: Running health check');
+    
+    // Run health checks for backends
     await Promise.all([
-      checkBackendHealth(primaryBackend, setPrimaryBackend),
-      checkBackendHealth(fallbackBackend, setFallbackBackend)
+      checkBackendHealth(primaryBackend, setPrimaryBackend, 'primaryBackend'),
+      checkBackendHealth(fallbackBackend, setFallbackBackend, 'fallbackBackend')
     ]);
     
-    // Run comprehensive test on the active backend
-    await runQuickHealthCheck();
+    // Run comprehensive test on the active backend (but don't wait for it)
+    runQuickHealthCheck().catch(error => {
+      console.log('Quick health check failed (silenced):', error.message);
+    });
   };
 
   const runComprehensiveTests = async () => {
-    if (!user || !isEmailVerified) return;
-    
     try {
       await runFullTestSuite();
     } catch (error) {
-      console.error('Comprehensive tests failed:', error);
+      console.log('Comprehensive tests failed (silenced):', error);
     }
   };
 
   useEffect(() => {
-    // Only run health checks for authenticated dashboard users
+    // Double-check we should run health checks
     if (!user || !isEmailVerified || !window.location.pathname.includes('/dashboard')) {
       return;
     }
 
+    console.log('HealthStatusDashboard: Starting health monitoring');
     refreshHealthData();
     
-    // Health checks every 30 seconds
-    const interval = setInterval(refreshHealthData, 30000);
-    return () => clearInterval(interval);
+    // Reduced frequency health checks
+    const interval = setInterval(refreshHealthData, HEALTH_CHECK_INTERVAL);
+    
+    return () => {
+      console.log('HealthStatusDashboard: Cleaning up health monitoring');
+      clearInterval(interval);
+    };
   }, [user, isEmailVerified]);
 
   useEffect(() => {
@@ -165,8 +231,8 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
       setOverallHealth(testSummary.passRate);
     } else {
       // Base calculation on backend connectivity
-      const primaryWeight = 30; // Primary backend weight
-      const fallbackWeight = 70; // Fallback backend weight (more important)
+      const primaryWeight = 70; // Primary backend weight
+      const fallbackWeight = 30; // Fallback backend weight
       
       const primaryScore = primaryBackend.isConnected ? 100 : 0;
       const fallbackScore = fallbackBackend.isConnected ? 100 : 0;
@@ -372,7 +438,7 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
         
         <div className="flex items-center space-x-2 mt-2 text-sm text-purple-200">
           <TrendingUp className="w-4 h-4" />
-          <span>Real-time monitoring with accurate backend connectivity</span>
+          <span>Optimized monitoring with circuit breaker protection</span>
         </div>
       </div>
 
@@ -422,15 +488,15 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
         <div className="flex items-center justify-center space-x-6 text-xs">
           <div className="flex items-center space-x-1 text-green-400">
             <Wifi className="w-3 h-3" />
-            <span>Real-time Testing</span>
+            <span>Smart Monitoring</span>
           </div>
           <div className="flex items-center space-x-1 text-blue-400">
             <Activity className="w-3 h-3" />
-            <span>Accurate Monitoring</span>
+            <span>Circuit Breaker Protection</span>
           </div>
           <div className="flex items-center space-x-1 text-purple-400">
             <Zap className="w-3 h-3" />
-            <span>Live Status</span>
+            <span>Optimized Performance</span>
           </div>
         </div>
       </div>
