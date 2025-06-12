@@ -21,6 +21,14 @@ export interface CircuitBreakerState {
   lastFailure: number;
 }
 
+// Updated to match the TestSuite from testingService.ts
+export interface TestResult {
+  name: string;
+  tests: Array<{ status: 'passed' | 'failed' | 'skipped' | 'partial' }>;
+  overallStatus: 'healthy' | 'degraded' | 'unhealthy';
+  passRate: number;
+}
+
 export const MAX_FAILURES = 3;
 export const CIRCUIT_BREAKER_TIMEOUT = 300000; // 5 minutes
 export const HEALTH_CHECK_INTERVAL = 120000; // 2 minutes
