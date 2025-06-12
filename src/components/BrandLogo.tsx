@@ -18,31 +18,32 @@ const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: 
 
   return (
     <div className={`flex items-center group ${className}`}>
-      <div className="flex items-center space-x-2">
-        {/* Zap icon with gradient stroke */}
+      {/* Container with unified gradient background */}
+      <div 
+        className="flex items-center space-x-2 relative"
+        style={{
+          background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
+          backgroundSize: '300% 300%',
+          animation: 'heroGradientFlow 6s ease-in-out infinite',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent',
+          filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
+        }}
+      >
+        {/* Zap icon with increased stroke and gradient */}
         <Zap 
           className={`${currentSize.icon}`}
-          strokeWidth={1.5}
+          strokeWidth={2.5}
           style={{
             stroke: 'url(#iconGradient)',
             filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
           }}
         />
         
-        {/* Brand text with gradient */}
+        {/* Brand text */}
         {variant === 'horizontal' && (
-          <span 
-            className={`${currentSize.text} font-bold`}
-            style={{
-              background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
-              backgroundSize: '300% 300%',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              color: 'transparent',
-              animation: 'heroGradientFlow 6s ease-in-out infinite',
-              filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
-            }}
-          >
+          <span className={`${currentSize.text} font-bold`}>
             AutoPromptr
           </span>
         )}
