@@ -2,8 +2,8 @@
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { AlertCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { usePlatforms } from '@/hooks/usePlatforms';
 import ContentInputSection from './ContentInputSection';
 import ExtractionControls from './ExtractionControls';
 
@@ -14,6 +14,8 @@ interface BatchExtractorPageContentProps {
   setBatchName: (value: string) => void;
   targetUrl: string;
   setTargetUrl: (value: string) => void;
+  selectedPlatform: string;
+  setSelectedPlatform: (value: string) => void;
   isProcessing: boolean;
   CHARACTER_LIMIT: number;
   characterCount: number;
@@ -21,7 +23,7 @@ interface BatchExtractorPageContentProps {
   handleExtract: () => void;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   getCharacterCountColor: () => string;
-  getEffectiveTargetUrl: () => string;
+  getEffectiveTargetDisplay: () => string;
 }
 
 const BatchExtractorPageContent = ({
@@ -31,6 +33,8 @@ const BatchExtractorPageContent = ({
   setBatchName,
   targetUrl,
   setTargetUrl,
+  selectedPlatform,
+  setSelectedPlatform,
   isProcessing,
   CHARACTER_LIMIT,
   characterCount,
@@ -38,12 +42,16 @@ const BatchExtractorPageContent = ({
   handleExtract,
   handleFileUpload,
   getCharacterCountColor,
-  getEffectiveTargetUrl
+  getEffectiveTargetDisplay
 }: BatchExtractorPageContentProps) => {
+  const { platforms } = usePlatforms();
+
   const handleFileContent = (content: string, filename: string) => {
     setPrompts(content);
     setBatchName(filename);
   };
+
+  const showPlatformDropdown = !targetUrl.trim();
 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl relative overflow-hidden max-w-4xl">
@@ -76,14 +84,42 @@ const BatchExtractorPageContent = ({
           <Input
             id="target-url"
             value={targetUrl}
-            onChange={(e) => setTargetUrl(e.target.value)}
-            placeholder="https://lovable.dev (default for new projects)"
+            onChange={(e) => {
+              setTargetUrl(e.target.value);
+              if (e.target.value.trim()) {
+                setSelectedPlatform('');
+              }
+            }}
+            placeholder="https://lovable.dev (or leave empty to select platform)"
             className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl h-12 text-base"
           />
           <p className="text-white/60 text-xs">
-            Leave empty to start a new Lovable project. You'll be asked to update with the actual project URL after creation.
+            Enter a specific project URL, or leave empty to select a platform below for new projects.
           </p>
         </div>
+
+        {showPlatformDropdown && (
+          <div className="space-y-2">
+            <Label htmlFor="platform-select" className="text-white text-sm font-medium">
+              Target Platform
+            </Label>
+            <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+              <SelectTrigger className="bg-white/10 border-white/20 text-white rounded-xl h-12">
+                <SelectValue placeholder="Select a platform for new projects..." />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800/95 backdrop-blur-sm border-gray-700 rounded-xl">
+                {platforms.map(platform => (
+                  <SelectItem key={platform.id} value={platform.id} className="text-white">
+                    {platform.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-white/60 text-xs">
+              Choose the platform where you want to start a new project. You'll be asked to update with the actual project URL after creation.
+            </p>
+          </div>
+        )}
 
         <ContentInputSection
           prompts={prompts}
@@ -107,7 +143,7 @@ const BatchExtractorPageContent = ({
 
         <div className="pt-4 border-t border-white/10">
           <p className="text-white/60 text-sm">
-            Target: <span className="text-white/80 font-mono">{getEffectiveTargetUrl()}</span> • 
+            Target: <span className="text-white/80 font-mono">{getEffectiveTargetDisplay()}</span> • 
             Max {CHARACTER_LIMIT.toLocaleString()} characters • Extracts up to 100 prompts • File size limit: 10MB
           </p>
         </div>

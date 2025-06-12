@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ const BatchForm = ({ onSubmit, onCancel }: BatchFormProps) => {
     waitForIdle: true,
     maxRetries: 0
   });
+  const [selectedTargetPlatform, setSelectedTargetPlatform] = useState('');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -46,16 +48,47 @@ const BatchForm = ({ onSubmit, onCancel }: BatchFormProps) => {
   }, [toast]);
 
   const handleSubmit = () => {
-    if (!formData.name.trim() || !formData.targetUrl.trim() || !formData.initialPrompt.trim()) {
+    if (!formData.name.trim() || !formData.initialPrompt.trim()) {
       toast({
         title: "Missing required fields",
-        description: "Name, target URL, and at least one prompt are required.",
+        description: "Name and at least one prompt are required.",
         variant: "destructive",
       });
       return;
     }
 
-    onSubmit(formData);
+    // Validate that either URL or platform is selected
+    if (!formData.targetUrl.trim() && !selectedTargetPlatform) {
+      toast({
+        title: "Missing target",
+        description: "Please enter a target URL or select a platform.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Use selected platform URL if no custom URL is provided
+    let finalTargetUrl = formData.targetUrl.trim();
+    if (!finalTargetUrl && selectedTargetPlatform) {
+      const platformUrls: Record<string, string> = {
+        'lovable': 'https://lovable.dev',
+        'chatgpt': 'https://chat.openai.com',
+        'claude': 'https://claude.ai',
+        'gemini': 'https://gemini.google.com',
+        'perplexity': 'https://perplexity.ai',
+        'bolt': 'https://bolt.new',
+        'v0': 'https://v0.dev',
+        'replit': 'https://replit.com',
+        'generic-web': 'https://example.com'
+      };
+      finalTargetUrl = platformUrls[selectedTargetPlatform] || 'https://lovable.dev';
+    }
+
+    onSubmit({
+      ...formData,
+      targetUrl: finalTargetUrl
+    });
+    
     setFormData({
       name: '',
       targetUrl: '',
@@ -65,7 +98,10 @@ const BatchForm = ({ onSubmit, onCancel }: BatchFormProps) => {
       waitForIdle: true,
       maxRetries: 0
     });
+    setSelectedTargetPlatform('');
   };
+
+  const showTargetPlatformDropdown = !formData.targetUrl.trim();
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
@@ -85,16 +121,39 @@ const BatchForm = ({ onSubmit, onCancel }: BatchFormProps) => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="target-url" className="text-white">Target URL *</Label>
+              <Label htmlFor="target-url" className="text-white">Target URL</Label>
               <Input
                 id="target-url"
                 value={formData.targetUrl}
-                onChange={(e) => setFormData({...formData, targetUrl: e.target.value})}
-                placeholder="https://example.com"
+                onChange={(e) => {
+                  setFormData({...formData, targetUrl: e.target.value});
+                  if (e.target.value.trim()) {
+                    setSelectedTargetPlatform('');
+                  }
+                }}
+                placeholder="https://example.com (or leave empty to select platform)"
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl"
               />
             </div>
           </div>
+
+          {showTargetPlatformDropdown && (
+            <div className="space-y-2">
+              <Label htmlFor="target-platform" className="text-white">Target Platform</Label>
+              <Select value={selectedTargetPlatform} onValueChange={setSelectedTargetPlatform}>
+                <SelectTrigger className="bg-white/10 border-white/20 text-white rounded-xl">
+                  <SelectValue placeholder="Select a platform for new projects..." />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800/90 backdrop-blur-sm border-gray-700 rounded-xl">
+                  {platforms.map(platform => (
+                    <SelectItem key={platform.id} value={platform.id}>
+                      {platform.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">

@@ -1,3 +1,4 @@
+
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useToast } from "@/hooks/use-toast";
@@ -14,13 +15,15 @@ const BatchExtractor = () => {
     setBatchName,
     targetUrl,
     setTargetUrl,
+    selectedPlatform,
+    setSelectedPlatform,
     isProcessing,
     CHARACTER_LIMIT,
     characterCount,
     isOverLimit,
     handleExtract,
     getCharacterCountColor,
-    getEffectiveTargetUrl
+    getEffectiveTargetDisplay
   } = useBatchExtraction();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,6 +98,8 @@ const BatchExtractor = () => {
               setBatchName={setBatchName}
               targetUrl={targetUrl}
               setTargetUrl={setTargetUrl}
+              selectedPlatform={selectedPlatform}
+              setSelectedPlatform={setSelectedPlatform}
               isProcessing={isProcessing}
               CHARACTER_LIMIT={CHARACTER_LIMIT}
               characterCount={characterCount}
@@ -102,7 +107,7 @@ const BatchExtractor = () => {
               handleExtract={handleExtract}
               handleFileUpload={handleFileUpload}
               getCharacterCountColor={getCharacterCountColor}
-              getEffectiveTargetUrl={getEffectiveTargetUrl}
+              getEffectiveTargetDisplay={getEffectiveTargetDisplay}
             />
           </div>
         </SidebarInset>

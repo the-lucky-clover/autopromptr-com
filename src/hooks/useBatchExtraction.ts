@@ -3,11 +3,13 @@ import { useToast } from '@/hooks/use-toast';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
 import { Batch, TextPrompt } from '@/types/batch';
 import { useNavigate } from 'react-router-dom';
+import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 
 export const useBatchExtraction = () => {
   const [prompts, setPrompts] = useState('');
   const [batchName, setBatchName] = useState('');
   const [targetUrl, setTargetUrl] = useState('');
+  const [selectedPlatform, setSelectedPlatform] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const { setBatches, triggerBatchSync } = usePersistentBatches();
   const { toast } = useToast();
@@ -23,8 +25,40 @@ export const useBatchExtraction = () => {
     return 'text-white/70';
   };
 
+  const getPlatformUrl = (platformId: string): string => {
+    const platformUrls: Record<string, string> = {
+      'lovable': 'https://lovable.dev',
+      'chatgpt': 'https://chat.openai.com',
+      'claude': 'https://claude.ai',
+      'gemini': 'https://gemini.google.com',
+      'perplexity': 'https://perplexity.ai',
+      'bolt': 'https://bolt.new',
+      'v0': 'https://v0.dev',
+      'replit': 'https://replit.com',
+      'generic-web': 'https://example.com'
+    };
+    return platformUrls[platformId] || 'https://lovable.dev';
+  };
+
   const getEffectiveTargetUrl = () => {
-    return targetUrl.trim() || 'https://lovable.dev';
+    if (targetUrl.trim()) {
+      return targetUrl.trim();
+    }
+    if (selectedPlatform) {
+      return getPlatformUrl(selectedPlatform);
+    }
+    return 'https://lovable.dev';
+  };
+
+  const getEffectiveTargetDisplay = () => {
+    if (targetUrl.trim()) {
+      return targetUrl.trim();
+    }
+    if (selectedPlatform) {
+      const platformName = getPlatformName(selectedPlatform);
+      return `${platformName} (${getPlatformUrl(selectedPlatform)})`;
+    }
+    return 'Lovable (https://lovable.dev)';
   };
 
   const extractPrompts = (text: string): string[] => {
@@ -92,6 +126,16 @@ export const useBatchExtraction = () => {
       return;
     }
 
+    // Validate that either URL or platform is selected
+    if (!targetUrl.trim() && !selectedPlatform) {
+      toast({
+        title: "Missing target",
+        description: "Please enter a target URL or select a platform.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
@@ -148,13 +192,16 @@ export const useBatchExtraction = () => {
       setPrompts('');
       setBatchName('');
       setTargetUrl('');
+      setSelectedPlatform('');
 
       // Show success message and navigate
       const isLovableDefault = effectiveUrl === 'https://lovable.dev';
+      const platformName = selectedPlatform ? getPlatformName(selectedPlatform) : 'Lovable';
+      
       toast({
         title: "Batch created successfully!",
         description: isLovableDefault 
-          ? `Extracted ${textPrompts.length} prompts for new Lovable project. You'll be prompted to update the project URL after automation starts.`
+          ? `Extracted ${textPrompts.length} prompts for new ${platformName} project. You'll be prompted to update the project URL after automation starts.`
           : `Extracted ${textPrompts.length} prompts for "${batchName}". Navigating to dashboard...`,
       });
 
@@ -184,12 +231,15 @@ export const useBatchExtraction = () => {
     setBatchName,
     targetUrl,
     setTargetUrl,
+    selectedPlatform,
+    setSelectedPlatform,
     isProcessing,
     CHARACTER_LIMIT,
     characterCount,
     isOverLimit,
     handleExtract,
     getCharacterCountColor,
-    getEffectiveTargetUrl
+    getEffectiveTargetUrl,
+    getEffectiveTargetDisplay
   };
 };
