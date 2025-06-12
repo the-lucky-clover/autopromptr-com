@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, Upload, FileText, Download, AlertCircle } from "lucide-react";
+import { Zap, Upload, Download, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface BatchExtractorModuleProps {
@@ -138,9 +138,9 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl relative overflow-hidden">
       {/* BETA Banner */}
-      <div className="absolute top-0 right-0 w-20 h-20 overflow-hidden">
-        <div className="absolute top-3 right-[-20px] bg-orange-500/90 text-white text-xs font-mono font-bold px-8 py-1 transform rotate-45 shadow-lg">
-          B E T A
+      <div className="absolute top-0 right-0 w-32 h-20 overflow-hidden">
+        <div className="absolute top-3 right-[-32px] bg-orange-500/90 text-white text-xs font-mono font-bold px-12 py-1 transform rotate-45 shadow-lg">
+          beta
         </div>
       </div>
       
@@ -155,11 +155,7 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
       </CardHeader>
       <CardContent className={`space-y-4 ${isCompact ? 'space-y-2' : ''}`}>
         <div className="space-y-2">
-          <Label htmlFor="batch-name" className={`text-white ${isCompact ? 'text-xs' : 'text-sm'}`}>
-            Batch Name (Optional)
-          </Label>
           <Input
-            id="batch-name"
             value={batchName}
             onChange={(e) => setBatchName(e.target.value)}
             placeholder="Enter batch name..."
@@ -225,7 +221,7 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
         {!isCompact && (
           <div className="pt-2 border-t border-white/10">
             <p className="text-white/60 text-xs">
-              Supports: TXT, MD, HTML, CSV, PDF, DOCX • Max {CHARACTER_LIMIT.toLocaleString()} characters • Extracts up to 100 prompts
+              Max {CHARACTER_LIMIT.toLocaleString()} characters • Extracts up to 100 prompts
             </p>
           </div>
         )}

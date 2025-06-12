@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -78,12 +77,10 @@ const BatchForm = ({ onSubmit, onCancel }: BatchFormProps) => {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="batch-name" className="text-white">Batch Name *</Label>
               <Input
-                id="batch-name"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                placeholder="Enter batch name"
+                placeholder="Enter batch name..."
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl"
               />
             </div>

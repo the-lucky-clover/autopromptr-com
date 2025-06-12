@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Screenshots from "./pages/Screenshots";
+import BatchExtractor from "./pages/BatchExtractor";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import Blog from "./pages/Blog";
@@ -39,6 +40,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/dashboard/batch-extractor" 
+              element={
+                <ProtectedRoute>
+                  <BatchExtractor />
                 </ProtectedRoute>
               } 
             />

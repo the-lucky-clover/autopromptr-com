@@ -31,8 +31,26 @@ const RealTimeClock = () => {
   };
 
   const getTimezone = () => {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone.split('/')[1] || 
-           new Date().toLocaleTimeString('en-us', { timeZoneName: 'short' }).split(' ')[2];
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    
+    // Map common timezones to readable names
+    const timezoneMap: { [key: string]: string } = {
+      'America/New_York': 'Eastern',
+      'America/Chicago': 'Central', 
+      'America/Denver': 'Mountain',
+      'America/Los_Angeles': 'Pacific',
+      'America/Phoenix': 'Mountain',
+      'America/Anchorage': 'Alaska',
+      'Pacific/Honolulu': 'Hawaii',
+      'Europe/London': 'GMT',
+      'Europe/Paris': 'CET',
+      'Europe/Berlin': 'CET',
+      'Asia/Tokyo': 'JST',
+      'Asia/Shanghai': 'CST',
+      'Australia/Sydney': 'AEDT'
+    };
+    
+    return timezoneMap[timezone] || timezone.split('/')[1]?.replace('_', ' ') || 'Local';
   };
 
   return (

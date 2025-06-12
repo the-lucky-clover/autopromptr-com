@@ -4,7 +4,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -17,10 +16,13 @@ import {
   Camera, 
   Crown,
   Infinity,
+  Zap,
+  User,
   LucideIcon
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
+import BrandLogo from "@/components/BrandLogo";
 
 // Navigation items with proper typing
 const items: Array<{
@@ -32,6 +34,11 @@ const items: Array<{
     title: "Dashboard",
     url: "/dashboard",
     icon: Home,
+  },
+  {
+    title: "Batch Extractor",
+    url: "/dashboard/batch-extractor",
+    icon: Zap,
   },
   {
     title: "Screenshots",
@@ -65,17 +72,13 @@ export function AppSidebar() {
   return (
     <Sidebar className="bg-white/5 backdrop-blur-sm border-white/10">
       <SidebarHeader className="p-4 border-b border-white/10">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">PL</span>
-          </div>
-          <span className="text-white font-semibold">Prompt Lab</span>
+        <div className="flex justify-center">
+          <BrandLogo size="small" variant="horizontal" />
         </div>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-purple-200">Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
@@ -101,10 +104,6 @@ export function AppSidebar() {
 
         {isSysOp && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-purple-200 flex items-center space-x-1">
-              <Infinity className="h-3 w-3 text-yellow-400" />
-              <span>SysOp Access</span>
-            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {adminItems.map((item) => {
@@ -119,6 +118,7 @@ export function AppSidebar() {
                         <Link to={item.url}>
                           <IconComponent className="h-4 w-4 text-yellow-400" />
                           <span>{item.title}</span>
+                          <Infinity className="h-3 w-3 text-yellow-400 ml-auto" />
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -131,9 +131,10 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-white/10">
-        <div className="text-xs text-purple-300">
-          Prompt Engineering Lab v2.0
-        </div>
+        <SidebarMenuButton className="text-white hover:bg-white/10 justify-start">
+          <User className="h-4 w-4" />
+          <span>Profile</span>
+        </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>
   );
