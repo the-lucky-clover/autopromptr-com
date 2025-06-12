@@ -92,8 +92,21 @@ const DashboardBatchList = ({
                 
                 {/* Control Buttons */}
                 <div className="flex items-center justify-between sm:justify-end gap-2">
-                  {/* Play Controls */}
+                  {/* Play Controls - Reordered with Rewind first */}
                   <div className="flex items-center space-x-1 bg-white/10 rounded-lg p-1">
+                    {/* Rewind Button - Show for completed, failed, stopped, and paused batches */}
+                    {(['paused', 'completed', 'failed', 'stopped'].includes(batch.status)) && onRewind && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onRewind(batch)}
+                        className="text-purple-400 hover:text-purple-300 hover:bg-purple-400/20 h-8 w-8 p-0"
+                        title="Rewind"
+                      >
+                        <Rewind className="w-4 h-4" />
+                      </Button>
+                    )}
+
                     {/* Play Button - Show for pending and paused batches */}
                     {(batch.status === 'pending' || batch.status === 'paused') && (
                       <Button
@@ -135,19 +148,6 @@ const DashboardBatchList = ({
                         title="Stop"
                       >
                         <Square className="w-4 h-4" />
-                      </Button>
-                    )}
-
-                    {/* Rewind Button - Show for completed, failed, stopped, and paused batches */}
-                    {(['paused', 'completed', 'failed', 'stopped'].includes(batch.status)) && onRewind && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onRewind(batch)}
-                        className="text-purple-400 hover:text-purple-300 hover:bg-purple-400/20 h-8 w-8 p-0"
-                        title="Rewind"
-                      >
-                        <Rewind className="w-4 h-4" />
                       </Button>
                     )}
                   </div>

@@ -5,9 +5,8 @@ import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
 import BatchModal from './BatchModal';
 import DashboardBatchList from './DashboardBatchList';
 import DashboardEmptyState from './DashboardEmptyState';
-import DashboardBatchHeader from './DashboardBatchHeader';
 import { Button } from './ui/button';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Plus } from 'lucide-react';
 
 interface DashboardBatchManagerProps {
   onStatsUpdate?: (stats: {
@@ -95,7 +94,14 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
         ) : (
           <>
             <div className="flex items-center justify-between">
-              <DashboardBatchHeader onNewBatch={handleNewBatch} />
+              <Button 
+                onClick={handleNewBatch}
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Batch
+              </Button>
               
               {stuckBatchCount > 0 && (
                 <Button
