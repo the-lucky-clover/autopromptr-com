@@ -1,3 +1,4 @@
+
 import { AutoPromtrError } from './errors';
 import { API_BASE_URL, SUPABASE_URL } from './config';
 
@@ -148,19 +149,27 @@ export class AutoPromptr {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes for batch
         
+        // Fix the payload structure to match backend expectations
+        const firstPrompt = batch.prompts?.[0]?.text || batch.prompt || '';
+        
+        if (!firstPrompt) {
+          throw new Error('No prompt found in batch - batch must have either prompt or prompts[0].text');
+        }
+        
         const requestBody = {
           batch: {
             id: batch.id,
             name: batch.name,
             targetUrl: batch.targetUrl,
-            prompts: batch.prompts || []
+            prompt: firstPrompt // Backend expects 'prompt' (singular), not 'prompts'
           },
           platform: platform,
           wait_for_idle: options.waitForIdle ?? true,
           max_retries: options.maxRetries ?? 3
         };
         
-        console.log('Sending enhanced batch request:', requestBody);
+        console.log('🔧 Fixed batch request payload:', requestBody);
+        console.log('📝 Sending prompt:', firstPrompt.substring(0, 100) + '...');
         
         const response = await fetch(`${this.apiBaseUrl}${endpoint}`, {
           method: 'POST',
@@ -176,12 +185,22 @@ export class AutoPromptr {
         
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Enhanced backend error response:', response.status, errorText);
-          throw new Error(`Enhanced backend error: ${response.status}`);
+          console.error('❌ Enhanced backend error response:', response.status, errorText);
+          
+          // Better error handling based on status code
+          if (response.status === 404) {
+            throw new Error('Backend endpoint not found - please check backend deployment');
+          } else if (response.status === 400) {
+            throw new Error(`Bad request: ${errorText}`);
+          } else if (response.status >= 500) {
+            throw new Error(`Server error (${response.status}): Backend may be down`);
+          }
+          
+          throw new Error(`Enhanced backend error: ${response.status} - ${errorText}`);
         }
         
         const result = await response.json();
-        console.log('✅ Enhanced batch processed successfully');
+        console.log('✅ Enhanced batch processed successfully:', result);
         
         return {
           batchId: batch.id,
@@ -193,9 +212,27 @@ export class AutoPromptr {
         
       } catch (err) {
         console.error('❌ Enhanced batch processing failed:', err);
+        
+        // Enhanced error categorization
+        let errorMessage = err.message || 'Unknown error';
+        let errorCode = 'ENHANCED_BATCH_FAILED';
+        
+        if (errorMessage.includes('fetch')) {
+          errorCode = 'NETWORK_ERROR';
+          errorMessage = 'Failed to connect to backend - check internet connection';
+        } else if (errorMessage.includes('timeout') || errorMessage.includes('AbortError')) {
+          errorCode = 'REQUEST_TIMEOUT';
+          errorMessage = 'Request timed out - backend may be overloaded';
+        } else if (errorMessage.includes('404')) {
+          errorCode = 'ENDPOINT_NOT_FOUND';
+          errorMessage = 'Backend endpoint not found - check deployment';
+        } else if (errorMessage.includes('Bad request')) {
+          errorCode = 'INVALID_REQUEST';
+        }
+        
         throw new AutoPromtrError(
-          `Enhanced batch processing failed: ${err.message}`,
-          'ENHANCED_BATCH_FAILED',
+          errorMessage,
+          errorCode,
           500,
           true
         );
