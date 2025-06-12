@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap } from "lucide-react";
@@ -42,9 +43,18 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center group">
             <div className="flex items-center space-x-2">
-              {/* Unified gradient container for both icon and text */}
-              <div 
-                className="flex items-center space-x-2"
+              {/* Separate Zap icon with SVG gradient */}
+              <Zap 
+                className="w-8 h-8" 
+                strokeWidth={1.5}
+                style={{
+                  stroke: 'url(#navbarGradient)',
+                  filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
+                }}
+              />
+              {/* Text with CSS gradient */}
+              <span 
+                className="text-2xl font-bold"
                 style={{
                   background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
                   backgroundSize: '300% 300%',
@@ -55,17 +65,46 @@ const Navbar = () => {
                   filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
                 }}
               >
-                <Zap 
-                  className="w-8 h-8" 
-                  strokeWidth={1.5}
-                  style={{
-                    stroke: 'currentColor'
-                  }}
-                />
-                <span className="text-2xl font-bold">
-                  AutoPromptr
-                </span>
-              </div>
+                AutoPromptr
+              </span>
+              
+              {/* SVG gradient definition for Zap icon */}
+              <svg width="0" height="0" className="absolute">
+                <defs>
+                  <linearGradient id="navbarGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#3B82F6">
+                      <animate attributeName="stop-color" 
+                        values="#3B82F6;#8B5CF6;#EC4899;#8B5CF6;#3B82F6" 
+                        dur="6s" 
+                        repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="25%" stopColor="#8B5CF6">
+                      <animate attributeName="stop-color" 
+                        values="#8B5CF6;#EC4899;#8B5CF6;#3B82F6;#8B5CF6" 
+                        dur="6s" 
+                        repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="50%" stopColor="#EC4899">
+                      <animate attributeName="stop-color" 
+                        values="#EC4899;#8B5CF6;#3B82F6;#8B5CF6;#EC4899" 
+                        dur="6s" 
+                        repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="75%" stopColor="#8B5CF6">
+                      <animate attributeName="stop-color" 
+                        values="#8B5CF6;#3B82F6;#8B5CF6;#EC4899;#8B5CF6" 
+                        dur="6s" 
+                        repeatCount="indefinite" />
+                    </stop>
+                    <stop offset="100%" stopColor="#3B82F6">
+                      <animate attributeName="stop-color" 
+                        values="#3B82F6;#8B5CF6;#EC4899;#8B5CF6;#3B82F6" 
+                        dur="6s" 
+                        repeatCount="indefinite" />
+                    </stop>
+                  </linearGradient>
+                </defs>
+              </svg>
             </div>
           </Link>
           
