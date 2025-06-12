@@ -1,4 +1,6 @@
 
+import { TestingService } from './testingService';
+
 export interface HealthMetrics {
   status: 'healthy' | 'degraded' | 'unhealthy';
   responseTime: number;
@@ -15,19 +17,25 @@ export interface HealthMetrics {
     total: number;
     percentage: number;
   };
+  connectivity?: {
+    isConnected: boolean;
+    lastError?: string;
+  };
 }
 
 export class HealthDataService {
   private baseUrl: string;
   private lastFetch: number = 0;
   private cachedData: HealthMetrics | null = null;
-  private readonly CACHE_DURATION = 300000; // Increased to 5 minutes cache
+  private readonly CACHE_DURATION = 30000; // Reduced to 30 seconds for more accurate reporting
   private circuitBreakerOpen: boolean = false;
   private failureCount: number = 0;
   private readonly MAX_FAILURES = 3;
+  private testingService: TestingService;
   
   constructor(baseUrl = 'https://autopromptr-backend.onrender.com') {
     this.baseUrl = baseUrl;
+    this.testingService = new TestingService(baseUrl);
   }
 
   async fetchHealthData(): Promise<HealthMetrics> {
@@ -44,7 +52,10 @@ export class HealthDataService {
         status: 'healthy',
         responseTime: 0,
         uptime: 'Ready',
-        timestamp: new Date()
+        timestamp: new Date(),
+        connectivity: {
+          isConnected: true
+        }
       };
       
       this.cachedData = healthData;
@@ -54,13 +65,17 @@ export class HealthDataService {
 
     // Circuit breaker pattern - don't make requests if too many failures
     if (this.circuitBreakerOpen) {
-      console.log('Health service circuit breaker is open - using cached data');
+      console.log('Health service circuit breaker is open - using degraded status');
       
       const fallbackData: HealthMetrics = {
-        status: 'degraded',
+        status: 'unhealthy',
         responseTime: 0,
         uptime: 'Service Offline',
-        timestamp: new Date()
+        timestamp: new Date(),
+        connectivity: {
+          isConnected: false,
+          lastError: 'Circuit breaker active'
+        }
       };
       
       this.cachedData = fallbackData;
@@ -68,34 +83,37 @@ export class HealthDataService {
       return fallbackData;
     }
 
-    const startTime = Date.now();
-    
+    // Run actual health check using testing service
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000); // Increased timeout
-      
-      // Simplified HEAD request to avoid complex CORS issues
-      const response = await fetch(`${this.baseUrl}/`, {
-        method: 'HEAD',
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      const responseTime = Date.now() - startTime;
-      
-      const healthData: HealthMetrics = {
-        status: this.determineStatus(response, responseTime),
-        responseTime,
-        uptime: 'Available',
-        timestamp: new Date()
-      };
+      const quickCheck = await this.testingService.runQuickHealthCheck();
       
       // Reset failure count on success
-      this.failureCount = 0;
-      if (this.circuitBreakerOpen) {
-        this.circuitBreakerOpen = false;
-        console.log('Health service circuit breaker reset');
+      if (quickCheck.isHealthy) {
+        this.failureCount = 0;
+        if (this.circuitBreakerOpen) {
+          this.circuitBreakerOpen = false;
+          console.log('Health service circuit breaker reset');
+        }
+      } else {
+        this.failureCount++;
+        
+        // Open circuit breaker if too many failures
+        if (this.failureCount >= this.MAX_FAILURES) {
+          this.circuitBreakerOpen = true;
+          console.log('Health service circuit breaker opened due to repeated failures');
+        }
       }
+      
+      const healthData: HealthMetrics = {
+        status: this.determineStatus(quickCheck.isHealthy, quickCheck.responseTime),
+        responseTime: quickCheck.responseTime,
+        uptime: quickCheck.isHealthy ? 'Available' : 'Unavailable',
+        timestamp: new Date(),
+        connectivity: {
+          isConnected: quickCheck.isHealthy,
+          lastError: quickCheck.error
+        }
+      };
       
       // Cache the result
       this.cachedData = healthData;
@@ -104,8 +122,6 @@ export class HealthDataService {
       return healthData;
       
     } catch (err) {
-      const responseTime = Date.now() - startTime;
-      
       // Increment failure count
       this.failureCount++;
       
@@ -115,12 +131,16 @@ export class HealthDataService {
         console.log('Health service circuit breaker opened due to repeated failures');
       }
       
-      // Always assume healthy for CORS/network errors to reduce console spam
+      // Return accurate unhealthy status for actual failures
       const healthData: HealthMetrics = {
-        status: 'healthy',
-        responseTime,
-        uptime: 'Ready',
-        timestamp: new Date()
+        status: 'unhealthy',
+        responseTime: 0,
+        uptime: 'Connection Failed',
+        timestamp: new Date(),
+        connectivity: {
+          isConnected: false,
+          lastError: err instanceof Error ? err.message : 'Unknown error'
+        }
       };
       
       this.cachedData = healthData;
@@ -129,13 +149,30 @@ export class HealthDataService {
     }
   }
 
-  private determineStatus(response: Response, responseTime: number): 'healthy' | 'degraded' | 'unhealthy' {
-    // Be more optimistic about status
-    if (responseTime > 10000) return 'degraded';
-    if (responseTime > 5000) return 'degraded';
+  private determineStatus(isHealthy: boolean, responseTime: number): 'healthy' | 'degraded' | 'unhealthy' {
+    if (!isHealthy) return 'unhealthy';
     
-    // Any response means healthy
+    if (responseTime > 5000) return 'degraded';
+    if (responseTime > 3000) return 'degraded';
+    
     return 'healthy';
+  }
+
+  // Method to get real connectivity status
+  async getConnectivityStatus(): Promise<{
+    isConnected: boolean;
+    responseTime: number;
+    error?: string;
+  }> {
+    try {
+      return await this.testingService.runQuickHealthCheck();
+    } catch (error) {
+      return {
+        isConnected: false,
+        responseTime: 0,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
   }
 
   // Method to manually reset circuit breaker
@@ -152,5 +189,11 @@ export class HealthDataService {
       failureCount: this.failureCount,
       maxFailures: this.MAX_FAILURES
     };
+  }
+
+  // Clear cache to force fresh data
+  clearCache() {
+    this.cachedData = null;
+    this.lastFetch = 0;
   }
 }
