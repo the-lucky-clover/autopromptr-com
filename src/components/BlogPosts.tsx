@@ -15,19 +15,15 @@ interface BlogPost {
 }
 
 const BlogPosts = () => {
-  console.log("BlogPosts component rendering...");
-  
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("BlogPosts useEffect triggered");
     fetchBlogPosts();
   }, []);
 
   const fetchBlogPosts = async () => {
     try {
-      console.log("Fetching blog posts...");
       const { data, error } = await supabase
         .from('blog_posts')
         .select('id, title, slug, excerpt, published_at')
@@ -36,14 +32,13 @@ const BlogPosts = () => {
         .limit(3);
 
       if (error) {
-        console.error('Error fetching blog posts:', error);
+        console.warn('Blog posts could not be loaded:', error.message);
         return;
       }
 
-      console.log('Blog posts fetched successfully:', data);
       setPosts(data || []);
     } catch (error) {
-      console.error('Error in fetchBlogPosts:', error);
+      console.warn('Blog posts fetch failed:', error instanceof Error ? error.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -64,7 +59,6 @@ const BlogPosts = () => {
   };
 
   if (loading) {
-    console.log("BlogPosts showing loading state");
     return (
       <section className="py-16 relative bg-gradient-to-b from-slate-900 to-blue-900">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 blur-3xl"></div>
@@ -86,8 +80,6 @@ const BlogPosts = () => {
       </section>
     );
   }
-
-  console.log("BlogPosts rendering main content with", posts.length, "posts");
 
   return (
     <section className="py-16 relative bg-gradient-to-b from-blue-900 to-purple-900">

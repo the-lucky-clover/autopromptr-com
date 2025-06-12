@@ -9,7 +9,7 @@
     <meta name="description" content="Automate your AI workflows with smart prompts. Create, manage, and deploy intelligent AI prompts that scale with your business." />
     <meta name="author" content="AutoPromptr" />
 
-    <!-- Updated Permissions Policy to use recognized features only -->
+    <!-- Updated Permissions Policy with recognized features only -->
     <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
 
     <!-- Open Graph -->
@@ -23,8 +23,18 @@
     <meta name="twitter:site" content="@autopromptr" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
-    <!-- Simplified Content Security Policy without frame-ancestors in meta tag -->
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <!-- Enhanced Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self'; 
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://lovable.dev; 
+      style-src 'self' 'unsafe-inline'; 
+      img-src 'self' data: https:; 
+      font-src 'self' data:; 
+      connect-src 'self' https: wss:; 
+      frame-src 'self'; 
+      frame-ancestors 'none';
+      upgrade-insecure-requests
+    ">
   </head>
 
   <body>

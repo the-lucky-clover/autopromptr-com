@@ -4,8 +4,6 @@ import { ArrowRight, Zap } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Hero = () => {
-  console.log("Hero component rendering...");
-  
   const { user, isEmailVerified } = useAuth();
 
   const handleGetStarted = () => {
@@ -63,8 +61,10 @@ const Hero = () => {
                 src="https://images.unsplash.com/photo-1677696795198-5ac0e21060ed" 
                 alt="AI-powered coding and automation workspace" 
                 className="mx-auto rounded-2xl shadow-2xl max-w-full h-auto"
-                onLoad={() => console.log("Hero image loaded successfully")}
-                onError={() => console.error("Hero image failed to load")}
+                onError={(e) => {
+                  console.warn('Hero image failed to load, using fallback');
+                  e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgdmlld0JveD0iMCAwIDgwMCA0NTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDUwIiBmaWxsPSIjMUUyOTNDIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjI1IiBmaWxsPSIjNjM2NjZBIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiPkFJIFdvcmtmbG93IERhc2hib2FyZDwvdGV4dD4KPC9zdmc+';
+                }}
               />
             </div>
           </div>
