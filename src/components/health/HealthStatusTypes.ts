@@ -21,11 +21,18 @@ export interface CircuitBreakerState {
   lastFailure: number;
 }
 
-// Updated to match the TestSuite from testingService.ts
-export interface TestResult {
+// This should match the TestSuite from testingService.ts
+export interface TestSuite {
   name: string;
-  tests: Array<{ status: 'passed' | 'failed' | 'skipped' | 'partial' }>;
-  overallStatus: 'healthy' | 'degraded' | 'unhealthy';
+  tests: Array<{
+    name: string;
+    status: 'passed' | 'failed' | 'skipped' | 'partial';
+    duration: number;
+    error?: string;
+    details?: any;
+  }>;
+  overallStatus: 'passed' | 'failed' | 'partial';
+  totalDuration: number;
   passRate: number;
 }
 
