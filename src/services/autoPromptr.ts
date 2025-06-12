@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 // Configuration - Use your working AutoPromptr backend
@@ -147,7 +146,7 @@ export class AutoPromptr {
         
         console.log('Sending prompt request:', requestBody);
         
-        const response = await fetch(`${this.apiBaseUrl}/api/run-puppeteer`, {
+        const response = await fetch(`${this.apiBaseUrl}/run-puppeteer`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -122,8 +122,8 @@ export class ConnectionDiagnostics {
       };
     }
 
-    // Test only one essential endpoint to reduce load
-    const endpoints = ['/api/run-puppeteer'];
+    // Test only one essential endpoint to reduce load - updated to correct path
+    const endpoints = ['/run-puppeteer'];
     const endpointResults: ConnectionTestResult[] = [];
     
     console.log('Running optimized connection tests...');
