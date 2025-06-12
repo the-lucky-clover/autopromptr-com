@@ -7,13 +7,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useScreenshots } from '@/hooks/useScreenshots';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Loader2 } from 'lucide-react';
+import { Camera, Loader2, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const ScreenshotCapture = () => {
   const [url, setUrl] = useState('');
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState(() => `session-${Date.now()}`);
+  const [corsError, setCorsError] = useState(false);
   const { saveScreenshot } = useScreenshots();
   const { toast } = useToast();
 
@@ -28,6 +30,8 @@ const ScreenshotCapture = () => {
     }
 
     setLoading(true);
+    setCorsError(false);
+    
     try {
       // Call your Puppeteer backend
       const response = await fetch('https://puppeteer-backend-da0o.onrender.com/api/run-puppeteer', {
@@ -72,11 +76,23 @@ const ScreenshotCapture = () => {
       }
     } catch (error) {
       console.error('Error capturing screenshot:', error);
-      toast({
-        title: "Capture failed",
-        description: "Failed to capture screenshot. Please try again.",
-        variant: "destructive",
-      });
+      
+      // Check if it's a CORS error
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('CORS') || errorMessage.includes('fetch')) {
+        setCorsError(true);
+        toast({
+          title: "CORS Configuration Required",
+          description: "The backend needs to be configured to allow requests from this domain.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Capture failed",
+          description: "Failed to capture screenshot. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -91,6 +107,19 @@ const ScreenshotCapture = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {corsError && (
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              <strong>CORS Configuration Required:</strong> The Puppeteer backend needs to allow requests from this domain. 
+              Add the following header to your backend:
+              <code className="block mt-2 p-2 bg-gray-100 rounded text-sm">
+                Access-Control-Allow-Origin: https://1fec766e-41d8-4e0e-9e5c-277ce2efbe11.lovableproject.com
+              </code>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="space-y-2">
           <Label htmlFor="session-id">Session ID</Label>
           <Input
