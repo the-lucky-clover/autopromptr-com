@@ -32,7 +32,7 @@ const ModuleRestorePanel = ({
             <Button
               key={module.id}
               onClick={() => onRestoreModule(module.id)}
-              className="bg-white/10 hover:bg-white/20 text-white border-white/20 rounded-lg h-auto p-3 flex flex-col items-center space-y-1"
+              className="bg-white/10 hover:bg-white/20 text-white border-white/20 rounded-xl h-auto p-3 flex flex-col items-center space-y-1"
               variant="outline"
             >
               <Plus className="w-4 h-4" />
@@ -44,7 +44,7 @@ const ModuleRestorePanel = ({
         <div className="pt-2 border-t border-white/10">
           <Button
             onClick={onResetLayout}
-            className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+            className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
             size="sm"
           >
             <RotateCcw className="w-4 h-4 mr-2" />

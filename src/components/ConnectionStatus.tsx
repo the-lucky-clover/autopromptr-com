@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Wifi, WifiOff, Loader2 } from 'lucide-react';
 import { EnhancedAutoPromptr } from '@/services/enhancedAutoPromptr';
+import RealTimeClock from './RealTimeClock';
 
 export const ConnectionStatus = () => {
   const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
@@ -58,13 +59,9 @@ export const ConnectionStatus = () => {
   };
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-4">
+      <RealTimeClock />
       {getStatusBadge()}
-      {lastChecked && (
-        <span className="text-xs text-purple-300">
-          {lastChecked.toLocaleTimeString()}
-        </span>
-      )}
     </div>
   );
 };

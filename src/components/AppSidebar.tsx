@@ -13,37 +13,52 @@ import {
 import { Home, Settings, LogOut, UserCog, Upload, Package } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import BrandLogo from "@/components/BrandLogo";
 
-const menuItems = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: Home,
-  },
-  {
-    title: "Batches",
-    url: "/dashboard/batches",
-    icon: Package,
-  },
-  {
-    title: "Upload/Import",
-    url: "/dashboard/upload",
-    icon: Upload,
-  },
-  {
-    title: "Settings",
-    url: "/dashboard/settings",
-    icon: Settings,
-  },
-];
-
-export function AppSidebar() {
+const AppSidebar = () => {
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { isSysOp } = useUserRole();
+
+  const baseMenuItems = [
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: Home,
+    },
+    {
+      title: "Batches",
+      url: "/dashboard/batches",
+      icon: Package,
+    },
+    {
+      title: "Upload/Import",
+      url: "/dashboard/upload",
+      icon: Upload,
+    },
+    {
+      title: "Settings",
+      url: "/dashboard/settings",
+      icon: Settings,
+    },
+  ];
+
+  // Add Admin menu for SysOp users
+  const menuItems = isSysOp 
+    ? [
+        ...baseMenuItems.slice(0, -1), // Insert before Settings
+        {
+          title: "Admin",
+          url: "/dashboard/admin",
+          icon: () => <span className="w-4 h-4 text-red-400 font-bold">∞</span>,
+        },
+        baseMenuItems[baseMenuItems.length - 1], // Settings at the end
+      ]
+    : baseMenuItems;
 
   const handleSignOut = async () => {
     await signOut();
@@ -75,7 +90,7 @@ export function AppSidebar() {
                     className="hover:bg-gray-800 data-[active=true]:bg-blue-600 data-[active=true]:text-white text-gray-300 rounded-xl"
                   >
                     <Link to={item.url}>
-                      <item.icon className="w-4 h-4" />
+                      {typeof item.icon === 'function' ? <item.icon /> : <item.icon className="w-4 h-4" />}
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -104,7 +119,9 @@ export function AppSidebar() {
                     <p className="text-sm font-medium text-gray-200 truncate">
                       {user?.email || 'user@example.com'}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">Online</p>
+                    <p className="text-xs text-gray-400 truncate">
+                      {isSysOp ? 'SysOp' : 'Online'}
+                    </p>
                   </div>
                 </div>
               </Button>
@@ -141,4 +158,6 @@ export function AppSidebar() {
       </SidebarFooter>
     </Sidebar>
   );
-}
+};
+
+export { AppSidebar };

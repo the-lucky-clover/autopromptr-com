@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, TrendingUp, Calendar } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
 interface AnalyticsModuleProps {
   isCompact?: boolean;
@@ -10,7 +10,9 @@ interface AnalyticsModuleProps {
 
 const AnalyticsModule = ({ isCompact = false }: AnalyticsModuleProps) => {
   const [chartData, setChartData] = useState<any[]>([]);
+  const [pieData, setPieData] = useState<any[]>([]);
   const [timeframe, setTimeframe] = useState<'7d' | '30d' | '90d'>('7d');
+  const [chartType, setChartType] = useState<'line' | 'pie'>('line');
 
   // Generate sample data
   useEffect(() => {
@@ -33,6 +35,15 @@ const AnalyticsModule = ({ isCompact = false }: AnalyticsModuleProps) => {
       }
       
       setChartData(data);
+
+      // Generate pie chart data for batch statuses
+      const totalBatches = data.reduce((sum, item) => sum + item.batchesCreated, 0);
+      setPieData([
+        { name: 'Completed', value: Math.floor(totalBatches * 0.7), color: '#10B981' },
+        { name: 'Running', value: Math.floor(totalBatches * 0.2), color: '#F59E0B' },
+        { name: 'Failed', value: Math.floor(totalBatches * 0.05), color: '#EF4444' },
+        { name: 'Pending', value: Math.floor(totalBatches * 0.05), color: '#6B7280' },
+      ]);
     };
 
     generateData();
@@ -110,19 +121,43 @@ const AnalyticsModule = ({ isCompact = false }: AnalyticsModuleProps) => {
             <span>Analytics Overview</span>
           </CardTitle>
           <div className="flex space-x-2">
-            {['7d', '30d', '90d'].map((period) => (
+            <div className="flex space-x-1">
               <button
-                key={period}
-                onClick={() => setTimeframe(period as '7d' | '30d' | '90d')}
+                onClick={() => setChartType('line')}
                 className={`px-3 py-1 text-sm rounded-lg transition-colors ${
-                  timeframe === period
+                  chartType === 'line'
                     ? 'bg-purple-600 text-white'
                     : 'bg-white/10 text-white/60 hover:bg-white/20'
                 }`}
               >
-                {period}
+                Line
               </button>
-            ))}
+              <button
+                onClick={() => setChartType('pie')}
+                className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                  chartType === 'pie'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white/10 text-white/60 hover:bg-white/20'
+                }`}
+              >
+                Pie
+              </button>
+            </div>
+            <div className="flex space-x-1">
+              {['7d', '30d', '90d'].map((period) => (
+                <button
+                  key={period}
+                  onClick={() => setTimeframe(period as '7d' | '30d' | '90d')}
+                  className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                    timeframe === period
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white/10 text-white/60 hover:bg-white/20'
+                  }`}
+                >
+                  {period}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -146,42 +181,67 @@ const AnalyticsModule = ({ isCompact = false }: AnalyticsModuleProps) => {
         {/* Chart */}
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis 
-                dataKey="date" 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-              />
-              <YAxis 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'rgba(0,0,0,0.8)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  borderRadius: '8px',
-                  color: 'white'
-                }}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="batchesCreated" 
-                stroke="#3B82F6" 
-                strokeWidth={3}
-                name="Batches Created"
-              />
-              <Line 
-                type="monotone" 
-                dataKey="promptsProcessed" 
-                stroke="#10B981" 
-                strokeWidth={3}
-                name="Prompts Processed"
-              />
-            </LineChart>
+            {chartType === 'line' ? (
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+                />
+                <YAxis 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '8px',
+                    color: 'white'
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="batchesCreated" 
+                  stroke="#3B82F6" 
+                  strokeWidth={3}
+                  name="Batches Created"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="promptsProcessed" 
+                  stroke="#10B981" 
+                  strokeWidth={3}
+                  name="Prompts Processed"
+                />
+              </LineChart>
+            ) : (
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '8px',
+                    color: 'white'
+                  }}
+                />
+              </PieChart>
+            )}
           </ResponsiveContainer>
         </div>
 
