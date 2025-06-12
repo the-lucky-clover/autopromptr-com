@@ -20,11 +20,12 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { ConnectionStatus } from "@/components/ConnectionStatus";
 import DashboardBatchManager from "@/components/DashboardBatchManager";
 import DashboardStatsModule from "@/components/DashboardStatsModule";
-import DashboardQuickActions from "@/components/DashboardQuickActions";
 import DashboardSubscription from "@/components/DashboardSubscription";
 import SystemLogsPanel from "@/components/SystemLogsPanel";
 import HealthStatusDashboard from "@/components/HealthStatusDashboard";
 import SystemReliabilityScore from "@/components/SystemReliabilityScore";
+import BatchExtractorModule from "@/components/BatchExtractorModule";
+import AnalyticsModule from "@/components/AnalyticsModule";
 import DashboardModuleWrapper from "@/components/DashboardModuleWrapper";
 import ModuleRestorePanel from "@/components/ModuleRestorePanel";
 import DashboardEmptyModuleState from "@/components/DashboardEmptyModuleState";
@@ -83,9 +84,6 @@ const Dashboard = () => {
       case 'SystemLogsPanel':
         return <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} isCompact={isMinimized} />;
       
-      case 'DashboardQuickActions':
-        return <DashboardQuickActions isCompact={isMinimized} />;
-      
       case 'DashboardSubscription':
         return <DashboardSubscription isCompact={isMinimized} />;
       
@@ -94,6 +92,12 @@ const Dashboard = () => {
 
       case 'SystemReliabilityScore':
         return <SystemReliabilityScore isCompact={isMinimized} />;
+
+      case 'BatchExtractorModule':
+        return <BatchExtractorModule isCompact={isMinimized} />;
+
+      case 'AnalyticsModule':
+        return <AnalyticsModule isCompact={isMinimized} />;
       
       default:
         return <div>Module content not found</div>;
@@ -162,7 +166,7 @@ const Dashboard = () => {
               <SidebarTrigger className="text-white hover:text-purple-200 rounded-xl flex-shrink-0" />
               <div className="min-w-0">
                 <h1 className="text-xl lg:text-2xl font-semibold text-white truncate">Prompt Engineering Lab</h1>
-                <p className="text-purple-200 text-sm lg:text-base mt-1">Drag & drop modules • Minimize • Customize layout</p>
+                <p className="text-purple-200 text-sm lg:text-base mt-1">Transform ideas into reality with AI-powered automation</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">

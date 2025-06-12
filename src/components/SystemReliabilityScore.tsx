@@ -74,10 +74,28 @@ const SystemReliabilityScore = ({ className = '', isCompact = false }: SystemRel
           <div className="relative w-24 h-12">
             <svg viewBox="0 0 100 50" className="w-full h-full">
               {/* Background Arc */}
+              <defs>
+                <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.05)" />
+                  <stop offset="100%" stopColor="rgba(255,255,255,0.15)" />
+                </linearGradient>
+                <linearGradient id="score-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor={score >= 90 ? '#10B981' : score >= 75 ? '#F59E0B' : '#EF4444'} />
+                  <stop offset="100%" stopColor={score >= 90 ? '#059669' : score >= 75 ? '#D97706' : '#DC2626'} />
+                </linearGradient>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                  <feMerge> 
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              
               <path
                 d="M 10 40 A 40 40 0 0 1 90 40"
                 fill="none"
-                stroke="rgba(255,255,255,0.1)"
+                stroke="url(#bg-gradient)"
                 strokeWidth="4"
                 strokeLinecap="round"
               />
@@ -86,29 +104,31 @@ const SystemReliabilityScore = ({ className = '', isCompact = false }: SystemRel
               <path
                 d="M 10 40 A 40 40 0 0 1 90 40"
                 fill="none"
-                stroke={score >= 90 ? '#10B981' : score >= 75 ? '#F59E0B' : '#EF4444'}
+                stroke="url(#score-gradient)"
                 strokeWidth="4"
                 strokeLinecap="round"
                 strokeDasharray={`${(score / 100) * 125.6} 125.6`}
                 className="transition-all duration-1000 ease-out"
+                filter="url(#glow)"
               />
               
-              {/* Needle */}
+              {/* Needle with gradient */}
               <line
                 x1="50"
                 y1="40"
                 x2="50"
                 y2="20"
-                stroke="white"
+                stroke="url(#score-gradient)"
                 strokeWidth="2"
                 strokeLinecap="round"
                 transform={`rotate(${needleAngle - 90} 50 40)`}
                 className="transition-transform duration-1000 ease-out"
                 style={{ transformOrigin: '50px 40px' }}
+                filter="url(#glow)"
               />
               
               {/* Center dot */}
-              <circle cx="50" cy="40" r="2" fill="white" />
+              <circle cx="50" cy="40" r="2" fill="white" filter="url(#glow)" />
             </svg>
           </div>
         </div>
@@ -139,7 +159,7 @@ const SystemReliabilityScore = ({ className = '', isCompact = false }: SystemRel
   }
 
   return (
-    <Card className={`${className} bg-white/10 backdrop-blur-sm border-white/20`}>
+    <Card className={`${className} bg-white/10 backdrop-blur-sm border-white/20 rounded-xl`}>
       <CardHeader className="pb-4">
         <CardTitle className="text-white flex items-center space-x-2">
           <Activity className="w-5 h-5 text-blue-400" />
@@ -156,11 +176,31 @@ const SystemReliabilityScore = ({ className = '', isCompact = false }: SystemRel
               className="w-full h-full"
               style={{ transform: 'rotate(0deg)' }}
             >
+              <defs>
+                <linearGradient id="bg-gradient-full" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.05)" />
+                  <stop offset="50%" stopColor="rgba(255,255,255,0.1)" />
+                  <stop offset="100%" stopColor="rgba(255,255,255,0.15)" />
+                </linearGradient>
+                <linearGradient id="score-gradient-full" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor={score >= 90 ? '#10B981' : score >= 75 ? '#F59E0B' : '#EF4444'} />
+                  <stop offset="50%" stopColor={score >= 90 ? '#059669' : score >= 75 ? '#D97706' : '#DC2626'} />
+                  <stop offset="100%" stopColor={score >= 90 ? '#047857' : score >= 75 ? '#B45309' : '#B91C1C'} />
+                </linearGradient>
+                <filter id="glow-full">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feMerge> 
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              
               {/* Background Arc */}
               <path
                 d="M 20 80 A 80 80 0 0 1 180 80"
                 fill="none"
-                stroke="rgba(255,255,255,0.1)"
+                stroke="url(#bg-gradient-full)"
                 strokeWidth="8"
                 strokeLinecap="round"
               />
@@ -169,11 +209,12 @@ const SystemReliabilityScore = ({ className = '', isCompact = false }: SystemRel
               <path
                 d="M 20 80 A 80 80 0 0 1 180 80"
                 fill="none"
-                stroke={score >= 90 ? '#10B981' : score >= 75 ? '#F59E0B' : '#EF4444'}
+                stroke="url(#score-gradient-full)"
                 strokeWidth="8"
                 strokeLinecap="round"
                 strokeDasharray={`${(score / 100) * 251.2} 251.2`}
                 className="transition-all duration-1000 ease-out"
+                filter="url(#glow-full)"
               />
               
               {/* Needle */}
@@ -182,12 +223,13 @@ const SystemReliabilityScore = ({ className = '', isCompact = false }: SystemRel
                 y1="80"
                 x2="100"
                 y2="30"
-                stroke="white"
+                stroke="url(#score-gradient-full)"
                 strokeWidth="3"
                 strokeLinecap="round"
                 transform={`rotate(${needleAngle - 90} 100 80)`}
                 className="transition-transform duration-1000 ease-out"
                 style={{ transformOrigin: '100px 80px' }}
+                filter="url(#glow-full)"
               />
               
               {/* Center dot */}
@@ -196,6 +238,7 @@ const SystemReliabilityScore = ({ className = '', isCompact = false }: SystemRel
                 cy="80"
                 r="4"
                 fill="white"
+                filter="url(#glow-full)"
               />
               
               {/* Scale markers */}

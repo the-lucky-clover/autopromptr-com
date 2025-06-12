@@ -1,3 +1,4 @@
+
 import {
   Sidebar,
   SidebarContent,
@@ -9,12 +10,13 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { Home, FileText, BarChart3, Settings, LogOut, UserCog, Zap, Upload, Package } from "lucide-react";
+import { Home, Settings, LogOut, UserCog, Upload, Package } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import BrandLogo from "@/components/BrandLogo";
 
 const menuItems = [
   {
@@ -28,19 +30,9 @@ const menuItems = [
     icon: Package,
   },
   {
-    title: "Batch Extractor",
-    url: "/dashboard/extractor",
-    icon: Zap,
-  },
-  {
     title: "Upload/Import",
     url: "/dashboard/upload",
     icon: Upload,
-  },
-  {
-    title: "Analytics",
-    url: "/dashboard/analytics",
-    icon: BarChart3,
   },
   {
     title: "Settings",
@@ -66,15 +58,8 @@ export function AppSidebar() {
   return (
     <Sidebar className="border-r border-gray-700 bg-gray-900">
       <SidebarHeader className="p-6 flex items-center justify-center">
-        <Link to="/" className="flex items-center space-x-1 group justify-center">
-          <div className="relative animate-shimmer">
-            <Zap className="w-8 h-8 text-blue-400 drop-shadow-lg" strokeWidth={2} style={{
-              filter: 'drop-shadow(0 0 8px rgba(96, 165, 250, 0.6))'
-            }} />
-          </div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent animate-shimmer-delayed">
-            AutoPromptr
-          </span>
+        <Link to="/" className="flex items-center justify-center">
+          <BrandLogo size="medium" variant="horizontal" />
         </Link>
       </SidebarHeader>
       
@@ -132,7 +117,7 @@ export function AppSidebar() {
               <div className="space-y-2 p-2">
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-gray-300 hover:bg-gray-800 rounded-lg"
+                  className="w-full justify-start text-gray-300 hover:bg-gray-800 rounded-xl"
                   onClick={() => {
                     // TODO: Navigate to profile page or open profile modal
                     console.log('Update profile clicked');
@@ -143,7 +128,7 @@ export function AppSidebar() {
                 </Button>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-red-400 hover:bg-red-400/20 hover:text-red-300 rounded-lg"
+                  className="w-full justify-start text-red-400 hover:bg-red-400/20 hover:text-red-300 rounded-xl"
                   onClick={handleSignOut}
                 >
                   <LogOut className="w-4 h-4 mr-2" />

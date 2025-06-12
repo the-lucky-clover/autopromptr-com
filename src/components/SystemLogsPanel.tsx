@@ -13,6 +13,7 @@ import { useSystemDiagnostics } from './SystemDiagnostics';
 interface SystemLogsProps {
   batches: Batch[];
   hasActiveBatch: boolean;
+  isCompact?: boolean;
 }
 
 interface LogEntry {
@@ -24,7 +25,7 @@ interface LogEntry {
   details?: string;
 }
 
-const SystemLogsPanel = ({ batches, hasActiveBatch }: SystemLogsProps) => {
+const SystemLogsPanel = ({ batches, hasActiveBatch, isCompact = false }: SystemLogsProps) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [systemStatus, setSystemStatus] = useState({
@@ -77,11 +78,13 @@ const SystemLogsPanel = ({ batches, hasActiveBatch }: SystemLogsProps) => {
 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-      <CardHeader className="pb-4">
+      <CardHeader className={isCompact ? "pb-2" : "pb-4"}>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-white mb-2">System Diagnostics & Logs</CardTitle>
-            <CardDescription className="text-purple-200">
+            <CardTitle className={`text-white ${isCompact ? 'text-sm' : 'text-base'}`}>
+              System Diagnostics & Logs
+            </CardTitle>
+            <CardDescription className={`text-purple-200 ${isCompact ? 'text-xs' : 'text-sm'}`}>
               {hasActiveBatch 
                 ? "Real-time monitoring of system handshakes and render logs during batch processing" 
                 : "System in standby mode - diagnostics will run when batches are active"}
@@ -98,7 +101,7 @@ const SystemLogsPanel = ({ batches, hasActiveBatch }: SystemLogsProps) => {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-5">
+      <CardContent className={`space-y-5 ${isCompact ? 'space-y-3' : ''}`}>
         <SystemStatusOverview systemStatus={systemStatus} />
         
         <Tabs defaultValue="system" className="w-full">
