@@ -26,7 +26,25 @@ const defaultModules: DashboardModule[] = [
 export const useDashboardModules = () => {
   const [modules, setModules] = useState<DashboardModule[]>(() => {
     const saved = localStorage.getItem('dashboard-modules');
-    return saved ? JSON.parse(saved) : defaultModules;
+    if (saved) {
+      try {
+        const parsedModules = JSON.parse(saved);
+        // Ensure all default modules exist in saved modules
+        const moduleIds = parsedModules.map((m: DashboardModule) => m.id);
+        const missingModules = defaultModules.filter(dm => !moduleIds.includes(dm.id));
+        
+        if (missingModules.length > 0) {
+          // Add missing modules to the saved modules
+          return [...parsedModules, ...missingModules].sort((a, b) => a.order - b.order);
+        }
+        
+        return parsedModules;
+      } catch (error) {
+        console.error('Error parsing saved modules, using defaults:', error);
+        return defaultModules;
+      }
+    }
+    return defaultModules;
   });
 
   const saveModules = useCallback((newModules: DashboardModule[]) => {
