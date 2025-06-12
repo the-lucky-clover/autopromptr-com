@@ -22,13 +22,17 @@ export const checkBackendHealth = async (
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const timeoutId = setTimeout(() => controller.abort(), 6000); // Reduced timeout from 8s to 6s
     
     const startTime = Date.now();
     
     const response = await fetch(backend.url, {
       method: 'HEAD',
-      signal: controller.signal
+      signal: controller.signal,
+      cache: 'no-cache', // Prevent caching issues
+      headers: {
+        'Cache-Control': 'no-cache'
+      }
     });
     
     clearTimeout(timeoutId);
@@ -36,7 +40,7 @@ export const checkBackendHealth = async (
     
     const isConnected = response.ok || response.status < 500;
     const status = isConnected 
-      ? (responseTime > 5000 ? 'degraded' : 'healthy')
+      ? (responseTime > 3000 ? 'degraded' : 'healthy') // Reduced threshold from 5s to 3s
       : 'unhealthy';
     
     if (isConnected) {
@@ -55,11 +59,21 @@ export const checkBackendHealth = async (
     });
   } catch (error) {
     recordFailure(backendKey);
+    
+    let uptime = 'Connection Failed';
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        uptime = 'Request Timeout';
+      } else if (error.message.includes('fetch')) {
+        uptime = 'Network Error';
+      }
+    }
+    
     setter({
       ...backend,
       status: 'unhealthy',
       responseTime: 0,
-      uptime: 'Connection Failed',
+      uptime,
       lastChecked: new Date(),
       isConnected: false
     });

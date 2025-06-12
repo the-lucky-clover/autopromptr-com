@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useBackendTesting } from '@/hooks/useBackendTesting';
 import { BackendStatus, HealthStatusDashboardProps, HEALTH_CHECK_INTERVAL } from './health/HealthStatusTypes';
@@ -12,19 +12,21 @@ import SystemHealthHeader from './health/SystemHealthHeader';
 const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps) => {
   const location = useLocation();
   const isDevelopment = process.env.NODE_ENV === 'development';
+  const mounted = useRef(true);
+  const lastHealthCheck = useRef(0);
+  const healthCheckInProgress = useRef(false);
   
   // Route guard - ensure we're on a dashboard route
-  const isDashboardRoute = location.pathname === '/dashboard' || location.pathname.startsWith('/dashboard/');
+  const isDashboardRoute = useMemo(() => 
+    location.pathname === '/dashboard' || location.pathname.startsWith('/dashboard/'),
+    [location.pathname]
+  );
   
   if (!isDashboardRoute) {
     if (isDevelopment) {
       console.log('HealthStatusDashboard: Component mounted on non-dashboard route, returning null');
     }
     return null;
-  }
-
-  if (isDevelopment) {
-    console.log('HealthStatusDashboard: Component instantiated - health checks will run');
   }
 
   const { 
@@ -61,45 +63,92 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
 
   const [overallHealth, setOverallHealth] = useState(75);
 
-  const refreshHealthData = async () => {
-    console.log('HealthStatusDashboard: Running health check');
+  // Debounced health check function
+  const refreshHealthData = useCallback(async () => {
+    if (!mounted.current) return;
     
-    // Run health checks for backends
-    await Promise.all([
-      checkBackendHealth(primaryBackend, setPrimaryBackend, 'primaryBackend'),
-      checkBackendHealth(fallbackBackend, setFallbackBackend, 'fallbackBackend')
-    ]);
+    const now = Date.now();
+    // Prevent multiple simultaneous health checks
+    if (healthCheckInProgress.current || (now - lastHealthCheck.current) < 30000) {
+      return;
+    }
     
-    // Run comprehensive test on the active backend (but don't wait for it)
-    runQuickHealthCheck().catch(error => {
-      console.log('Quick health check failed (silenced):', error.message);
-    });
-  };
+    healthCheckInProgress.current = true;
+    lastHealthCheck.current = now;
+    
+    try {
+      console.log('HealthStatusDashboard: Running debounced health check');
+      
+      // Run health checks for backends with timeout
+      const healthCheckPromises = [
+        checkBackendHealth(primaryBackend, setPrimaryBackend, 'primaryBackend'),
+        checkBackendHealth(fallbackBackend, setFallbackBackend, 'fallbackBackend')
+      ];
+      
+      await Promise.allSettled(healthCheckPromises);
+      
+      // Run quick health check but don't wait for it
+      runQuickHealthCheck().catch(error => {
+        if (isDevelopment) {
+          console.log('Quick health check failed (silenced):', error.message);
+        }
+      });
+      
+    } catch (error) {
+      if (isDevelopment) {
+        console.log('Health check error (silenced):', error);
+      }
+    } finally {
+      healthCheckInProgress.current = false;
+    }
+  }, [primaryBackend, fallbackBackend, runQuickHealthCheck, isDevelopment]);
 
-  const runComprehensiveTests = async () => {
+  const runComprehensiveTests = useCallback(async () => {
+    if (!mounted.current) return;
+    
     try {
       await runFullTestSuite();
     } catch (error) {
-      console.log('Comprehensive tests failed (silenced):', error);
+      if (isDevelopment) {
+        console.log('Comprehensive tests failed (silenced):', error);
+      }
     }
-  };
+  }, [runFullTestSuite, isDevelopment]);
 
+  // Memoized test summary to prevent unnecessary recalculations
+  const testSummary = useMemo(() => getTestSummary(), [lastTestResults, getTestSummary]);
+
+  // Effect for initial health check and interval setup
   useEffect(() => {
+    if (!mounted.current) return;
+    
     console.log('HealthStatusDashboard: Starting health monitoring');
-    refreshHealthData();
+    
+    // Initial health check with delay to prevent immediate execution
+    const initialTimeout = setTimeout(() => {
+      if (mounted.current) {
+        refreshHealthData();
+      }
+    }, 2000);
     
     // Start health check interval
-    const interval = setInterval(refreshHealthData, HEALTH_CHECK_INTERVAL);
+    const interval = setInterval(() => {
+      if (mounted.current) {
+        refreshHealthData();
+      }
+    }, HEALTH_CHECK_INTERVAL);
     
     return () => {
       console.log('HealthStatusDashboard: Cleaning up health monitoring');
+      clearTimeout(initialTimeout);
       clearInterval(interval);
+      mounted.current = false;
     };
-  }, []);
+  }, []); // Empty dependency array - only run on mount/unmount
 
+  // Effect for calculating overall health
   useEffect(() => {
-    // Calculate overall health based on actual backend status
-    const testSummary = getTestSummary();
+    if (!mounted.current) return;
     
     if (testSummary) {
       setOverallHealth(testSummary.passRate);
@@ -117,7 +166,7 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
       
       setOverallHealth(weightedScore);
     }
-  }, [primaryBackend, fallbackBackend, lastTestResults, getTestSummary]);
+  }, [primaryBackend.isConnected, fallbackBackend.isConnected, testSummary]);
 
   if (isCompact) {
     return (

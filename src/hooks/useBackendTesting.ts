@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { TestingService, TestSuite } from '@/services/testingService';
 
 export const useBackendTesting = () => {
@@ -13,13 +13,23 @@ export const useBackendTesting = () => {
   } | null>(null);
 
   const testingService = new TestingService();
+  const lastTestRun = useRef(0);
+  const testInProgress = useRef(false);
 
   const runFullTestSuite = useCallback(async () => {
+    if (testInProgress.current) {
+      console.log('Test suite already running, skipping');
+      return lastTestResults;
+    }
+    
     setIsRunning(true);
+    testInProgress.current = true;
+    
     try {
       console.log('🚀 Starting full backend test suite...');
       const results = await testingService.runTestSuite();
       setLastTestResults(results);
+      lastTestRun.current = Date.now();
       console.log('✅ Test suite completed:', results);
       return results;
     } catch (error) {
@@ -27,10 +37,19 @@ export const useBackendTesting = () => {
       throw error;
     } finally {
       setIsRunning(false);
+      testInProgress.current = false;
     }
-  }, []);
+  }, [testingService, lastTestResults]);
 
   const runQuickHealthCheck = useCallback(async () => {
+    const now = Date.now();
+    
+    // Debounce quick health checks - don't run more than once per 30 seconds
+    if (testInProgress.current || (now - lastTestRun.current) < 30000) {
+      console.log('Quick health check debounced');
+      return lastQuickCheck;
+    }
+    
     try {
       const result = await testingService.runQuickHealthCheck();
       const checkResult = {
@@ -38,6 +57,7 @@ export const useBackendTesting = () => {
         timestamp: new Date()
       };
       setLastQuickCheck(checkResult);
+      lastTestRun.current = now;
       return checkResult;
     } catch (error) {
       console.error('Quick health check failed:', error);
@@ -48,9 +68,10 @@ export const useBackendTesting = () => {
         timestamp: new Date()
       };
       setLastQuickCheck(errorResult);
+      lastTestRun.current = now;
       return errorResult;
     }
-  }, []);
+  }, [testingService, lastQuickCheck]);
 
   const getTestSummary = useCallback(() => {
     if (!lastTestResults) return null;
