@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Batch } from '@/types/batch';
 import { useBatchSync } from './useBatchSync';
 
@@ -9,10 +9,18 @@ const BACKUP_STORAGE_KEY = 'autopromptr_batches_backup';
 export const usePersistentBatches = () => {
   const [batches, setBatches] = useState<Batch[]>([]);
   const { triggerBatchSync, subscribeToBatchSync } = useBatchSync();
+  const isSavingRef = useRef(false);
+  const isLoadingRef = useRef(false);
+
+  // Debounced save function
+  const debouncedSave = useRef<NodeJS.Timeout | null>(null);
 
   // Force reload batches from storage
   const reloadBatches = () => {
+    if (isSavingRef.current) return; // Don't reload while saving
+    
     try {
+      isLoadingRef.current = true;
       console.log('Reloading batches from localStorage...');
       const savedBatches = localStorage.getItem(STORAGE_KEY);
       
@@ -28,6 +36,8 @@ export const usePersistentBatches = () => {
       }
     } catch (error) {
       console.error('Failed to reload batches:', error);
+    } finally {
+      isLoadingRef.current = false;
     }
   };
 
@@ -39,21 +49,8 @@ export const usePersistentBatches = () => {
       // Debug: Check all localStorage keys for any trace of batch data
       console.log('All localStorage keys:', Object.keys(localStorage));
       
-      // Look for any keys that might contain batch data
-      const potentialBatchKeys = Object.keys(localStorage).filter(key => 
-        key.includes('batch') || key.includes('autopromptr') || key.includes('prompt')
-      );
-      console.log('Potential batch-related keys found:', potentialBatchKeys);
-      
-      // Check each potential key
-      potentialBatchKeys.forEach(key => {
-        const value = localStorage.getItem(key);
-        console.log(`Content of ${key}:`, value);
-      });
-      
       const savedBatches = localStorage.getItem(STORAGE_KEY);
       console.log('Raw saved batches:', savedBatches);
-      console.log('Storage key being used:', STORAGE_KEY);
       
       if (savedBatches) {
         const parsedBatches = JSON.parse(savedBatches);
@@ -71,59 +68,30 @@ export const usePersistentBatches = () => {
         // Create a backup
         localStorage.setItem(BACKUP_STORAGE_KEY, JSON.stringify(batchesWithDates));
       } else {
-        // Automatically try to recover from backup on page load
-        console.log('No batches found in main storage, automatically checking backup...');
+        // Try to recover from backup
+        console.log('No batches found in main storage, checking backup...');
         const backupBatches = localStorage.getItem(BACKUP_STORAGE_KEY);
-        console.log('Backup batches found:', backupBatches);
         
         if (backupBatches) {
-          console.log('Found backup batches, automatically restoring...');
+          console.log('Found backup batches, restoring...');
           const parsedBackup = JSON.parse(backupBatches);
           const batchesWithDates = parsedBackup.map((batch: any) => ({
             ...batch,
             createdAt: new Date(batch.createdAt)
           }));
           setBatches(batchesWithDates);
-          // Restore to main storage
           localStorage.setItem(STORAGE_KEY, JSON.stringify(batchesWithDates));
-          console.log('Automatically restored from backup successfully');
-        } else {
-          console.log('No backup found either. Starting fresh.');
-          
-          // Automatically search for any data that looks like batches under any key
-          console.log('Automatically searching all localStorage for batch-like data...');
-          Object.keys(localStorage).forEach(key => {
-            try {
-              const value = localStorage.getItem(key);
-              if (value) {
-                const parsed = JSON.parse(value);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                  const firstItem = parsed[0];
-                  // Check if it looks like a batch object
-                  if (firstItem && typeof firstItem === 'object' && 
-                      ('name' in firstItem || 'targetUrl' in firstItem || 'prompts' in firstItem)) {
-                    console.log(`POTENTIAL BATCH DATA FOUND under key "${key}":`, parsed);
-                  }
-                }
-              }
-            } catch (e) {
-              // Not JSON, skip
-            }
-          });
+          console.log('Restored from backup successfully');
         }
       }
-      
-      // Automatically run comprehensive search for lost data on every page load
-      performAutomaticDataSearch();
-      
     } catch (error) {
       console.error('Failed to load batches from localStorage:', error);
       
-      // Automatically try to recover from backup on error
+      // Try to recover from backup on error
       try {
         const backupBatches = localStorage.getItem(BACKUP_STORAGE_KEY);
         if (backupBatches) {
-          console.log('Attempting automatic recovery from backup due to error...');
+          console.log('Attempting recovery from backup due to error...');
           const parsedBackup = JSON.parse(backupBatches);
           const batchesWithDates = parsedBackup.map((batch: any) => ({
             ...batch,
@@ -132,7 +100,7 @@ export const usePersistentBatches = () => {
           setBatches(batchesWithDates);
         }
       } catch (backupError) {
-        console.error('Automatic backup recovery also failed:', backupError);
+        console.error('Backup recovery also failed:', backupError);
       }
     }
   }, []);
@@ -147,44 +115,39 @@ export const usePersistentBatches = () => {
     return unsubscribe;
   }, [subscribeToBatchSync]);
 
-  // Automatic comprehensive data search function
-  const performAutomaticDataSearch = () => {
-    console.log('=== AUTOMATIC SEARCH FOR LOST BATCHES ===');
-    console.log('All localStorage keys:', Object.keys(localStorage));
-    
-    Object.keys(localStorage).forEach(key => {
-      try {
-        const value = localStorage.getItem(key);
-        if (value) {
-          const parsed = JSON.parse(value);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            console.log(`Key "${key}" contains array with ${parsed.length} items:`, parsed);
-          }
-        }
-      } catch (e) {
-        // Not JSON, skip
-      }
-    });
-    console.log('=== END AUTOMATIC SEARCH ===');
-  };
-
-  // Save batches to localStorage whenever batches change
+  // Save batches to localStorage with debouncing
   useEffect(() => {
-    if (batches.length > 0) {
-      try {
-        console.log(`Saving ${batches.length} batches to localStorage...`);
-        const dataToSave = JSON.stringify(batches);
-        localStorage.setItem(STORAGE_KEY, dataToSave);
-        localStorage.setItem(BACKUP_STORAGE_KEY, dataToSave);
-        console.log('Batches saved successfully');
-        console.log('Saved data:', dataToSave);
-        
-        // Trigger sync to other components
-        triggerBatchSync();
-      } catch (error) {
-        console.error('Failed to save batches to localStorage:', error);
+    if (batches.length > 0 && !isLoadingRef.current) {
+      // Clear previous debounced save
+      if (debouncedSave.current) {
+        clearTimeout(debouncedSave.current);
       }
+
+      // Debounce the save operation
+      debouncedSave.current = setTimeout(() => {
+        try {
+          isSavingRef.current = true;
+          console.log(`Saving ${batches.length} batches to localStorage...`);
+          const dataToSave = JSON.stringify(batches);
+          localStorage.setItem(STORAGE_KEY, dataToSave);
+          localStorage.setItem(BACKUP_STORAGE_KEY, dataToSave);
+          console.log('Batches saved successfully');
+          
+          // Only trigger sync after successful save, not during loading
+          triggerBatchSync();
+        } catch (error) {
+          console.error('Failed to save batches to localStorage:', error);
+        } finally {
+          isSavingRef.current = false;
+        }
+      }, 300); // 300ms debounce
     }
+
+    return () => {
+      if (debouncedSave.current) {
+        clearTimeout(debouncedSave.current);
+      }
+    };
   }, [batches, triggerBatchSync]);
 
   const updateBatches = (newBatches: Batch[] | ((prev: Batch[]) => Batch[])) => {
@@ -218,17 +181,11 @@ export const usePersistentBatches = () => {
     return false;
   };
 
-  // Debug function to manually search for lost data
-  const searchForLostBatches = () => {
-    performAutomaticDataSearch();
-  };
-
   return {
     batches,
     setBatches: updateBatches,
     clearAllBatches,
     recoverFromBackup,
-    searchForLostBatches,
     reloadBatches,
     triggerBatchSync
   };

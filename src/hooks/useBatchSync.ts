@@ -1,13 +1,21 @@
 
-import { useEffect, useCallback } from 'react';
-import { Batch } from '@/types/batch';
+import { useEffect, useCallback, useRef } from 'react';
 
 const BATCH_SYNC_EVENT = 'autopromptr_batch_sync';
 
 export const useBatchSync = () => {
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
   const triggerBatchSync = useCallback(() => {
-    console.log('Triggering batch sync across components...');
-    window.dispatchEvent(new CustomEvent(BATCH_SYNC_EVENT));
+    // Debounce sync triggers to prevent rapid-fire events
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(() => {
+      console.log('Triggering batch sync across components...');
+      window.dispatchEvent(new CustomEvent(BATCH_SYNC_EVENT));
+    }, 100); // 100ms debounce
   }, []);
 
   const subscribeToBatchSync = useCallback((callback: () => void) => {
@@ -32,6 +40,15 @@ export const useBatchSync = () => {
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [triggerBatchSync]);
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
 
   return {
     triggerBatchSync,
