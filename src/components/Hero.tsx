@@ -1,9 +1,20 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Hero = () => {
   console.log("Hero component rendering...");
+  
+  const { user, isEmailVerified } = useAuth();
+
+  const handleGetStarted = () => {
+    if (user && isEmailVerified) {
+      window.location.href = '/dashboard';
+    } else {
+      window.location.href = '/auth';
+    }
+  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 md:pt-20">
@@ -31,10 +42,11 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <Button 
               size="lg" 
+              onClick={handleGetStarted}
               className="text-white text-lg px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
             >
               <Zap className="w-5 h-5" />
-              Start Free Trial
+              {user && isEmailVerified ? 'Go to Dashboard' : 'Start Free Trial'}
             </Button>
             <Button 
               size="lg" 
