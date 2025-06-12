@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Zap, Upload, Download, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useBatchOperations } from '@/hooks/useBatchOperations';
+import { Batch, TextPrompt } from '@/types/batch';
+import { detectPlatformFromUrl } from '@/utils/platformDetection';
 
 interface BatchExtractorModuleProps {
   isCompact?: boolean;
@@ -17,10 +19,22 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
   const [batchName, setBatchName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+  const { createBatch } = useBatchOperations();
 
   const CHARACTER_LIMIT = 50000;
   const characterCount = prompts.length;
   const isOverLimit = characterCount > CHARACTER_LIMIT;
+
+  const extractPromptsFromText = (text: string): string[] => {
+    // Split by double newlines, filter empty lines, and clean up
+    const extractedPrompts = text
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(p => p.length > 10) // Only keep prompts with reasonable length
+      .slice(0, 100); // Limit to 100 prompts max
+
+    return extractedPrompts;
+  };
 
   const handleExtract = async () => {
     if (!prompts.trim()) {
@@ -43,14 +57,9 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
 
     setIsProcessing(true);
     
-    // Simulate intelligent prompt extraction
-    setTimeout(() => {
-      // Simple extraction logic - split by double newlines, filter empty lines
-      const extractedPrompts = prompts
-        .split(/\n\s*\n/)
-        .map(p => p.trim())
-        .filter(p => p.length > 10) // Only keep prompts with reasonable length
-        .slice(0, 100); // Limit to 100 prompts max
+    try {
+      // Extract prompts from the text
+      const extractedPrompts = extractPromptsFromText(prompts);
 
       if (extractedPrompts.length === 0) {
         toast({
@@ -62,14 +71,43 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
         return;
       }
 
+      // Create batch data
+      const batchFormData = {
+        name: batchName.trim() || 'Extracted Batch',
+        targetUrl: 'https://lovable.dev', // Default to Lovable for extracted batches
+        description: `Batch extracted from text content containing ${extractedPrompts.length} prompts`,
+        initialPrompt: extractedPrompts[0], // First prompt as initial
+        platform: 'lovable',
+        waitForIdle: true,
+        maxRetries: 0
+      };
+
+      // Create the batch using the batch operations
+      createBatch(batchFormData);
+
+      // If there are additional prompts beyond the first one, we'll need to add them
+      // This is a limitation of the current createBatch interface that only takes initialPrompt
+      // For now, we'll create a batch with the first prompt and note this in the description
+
       toast({
         title: "Extraction successful",
-        description: `Extracted ${extractedPrompts.length} prompts and created batch "${batchName || 'Untitled'}".`,
+        description: `Extracted ${extractedPrompts.length} prompts and created batch "${batchFormData.name}". Note: Only the first prompt was added due to current system limitations.`,
       });
-      setIsProcessing(false);
+
+      // Clear the form
       setPrompts('');
       setBatchName('');
-    }, 2000);
+
+    } catch (error) {
+      console.error('Failed to extract and create batch:', error);
+      toast({
+        title: "Failed to create batch",
+        description: error instanceof Error ? error.message : 'Unknown error occurred',
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
