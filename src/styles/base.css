@@ -53,40 +53,8 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #7c3aed 100%) !important;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #7c3aed 100%);
     min-height: 100vh;
-  }
-
-  /* Much darker theme for all sections */
-  section {
-    background: linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 50%, #1e1b4b 100%) !important;
-  }
-
-  /* Override any light backgrounds with very dark gradients */
-  .bg-white, .bg-gray-50, .bg-gray-100, .bg-gray-200 {
-    background: linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 100%) !important;
-  }
-
-  /* Ensure main content areas are very dark */
-  main {
-    background: linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 50%, #1e1b4b 100%) !important;
-  }
-
-  /* Override any remaining light elements */
-  .text-gray-900 {
-    color: white !important;
-  }
-
-  .text-gray-800 {
-    color: #e2e8f0 !important;
-  }
-
-  .text-gray-700 {
-    color: #cbd5e1 !important;
-  }
-
-  .text-gray-600 {
-    color: #94a3b8 !important;
   }
 
   /* Ensure ALL buttons have rounded corners */
