@@ -14,6 +14,8 @@ import SpeedometerSection from "@/components/SpeedometerSection";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Index = () => {
+  console.log("Index page rendering...");
+  
   useScrollAnimation();
 
   return (

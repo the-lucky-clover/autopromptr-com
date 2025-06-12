@@ -15,15 +15,19 @@ interface BlogPost {
 }
 
 const BlogPosts = () => {
+  console.log("BlogPosts component rendering...");
+  
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("BlogPosts useEffect triggered");
     fetchBlogPosts();
   }, []);
 
   const fetchBlogPosts = async () => {
     try {
+      console.log("Fetching blog posts...");
       const { data, error } = await supabase
         .from('blog_posts')
         .select('id, title, slug, excerpt, published_at')
@@ -36,6 +40,7 @@ const BlogPosts = () => {
         return;
       }
 
+      console.log('Blog posts fetched successfully:', data);
       setPosts(data || []);
     } catch (error) {
       console.error('Error in fetchBlogPosts:', error);
@@ -59,12 +64,13 @@ const BlogPosts = () => {
   };
 
   if (loading) {
+    console.log("BlogPosts showing loading state");
     return (
-      <section className="py-16 relative" style={{ background: 'linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 100%)' }}>
+      <section className="py-16 relative bg-gradient-to-b from-slate-900 to-blue-900">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 blur-3xl"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-12 animate-on-scroll">
+          <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-4">
               Latest Insights
             </h2>
@@ -81,12 +87,14 @@ const BlogPosts = () => {
     );
   }
 
+  console.log("BlogPosts rendering main content with", posts.length, "posts");
+
   return (
-    <section className="py-16 relative" style={{ background: 'linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 100%)' }}>
+    <section className="py-16 relative bg-gradient-to-b from-blue-900 to-purple-900">
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 blur-3xl"></div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-12 animate-on-scroll">
+        <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-white mb-4">
             Latest Insights
           </h2>
@@ -105,8 +113,7 @@ const BlogPosts = () => {
               {posts.map((post, index) => (
                 <div 
                   key={post.id}
-                  className="animate-on-scroll stagger-animation"
-                  style={{ "--animation-delay": `${index * 0.1 + 0.1}s` } as React.CSSProperties}
+                  className="group"
                 >
                   <Card className="h-full flex flex-col glass-effect border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 hover:scale-105">
                     <CardHeader>
@@ -148,7 +155,7 @@ const BlogPosts = () => {
               ))}
             </div>
 
-            <div className="text-center animate-on-scroll">
+            <div className="text-center">
               <Link to="/blog">
                 <Button 
                   variant="outline"

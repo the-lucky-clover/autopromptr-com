@@ -3,13 +3,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap } from "lucide-react";
 
 const Hero = () => {
+  console.log("Hero component rendering...");
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 md:pt-20">
-      {/* Gradient Background */}
+      {/* Simplified gradient background */}
       <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-blue-900 to-purple-600"></div>
-      
-      {/* Subtle texture overlay */}
-      <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-transparent via-blue-500/10 to-purple-500/20"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-5xl mx-auto">
@@ -32,15 +31,14 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <Button 
               size="lg" 
-              className="text-white text-lg px-8 py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2"
-              style={{ background: 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%)' }}
+              className="text-white text-lg px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
             >
               <Zap className="w-5 h-5" />
               Start Free Trial
             </Button>
             <Button 
               size="lg" 
-              className="bg-black hover:bg-gray-800 text-white text-lg px-8 py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2"
+              className="bg-black hover:bg-gray-800 text-white text-lg px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-2"
             >
               Watch Demo
               <ArrowRight className="w-5 h-5" />
@@ -53,6 +51,8 @@ const Hero = () => {
                 src="https://images.unsplash.com/photo-1677696795198-5ac0e21060ed" 
                 alt="AI-powered coding and automation workspace" 
                 className="mx-auto rounded-2xl shadow-2xl max-w-full h-auto"
+                onLoad={() => console.log("Hero image loaded successfully")}
+                onError={() => console.error("Hero image failed to load")}
               />
             </div>
           </div>
