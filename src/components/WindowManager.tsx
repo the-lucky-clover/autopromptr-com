@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Minimize2, 
   X, 
-  GripHorizontal,
-  Monitor
+  GripHorizontal
 } from 'lucide-react';
 
 interface WindowState {
@@ -82,46 +81,7 @@ export const WindowManagerProvider = ({ children }: { children: ReactNode }) => 
       unregisterWindow
     }}>
       {children}
-      <Taskbar />
     </WindowManagerContext.Provider>
-  );
-};
-
-const Taskbar = () => {
-  const context = React.useContext(WindowManagerContext);
-  if (!context) return null;
-
-  const { windows, focusWindow, minimizeWindow } = context;
-  const visibleWindows = windows.filter(w => !w.isClosed);
-
-  if (visibleWindows.length === 0) return null;
-
-  return (
-    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[10000]">
-      <div className="bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-3 shadow-2xl">
-        <div className="flex items-center space-x-3">
-          {visibleWindows.map(window => (
-            <Button
-              key={window.id}
-              variant="ghost"
-              size="sm"
-              className={`text-white rounded-xl transition-all px-3 py-2 ${
-                window.isFocused ? 'bg-purple-500/30 border border-purple-400/50' : 'hover:bg-white/10'
-              } ${window.isMinimized ? 'opacity-60' : ''}`}
-              onClick={() => {
-                if (window.isMinimized) {
-                  minimizeWindow(window.id);
-                }
-                focusWindow(window.id);
-              }}
-            >
-              <Monitor className="w-4 h-4 mr-2" />
-              <span className="text-xs max-w-24 truncate">{window.title}</span>
-            </Button>
-          ))}
-        </div>
-      </div>
-    </div>
   );
 };
 
