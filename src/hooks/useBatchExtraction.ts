@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
@@ -11,7 +12,7 @@ export const useBatchExtraction = () => {
   const [targetUrl, setTargetUrl] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const { setBatches, triggerBatchSync } = usePersistentBatches();
+  const { setBatches, triggerManualSync } = usePersistentBatches();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -185,7 +186,7 @@ export const useBatchExtraction = () => {
 
       // Force sync across all components
       setTimeout(() => {
-        triggerBatchSync();
+        triggerManualSync();
       }, 100);
 
       // Clear form
