@@ -15,9 +15,9 @@ export interface DashboardModule {
 const defaultModules: DashboardModule[] = [
   { id: 'batch-processor', title: 'Batch Processor', component: 'DashboardBatchManager', state: 'full', order: 0, isVisible: true },
   { id: 'batch-extractor', title: 'Batch Extractor', component: 'BatchExtractorModule', state: 'full', order: 1, isVisible: true },
-  { id: 'analytics', title: 'Analytics', component: 'AnalyticsModule', state: 'full', order: 2, isVisible: true },
+  { id: 'analytics', title: 'System Overview', component: 'AnalyticsModule', state: 'full', order: 2, isVisible: true },
   { id: 'system-reliability', title: 'System Reliability Score', component: 'SystemReliabilityScore', state: 'full', order: 3, isVisible: true },
-  { id: 'system-logs', title: 'System Logs', component: 'SystemLogsPanel', state: 'full', order: 4, isVisible: true },
+  { id: 'system-logs', title: 'System Diagnostics & Logs', component: 'SystemLogsPanel', state: 'full', order: 4, isVisible: true },
   { id: 'backend-health', title: 'Backend Health', component: 'HealthStatusDashboard', state: 'full', order: 5, isVisible: true },
   { id: 'subscription', title: 'Subscription', component: 'DashboardSubscription', state: 'full', order: 6, isVisible: true },
   { id: 'stats-cards', title: 'Statistics', component: 'DashboardStatsModule', state: 'full', order: 7, isVisible: true },
@@ -29,16 +29,17 @@ export const useDashboardModules = () => {
     if (saved) {
       try {
         const parsedModules = JSON.parse(saved);
-        // Ensure all default modules exist in saved modules
-        const moduleIds = parsedModules.map((m: DashboardModule) => m.id);
+        // Filter out QuickActions permanently and ensure all default modules exist
+        const filteredModules = parsedModules.filter((m: DashboardModule) => m.id !== 'quick-actions');
+        const moduleIds = filteredModules.map((m: DashboardModule) => m.id);
         const missingModules = defaultModules.filter(dm => !moduleIds.includes(dm.id));
         
         if (missingModules.length > 0) {
           // Add missing modules to the saved modules
-          return [...parsedModules, ...missingModules].sort((a, b) => a.order - b.order);
+          return [...filteredModules, ...missingModules].sort((a, b) => a.order - b.order);
         }
         
-        return parsedModules;
+        return filteredModules;
       } catch (error) {
         console.error('Error parsing saved modules, using defaults:', error);
         return defaultModules;
@@ -48,8 +49,10 @@ export const useDashboardModules = () => {
   });
 
   const saveModules = useCallback((newModules: DashboardModule[]) => {
-    setModules(newModules);
-    localStorage.setItem('dashboard-modules', JSON.stringify(newModules));
+    // Always filter out QuickActions before saving
+    const filteredModules = newModules.filter(m => m.id !== 'quick-actions');
+    setModules(filteredModules);
+    localStorage.setItem('dashboard-modules', JSON.stringify(filteredModules));
   }, []);
 
   const updateModuleState = useCallback((moduleId: string, newState: ModuleState) => {

@@ -124,30 +124,32 @@ const Dashboard = () => {
       <div className="space-y-4">
         {/* Full-width modules */}
         {fullWidthModules.map((module) => (
-          <DashboardModuleWrapper
-            key={module.id}
-            id={module.id}
-            title={module.title}
-            state={module.state}
-            onStateChange={(newState) => updateModuleState(module.id, newState)}
-          >
-            {renderModuleContent(module.id, module.component, false)}
-          </DashboardModuleWrapper>
+          <div key={module.id} className="shadow-2xl">
+            <DashboardModuleWrapper
+              id={module.id}
+              title={module.title}
+              state={module.state}
+              onStateChange={(newState) => updateModuleState(module.id, newState)}
+            >
+              {renderModuleContent(module.id, module.component, false)}
+            </DashboardModuleWrapper>
+          </div>
         ))}
 
         {/* Two-column layout for minimized modules */}
         {minimizedModules.length > 0 && (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             {minimizedModules.map((module) => (
-              <DashboardModuleWrapper
-                key={module.id}
-                id={module.id}
-                title={module.title}
-                state={module.state}
-                onStateChange={(newState) => updateModuleState(module.id, newState)}
-              >
-                {renderModuleContent(module.id, module.component, true)}
-              </DashboardModuleWrapper>
+              <div key={module.id} className="shadow-2xl">
+                <DashboardModuleWrapper
+                  id={module.id}
+                  title={module.title}
+                  state={module.state}
+                  onStateChange={(newState) => updateModuleState(module.id, newState)}
+                >
+                  {renderModuleContent(module.id, module.component, true)}
+                </DashboardModuleWrapper>
+              </div>
             ))}
           </div>
         )}
@@ -158,7 +160,9 @@ const Dashboard = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full overflow-x-hidden" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
-        <AppSidebar />
+        <div className="shadow-2xl">
+          <AppSidebar />
+        </div>
         <main className="flex-1 p-4 lg:p-6 min-w-0">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">

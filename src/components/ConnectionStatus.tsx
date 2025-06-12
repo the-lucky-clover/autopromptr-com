@@ -56,9 +56,11 @@ export const ConnectionStatus = () => {
   };
 
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center justify-end space-x-4">
       {getStatusBadge()}
-      <RealTimeClock />
+      <div className="flex justify-end">
+        <RealTimeClock />
+      </div>
     </div>
   );
 };

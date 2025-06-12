@@ -48,7 +48,7 @@ const DashboardStatsCards = ({ stats, isCompact = false }: DashboardStatsCardsPr
 
   if (isCompact) {
     return (
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2">
         {statsData.map((stat, index) => (
           <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
             <CardContent className="p-2">

@@ -1,135 +1,168 @@
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RefreshCw, Info } from 'lucide-react';
-import { Batch } from '@/types/batch';
-import SystemStatusOverview from './SystemStatusOverview';
+import { Badge } from '@/components/ui/badge';
+import { RefreshCw, Terminal, FileText, Activity, AlertCircle } from 'lucide-react';
 import SystemLogsDisplay from './SystemLogsDisplay';
 import RenderSyslogDisplay from './RenderSyslogDisplay';
-import { useSystemDiagnostics } from './SystemDiagnostics';
 
-interface SystemLogsProps {
-  batches: Batch[];
+interface SystemLogsPanelProps {
+  batches: any[];
   hasActiveBatch: boolean;
   isCompact?: boolean;
 }
 
-interface LogEntry {
-  id: string;
-  timestamp: Date;
-  type: 'success' | 'error' | 'warning' | 'info';
-  system: string;
-  message: string;
-  details?: string;
-}
-
-const SystemLogsPanel = ({ batches, hasActiveBatch, isCompact = false }: SystemLogsProps) => {
-  const [logs, setLogs] = useState<LogEntry[]>([]);
+const SystemLogsPanel = ({ batches, hasActiveBatch, isCompact = false }: SystemLogsPanelProps) => {
+  const [activeTab, setActiveTab] = useState<'system' | 'syslog'>('system');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [systemStatus, setSystemStatus] = useState({
-    lovableSupabase: 'unknown',
-    supabaseRender: 'unknown',
-    renderTarget: 'unknown'
-  });
+  const [logCount, setLogCount] = useState(0);
 
-  // Get the active batch ID for filtering syslog entries
-  const activeBatchId = batches.find(batch => batch.status === 'running')?.id || null;
-
-  const addLog = (type: LogEntry['type'], system: string, message: string, details?: string) => {
-    const newLog: LogEntry = {
-      id: crypto.randomUUID(),
-      timestamp: new Date(),
-      type,
-      system,
-      message,
-      details
-    };
-    setLogs(prev => [newLog, ...prev.slice(0, 49)]); // Keep last 50 logs
-  };
-
-  const { runSystemDiagnostics } = useSystemDiagnostics({
-    batches,
-    addLog,
-    setSystemStatus
-  });
-
-  const handleRefreshDiagnostics = async () => {
-    if (!hasActiveBatch) {
-      addLog('info', 'System', 'No active batches - skipping system diagnostics');
-      return;
-    }
-
-    setIsRefreshing(true);
-    await runSystemDiagnostics(hasActiveBatch);
-    setIsRefreshing(false);
-  };
-
-  // Only run diagnostics when there are active batches
   useEffect(() => {
-    if (hasActiveBatch) {
-      addLog('info', 'System', 'Active batch detected - initializing system diagnostics...');
-      handleRefreshDiagnostics();
-    } else {
-      addLog('info', 'System', 'No active batches - system in standby mode');
-    }
-  }, [hasActiveBatch]);
+    // Simulate log count updates
+    const interval = setInterval(() => {
+      setLogCount(prev => prev + Math.floor(Math.random() * 3));
+    }, 5000);
 
-  return (
-    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-      <CardHeader className={isCompact ? "pb-2" : "pb-4"}>
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    // Simulate refresh delay
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
+  };
+
+  if (isCompact) {
+    return (
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className={`text-white ${isCompact ? 'text-sm' : 'text-base'}`}>
-              System Diagnostics & Logs
-            </CardTitle>
-            <CardDescription className={`text-purple-200 ${isCompact ? 'text-xs' : 'text-sm'}`}>
-              {hasActiveBatch 
-                ? "Real-time monitoring of system handshakes and render logs during batch processing" 
-                : "System in standby mode - diagnostics will run when batches are active"}
-            </CardDescription>
+          <div className="flex items-center space-x-2">
+            <Terminal className="w-3 h-3 text-blue-400" />
+            <span className="text-white font-medium text-xs">System Diagnostics & Logs</span>
           </div>
           <Button
-            onClick={handleRefreshDiagnostics}
-            disabled={isRefreshing || !hasActiveBatch}
+            onClick={handleRefresh}
+            disabled={isRefreshing}
             size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50"
+            variant="ghost"
+            className="h-6 w-6 p-0 text-white hover:bg-white/20"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {hasActiveBatch ? 'Refresh' : 'No Active Batch'}
+            <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
           </Button>
         </div>
+
+        <div className="flex space-x-1">
+          <Button
+            onClick={() => setActiveTab('system')}
+            size="sm"
+            variant={activeTab === 'system' ? 'default' : 'ghost'}
+            className={`text-xs h-6 px-2 ${
+              activeTab === 'system' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-white/10 text-white/60 hover:bg-white/20'
+            }`}
+          >
+            <Terminal className="w-3 h-3 mr-1" />
+            System Logs
+          </Button>
+          <Button
+            onClick={() => setActiveTab('syslog')}
+            size="sm"
+            variant={activeTab === 'syslog' ? 'default' : 'ghost'}
+            className={`text-xs h-6 px-2 ${
+              activeTab === 'syslog' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-white/10 text-white/60 hover:bg-white/20'
+            }`}
+          >
+            <FileText className="w-3 h-3 mr-1" />
+            Render SysLog
+          </Button>
+        </div>
+
+        <div className="h-20 overflow-hidden">
+          {activeTab === 'system' ? (
+            <SystemLogsDisplay batches={batches} isCompact={true} />
+          ) : (
+            <RenderSyslogDisplay isCompact={true} />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl shadow-lg">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-white flex items-center space-x-2">
+            <Terminal className="w-5 h-5 text-blue-400" />
+            <span>System Diagnostics & Logs</span>
+          </CardTitle>
+          <div className="flex items-center space-x-3">
+            <Badge variant="outline" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+              <Activity className="w-3 h-3 mr-1" />
+              {logCount} entries
+            </Badge>
+            {hasActiveBatch && (
+              <Badge variant="outline" className="bg-green-500/20 text-green-300 border-green-500/30">
+                <AlertCircle className="w-3 h-3 mr-1" />
+                Active
+              </Badge>
+            )}
+            <Button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              size="sm"
+              variant="ghost"
+              className="text-white hover:bg-white/20 rounded-xl"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className={`space-y-5 ${isCompact ? 'space-y-3' : ''}`}>
-        <SystemStatusOverview systemStatus={systemStatus} />
-        
-        <Tabs defaultValue="system" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-white/10 mb-4">
-            <TabsTrigger value="system" className="text-white data-[state=active]:bg-white/20">
-              System Logs
-            </TabsTrigger>
-            <TabsTrigger value="render" className="text-white data-[state=active]:bg-white/20">
-              Render Syslog
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="system" className="mt-0">
-            <SystemLogsDisplay logs={logs} hasActiveBatch={hasActiveBatch} />
-          </TabsContent>
-          
-          <TabsContent value="render" className="mt-0">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2 text-white/80 text-sm bg-white/5 rounded-lg p-3">
-                <Info className="w-4 h-4 flex-shrink-0" />
-                <span>
-                  Syslog endpoint: raahpoyciwuyhwlcenpy.supabase.co:443
-                </span>
-              </div>
-              <RenderSyslogDisplay batchId={activeBatchId} />
-            </div>
-          </TabsContent>
-        </Tabs>
+      <CardContent className="space-y-4">
+        <div className="flex space-x-2">
+          <Button
+            onClick={() => setActiveTab('system')}
+            size="sm"
+            variant={activeTab === 'system' ? 'default' : 'ghost'}
+            className={`${
+              activeTab === 'system' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-white/10 text-white/60 hover:bg-white/20'
+            } rounded-xl`}
+          >
+            <Terminal className="w-4 h-4 mr-2" />
+            System Logs
+          </Button>
+          <Button
+            onClick={() => setActiveTab('syslog')}
+            size="sm"
+            variant={activeTab === 'syslog' ? 'default' : 'ghost'}
+            className={`${
+              activeTab === 'syslog' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-white/10 text-white/60 hover:bg-white/20'
+            } rounded-xl`}
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            Render SysLog
+          </Button>
+        </div>
+
+        <div className="min-h-[300px]">
+          {activeTab === 'system' ? (
+            <SystemLogsDisplay batches={batches} />
+          ) : (
+            <RenderSyslogDisplay />
+          )}
+        </div>
       </CardContent>
     </Card>
   );

@@ -110,7 +110,7 @@ const AnalyticsModule = ({ isCompact = false }: AnalyticsModuleProps) => {
             <div className="text-white/60 text-[10px]">Prompts</div>
           </div>
           <div>
-            <div className="text-purple-400 text-xs font-semibold">{realStats.successRate}%</div>
+            <div className="text-red-400 text-xs font-semibold">{realStats.successRate}%</div>
             <div className="text-white/60 text-[10px]">Success</div>
           </div>
         </div>
@@ -133,7 +133,7 @@ const AnalyticsModule = ({ isCompact = false }: AnalyticsModuleProps) => {
   }
 
   return (
-    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl shadow-lg">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-white flex items-center space-x-2">
@@ -193,7 +193,7 @@ const AnalyticsModule = ({ isCompact = false }: AnalyticsModuleProps) => {
             <div className="text-white/60 text-sm">Prompts Processed</div>
           </div>
           <div className="space-y-1">
-            <div className="text-purple-400 text-2xl font-bold">{realStats.successRate}%</div>
+            <div className="text-red-400 text-2xl font-bold">{realStats.successRate}%</div>
             <div className="text-white/60 text-sm">Success Rate</div>
           </div>
         </div>

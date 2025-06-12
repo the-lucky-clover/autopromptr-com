@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { LogOut, Settings, User } from 'lucide-react';
+import { LogOut, CreditCard, User, Key, Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const UserProfile = () => {
@@ -29,7 +29,7 @@ const UserProfile = () => {
         variant="ghost"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        className="p-0 h-auto hover:bg-white/10 rounded-full"
+        className="p-0 h-auto hover:bg-white/10 rounded-xl"
       >
         <div className="flex items-center space-x-3 p-2 rounded-xl hover:bg-white/10 transition-colors">
           <Avatar className="h-8 w-8">
@@ -52,7 +52,7 @@ const UserProfile = () => {
             className="fixed inset-0 z-40" 
             onClick={() => setIsOpen(false)}
           />
-          <Card className="absolute bottom-full left-0 mb-2 w-72 bg-white/10 backdrop-blur-xl border-white/20 z-50 rounded-xl">
+          <Card className="absolute bottom-full left-0 mb-2 w-80 bg-white/10 backdrop-blur-xl border-white/20 z-50 rounded-xl shadow-2xl">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3 mb-4 p-3 bg-white/5 rounded-xl">
                 <Avatar className="h-12 w-12">
@@ -74,16 +74,32 @@ const UserProfile = () => {
                   size="sm"
                   className="w-full justify-start text-white hover:bg-white/10 rounded-xl"
                 >
-                  <User className="h-4 w-4 mr-3" />
-                  Profile
+                  <CreditCard className="h-4 w-4 mr-3" />
+                  Subscription
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="w-full justify-start text-white hover:bg-white/10 rounded-xl"
                 >
-                  <Settings className="h-4 w-4 mr-3" />
-                  Settings
+                  <User className="h-4 w-4 mr-3" />
+                  Change Email
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-white hover:bg-white/10 rounded-xl"
+                >
+                  <Key className="h-4 w-4 mr-3" />
+                  Change Password
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-white hover:bg-white/10 rounded-xl"
+                >
+                  <Shield className="h-4 w-4 mr-3" />
+                  Two-Factor Auth
                 </Button>
                 <div className="border-t border-white/10 pt-2 mt-2">
                   <Button

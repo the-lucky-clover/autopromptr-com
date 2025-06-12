@@ -16,7 +16,9 @@ import {
   Camera, 
   Zap,
   User,
-  LucideIcon
+  LucideIcon,
+  MessageCircle,
+  BookOpen
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -54,6 +56,16 @@ const items: Array<{
     url: "/dashboard/settings",
     icon: Settings,
   },
+  {
+    title: "Contact",
+    url: "/dashboard/contact",
+    icon: MessageCircle,
+  },
+  {
+    title: "User Guide",
+    url: "/dashboard/user-guide",
+    icon: BookOpen,
+  },
 ];
 
 // Admin items with proper typing
@@ -74,7 +86,7 @@ export function AppSidebar() {
   const { isSysOp } = useUserRole();
 
   return (
-    <Sidebar className="bg-white/5 backdrop-blur-sm border-white/10">
+    <Sidebar className="bg-white/5 backdrop-blur-sm border-white/10 shadow-2xl">
       <SidebarHeader className="p-4 border-b border-white/10">
         <div className="flex justify-center">
           <BrandLogo size="small" variant="horizontal" />
@@ -93,13 +105,13 @@ export function AppSidebar() {
                     <SidebarMenuButton 
                       asChild
                       isActive={isActive}
-                      className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-200 ${
-                        isActive ? 'bg-gradient-to-r from-blue-600/50 to-purple-600/50 backdrop-blur-sm border border-blue-400/30 shadow-lg rounded-lg' : 'rounded-lg'
+                      className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-200 rounded-lg ${
+                        isActive ? 'bg-gradient-to-r from-blue-600/70 to-purple-600/70 backdrop-blur-sm border border-blue-400/40 shadow-lg shadow-blue-500/25' : ''
                       }`}
                     >
                       <Link to={item.url}>
-                        <IconComponent className="h-4 w-4" />
-                        <span className={isActive ? 'font-medium text-white' : ''}>{item.title}</span>
+                        <IconComponent className={`h-4 w-4 ${isActive ? 'text-white' : ''}`} />
+                        <span className={`${isActive ? 'font-medium text-white' : ''}`}>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -110,7 +122,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {isSysOp && (
-          <SidebarGroup>
+          <SidebarGroup className="mt-0">
             <SidebarGroupContent>
               <SidebarMenu>
                 {adminItems.map((item) => {
@@ -121,13 +133,13 @@ export function AppSidebar() {
                       <SidebarMenuButton 
                         asChild
                         isActive={isActive}
-                        className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-200 ${
-                          isActive ? 'bg-gradient-to-r from-blue-600/50 to-purple-600/50 backdrop-blur-sm border border-blue-400/30 shadow-lg rounded-lg' : 'rounded-lg'
+                        className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-200 rounded-lg ${
+                          isActive ? 'bg-gradient-to-r from-blue-600/70 to-purple-600/70 backdrop-blur-sm border border-blue-400/40 shadow-lg shadow-blue-500/25' : ''
                         }`}
                       >
                         <Link to={item.url}>
-                          <IconComponent className="h-4 w-4" />
-                          <span className={isActive ? 'font-medium text-white' : ''}>{item.title}</span>
+                          <IconComponent className={`h-4 w-4 ${isActive ? 'text-white' : ''}`} />
+                          <span className={`${isActive ? 'font-medium text-white' : ''}`}>{item.title}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
