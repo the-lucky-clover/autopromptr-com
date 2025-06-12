@@ -21,7 +21,10 @@ export class HealthDataService {
   private baseUrl: string;
   private lastFetch: number = 0;
   private cachedData: HealthMetrics | null = null;
-  private readonly CACHE_DURATION = 60000; // Increased to 60 seconds cache
+  private readonly CACHE_DURATION = 300000; // Increased to 5 minutes cache
+  private circuitBreakerOpen: boolean = false;
+  private failureCount: number = 0;
+  private readonly MAX_FAILURES = 3;
   
   constructor(baseUrl = 'https://autopromptr-backend.onrender.com') {
     this.baseUrl = baseUrl;
@@ -49,11 +52,27 @@ export class HealthDataService {
       return healthData;
     }
 
+    // Circuit breaker pattern - don't make requests if too many failures
+    if (this.circuitBreakerOpen) {
+      console.log('Health service circuit breaker is open - using cached data');
+      
+      const fallbackData: HealthMetrics = {
+        status: 'degraded',
+        responseTime: 0,
+        uptime: 'Service Offline',
+        timestamp: new Date()
+      };
+      
+      this.cachedData = fallbackData;
+      this.lastFetch = now;
+      return fallbackData;
+    }
+
     const startTime = Date.now();
     
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // Increased timeout
       
       // Simplified HEAD request to avoid complex CORS issues
       const response = await fetch(`${this.baseUrl}/`, {
@@ -71,6 +90,13 @@ export class HealthDataService {
         timestamp: new Date()
       };
       
+      // Reset failure count on success
+      this.failureCount = 0;
+      if (this.circuitBreakerOpen) {
+        this.circuitBreakerOpen = false;
+        console.log('Health service circuit breaker reset');
+      }
+      
       // Cache the result
       this.cachedData = healthData;
       this.lastFetch = now;
@@ -79,6 +105,15 @@ export class HealthDataService {
       
     } catch (err) {
       const responseTime = Date.now() - startTime;
+      
+      // Increment failure count
+      this.failureCount++;
+      
+      // Open circuit breaker if too many failures
+      if (this.failureCount >= this.MAX_FAILURES) {
+        this.circuitBreakerOpen = true;
+        console.log('Health service circuit breaker opened due to repeated failures');
+      }
       
       // Always assume healthy for CORS/network errors to reduce console spam
       const healthData: HealthMetrics = {
@@ -101,5 +136,21 @@ export class HealthDataService {
     
     // Any response means healthy
     return 'healthy';
+  }
+
+  // Method to manually reset circuit breaker
+  resetCircuitBreaker() {
+    this.circuitBreakerOpen = false;
+    this.failureCount = 0;
+    this.cachedData = null;
+  }
+
+  // Get circuit breaker status
+  getCircuitBreakerStatus() {
+    return {
+      isOpen: this.circuitBreakerOpen,
+      failureCount: this.failureCount,
+      maxFailures: this.MAX_FAILURES
+    };
   }
 }

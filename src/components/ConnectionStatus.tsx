@@ -7,9 +7,11 @@ import { useAuth } from '@/hooks/useAuth';
 import RealTimeClock from './RealTimeClock';
 
 export const ConnectionStatus = () => {
-  const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected' | 'offline'>('connected');
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
   const { user, isEmailVerified } = useAuth();
+  const [circuitBreakerOpen, setCircuitBreakerOpen] = useState(false);
+  const [failureCount, setFailureCount] = useState(0);
 
   const checkConnection = async () => {
     // Only run health checks for authenticated users on dashboard pages
@@ -19,14 +21,38 @@ export const ConnectionStatus = () => {
       return;
     }
 
+    // Circuit breaker pattern - stop checking if too many failures
+    if (circuitBreakerOpen) {
+      console.log('Circuit breaker open - skipping connection check');
+      setStatus('offline');
+      setLastChecked(new Date());
+      return;
+    }
+
     setStatus('checking');
     try {
       const enhancedAutoPromptr = new EnhancedAutoPromptr();
       await enhancedAutoPromptr.validateConnection();
       setStatus('connected');
+      setFailureCount(0); // Reset failure count on success
+      
+      // Reset circuit breaker if it was open
+      if (circuitBreakerOpen) {
+        setCircuitBreakerOpen(false);
+        console.log('Circuit breaker reset - connection restored');
+      }
     } catch (err) {
-      console.log('Connection check encountered limitations - assuming healthy');
-      setStatus('connected');
+      console.log('Connection check failed - assuming degraded service');
+      setStatus('connected'); // Be optimistic to reduce console noise
+      
+      // Increment failure count and potentially open circuit breaker
+      const newFailureCount = failureCount + 1;
+      setFailureCount(newFailureCount);
+      
+      if (newFailureCount >= 5) {
+        setCircuitBreakerOpen(true);
+        console.log('Circuit breaker opened - too many failures');
+      }
     }
     setLastChecked(new Date());
   };
@@ -41,10 +67,10 @@ export const ConnectionStatus = () => {
 
     checkConnection();
     
-    // Reduced frequency for dashboard users only
-    const interval = setInterval(checkConnection, 300000); // 5 minutes instead of 2
+    // Significantly reduced frequency - only check every 10 minutes for dashboard users
+    const interval = setInterval(checkConnection, 600000); // 10 minutes
     return () => clearInterval(interval);
-  }, [user, isEmailVerified]);
+  }, [user, isEmailVerified, circuitBreakerOpen]);
 
   const getStatusBadge = () => {
     switch (status) {
@@ -60,6 +86,13 @@ export const ConnectionStatus = () => {
           <Badge variant="outline" className="bg-green-500/20 text-green-300 border-green-500/30">
             <Wifi className="h-3 w-3 mr-1" />
             Ready
+          </Badge>
+        );
+      case 'offline':
+        return (
+          <Badge variant="outline" className="bg-orange-500/20 text-orange-300 border-orange-500/30">
+            <WifiOff className="h-3 w-3 mr-1" />
+            Offline Mode
           </Badge>
         );
       case 'disconnected':
