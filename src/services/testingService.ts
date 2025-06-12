@@ -1,9 +1,8 @@
-
 import { ConnectionDiagnostics } from './connectionDiagnostics';
 
 export interface TestResult {
   name: string;
-  status: 'passed' | 'failed' | 'skipped';
+  status: 'passed' | 'failed' | 'skipped' | 'partial';
   duration: number;
   error?: string;
   details?: any;

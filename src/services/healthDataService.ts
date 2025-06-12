@@ -165,7 +165,12 @@ export class HealthDataService {
     error?: string;
   }> {
     try {
-      return await this.testingService.runQuickHealthCheck();
+      const result = await this.testingService.runQuickHealthCheck();
+      return {
+        isConnected: result.isHealthy,
+        responseTime: result.responseTime,
+        error: result.error
+      };
     } catch (error) {
       return {
         isConnected: false,
