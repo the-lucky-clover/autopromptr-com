@@ -12,6 +12,8 @@ interface BatchExtractorPageContentProps {
   setPrompts: (value: string) => void;
   batchName: string;
   setBatchName: (value: string) => void;
+  targetUrl: string;
+  setTargetUrl: (value: string) => void;
   isProcessing: boolean;
   CHARACTER_LIMIT: number;
   characterCount: number;
@@ -19,6 +21,7 @@ interface BatchExtractorPageContentProps {
   handleExtract: () => void;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   getCharacterCountColor: () => string;
+  getEffectiveTargetUrl: () => string;
 }
 
 const BatchExtractorPageContent = ({
@@ -26,13 +29,16 @@ const BatchExtractorPageContent = ({
   setPrompts,
   batchName,
   setBatchName,
+  targetUrl,
+  setTargetUrl,
   isProcessing,
   CHARACTER_LIMIT,
   characterCount,
   isOverLimit,
   handleExtract,
   handleFileUpload,
-  getCharacterCountColor
+  getCharacterCountColor,
+  getEffectiveTargetUrl
 }: BatchExtractorPageContentProps) => {
   const handleFileContent = (content: string, filename: string) => {
     setPrompts(content);
@@ -63,6 +69,22 @@ const BatchExtractorPageContent = ({
           />
         </div>
 
+        <div className="space-y-2">
+          <Label htmlFor="target-url" className="text-white text-sm font-medium">
+            Project Target URL
+          </Label>
+          <Input
+            id="target-url"
+            value={targetUrl}
+            onChange={(e) => setTargetUrl(e.target.value)}
+            placeholder="https://lovable.dev (default for new projects)"
+            className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl h-12 text-base"
+          />
+          <p className="text-white/60 text-xs">
+            Leave empty to start a new Lovable project. You'll be asked to update with the actual project URL after creation.
+          </p>
+        </div>
+
         <ContentInputSection
           prompts={prompts}
           onPromptsChange={setPrompts}
@@ -85,6 +107,7 @@ const BatchExtractorPageContent = ({
 
         <div className="pt-4 border-t border-white/10">
           <p className="text-white/60 text-sm">
+            Target: <span className="text-white/80 font-mono">{getEffectiveTargetUrl()}</span> • 
             Max {CHARACTER_LIMIT.toLocaleString()} characters • Extracts up to 100 prompts • File size limit: 10MB
           </p>
         </div>

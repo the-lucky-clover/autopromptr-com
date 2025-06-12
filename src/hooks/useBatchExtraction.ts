@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
@@ -8,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 export const useBatchExtraction = () => {
   const [prompts, setPrompts] = useState('');
   const [batchName, setBatchName] = useState('');
+  const [targetUrl, setTargetUrl] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const { setBatches, triggerBatchSync } = usePersistentBatches();
   const { toast } = useToast();
@@ -21,6 +21,10 @@ export const useBatchExtraction = () => {
     if (isOverLimit) return 'text-red-400';
     if (characterCount > CHARACTER_LIMIT * 0.8) return 'text-orange-400';
     return 'text-white/70';
+  };
+
+  const getEffectiveTargetUrl = () => {
+    return targetUrl.trim() || 'https://lovable.dev';
   };
 
   const extractPrompts = (text: string): string[] => {
@@ -102,6 +106,8 @@ export const useBatchExtraction = () => {
         return;
       }
 
+      const effectiveUrl = getEffectiveTargetUrl();
+
       // Create text prompts with proper structure
       const textPrompts: TextPrompt[] = extractedPrompts.map((prompt, index) => ({
         id: crypto.randomUUID(),
@@ -113,7 +119,7 @@ export const useBatchExtraction = () => {
       const newBatch: Batch = {
         id: crypto.randomUUID(),
         name: batchName,
-        targetUrl: '',
+        targetUrl: effectiveUrl,
         description: `Extracted from batch extractor with ${textPrompts.length} prompts`,
         prompts: textPrompts,
         status: 'pending',
@@ -141,11 +147,15 @@ export const useBatchExtraction = () => {
       // Clear form
       setPrompts('');
       setBatchName('');
+      setTargetUrl('');
 
       // Show success message and navigate
+      const isLovableDefault = effectiveUrl === 'https://lovable.dev';
       toast({
         title: "Batch created successfully!",
-        description: `Extracted ${textPrompts.length} prompts and saved to "${batchName}". Navigating to dashboard...`,
+        description: isLovableDefault 
+          ? `Extracted ${textPrompts.length} prompts for new Lovable project. You'll be prompted to update the project URL after automation starts.`
+          : `Extracted ${textPrompts.length} prompts for "${batchName}". Navigating to dashboard...`,
       });
 
       // Navigate to dashboard after a short delay
@@ -153,7 +163,7 @@ export const useBatchExtraction = () => {
         navigate('/dashboard');
       }, 1500);
 
-      console.log(`Successfully extracted ${textPrompts.length} prompts and created batch "${batchName}"`);
+      console.log(`Successfully extracted ${textPrompts.length} prompts and created batch "${batchName}" with target URL: ${effectiveUrl}`);
 
     } catch (error) {
       console.error('Error during batch extraction:', error);
@@ -172,11 +182,14 @@ export const useBatchExtraction = () => {
     setPrompts,
     batchName,
     setBatchName,
+    targetUrl,
+    setTargetUrl,
     isProcessing,
     CHARACTER_LIMIT,
     characterCount,
     isOverLimit,
     handleExtract,
-    getCharacterCountColor
+    getCharacterCountColor,
+    getEffectiveTargetUrl
   };
 };

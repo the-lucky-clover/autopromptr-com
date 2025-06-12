@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Zap } from "lucide-react";
 import { useBatchExtraction } from '@/hooks/useBatchExtraction';
 import ContentInputSection from './batch-extractor/ContentInputSection';
@@ -16,12 +17,15 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
     setPrompts,
     batchName,
     setBatchName,
+    targetUrl,
+    setTargetUrl,
     isProcessing,
     CHARACTER_LIMIT,
     characterCount,
     isOverLimit,
     handleExtract,
-    getCharacterCountColor
+    getCharacterCountColor,
+    getEffectiveTargetUrl
   } = useBatchExtraction();
 
   const handleFileContent = (content: string, filename: string) => {
@@ -57,6 +61,21 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
           />
         </div>
 
+        {!isCompact && (
+          <div className="space-y-2">
+            <Label htmlFor="target-url-module" className="text-white text-xs font-medium">
+              Project Target URL
+            </Label>
+            <Input
+              id="target-url-module"
+              value={targetUrl}
+              onChange={(e) => setTargetUrl(e.target.value)}
+              placeholder="https://lovable.dev (default)"
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl h-8 text-xs"
+            />
+          </div>
+        )}
+
         <ContentInputSection
           prompts={prompts}
           onPromptsChange={setPrompts}
@@ -80,7 +99,7 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
         {!isCompact && (
           <div className="pt-2 border-t border-white/10">
             <p className="text-white/60 text-xs">
-              Max {CHARACTER_LIMIT.toLocaleString()} characters • Extracts up to 100 prompts
+              Target: <span className="text-white/80 font-mono text-xs">{getEffectiveTargetUrl()}</span> • Max {CHARACTER_LIMIT.toLocaleString()} characters
             </p>
           </div>
         )}

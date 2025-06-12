@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,6 +15,23 @@ interface PromptEditorProps {
 
 const PromptEditor = ({ prompts, onUpdatePrompt, onDeletePrompt, onAddPrompt, disabled = false }: PromptEditorProps) => {
   const [editingPrompt, setEditingPrompt] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState<string>('');
+
+  const handleStartEdit = (prompt: TextPrompt) => {
+    setEditingPrompt(prompt.id);
+    setEditingText(prompt.text);
+  };
+
+  const handleSaveEdit = (promptId: string) => {
+    onUpdatePrompt(promptId, editingText);
+    setEditingPrompt(null);
+    setEditingText('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPrompt(null);
+    setEditingText('');
+  };
 
   return (
     <div className="space-y-3">
@@ -25,15 +43,15 @@ const PromptEditor = ({ prompts, onUpdatePrompt, onDeletePrompt, onAddPrompt, di
             {editingPrompt === prompt.id ? (
               <div className="space-y-2">
                 <Textarea
-                  value={prompt.text}
-                  onChange={(e) => onUpdatePrompt(prompt.id, e.target.value)}
+                  value={editingText}
+                  onChange={(e) => setEditingText(e.target.value)}
                   rows={2}
                   className="w-full"
                 />
                 <div className="flex space-x-2">
                   <Button
                     size="sm"
-                    onClick={() => setEditingPrompt(null)}
+                    onClick={() => handleSaveEdit(prompt.id)}
                     className="bg-green-600 hover:bg-green-700"
                   >
                     <Save className="h-3 w-3 mr-1" />
@@ -42,7 +60,7 @@ const PromptEditor = ({ prompts, onUpdatePrompt, onDeletePrompt, onAddPrompt, di
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => setEditingPrompt(null)}
+                    onClick={handleCancelEdit}
                   >
                     <X className="h-3 w-3 mr-1" />
                     Cancel
@@ -56,7 +74,7 @@ const PromptEditor = ({ prompts, onUpdatePrompt, onDeletePrompt, onAddPrompt, di
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => setEditingPrompt(prompt.id)}
+                    onClick={() => handleStartEdit(prompt)}
                     disabled={disabled}
                   >
                     <Edit2 className="h-3 w-3 mr-1" />
