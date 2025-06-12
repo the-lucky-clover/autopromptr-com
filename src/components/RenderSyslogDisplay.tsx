@@ -24,9 +24,10 @@ interface RenderSyslogEntry {
 interface RenderSyslogDisplayProps {
   batchId?: string | null;
   maxEntries?: number;
+  isCompact?: boolean;
 }
 
-const RenderSyslogDisplay = ({ batchId, maxEntries = 50 }: RenderSyslogDisplayProps) => {
+const RenderSyslogDisplay = ({ batchId, maxEntries = 50, isCompact = false }: RenderSyslogDisplayProps) => {
   const [syslogEntries, setSyslogEntries] = useState<RenderSyslogEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -100,26 +101,61 @@ const RenderSyslogDisplay = ({ batchId, maxEntries = 50 }: RenderSyslogDisplayPr
   if (isLoading) {
     return (
       <div className="bg-white/5 rounded-xl p-4">
-        <h5 className="text-white font-medium mb-3 flex items-center">
+        <div className="flex items-center mb-3">
           <Server className="w-4 h-4 mr-2" />
-          Render.com Syslog Stream
-        </h5>
+          <span className="text-white font-medium text-sm">Render.com Syslog Stream</span>
+        </div>
         <p className="text-white/60 text-sm">Loading syslog entries...</p>
       </div>
     );
   }
 
+  if (isCompact) {
+    return (
+      <ScrollArea className="h-16 bg-white/5 rounded-lg p-2">
+        {syslogEntries.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-white/60 text-xs text-center">
+              {batchId ? 'No syslog entries for this batch yet' : 'No syslog entries received yet'}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {syslogEntries.slice(0, 2).map((entry) => {
+              const severityInfo = getSeverityInfo(entry.severity);
+              return (
+                <div key={entry.id} className="flex items-center justify-between text-xs">
+                  <div className="flex items-center space-x-1">
+                    <Badge className={`${severityInfo.color} text-white text-xs px-1 py-0`}>
+                      {severityInfo.icon}
+                    </Badge>
+                    <span className="text-white/90 truncate">{entry.message}</span>
+                  </div>
+                  <span className="text-white/50 text-xs">
+                    {new Date(entry.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </ScrollArea>
+    );
+  }
+
   return (
     <div className="bg-white/5 rounded-xl p-4">
-      <h5 className="text-white font-medium mb-3 flex items-center">
-        <Server className="w-4 h-4 mr-2" />
-        Render.com Syslog Stream
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center">
+          <Server className="w-4 h-4 mr-2" />
+          <span className="text-white font-medium">Render.com Syslog Stream</span>
+        </div>
         {syslogEntries.length > 0 && (
-          <Badge variant="outline" className="ml-2 text-white/80 border-white/30">
+          <Badge variant="outline" className="text-white/80 border-white/30">
             {syslogEntries.length} entries
           </Badge>
         )}
-      </h5>
+      </div>
       
       <ScrollArea className="h-64">
         {syslogEntries.length === 0 ? (
