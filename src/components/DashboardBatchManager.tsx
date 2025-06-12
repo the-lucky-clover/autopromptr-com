@@ -1,10 +1,13 @@
 
 import { useEffect } from 'react';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
+import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
 import BatchModal from './BatchModal';
 import DashboardBatchList from './DashboardBatchList';
 import DashboardEmptyState from './DashboardEmptyState';
 import DashboardBatchHeader from './DashboardBatchHeader';
+import { Button } from './ui/button';
+import { AlertTriangle } from 'lucide-react';
 
 interface DashboardBatchManagerProps {
   onStatsUpdate?: (stats: {
@@ -37,6 +40,8 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
     handleNewBatch
   } = useDashboardBatchManager();
 
+  const { detectAndFixFailedBatches } = useBatchStatusManager();
+
   // Update stats whenever batches change
   useEffect(() => {
     if (onStatsUpdate) {
@@ -57,6 +62,31 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
     }
   }, [batches, onBatchesUpdate]);
 
+  // Check for stuck/failed batches on component mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const stuckBatches = batches.filter(batch => {
+        const now = new Date();
+        const timeDiff = now.getTime() - new Date(batch.createdAt).getTime();
+        const tenMinutes = 10 * 60 * 1000;
+        return (batch.status === 'pending' || batch.status === 'running') && timeDiff > tenMinutes;
+      });
+
+      if (stuckBatches.length > 0) {
+        console.log('Found stuck batches:', stuckBatches.map(b => b.name));
+      }
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [batches]);
+
+  const stuckBatchCount = batches.filter(batch => {
+    const now = new Date();
+    const timeDiff = now.getTime() - new Date(batch.createdAt).getTime();
+    const tenMinutes = 10 * 60 * 1000;
+    return (batch.status === 'pending' || batch.status === 'running') && timeDiff > tenMinutes;
+  }).length;
+
   return (
     <div className={`space-y-5 ${isCompact ? 'space-y-3' : ''}`}>
       <div className={`space-y-5 ${isCompact ? 'space-y-3' : ''}`}>
@@ -64,7 +94,22 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
           <DashboardEmptyState onNewBatch={handleNewBatch} />
         ) : (
           <>
-            <DashboardBatchHeader onNewBatch={handleNewBatch} />
+            <div className="flex items-center justify-between">
+              <DashboardBatchHeader onNewBatch={handleNewBatch} />
+              
+              {stuckBatchCount > 0 && (
+                <Button
+                  onClick={detectAndFixFailedBatches}
+                  variant="outline"
+                  size="sm"
+                  className="bg-orange-500/20 border-orange-500/30 text-orange-300 hover:bg-orange-500/30"
+                >
+                  <AlertTriangle className="w-4 h-4 mr-2" />
+                  Fix {stuckBatchCount} Stuck Batch{stuckBatchCount > 1 ? 'es' : ''}
+                </Button>
+              )}
+            </div>
+            
             <DashboardBatchList 
               batches={batches}
               onEdit={handleEditBatch}

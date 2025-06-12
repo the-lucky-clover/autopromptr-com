@@ -14,6 +14,7 @@ export interface Batch {
   status: 'pending' | 'running' | 'completed' | 'failed' | 'stopped' | 'paused';
   createdAt: Date;
   platform?: string;
+  errorMessage?: string; // Added error message support
   settings?: {
     waitForIdle: boolean;
     maxRetries: number;

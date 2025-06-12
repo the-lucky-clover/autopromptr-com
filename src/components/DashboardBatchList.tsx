@@ -3,8 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Edit2, Trash2, Play, Square, Pause, Rewind, Loader2 } from 'lucide-react';
+import { Edit2, Trash2, Play, Square, Pause, Rewind, Loader2, AlertCircle } from 'lucide-react';
 import { Batch } from '@/types/batch';
+import BatchStatusControls from './BatchStatusControls';
+import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
 
 interface DashboardBatchListProps {
   batches: Batch[];
@@ -29,6 +31,8 @@ const DashboardBatchList = ({
   selectedBatchId, 
   automationLoading 
 }: DashboardBatchListProps) => {
+  const { markBatchAsFailed, resetBatchStatus, isUpdating } = useBatchStatusManager();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-500';
@@ -67,6 +71,9 @@ const DashboardBatchList = ({
                     <div className="flex items-center space-x-2 flex-shrink-0">
                       <span className={`w-2 h-2 rounded-full ${getStatusColor(batch.status)}`} />
                       <span className="text-white/70 text-xs whitespace-nowrap">{getStatusText(batch.status)}</span>
+                      {batch.status === 'failed' && (
+                        <AlertCircle className="w-3 h-3 text-red-400" />
+                      )}
                     </div>
                   </div>
                   <p className="text-white/60 text-sm truncate">{batch.targetUrl}</p>
@@ -74,9 +81,16 @@ const DashboardBatchList = ({
                     {batch.prompts.length} prompt{batch.prompts.length !== 1 ? 's' : ''}
                     {batch.platform && ` • Platform: ${batch.platform}`}
                   </p>
+                  
+                  {/* Error Message Display */}
+                  {batch.status === 'failed' && (batch as any).errorMessage && (
+                    <div className="mt-2 p-2 bg-red-500/20 border border-red-500/30 rounded-lg">
+                      <p className="text-red-300 text-xs">{(batch as any).errorMessage}</p>
+                    </div>
+                  )}
                 </div>
                 
-                {/* Control Buttons - Horizontal on mobile, grouped on desktop */}
+                {/* Control Buttons */}
                 <div className="flex items-center justify-between sm:justify-end gap-2">
                   {/* Play Controls */}
                   <div className="flex items-center space-x-1 bg-white/10 rounded-lg p-1">
@@ -137,6 +151,14 @@ const DashboardBatchList = ({
                       </Button>
                     )}
                   </div>
+                  
+                  {/* Status Management Controls */}
+                  <BatchStatusControls
+                    batch={batch}
+                    onMarkAsFailed={markBatchAsFailed}
+                    onReset={resetBatchStatus}
+                    isUpdating={isUpdating}
+                  />
                   
                   {/* Edit and Delete Controls */}
                   <div className="flex items-center space-x-1 bg-white/5 rounded-lg p-1">

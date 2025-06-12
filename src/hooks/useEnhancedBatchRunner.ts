@@ -51,7 +51,7 @@ export const useEnhancedBatchRunner = () => {
     try {
       // Update batch status to pending
       setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { ...b, status: 'pending' as const } : b
+        b.id === batch.id ? { ...b, status: 'pending' as const, errorMessage: undefined } : b
       ));
 
       // ENHANCED REDUNDANT settings
@@ -102,7 +102,8 @@ export const useEnhancedBatchRunner = () => {
           ...b, 
           status: 'running' as const, 
           platform: detectedPlatform, 
-          settings: enhancedSettings 
+          settings: enhancedSettings,
+          errorMessage: undefined
         } : b
       ));
       
@@ -129,10 +130,6 @@ export const useEnhancedBatchRunner = () => {
     } catch (err) {
       console.error('💥 Enhanced redundant batch run failed:', err);
       
-      setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { ...b, status: 'failed' as const } : b
-      ));
-      
       let errorMessage = 'Unknown error occurred';
       
       if (err instanceof Error) {
@@ -140,29 +137,61 @@ export const useEnhancedBatchRunner = () => {
         
         // Enhanced error categorization for redundant failures
         if (errorMessage.includes('REDUNDANCY_EXHAUSTED')) {
-          toast({
-            title: "All backends exhausted",
-            description: "Both Puppeteer and AutoPromptr backends failed after 6 total attempts. Both services may be down.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        if (errorMessage.includes('database')) {
-          toast({
-            title: "Database operation failed",
-            description: "Enhanced database save failed. Please try again.",
-            variant: "destructive",
-          });
-          return;
+          errorMessage = 'All backends exhausted - Both Puppeteer and AutoPromptr failed after 6 attempts';
+        } else if (errorMessage.includes('404')) {
+          errorMessage = 'Backend endpoint not found (404) - Please check backend configuration';
+        } else if (errorMessage.includes('database')) {
+          errorMessage = 'Database operation failed - Please try again';
         }
       }
       
-      toast({
-        title: "Enhanced redundant batch failed",
-        description: `Redundant automation failed: ${errorMessage}`,
-        variant: "destructive",
-      });
+      // Update batch status to failed with error message
+      setBatches(prev => prev.map(b => 
+        b.id === batch.id ? { 
+          ...b, 
+          status: 'failed' as const,
+          errorMessage: errorMessage
+        } : b
+      ));
+      
+      // Save failed status to database
+      try {
+        const failedBatch = {
+          ...batch,
+          status: 'failed' as const,
+          errorMessage: errorMessage,
+          platform: detectedPlatform
+        };
+        await saveBatchToDatabase(failedBatch);
+      } catch (saveError) {
+        console.error('Failed to save failed batch status to database:', saveError);
+      }
+      
+      if (errorMessage.includes('REDUNDANCY_EXHAUSTED')) {
+        toast({
+          title: "All backends exhausted",
+          description: "Both Puppeteer and AutoPromptr backends failed after 6 total attempts. Both services may be down.",
+          variant: "destructive",
+        });
+      } else if (errorMessage.includes('404')) {
+        toast({
+          title: "Backend endpoint not found",
+          description: "The backend automation service is not available. Please check your backend configuration in Settings.",
+          variant: "destructive",
+        });
+      } else if (errorMessage.includes('database')) {
+        toast({
+          title: "Database operation failed",
+          description: "Enhanced database save failed. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Enhanced redundant batch failed",
+          description: `Redundant automation failed: ${errorMessage}`,
+          variant: "destructive",
+        });
+      }
       
     } finally {
       setAutomationLoading(false);
