@@ -14,8 +14,6 @@ import {
   Home, 
   Settings, 
   Camera, 
-  Crown,
-  Infinity,
   Zap,
   User,
   LucideIcon
@@ -23,6 +21,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
 import BrandLogo from "@/components/BrandLogo";
+import UserProfile from "@/components/UserProfile";
 
 // Navigation items with proper typing
 const items: Array<{
@@ -46,6 +45,11 @@ const items: Array<{
     icon: Camera,
   },
   {
+    title: "Profile",
+    url: "/dashboard/profile",
+    icon: User,
+  },
+  {
     title: "Settings",
     url: "/dashboard/settings",
     icon: Settings,
@@ -61,7 +65,7 @@ const adminItems: Array<{
   {
     title: "Admin",
     url: "/dashboard/admin",
-    icon: Crown,
+    icon: Settings,
   },
 ];
 
@@ -83,16 +87,19 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => {
                 const IconComponent = item.icon;
+                const isActive = location.pathname === item.url;
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton 
                       asChild
-                      isActive={location.pathname === item.url}
-                      className="text-white hover:bg-white/10 data-[state=open]:bg-white/10"
+                      isActive={isActive}
+                      className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 ${
+                        isActive ? 'bg-white/30 backdrop-blur-sm border border-white/40 shadow-lg' : ''
+                      }`}
                     >
                       <Link to={item.url}>
                         <IconComponent className="h-4 w-4" />
-                        <span>{item.title}</span>
+                        <span className={isActive ? 'font-medium text-white' : ''}>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -108,17 +115,19 @@ export function AppSidebar() {
               <SidebarMenu>
                 {adminItems.map((item) => {
                   const IconComponent = item.icon;
+                  const isActive = location.pathname === item.url;
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton 
                         asChild
-                        isActive={location.pathname === item.url}
-                        className="text-white hover:bg-white/10 data-[state=open]:bg-white/10"
+                        isActive={isActive}
+                        className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 ${
+                          isActive ? 'bg-white/30 backdrop-blur-sm border border-white/40 shadow-lg' : ''
+                        }`}
                       >
                         <Link to={item.url}>
-                          <IconComponent className="h-4 w-4 text-yellow-400" />
-                          <span>{item.title}</span>
-                          <Infinity className="h-3 w-3 text-yellow-400 ml-auto" />
+                          <IconComponent className="h-4 w-4" />
+                          <span className={isActive ? 'font-medium text-white' : ''}>{item.title}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -131,10 +140,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-white/10">
-        <SidebarMenuButton className="text-white hover:bg-white/10 justify-start">
-          <User className="h-4 w-4" />
-          <span>Profile</span>
-        </SidebarMenuButton>
+        <UserProfile />
       </SidebarFooter>
     </Sidebar>
   );

@@ -17,8 +17,6 @@ export const ConnectionStatus = () => {
       setStatus('connected');
     } catch (err) {
       console.log('Connection check encountered CORS limitations - assuming healthy');
-      // Be more forgiving - CORS errors are expected in browser environment
-      // Assume connected unless there's a clear systemic failure
       setStatus('connected');
     }
     setLastChecked(new Date());
@@ -27,7 +25,6 @@ export const ConnectionStatus = () => {
   useEffect(() => {
     checkConnection();
     
-    // Check connection every 2 minutes
     const interval = setInterval(checkConnection, 120000);
     return () => clearInterval(interval);
   }, []);
@@ -60,8 +57,8 @@ export const ConnectionStatus = () => {
 
   return (
     <div className="flex items-center space-x-4">
-      <RealTimeClock />
       {getStatusBadge()}
+      <RealTimeClock />
     </div>
   );
 };

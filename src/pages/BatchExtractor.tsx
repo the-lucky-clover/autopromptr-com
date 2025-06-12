@@ -1,14 +1,14 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, Upload, Download, AlertCircle } from "lucide-react";
+import { Zap, Upload, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { ConnectionStatus } from "@/components/ConnectionStatus";
 
 const BatchExtractor = () => {
   const [prompts, setPrompts] = useState('');
@@ -136,27 +136,25 @@ const BatchExtractor = () => {
       <div className="min-h-screen flex w-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         <AppSidebar />
         <SidebarInset>
-          <div className="p-6">
-            <div className="mb-6">
+          <div className="flex justify-between items-center p-6 border-b border-white/10">
+            <div>
               <h1 className="text-3xl font-bold text-white mb-2">Batch Extractor</h1>
-              <p className="text-purple-200">Extract and process multiple prompts from large text blocks</p>
             </div>
-
+            <ConnectionStatus />
+          </div>
+          
+          <div className="p-6">
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl relative overflow-hidden max-w-4xl">
               {/* BETA Banner */}
-              <div className="absolute top-0 right-0 w-32 h-20 overflow-hidden">
-                <div className="absolute top-3 right-[-32px] bg-orange-500/90 text-white text-xs font-mono font-bold px-12 py-1 transform rotate-45 shadow-lg">
+              <div className="absolute top-0 right-0 w-40 h-20 overflow-hidden pointer-events-none">
+                <div className="absolute top-3 right-[-40px] bg-orange-500/90 text-white text-xs font-mono font-bold px-16 py-1 transform rotate-45 shadow-lg">
                   beta
                 </div>
               </div>
               
               <CardHeader className="pb-6">
-                <CardTitle className="text-white flex items-center space-x-2 text-xl">
-                  <Zap className="w-5 h-5 text-blue-400" />
-                  <span>Intelligent Prompt Extraction</span>
-                </CardTitle>
-                <CardDescription className="text-purple-200">
-                  Paste large amounts of text or import files to automatically extract individual prompts
+                <CardDescription className="text-purple-200 text-left">
+                  Extract and process multiple prompts from large text blocks
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
