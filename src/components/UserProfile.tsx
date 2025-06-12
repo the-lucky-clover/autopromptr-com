@@ -29,13 +29,21 @@ const UserProfile = () => {
         variant="ghost"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        className="p-0 h-auto hover:bg-white/10"
+        className="p-0 h-auto hover:bg-white/10 rounded-full"
       >
-        <Avatar className="h-8 w-8">
-          <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium">
-            {getInitial()}
-          </AvatarFallback>
-        </Avatar>
+        <div className="flex items-center space-x-3 p-2 rounded-xl hover:bg-white/10 transition-colors">
+          <Avatar className="h-8 w-8">
+            <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium">
+              {getInitial()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0 text-left">
+            <p className="text-white text-sm font-medium truncate">
+              {user?.email}
+            </p>
+            <p className="text-white/70 text-xs">Online</p>
+          </div>
+        </div>
       </Button>
 
       {isOpen && (
@@ -44,11 +52,11 @@ const UserProfile = () => {
             className="fixed inset-0 z-40" 
             onClick={() => setIsOpen(false)}
           />
-          <Card className="absolute bottom-full left-0 mb-2 w-64 bg-white/10 backdrop-blur-xl border-white/20 z-50">
-            <CardContent className="p-3">
-              <div className="flex items-center space-x-3 mb-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+          <Card className="absolute bottom-full left-0 mb-2 w-72 bg-white/10 backdrop-blur-xl border-white/20 z-50 rounded-xl">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3 mb-4 p-3 bg-white/5 rounded-xl">
+                <Avatar className="h-12 w-12">
+                  <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-medium">
                     {getInitial()}
                   </AvatarFallback>
                 </Avatar>
@@ -60,24 +68,34 @@ const UserProfile = () => {
                 </div>
               </div>
               
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start text-white hover:bg-white/10"
+                  className="w-full justify-start text-white hover:bg-white/10 rounded-xl"
                 >
-                  <Settings className="h-4 w-4 mr-2" />
+                  <User className="h-4 w-4 mr-3" />
+                  Profile
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-white hover:bg-white/10 rounded-xl"
+                >
+                  <Settings className="h-4 w-4 mr-3" />
                   Settings
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="w-full justify-start text-white hover:bg-white/10"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign out
-                </Button>
+                <div className="border-t border-white/10 pt-2 mt-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleSignOut}
+                    className="w-full justify-start text-white hover:bg-red-500/20 hover:text-red-300 rounded-xl"
+                  >
+                    <LogOut className="h-4 w-4 mr-3" />
+                    Sign out
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

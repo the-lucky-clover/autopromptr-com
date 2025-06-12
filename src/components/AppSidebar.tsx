@@ -93,8 +93,8 @@ export function AppSidebar() {
                     <SidebarMenuButton 
                       asChild
                       isActive={isActive}
-                      className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 ${
-                        isActive ? 'bg-white/30 backdrop-blur-sm border border-white/40 shadow-lg' : ''
+                      className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-200 ${
+                        isActive ? 'bg-gradient-to-r from-blue-600/50 to-purple-600/50 backdrop-blur-sm border border-blue-400/30 shadow-lg rounded-lg' : 'rounded-lg'
                       }`}
                     >
                       <Link to={item.url}>
@@ -121,8 +121,8 @@ export function AppSidebar() {
                       <SidebarMenuButton 
                         asChild
                         isActive={isActive}
-                        className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 ${
-                          isActive ? 'bg-white/30 backdrop-blur-sm border border-white/40 shadow-lg' : ''
+                        className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-200 ${
+                          isActive ? 'bg-gradient-to-r from-blue-600/50 to-purple-600/50 backdrop-blur-sm border border-blue-400/30 shadow-lg rounded-lg' : 'rounded-lg'
                         }`}
                       >
                         <Link to={item.url}>
