@@ -3,31 +3,48 @@ import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Wifi, WifiOff, Loader2 } from 'lucide-react';
 import { EnhancedAutoPromptr } from '@/services/enhancedAutoPromptr';
+import { useAuth } from '@/hooks/useAuth';
 import RealTimeClock from './RealTimeClock';
 
 export const ConnectionStatus = () => {
   const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
+  const { user, isEmailVerified } = useAuth();
 
   const checkConnection = async () => {
+    // Only run health checks for authenticated users on dashboard pages
+    if (!user || !isEmailVerified || !window.location.pathname.includes('/dashboard')) {
+      setStatus('connected'); // Assume healthy on public pages
+      setLastChecked(new Date());
+      return;
+    }
+
     setStatus('checking');
     try {
       const enhancedAutoPromptr = new EnhancedAutoPromptr();
       await enhancedAutoPromptr.validateConnection();
       setStatus('connected');
     } catch (err) {
-      console.log('Connection check encountered CORS limitations - assuming healthy');
+      console.log('Connection check encountered limitations - assuming healthy');
       setStatus('connected');
     }
     setLastChecked(new Date());
   };
 
   useEffect(() => {
+    // Only start checking if user is authenticated and on dashboard
+    if (!user || !isEmailVerified || !window.location.pathname.includes('/dashboard')) {
+      setStatus('connected');
+      setLastChecked(new Date());
+      return;
+    }
+
     checkConnection();
     
-    const interval = setInterval(checkConnection, 120000);
+    // Reduced frequency for dashboard users only
+    const interval = setInterval(checkConnection, 300000); // 5 minutes instead of 2
     return () => clearInterval(interval);
-  }, []);
+  }, [user, isEmailVerified]);
 
   const getStatusBadge = () => {
     switch (status) {
