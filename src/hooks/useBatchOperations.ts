@@ -1,15 +1,12 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
-import { useBatchSync } from '@/hooks/useBatchSync';
 import { Batch, BatchFormData, TextPrompt } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 
 export const useBatchOperations = () => {
-  const { batches, setBatches } = usePersistentBatches();
-  const { triggerBatchSync } = useBatchSync();
+  const { batches, setBatches, triggerManualSync } = usePersistentBatches();
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const { toast } = useToast();
   const { status: batchStatus, loading: automationLoading, error: automationError, runBatch, stopBatch } = useBatchAutomation(selectedBatchId || undefined);
@@ -40,10 +37,8 @@ export const useBatchOperations = () => {
 
     setBatches(prev => [...prev, batch]);
     
-    // Trigger sync to update all components
-    setTimeout(() => {
-      triggerBatchSync();
-    }, 100);
+    // Manually trigger sync only for this explicit user action
+    triggerManualSync();
     
     toast({
       title: "Batch created",
@@ -64,10 +59,8 @@ export const useBatchOperations = () => {
       setSelectedBatchId(null);
     }
     
-    // Trigger sync to update all components immediately
-    setTimeout(() => {
-      triggerBatchSync();
-    }, 100);
+    // Manually trigger sync only for this explicit user action
+    triggerManualSync();
     
     toast({
       title: "Batch deleted",

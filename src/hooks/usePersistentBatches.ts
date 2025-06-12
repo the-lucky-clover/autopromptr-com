@@ -8,9 +8,10 @@ const BACKUP_STORAGE_KEY = 'autopromptr_batches_backup';
 
 export const usePersistentBatches = () => {
   const [batches, setBatches] = useState<Batch[]>([]);
-  const { triggerBatchSync, subscribeToBatchSync } = useBatchSync();
+  const { subscribeToBatchSync } = useBatchSync();
   const isSavingRef = useRef(false);
   const isLoadingRef = useRef(false);
+  const lastSavedDataRef = useRef<string>('');
 
   // Debounced save function
   const debouncedSave = useRef<NodeJS.Timeout | null>(null);
@@ -46,9 +47,6 @@ export const usePersistentBatches = () => {
     try {
       console.log('Loading batches from localStorage...');
       
-      // Debug: Check all localStorage keys for any trace of batch data
-      console.log('All localStorage keys:', Object.keys(localStorage));
-      
       const savedBatches = localStorage.getItem(STORAGE_KEY);
       console.log('Raw saved batches:', savedBatches);
       
@@ -64,6 +62,7 @@ export const usePersistentBatches = () => {
         
         console.log(`Successfully loaded ${batchesWithDates.length} batches from localStorage`);
         setBatches(batchesWithDates);
+        lastSavedDataRef.current = savedBatches;
         
         // Create a backup
         localStorage.setItem(BACKUP_STORAGE_KEY, JSON.stringify(batchesWithDates));
@@ -81,6 +80,7 @@ export const usePersistentBatches = () => {
           }));
           setBatches(batchesWithDates);
           localStorage.setItem(STORAGE_KEY, JSON.stringify(batchesWithDates));
+          lastSavedDataRef.current = backupBatches;
           console.log('Restored from backup successfully');
         }
       }
@@ -98,6 +98,7 @@ export const usePersistentBatches = () => {
             createdAt: new Date(batch.createdAt)
           }));
           setBatches(batchesWithDates);
+          lastSavedDataRef.current = backupBatches;
         }
       } catch (backupError) {
         console.error('Backup recovery also failed:', backupError);
@@ -115,7 +116,7 @@ export const usePersistentBatches = () => {
     return unsubscribe;
   }, [subscribeToBatchSync]);
 
-  // Save batches to localStorage with debouncing
+  // Save batches to localStorage with debouncing - REMOVED AUTO-SYNC
   useEffect(() => {
     if (batches.length > 0 && !isLoadingRef.current) {
       // Clear previous debounced save
@@ -127,14 +128,16 @@ export const usePersistentBatches = () => {
       debouncedSave.current = setTimeout(() => {
         try {
           isSavingRef.current = true;
-          console.log(`Saving ${batches.length} batches to localStorage...`);
           const dataToSave = JSON.stringify(batches);
-          localStorage.setItem(STORAGE_KEY, dataToSave);
-          localStorage.setItem(BACKUP_STORAGE_KEY, dataToSave);
-          console.log('Batches saved successfully');
           
-          // Only trigger sync after successful save, not during loading
-          triggerBatchSync();
+          // Only save if data has actually changed
+          if (dataToSave !== lastSavedDataRef.current) {
+            console.log(`Saving ${batches.length} batches to localStorage...`);
+            localStorage.setItem(STORAGE_KEY, dataToSave);
+            localStorage.setItem(BACKUP_STORAGE_KEY, dataToSave);
+            lastSavedDataRef.current = dataToSave;
+            console.log('Batches saved successfully');
+          }
         } catch (error) {
           console.error('Failed to save batches to localStorage:', error);
         } finally {
@@ -148,7 +151,7 @@ export const usePersistentBatches = () => {
         clearTimeout(debouncedSave.current);
       }
     };
-  }, [batches, triggerBatchSync]);
+  }, [batches]);
 
   const updateBatches = (newBatches: Batch[] | ((prev: Batch[]) => Batch[])) => {
     setBatches(newBatches);
@@ -158,7 +161,7 @@ export const usePersistentBatches = () => {
     setBatches([]);
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(BACKUP_STORAGE_KEY);
-    triggerBatchSync();
+    lastSavedDataRef.current = '';
   };
 
   const recoverFromBackup = () => {
@@ -172,7 +175,7 @@ export const usePersistentBatches = () => {
         }));
         setBatches(batchesWithDates);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(batchesWithDates));
-        triggerBatchSync();
+        lastSavedDataRef.current = backupBatches;
         return true;
       }
     } catch (error) {
@@ -181,12 +184,20 @@ export const usePersistentBatches = () => {
     return false;
   };
 
+  // Manual sync trigger - only call this for explicit user actions
+  const triggerManualSync = () => {
+    const { triggerBatchSync } = useBatchSync();
+    setTimeout(() => {
+      triggerBatchSync();
+    }, 100);
+  };
+
   return {
     batches,
     setBatches: updateBatches,
     clearAllBatches,
     recoverFromBackup,
     reloadBatches,
-    triggerBatchSync
+    triggerManualSync
   };
 };
