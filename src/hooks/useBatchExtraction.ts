@@ -142,19 +142,16 @@ export const useBatchExtraction = () => {
       setPrompts('');
       setBatchName('');
 
-      // Show success message with navigation options
+      // Show success message and navigate
       toast({
         title: "Batch created successfully!",
-        description: `Extracted ${textPrompts.length} prompts and saved to "${batchName}". Click to view all batches.`,
-        action: (
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
-          >
-            View Batches
-          </button>
-        ),
+        description: `Extracted ${textPrompts.length} prompts and saved to "${batchName}". Navigating to dashboard...`,
       });
+
+      // Navigate to dashboard after a short delay
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1500);
 
       console.log(`Successfully extracted ${textPrompts.length} prompts and created batch "${batchName}"`);
 
