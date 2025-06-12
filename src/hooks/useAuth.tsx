@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, useMemo, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -20,7 +20,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+  // Memoize email verification status to prevent unnecessary re-renders
+  const isEmailVerified = useMemo(() => {
+    return user?.email_confirmed_at !== null;
+  }, [user?.email_confirmed_at]);
 
   useEffect(() => {
     // Set up auth state listener
@@ -36,7 +40,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Check email verification status
           const verified = session.user.email_confirmed_at !== null;
           console.log('Email verification status:', verified);
-          setIsEmailVerified(verified);
 
           // Only auto-redirect on explicit SIGNED_IN events (not INITIAL_SESSION or TOKEN_REFRESHED)
           // This prevents redirect loops on page load
@@ -49,8 +52,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               }
             }, 100);
           }
-        } else {
-          setIsEmailVerified(false);
         }
         
         setLoading(false);
@@ -62,10 +63,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Initial session check:', session);
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) {
-        const verified = session.user.email_confirmed_at !== null;
-        setIsEmailVerified(verified);
-      }
       if (!session) {
         setLoading(false);
       }
@@ -74,7 +71,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = useCallback(async (email: string, password: string) => {
     console.log('Starting signup process for:', email);
     
     // Clear any existing session first
@@ -110,13 +107,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       // Set user state immediately after signup
       setUser(data.user);
-      setIsEmailVerified(data.user.email_confirmed_at !== null);
     }
     
     return { error: null };
-  };
+  }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     console.log('Starting signin process for:', email);
     
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -133,18 +129,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // The onAuthStateChange will handle the redirect
     return { error: null };
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     console.log('Signing out...');
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
-    setIsEmailVerified(false);
     window.location.href = '/';
-  };
+  }, []);
 
-  const resendVerification = async (email: string) => {
+  const resendVerification = useCallback(async (email: string) => {
     console.log('Resending verification email to:', email);
     
     const redirectUrl = `${window.location.origin}/auth/callback`;
@@ -165,19 +160,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     
     return { error };
-  };
+  }, []);
+
+  // Memoize the context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    user,
+    session,
+    loading,
+    signUp,
+    signIn,
+    signOut,
+    resendVerification,
+    isEmailVerified
+  }), [user, session, loading, signUp, signIn, signOut, resendVerification, isEmailVerified]);
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      loading,
-      signUp,
-      signIn,
-      signOut,
-      resendVerification,
-      isEmailVerified
-    }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useBackendTesting } from '@/hooks/useBackendTesting';
 import { BackendStatus, HealthStatusDashboardProps, HEALTH_CHECK_INTERVAL } from './health/HealthStatusTypes';
@@ -9,23 +8,27 @@ import TestResultsDisplay from './health/TestResultsDisplay';
 import TrustIndicators from './health/TrustIndicators';
 import SystemHealthHeader from './health/SystemHealthHeader';
 
-const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps) => {
+const HealthStatusDashboard = React.memo(({ isCompact = false }: HealthStatusDashboardProps) => {
   const location = useLocation();
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  const isDevelopment = useMemo(() => process.env.NODE_ENV === 'development', []);
   const mounted = useRef(true);
   const lastHealthCheck = useRef(0);
   const healthCheckInProgress = useRef(false);
   
-  // Route guard - ensure we're on a dashboard route
+  // Route guard - ensure we're on a dashboard route - memoized to prevent re-calculations
   const isDashboardRoute = useMemo(() => 
     location.pathname === '/dashboard' || location.pathname.startsWith('/dashboard/'),
     [location.pathname]
   );
   
-  if (!isDashboardRoute) {
-    if (isDevelopment) {
+  // Move console log to useEffect to prevent render flooding
+  useEffect(() => {
+    if (!isDashboardRoute && isDevelopment) {
       console.log('HealthStatusDashboard: Component mounted on non-dashboard route, returning null');
     }
+  }, [isDashboardRoute, isDevelopment]);
+  
+  if (!isDashboardRoute) {
     return null;
   }
 
@@ -63,7 +66,7 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
 
   const [overallHealth, setOverallHealth] = useState(75);
 
-  // Debounced health check function
+  // Memoized and optimized health check function
   const refreshHealthData = useCallback(async () => {
     if (!mounted.current) return;
     
@@ -77,7 +80,9 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
     lastHealthCheck.current = now;
     
     try {
-      console.log('HealthStatusDashboard: Running debounced health check');
+      if (isDevelopment) {
+        console.log('HealthStatusDashboard: Running debounced health check');
+      }
       
       // Run health checks for backends with timeout
       const healthCheckPromises = [
@@ -122,7 +127,9 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
   useEffect(() => {
     if (!mounted.current) return;
     
-    console.log('HealthStatusDashboard: Starting health monitoring');
+    if (isDevelopment) {
+      console.log('HealthStatusDashboard: Starting health monitoring');
+    }
     
     // Initial health check with delay to prevent immediate execution
     const initialTimeout = setTimeout(() => {
@@ -139,7 +146,9 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
     }, HEALTH_CHECK_INTERVAL);
     
     return () => {
-      console.log('HealthStatusDashboard: Cleaning up health monitoring');
+      if (isDevelopment) {
+        console.log('HealthStatusDashboard: Cleaning up health monitoring');
+      }
       clearTimeout(initialTimeout);
       clearInterval(interval);
       mounted.current = false;
@@ -210,6 +219,8 @@ const HealthStatusDashboard = ({ isCompact = false }: HealthStatusDashboardProps
       <TrustIndicators />
     </div>
   );
-};
+});
+
+HealthStatusDashboard.displayName = 'HealthStatusDashboard';
 
 export default HealthStatusDashboard;
