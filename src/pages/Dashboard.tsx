@@ -66,33 +66,34 @@ const Dashboard = () => {
 
   const hasActiveBatch = batches.some(batch => batch.status === 'running');
 
-  const renderModuleContent = (moduleId: string, componentName: string) => {
+  const renderModuleContent = (moduleId: string, componentName: string, isMinimized: boolean) => {
     switch (componentName) {
       case 'DashboardBatchManager':
         return (
           <DashboardBatchManager 
             onStatsUpdate={handleStatsUpdate} 
             onBatchesUpdate={handleBatchesUpdate}
+            isCompact={isMinimized}
           />
         );
       
       case 'HealthStatusDashboard':
-        return <HealthStatusDashboard />;
+        return <HealthStatusDashboard isCompact={isMinimized} />;
       
       case 'SystemLogsPanel':
-        return <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} />;
+        return <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} isCompact={isMinimized} />;
       
       case 'DashboardQuickActions':
-        return <DashboardQuickActions />;
+        return <DashboardQuickActions isCompact={isMinimized} />;
       
       case 'DashboardSubscription':
-        return <DashboardSubscription />;
+        return <DashboardSubscription isCompact={isMinimized} />;
       
       case 'DashboardStatsModule':
-        return <DashboardStatsModule stats={stats} />;
+        return <DashboardStatsModule stats={stats} isCompact={isMinimized} />;
 
       case 'SystemReliabilityScore':
-        return <SystemReliabilityScore />;
+        return <SystemReliabilityScore isCompact={isMinimized} />;
       
       default:
         return <div>Module content not found</div>;
@@ -126,13 +127,13 @@ const Dashboard = () => {
             state={module.state}
             onStateChange={(newState) => updateModuleState(module.id, newState)}
           >
-            {renderModuleContent(module.id, module.component)}
+            {renderModuleContent(module.id, module.component, false)}
           </DashboardModuleWrapper>
         ))}
 
         {/* Two-column layout for minimized modules */}
         {minimizedModules.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             {minimizedModules.map((module) => (
               <DashboardModuleWrapper
                 key={module.id}
@@ -141,7 +142,7 @@ const Dashboard = () => {
                 state={module.state}
                 onStateChange={(newState) => updateModuleState(module.id, newState)}
               >
-                {renderModuleContent(module.id, module.component)}
+                {renderModuleContent(module.id, module.component, true)}
               </DashboardModuleWrapper>
             ))}
           </div>
@@ -160,7 +161,7 @@ const Dashboard = () => {
             <div className="flex items-center space-x-4 min-w-0">
               <SidebarTrigger className="text-white hover:text-purple-200 rounded-xl flex-shrink-0" />
               <div className="min-w-0">
-                <h1 className="text-xl lg:text-2xl font-semibold text-white truncate">Advanced Dashboard</h1>
+                <h1 className="text-xl lg:text-2xl font-semibold text-white truncate">Prompt Engineering Lab</h1>
                 <p className="text-purple-200 text-sm lg:text-base mt-1">Drag & drop modules • Minimize • Customize layout</p>
               </div>
             </div>

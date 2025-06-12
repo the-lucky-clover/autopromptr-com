@@ -54,7 +54,7 @@ const DashboardModuleWrapper = ({
       case 'full':
         return `${base} w-full`;
       case 'minimized':
-        return `${base} w-full lg:w-[calc(50%-0.5rem)] h-64`;
+        return `${base} w-full h-80`;
       default:
         return base;
     }
@@ -67,40 +67,52 @@ const DashboardModuleWrapper = ({
       className={`${getModuleClasses()} ${className} ${isDragging ? 'z-50 shadow-2xl' : ''}`}
     >
       {/* Module Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-t-xl border-b border-white/10">
+      <div className={`flex items-center justify-between bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-t-xl border-b border-white/10 ${
+        state === 'minimized' ? 'px-3 py-2' : 'px-4 py-3'
+      }`}>
         <div className="flex items-center space-x-3">
           <div
             {...attributes}
             {...listeners}
             className="cursor-move touch-none"
           >
-            <GripHorizontal className="w-4 h-4 text-purple-300 hover:text-purple-100 transition-colors" />
+            <GripHorizontal className={`text-purple-300 hover:text-purple-100 transition-colors ${
+              state === 'minimized' ? 'w-3 h-3' : 'w-4 h-4'
+            }`} />
           </div>
-          <span className="text-white font-medium text-sm">{title}</span>
+          <span className={`text-white font-medium ${
+            state === 'minimized' ? 'text-xs' : 'text-sm'
+          }`}>{title}</span>
         </div>
         
         <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
             size="sm"
-            className="w-7 h-7 p-0 text-yellow-400 hover:bg-yellow-400/20 rounded-lg transition-colors"
+            className={`p-0 text-yellow-400 hover:bg-yellow-400/20 rounded-lg transition-colors ${
+              state === 'minimized' ? 'w-5 h-5' : 'w-7 h-7'
+            }`}
             onClick={handleMinimize}
           >
-            <Minimize2 className="w-3 h-3" />
+            <Minimize2 className={state === 'minimized' ? 'w-2 h-2' : 'w-3 h-3'} />
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="w-7 h-7 p-0 text-red-400 hover:bg-red-400/20 rounded-lg transition-colors"
+            className={`p-0 text-red-400 hover:bg-red-400/20 rounded-lg transition-colors ${
+              state === 'minimized' ? 'w-5 h-5' : 'w-7 h-7'
+            }`}
             onClick={handleClose}
           >
-            <X className="w-3 h-3" />
+            <X className={state === 'minimized' ? 'w-2 h-2' : 'w-3 h-3'} />
           </Button>
         </div>
       </div>
       
       {/* Module Content */}
-      <div className={`${state === 'minimized' ? 'p-3' : 'p-5'} overflow-hidden`}>
+      <div className={`overflow-hidden ${
+        state === 'minimized' ? 'p-3 h-[calc(100%-3rem)]' : 'p-5'
+      }`}>
         {children}
       </div>
     </Card>

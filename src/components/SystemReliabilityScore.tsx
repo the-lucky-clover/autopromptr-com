@@ -5,9 +5,10 @@ import { Activity, TrendingUp } from 'lucide-react';
 
 interface SystemReliabilityScoreProps {
   className?: string;
+  isCompact?: boolean;
 }
 
-const SystemReliabilityScore = ({ className = '' }: SystemReliabilityScoreProps) => {
+const SystemReliabilityScore = ({ className = '', isCompact = false }: SystemReliabilityScoreProps) => {
   const [score, setScore] = useState(0);
   const [targetScore, setTargetScore] = useState(85);
 
@@ -53,6 +54,89 @@ const SystemReliabilityScore = ({ className = '' }: SystemReliabilityScoreProps)
 
   // Calculate angle for speedometer needle (0-180 degrees for half circle)
   const needleAngle = (score / 100) * 180;
+
+  if (isCompact) {
+    return (
+      <div className="space-y-3">
+        {/* Compact Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Activity className="w-3 h-3 text-blue-400" />
+            <span className="text-white font-medium text-xs">System Score</span>
+          </div>
+          <div className={`text-lg font-bold ${getScoreColor(score)}`}>
+            {score}%
+          </div>
+        </div>
+
+        {/* Compact Speedometer */}
+        <div className="flex items-center justify-center">
+          <div className="relative w-24 h-12">
+            <svg viewBox="0 0 100 50" className="w-full h-full">
+              {/* Background Arc */}
+              <path
+                d="M 10 40 A 40 40 0 0 1 90 40"
+                fill="none"
+                stroke="rgba(255,255,255,0.1)"
+                strokeWidth="4"
+                strokeLinecap="round"
+              />
+              
+              {/* Score Arc */}
+              <path
+                d="M 10 40 A 40 40 0 0 1 90 40"
+                fill="none"
+                stroke={score >= 90 ? '#10B981' : score >= 75 ? '#F59E0B' : '#EF4444'}
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray={`${(score / 100) * 125.6} 125.6`}
+                className="transition-all duration-1000 ease-out"
+              />
+              
+              {/* Needle */}
+              <line
+                x1="50"
+                y1="40"
+                x2="50"
+                y2="20"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                transform={`rotate(${needleAngle - 90} 50 40)`}
+                className="transition-transform duration-1000 ease-out"
+                style={{ transformOrigin: '50px 40px' }}
+              />
+              
+              {/* Center dot */}
+              <circle cx="50" cy="40" r="2" fill="white" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Compact Metrics */}
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div>
+            <div className="text-green-400 text-xs font-semibold">99.2%</div>
+            <div className="text-white/60 text-[10px]">Uptime</div>
+          </div>
+          <div>
+            <div className="text-blue-400 text-xs font-semibold">142ms</div>
+            <div className="text-white/60 text-[10px]">Response</div>
+          </div>
+          <div>
+            <div className="text-purple-400 text-xs font-semibold">0.03%</div>
+            <div className="text-white/60 text-[10px]">Errors</div>
+          </div>
+        </div>
+
+        {/* Compact Trend */}
+        <div className="flex items-center justify-center space-x-1 text-green-400">
+          <TrendingUp className="w-3 h-3" />
+          <span className="text-xs">+2.3%</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Card className={`${className} bg-white/10 backdrop-blur-sm border-white/20`}>
