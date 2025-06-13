@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { AutoPromptr } from '@/services/autoPromptr';
+import { AutoPromtrError } from '@/services/autoPromptr/errors';
 import { Platform } from '@/types/batch';
 
 export const usePlatforms = () => {
@@ -17,12 +18,22 @@ export const usePlatforms = () => {
         setPlatforms(platformArray.filter((p: Platform) => p.type === 'web'));
       })
       .catch((err) => {
-        console.log('Platform loading error:', err);
+        console.log('Platform loading error details:', {
+          error: err,
+          isAutoPromtrError: err instanceof AutoPromtrError,
+          statusCode: err?.statusCode,
+          code: err?.code,
+          message: err?.message
+        });
         
-        // Only show error toast for unexpected errors, not 404s (which are expected when backend is not available)
-        if (err?.message?.includes('404') || err?.status === 404) {
+        // Check for 404 errors more reliably
+        const is404Error = (err instanceof AutoPromtrError && err.statusCode === 404) ||
+                          (err?.status === 404) ||
+                          (err?.message?.includes('404'));
+        
+        if (is404Error) {
           console.log('Backend platform endpoint not available (404) - using fallback platforms silently');
-          // Use default platforms as fallback without showing error
+          // Use default platforms as fallback without showing any error
           const fallbackPlatforms: Platform[] = [
             { id: 'lovable', name: 'Lovable', type: 'web' },
             { id: 'bolt', name: 'Bolt.new', type: 'web' },
@@ -35,11 +46,18 @@ export const usePlatforms = () => {
         } else {
           // Only show error for unexpected failures (network errors, 500s, etc.)
           console.error('Unexpected platform loading error:', err);
-          toast({
-            title: "Platform loading issue",
-            description: "Unable to load automation platforms from backend. Using default platforms.",
-            variant: "default", // Use default instead of destructive for less alarming appearance
-          });
+          
+          // Only show toast for truly unexpected errors
+          const isNetworkError = err?.message?.includes('fetch') || err?.message?.includes('network');
+          const isServerError = (err instanceof AutoPromtrError && err.statusCode >= 500);
+          
+          if (isNetworkError || isServerError) {
+            toast({
+              title: "Platform loading issue",
+              description: "Unable to connect to backend. Using default platforms.",
+              variant: "default",
+            });
+          }
           
           // Still provide fallback platforms
           const fallbackPlatforms: Platform[] = [

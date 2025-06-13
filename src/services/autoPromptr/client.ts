@@ -36,6 +36,15 @@ export class AutoPromptr {
         throw error;
       }
       
+      // Handle network errors
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new AutoPromtrError(
+          'Network error while fetching platforms',
+          'NETWORK_ERROR',
+          0
+        );
+      }
+      
       // Return fallback platforms if the backend is not available
       return [
         { id: 'lovable', name: 'Lovable', type: 'web' },
