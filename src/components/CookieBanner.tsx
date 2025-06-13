@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { X, Cookie } from 'lucide-react';
 
 const CookieBanner = () => {
@@ -28,28 +27,28 @@ const CookieBanner = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4">
-      <Card className="max-w-4xl mx-auto bg-gray-900/95 backdrop-blur-xl border-gray-700 text-white">
-        <div className="p-6">
+    <div className="fixed bottom-0 left-0 right-0 z-50">
+      <div className="glass-cookie-banner text-white">
+        <div className="container mx-auto px-6 py-6">
           <div className="flex items-start gap-4">
-            <Cookie className="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" />
+            <Cookie className="w-6 h-6 text-purple-300 mt-1 flex-shrink-0" />
             <div className="flex-1">
-              <h3 className="text-lg font-semibold mb-2">Cookie Notice</h3>
-              <p className="text-gray-300 text-sm mb-4">
+              <h3 className="text-lg font-semibold mb-2 text-white">Cookie Notice</h3>
+              <p className="text-gray-200 text-sm mb-4 leading-relaxed">
                 We use essential cookies to ensure our website works properly and analytical cookies to improve your experience. 
                 By clicking "Accept All", you consent to our use of cookies. You can manage your preferences or decline non-essential cookies.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Button 
                   onClick={acceptCookies}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-purple-600 hover:bg-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   Accept All
                 </Button>
                 <Button 
                   onClick={declineCookies}
                   variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                  className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm transition-all duration-300"
                 >
                   Decline Non-Essential
                 </Button>
@@ -57,7 +56,7 @@ const CookieBanner = () => {
                   onClick={() => setIsVisible(false)}
                   variant="ghost"
                   size="sm"
-                  className="text-gray-400 hover:text-white ml-auto"
+                  className="text-gray-300 hover:text-white hover:bg-white/10 ml-auto transition-all duration-300"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -65,7 +64,7 @@ const CookieBanner = () => {
             </div>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };
