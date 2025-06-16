@@ -18,19 +18,7 @@ const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: 
 
   return (
     <div className={`flex items-center group ${className}`}>
-      {/* Container with unified gradient background and enhanced glow */}
-      <div 
-        className="flex items-center space-x-2 relative"
-        style={{
-          background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
-          backgroundSize: '300% 300%',
-          animation: 'heroGradientFlow 6s ease-in-out infinite',
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          color: 'transparent',
-          filter: 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.5)) drop-shadow(0 0 20px rgba(139, 92, 246, 0.3))'
-        }}
-      >
+      <div className="flex items-center space-x-2 relative">
         {/* Zap icon with enhanced glow and gradient stroke */}
         <div className="relative">
           <Zap 
@@ -53,11 +41,17 @@ const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: 
           />
         </div>
         
-        {/* Brand text with enhanced glow */}
+        {/* Brand text with fallback styling and enhanced effects */}
         {variant === 'horizontal' && (
           <span 
-            className={`${currentSize.text} font-bold transition-all duration-300 group-hover:scale-105`}
+            className={`${currentSize.text} font-bold transition-all duration-300 group-hover:scale-105 text-white`}
             style={{
+              background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
+              backgroundSize: '300% 300%',
+              animation: 'heroGradientFlow 6s ease-in-out infinite',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
               filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.4))'
             }}
           >
@@ -97,6 +91,17 @@ const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: 
           </linearGradient>
         </defs>
       </svg>
+      
+      {/* CSS fallback for browsers that don't support background-clip: text */}
+      <style jsx>{`
+        @supports not (-webkit-background-clip: text) {
+          span[style*="background-clip"] {
+            background: none !important;
+            -webkit-text-fill-color: white !important;
+            color: white !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };
