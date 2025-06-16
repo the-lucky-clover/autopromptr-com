@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,21 +7,47 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, Settings, Activity, Database, Shield, Zap } from "lucide-react";
+import { Users, Settings, Activity, Database, Shield, Zap, AlertTriangle } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { SecurityStatus } from "@/components/security/SecurityStatus";
 
 const AdminPanel = () => {
-  const { isSysOp } = useUserRole();
+  const { isSysOp, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('users');
+  const [activeTab, setActiveTab] = useState('overview');
+  const [securityEvents, setSecurityEvents] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!isSysOp) {
+    if (!roleLoading && !isSysOp) {
       navigate('/dashboard');
     }
-  }, [isSysOp, navigate]);
+  }, [isSysOp, roleLoading, navigate]);
+
+  useEffect(() => {
+    if (isSysOp) {
+      fetchSecurityEvents();
+    }
+  }, [isSysOp]);
+
+  const fetchSecurityEvents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('security_events')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) {
+        console.error('Error fetching security events:', error);
+      } else {
+        setSecurityEvents(data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch security events:', error);
+    }
+  };
 
   const mockUsers = [
     { id: 1, email: 'pounds1@gmail.com', role: 'sysop', status: 'active', batches: '∞', lastLogin: '2 mins ago' },
@@ -33,9 +59,20 @@ const AdminPanel = () => {
   const systemStats = [
     { title: 'Total Users', value: '1,247', icon: Users, color: 'text-blue-400' },
     { title: 'Active Batches', value: '89', icon: Zap, color: 'text-orange-400' },
-    { title: 'System Health', value: '98.5%', icon: Shield, color: 'text-green-400' },
-    { title: 'DB Queries/min', value: '2,134', icon: Database, color: 'text-purple-400' },
+    { title: 'Security Events', value: securityEvents.length.toString(), icon: Shield, color: 'text-red-400' },
+    { title: 'System Health', value: '98.5%', icon: Database, color: 'text-green-400' },
   ];
+
+  if (roleLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-slate-900 via-blue-900 to-purple-600">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-400 mx-auto mb-4"></div>
+          <p className="text-white text-lg">Loading admin panel...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isSysOp) {
     return null;
@@ -51,7 +88,7 @@ const AdminPanel = () => {
               <SidebarTrigger className="text-white hover:text-purple-200 rounded-xl" />
               <div>
                 <h1 className="text-2xl font-semibold text-white">System Administration</h1>
-                <p className="text-purple-200">SysOp Control Panel</p>
+                <p className="text-purple-200">Enhanced Security Control Panel</p>
               </div>
             </div>
             <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
@@ -80,9 +117,10 @@ const AdminPanel = () => {
           {/* Navigation Tabs */}
           <div className="flex space-x-1 mb-6">
             {[
+              { id: 'overview', label: 'Security Overview', icon: Shield },
               { id: 'users', label: 'User Management', icon: Users },
+              { id: 'security', label: 'Security Events', icon: AlertTriangle },
               { id: 'system', label: 'System Config', icon: Settings },
-              { id: 'activity', label: 'Activity Logs', icon: Activity },
               { id: 'database', label: 'Database', icon: Database },
             ].map((tab) => (
               <Button
@@ -102,6 +140,55 @@ const AdminPanel = () => {
           </div>
 
           {/* Tab Content */}
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <SecurityStatus />
+            </div>
+          )}
+
+          {activeTab === 'security' && (
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5" />
+                  Security Events Monitor
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button onClick={fetchSecurityEvents} className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl">
+                  Refresh Events
+                </Button>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {securityEvents.map((event) => (
+                    <div key={event.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                      <div className="flex items-center space-x-4">
+                        <span className="text-purple-300 text-sm font-mono">
+                          {new Date(event.created_at).toLocaleTimeString()}
+                        </span>
+                        <span className="text-white/60 text-sm">{event.user_id ? 'User Event' : 'System Event'}</span>
+                        <span className="text-white text-sm">{event.event_type}</span>
+                      </div>
+                      <Badge variant={
+                        event.event_type.includes('failed') || event.event_type.includes('unauthorized') 
+                          ? 'destructive' 
+                          : event.event_type.includes('success') 
+                          ? 'default' 
+                          : 'secondary'
+                      }>
+                        {event.event_type}
+                      </Badge>
+                    </div>
+                  ))}
+                  {securityEvents.length === 0 && (
+                    <div className="text-center text-white/60 py-8">
+                      No security events found
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {activeTab === 'users' && (
             <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
               <CardHeader>
