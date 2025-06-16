@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -148,134 +149,141 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[85vh] rounded-3xl bg-white border-2 border-gray-300 shadow-2xl">
-          <DialogHeader className="text-left pb-4">
+        <DialogContent className="w-[95vw] max-w-4xl h-[95vh] max-h-[95vh] md:h-auto md:max-h-[85vh] rounded-3xl bg-white border-2 border-gray-300 shadow-2xl flex flex-col p-0">
+          <DialogHeader className="text-left p-6 pb-4 flex-shrink-0">
             <DialogTitle className="text-2xl font-semibold text-left text-gray-900">
               {editingBatch ? 'Edit Batch' : 'Create New Batch'}
             </DialogTitle>
           </DialogHeader>
           
-          <ScrollArea className="max-h-[65vh] pr-4">
-            {isSaving && (
-              <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                <div className="flex items-center space-x-3 mb-3">
-                  <Save className="w-5 h-5 text-blue-600 animate-pulse" />
-                  <span className="text-blue-900 font-medium">Saving batch...</span>
-                </div>
-                <Progress value={saveProgress} className="h-2" />
-                <div className="text-sm text-blue-700 mt-2">
-                  {saveProgress < 20 && "Validating batch data..."}
-                  {saveProgress >= 20 && saveProgress < 40 && "Preparing prompts..."}
-                  {saveProgress >= 40 && saveProgress < 60 && "Saving to database..."}
-                  {saveProgress >= 60 && saveProgress < 80 && "Finalizing..."}
-                  {saveProgress >= 80 && saveProgress < 100 && "Almost done..."}
-                  {saveProgress === 100 && "Complete!"}
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <Input
-                  id="batch-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter a descriptive name for your batch (e.g., 'Product Research Q4 2024')"
-                  className="text-base rounded-xl bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                  disabled={isSaving}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Input
-                  id="target-url"
-                  value={targetUrl}
-                  onChange={(e) => setTargetUrl(e.target.value)}
-                  placeholder="Enter your project URL where prompts will be executed (e.g., https://chat.openai.com)"
-                  className="text-base rounded-xl bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                  disabled={isSaving}
-                />
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium text-gray-900">Prompts</h3>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAddPrompt}
-                    className="rounded-xl border-gray-200 hover:bg-gray-50"
-                    disabled={isSaving}
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Add Prompt
-                  </Button>
-                </div>
-
-                <div className="space-y-3">
-                  {prompts.map((prompt, index) => (
-                    <div
-                      key={prompt.id}
-                      className="flex items-start space-x-3 p-4 border border-gray-200 rounded-xl bg-gray-50/50"
-                      draggable={!isSaving}
-                      onDragStart={() => handleDragStart(index)}
-                      onDragOver={handleDragOver}
-                      onDrop={(e) => handleDrop(e, index)}
-                    >
-                      <GripVertical className="w-5 h-5 text-gray-400 cursor-move mt-3" />
-                      <div className="flex-1">
-                        <Textarea
-                          value={prompt.text}
-                          onChange={(e) => handlePromptChange(prompt.id, e.target.value)}
-                          placeholder={`Enter your prompt here (e.g., "Analyze the following data and provide insights about customer behavior patterns")`}
-                          rows={3}
-                          className="w-full text-base rounded-xl bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                          disabled={isSaving}
-                        />
-                      </div>
-                      {prompts.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemovePrompt(prompt.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl"
-                          disabled={isSaving}
-                        >
-                          <Minus className="w-4 h-4" />
-                        </Button>
-                      )}
+          <div className="flex-1 flex flex-col min-h-0">
+            <ScrollArea className="flex-1 px-6">
+              <div className="pb-6">
+                {isSaving && (
+                  <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <Save className="w-5 h-5 text-blue-600 animate-pulse" />
+                      <span className="text-blue-900 font-medium">Saving batch...</span>
                     </div>
-                  ))}
+                    <Progress value={saveProgress} className="h-2" />
+                    <div className="text-sm text-blue-700 mt-2">
+                      {saveProgress < 20 && "Validating batch data..."}
+                      {saveProgress >= 20 && saveProgress < 40 && "Preparing prompts..."}
+                      {saveProgress >= 40 && saveProgress < 60 && "Saving to database..."}
+                      {saveProgress >= 60 && saveProgress < 80 && "Finalizing..."}
+                      {saveProgress >= 80 && saveProgress < 100 && "Almost done..."}
+                      {saveProgress === 100 && "Complete!"}
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Input
+                      id="batch-name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter a descriptive name for your batch (e.g., 'Product Research Q4 2024')"
+                      className="text-base h-12 md:h-10 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                      disabled={isSaving}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Input
+                      id="target-url"
+                      value={targetUrl}
+                      onChange={(e) => setTargetUrl(e.target.value)}
+                      placeholder="Enter your project URL where prompts will be executed (e.g., https://chat.openai.com)"
+                      className="text-base h-12 md:h-10 rounded-xl bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                      disabled={isSaving}
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-medium text-gray-900">Prompts</h3>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleAddPrompt}
+                        className="h-10 md:h-8 rounded-xl border-gray-200 hover:bg-gray-50"
+                        disabled={isSaving}
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add Prompt
+                      </Button>
+                    </div>
+
+                    <div className="space-y-4">
+                      {prompts.map((prompt, index) => (
+                        <div
+                          key={prompt.id}
+                          className="flex items-start space-x-3 p-4 border border-gray-200 rounded-xl bg-gray-50/50"
+                          draggable={!isSaving}
+                          onDragStart={() => handleDragStart(index)}
+                          onDragOver={handleDragOver}
+                          onDrop={(e) => handleDrop(e, index)}
+                        >
+                          <GripVertical className="w-5 h-5 text-gray-400 cursor-move mt-3" />
+                          <div className="flex-1">
+                            <Textarea
+                              value={prompt.text}
+                              onChange={(e) => handlePromptChange(prompt.id, e.target.value)}
+                              placeholder={`Enter your prompt here (e.g., "Analyze the following data and provide insights about customer behavior patterns")`}
+                              rows={4}
+                              className="w-full text-base min-h-[100px] rounded-xl bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                              disabled={isSaving}
+                            />
+                          </div>
+                          {prompts.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemovePrompt(prompt.id)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-xl h-10 w-10 p-0 mt-2"
+                              disabled={isSaving}
+                            >
+                              <Minus className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
+              </div>
+            </ScrollArea>
+
+            {/* Mobile-optimized sticky footer */}
+            <div className="flex-shrink-0 p-6 pt-4 border-t border-gray-200 bg-white rounded-b-3xl">
+              <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+                <Button 
+                  variant="outline" 
+                  onClick={onClose} 
+                  className="h-12 sm:h-10 rounded-xl border-gray-200 hover:bg-gray-50 order-2 sm:order-1"
+                  disabled={isSaving}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleSave}
+                  disabled={!isValid || isSaving}
+                  className="h-12 sm:h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50 min-w-[120px] order-1 sm:order-2"
+                >
+                  {isSaving ? (
+                    <div className="flex items-center space-x-2">
+                      <Save className="w-4 h-4 animate-pulse" />
+                      <span>Saving...</span>
+                    </div>
+                  ) : (
+                    'Save Batch'
+                  )}
+                </Button>
               </div>
             </div>
-          </ScrollArea>
-
-          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-            <Button 
-              variant="outline" 
-              onClick={onClose} 
-              className="rounded-xl border-gray-200 hover:bg-gray-50"
-              disabled={isSaving}
-            >
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleSave}
-              disabled={!isValid || isSaving}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50 min-w-[120px]"
-            >
-              {isSaving ? (
-                <div className="flex items-center space-x-2">
-                  <Save className="w-4 h-4 animate-pulse" />
-                  <span>Saving...</span>
-                </div>
-              ) : (
-                'Save Batch'
-              )}
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -297,8 +305,8 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
               Remove
             </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        </AlertDialogFooter>
+      </Dialog>
     </>
   );
 };
