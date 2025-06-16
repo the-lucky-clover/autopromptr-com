@@ -10,15 +10,18 @@ export const useSecureAuth = () => {
   const { role, isSysOp, isAdmin, loading: roleLoading } = useUserRole();
   const { toast } = useToast();
 
-  // Log security events to the database
+  // Log security events using automation_logs table
   const logSecurityEvent = async (eventType: string, eventData?: any) => {
     try {
-      await supabase.from('security_events').insert({
-        user_id: auth.user?.id || null,
-        event_type: eventType,
-        event_data: eventData,
-        ip_address: null, // Could be enhanced to capture real IP
-        user_agent: navigator.userAgent
+      await supabase.from('automation_logs').insert({
+        level: 'security',
+        message: `Security Event: ${eventType}`,
+        metadata: {
+          event_type: eventType,
+          event_data: eventData,
+          user_id: auth.user?.id,
+          user_agent: navigator.userAgent
+        }
       });
     } catch (error) {
       console.error('Failed to log security event:', error);

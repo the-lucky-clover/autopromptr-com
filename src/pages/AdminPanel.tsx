@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -33,10 +32,12 @@ const AdminPanel = () => {
 
   const fetchSecurityEvents = async () => {
     try {
+      // Fetch security events from automation_logs where level = 'security'
       const { data, error } = await supabase
-        .from('security_events')
+        .from('automation_logs')
         .select('*')
-        .order('created_at', { ascending: false })
+        .eq('level', 'security')
+        .order('timestamp', { ascending: false })
         .limit(20);
 
       if (error) {
@@ -163,19 +164,23 @@ const AdminPanel = () => {
                     <div key={event.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
                       <div className="flex items-center space-x-4">
                         <span className="text-purple-300 text-sm font-mono">
-                          {new Date(event.created_at).toLocaleTimeString()}
+                          {new Date(event.timestamp).toLocaleTimeString()}
                         </span>
-                        <span className="text-white/60 text-sm">{event.user_id ? 'User Event' : 'System Event'}</span>
-                        <span className="text-white text-sm">{event.event_type}</span>
+                        <span className="text-white/60 text-sm">
+                          {event.metadata?.user_id ? 'User Event' : 'System Event'}
+                        </span>
+                        <span className="text-white text-sm">
+                          {event.metadata?.event_type || event.message}
+                        </span>
                       </div>
                       <Badge variant={
-                        event.event_type.includes('failed') || event.event_type.includes('unauthorized') 
+                        event.message.includes('failed') || event.message.includes('unauthorized') 
                           ? 'destructive' 
-                          : event.event_type.includes('success') 
+                          : event.message.includes('success') 
                           ? 'default' 
                           : 'secondary'
                       }>
-                        {event.event_type}
+                        {event.metadata?.event_type || 'security'}
                       </Badge>
                     </div>
                   ))}
