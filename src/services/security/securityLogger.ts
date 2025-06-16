@@ -21,17 +21,12 @@ export class SecurityLogger {
 
   async logEvent(event: SecurityEvent): Promise<void> {
     try {
-      // Use automation_logs table for security events until security_events table types are available
-      const { error } = await supabase.from('automation_logs').insert({
-        level: 'security',
-        message: `Security Event: ${event.eventType}`,
-        metadata: {
-          event_type: event.eventType,
-          event_data: event.eventData,
-          user_id: event.userId,
-          ip_address: event.ipAddress,
-          user_agent: event.userAgent || navigator.userAgent
-        }
+      const { error } = await supabase.from('security_events').insert({
+        user_id: event.userId || null,
+        event_type: event.eventType,
+        event_data: event.eventData || null,
+        ip_address: event.ipAddress || null,
+        user_agent: event.userAgent || navigator.userAgent
       });
 
       if (error) {
