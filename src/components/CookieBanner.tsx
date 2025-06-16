@@ -28,7 +28,15 @@ const CookieBanner = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50">
-      <div className="glass-cookie-banner text-white">
+      <div 
+        className="glass-cookie-banner text-white"
+        style={{
+          backgroundColor: '#0a0e17',
+          background: 'linear-gradient(135deg, rgba(10, 14, 23, 1.0) 0%, rgba(15, 20, 35, 0.98) 50%, rgba(30, 27, 75, 0.95) 100%)',
+          backdropFilter: 'blur(25px) saturate(180%) brightness(95%)',
+          WebkitBackdropFilter: 'blur(25px) saturate(180%) brightness(95%)'
+        }}
+      >
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-start gap-4">
             <Cookie className="w-6 h-6 text-purple-300 mt-1 flex-shrink-0" />
