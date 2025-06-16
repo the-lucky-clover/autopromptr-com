@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -305,8 +304,8 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
               Remove
             </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogFooter>
-      </Dialog>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
