@@ -81,11 +81,11 @@ const Navbar = () => {
               <BrandLogo size="medium" variant="horizontal" />
             </Link>
             
-            <div className="hidden md:flex items-center space-x-4 pr-8">
+            <div className="hidden md:flex items-center space-x-4">
               <div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>
             </div>
 
-            <div className="md:hidden pr-12">
+            <div className="md:hidden">
               <div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>
             </div>
           </div>
@@ -111,7 +111,7 @@ const Navbar = () => {
           </Link>
           
           {/* Desktop buttons */}
-          <div className="hidden md:flex items-center space-x-4 pr-8">
+          <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-300">Welcome back!</span>
@@ -143,8 +143,8 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile hamburger menu with increased right padding */}
-          <div className="md:hidden pr-12">
+          {/* Mobile hamburger menu */}
+          <div className="md:hidden">
             <Popover open={isOpen} onOpenChange={setIsOpen}>
               <PopoverTrigger asChild>
                 <Button
