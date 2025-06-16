@@ -28,17 +28,18 @@ const CTA = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-lg px-8 py-4 animate-glow"
+              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-lg px-8 py-4 animate-glow flex items-center justify-center gap-2"
             >
-              Start Your Free Trial
-              <ArrowRight className="ml-2 w-5 h-5" />
+              <span>⭐︎</span>
+              Get Started
             </Button>
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 text-lg px-8 py-4"
+              className="border-purple-500/50 text-purple-300 hover:bg-purple-500/10 text-lg px-8 py-4 flex items-center justify-center gap-2"
             >
-              Schedule Demo
+              Sign In
+              <ArrowRight className="w-5 h-5" />
             </Button>
           </div>
           

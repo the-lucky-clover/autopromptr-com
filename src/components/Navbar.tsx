@@ -30,6 +30,11 @@ const Navbar = () => {
     setAuthModalOpen(true);
   };
 
+  const handleSignInClick = () => {
+    setAuthMode('signin');
+    setAuthModalOpen(true);
+  };
+
   // Don't render auth-dependent UI until initialized
   if (!isInitialized) {
     return (
@@ -40,17 +45,17 @@ const Navbar = () => {
             : 'transform -translate-y-20 opacity-0'
         } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg rounded-b-2xl`} />
         
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-8">
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
               <BrandLogo size="medium" variant="horizontal" />
             </Link>
             
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-4 pr-8">
               <div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>
             </div>
 
-            <div className="md:hidden">
+            <div className="md:hidden pr-8">
               <div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>
             </div>
           </div>
@@ -69,13 +74,14 @@ const Navbar = () => {
       } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg rounded-b-2xl`} />
       
       {/* Navbar content - always visible */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-8">
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center group">
             <BrandLogo size="medium" variant="horizontal" />
           </Link>
           
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Desktop buttons */}
+          <div className="hidden md:flex items-center space-x-4 pr-8">
             {user ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-300">Welcome back!</span>
@@ -88,17 +94,27 @@ const Navbar = () => {
                 </Button>
               </div>
             ) : (
-              <Button 
-                onClick={handleGetStartedClick}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-2xl font-semibold transition-all duration-200"
-              >
-                Sign In / Register
-              </Button>
+              <div className="flex items-center space-x-3">
+                <Button 
+                  onClick={handleSignInClick}
+                  variant="ghost"
+                  className="text-white hover:text-purple-300 px-4 py-2 rounded-2xl font-semibold transition-all duration-200"
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  onClick={handleGetStartedClick}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-2 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-2"
+                >
+                  <span>⭐︎</span>
+                  Get Started
+                </Button>
+              </div>
             )}
           </div>
 
-          {/* Mobile menu - now uses popover */}
-          <div className="md:hidden">
+          {/* Mobile hamburger menu */}
+          <div className="md:hidden pr-8">
             <Popover open={isOpen} onOpenChange={setIsOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -127,11 +143,22 @@ const Navbar = () => {
                       </Button>
                     </div>
                   ) : (
-                    <AuthModal 
-                      mode={authMode} 
-                      onClose={() => setIsOpen(false)}
-                      isMobile={true}
-                    />
+                    <div className="space-y-3">
+                      <Button 
+                        onClick={() => { handleSignInClick(); setIsOpen(false); }}
+                        variant="ghost"
+                        className="w-full text-white hover:text-purple-300 rounded-2xl"
+                      >
+                        Sign In
+                      </Button>
+                      <Button 
+                        onClick={() => { handleGetStartedClick(); setIsOpen(false); }}
+                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl flex items-center justify-center gap-2"
+                      >
+                        <span>⭐︎</span>
+                        Get Started
+                      </Button>
+                    </div>
                   )}
                 </div>
               </PopoverContent>

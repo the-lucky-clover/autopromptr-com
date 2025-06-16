@@ -18,7 +18,7 @@ const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: 
 
   return (
     <div className={`flex items-center group ${className}`}>
-      {/* Container with unified gradient background */}
+      {/* Container with unified gradient background and enhanced glow */}
       <div 
         className="flex items-center space-x-2 relative"
         style={{
@@ -28,28 +28,45 @@ const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: 
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           color: 'transparent',
-          filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
+          filter: 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.5)) drop-shadow(0 0 20px rgba(139, 92, 246, 0.3))'
         }}
       >
-        {/* Zap icon with increased stroke and gradient */}
-        <Zap 
-          className={`${currentSize.icon}`}
-          strokeWidth={2.5}
-          style={{
-            stroke: 'url(#iconGradient)',
-            filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))'
-          }}
-        />
+        {/* Zap icon with enhanced glow and gradient stroke */}
+        <div className="relative">
+          <Zap 
+            className={`${currentSize.icon} transition-all duration-300 group-hover:scale-110`}
+            strokeWidth={2.5}
+            style={{
+              stroke: 'url(#iconGradient)',
+              filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.6)) drop-shadow(0 0 16px rgba(139, 92, 246, 0.4))'
+            }}
+          />
+          {/* Additional glow effect on hover */}
+          <div 
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            style={{
+              background: 'radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)',
+              borderRadius: '50%',
+              transform: 'scale(1.5)',
+              pointerEvents: 'none'
+            }}
+          />
+        </div>
         
-        {/* Brand text */}
+        {/* Brand text with enhanced glow */}
         {variant === 'horizontal' && (
-          <span className={`${currentSize.text} font-bold`}>
+          <span 
+            className={`${currentSize.text} font-bold transition-all duration-300 group-hover:scale-105`}
+            style={{
+              filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.4))'
+            }}
+          >
             AutoPromptr
           </span>
         )}
       </div>
       
-      {/* SVG gradient definition for the icon */}
+      {/* SVG gradient definition for the icon with animated colors */}
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
           <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="0%">

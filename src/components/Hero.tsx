@@ -23,6 +23,10 @@ const Hero = () => {
     }
   };
 
+  const handleSignIn = () => {
+    window.location.href = '/auth';
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 md:pt-20">
       {/* Simplified gradient background */}
@@ -53,14 +57,15 @@ const Hero = () => {
                 onClick={handleGetStarted}
                 className="text-white text-lg px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
               >
-                <Zap className="w-5 h-5" />
-                {user && isEmailVerified ? 'Go to Dashboard' : 'Start Free Trial'}
+                <span>⭐︎</span>
+                Get Started
               </Button>
               <Button 
                 size="lg" 
+                onClick={handleSignIn}
                 className="bg-black hover:bg-gray-800 text-white text-lg px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-2"
               >
-                Watch Demo
+                Sign In
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </div>
