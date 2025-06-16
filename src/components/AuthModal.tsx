@@ -1,6 +1,4 @@
-
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Zap, X } from 'lucide-react';
@@ -25,6 +23,29 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
   const [progressMessage, setProgressMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const { signUp, signIn, resendVerification } = useAuth();
+
+  // Keyboard event handling
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      } else if (event.key === 'Enter' && !loading && progressStep === 'idle') {
+        // Only handle Enter if not currently processing and not in an input field
+        const target = event.target as HTMLElement;
+        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+          event.preventDefault();
+          if (mode === 'signup') {
+            handleSignUp(event as any);
+          } else {
+            handleSignIn(event as any);
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mode, loading, progressStep, email, password, onClose]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -257,4 +278,3 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
 };
 
 export default AuthModal;
-

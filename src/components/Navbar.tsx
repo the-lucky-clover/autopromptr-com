@@ -25,14 +25,44 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Keyboard event handling for mobile menu and auth modal
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (isOpen) {
+          setIsOpen(false);
+        }
+        if (authModalOpen) {
+          setAuthModalOpen(false);
+        }
+      } else if (event.key === 'Enter' && isOpen) {
+        // Handle Enter key in mobile menu
+        const target = event.target as HTMLElement;
+        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+          if (user) {
+            signOut();
+            setIsOpen(false);
+          } else {
+            handleGetStartedClick();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, authModalOpen, user]);
+
   const handleGetStartedClick = () => {
     setAuthMode('signup');
     setAuthModalOpen(true);
+    setIsOpen(false);
   };
 
   const handleSignInClick = () => {
     setAuthMode('signin');
     setAuthModalOpen(true);
+    setIsOpen(false);
   };
 
   // Don't render auth-dependent UI until initialized
@@ -55,7 +85,7 @@ const Navbar = () => {
               <div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>
             </div>
 
-            <div className="md:hidden pr-8">
+            <div className="md:hidden pr-12">
               <div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>
             </div>
           </div>
@@ -113,8 +143,8 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile hamburger menu */}
-          <div className="md:hidden pr-8">
+          {/* Mobile hamburger menu with increased right padding */}
+          <div className="md:hidden pr-12">
             <Popover open={isOpen} onOpenChange={setIsOpen}>
               <PopoverTrigger asChild>
                 <Button

@@ -14,6 +14,23 @@ const CookieBanner = () => {
     }
   }, []);
 
+  // Keyboard event handling
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsVisible(false);
+      } else if (event.key === 'Enter') {
+        // Enter key accepts all cookies (default action)
+        acceptCookies();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isVisible]);
+
   const acceptCookies = () => {
     localStorage.setItem('cookieConsent', 'accepted');
     setIsVisible(false);
@@ -29,7 +46,7 @@ const CookieBanner = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50">
       <div 
-        className="glass-cookie-banner text-white"
+        className="glass-cookie-banner text-white relative"
         style={{
           backgroundColor: '#0a0e17',
           background: 'linear-gradient(135deg, rgba(10, 14, 23, 1.0) 0%, rgba(15, 20, 35, 0.98) 50%, rgba(30, 27, 75, 0.95) 100%)',
@@ -37,10 +54,20 @@ const CookieBanner = () => {
           WebkitBackdropFilter: 'blur(25px) saturate(180%) brightness(95%)'
         }}
       >
+        {/* Close button positioned absolutely in upper right */}
+        <Button 
+          onClick={() => setIsVisible(false)}
+          variant="ghost"
+          size="sm"
+          className="absolute top-4 right-4 text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 w-8 h-8 p-0 z-10"
+        >
+          <X className="w-4 h-4" />
+        </Button>
+
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-start gap-4">
             <Cookie className="w-6 h-6 text-purple-300 mt-1 flex-shrink-0" />
-            <div className="flex-1">
+            <div className="flex-1 pr-12">
               <h3 className="text-lg font-semibold mb-2 text-white">Cookie Notice</h3>
               <p className="text-gray-200 text-sm mb-4 leading-relaxed">
                 We use essential cookies to ensure our website works properly and analytical cookies to improve your experience. 
@@ -59,14 +86,6 @@ const CookieBanner = () => {
                   className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm transition-all duration-300"
                 >
                   Decline Non-Essential
-                </Button>
-                <Button 
-                  onClick={() => setIsVisible(false)}
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-300 hover:text-white hover:bg-white/10 ml-auto transition-all duration-300"
-                >
-                  <X className="w-4 h-4" />
                 </Button>
               </div>
             </div>

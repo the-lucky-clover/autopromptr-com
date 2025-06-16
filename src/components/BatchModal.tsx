@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,31 @@ const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) =>
       setPrompts([{ id: crypto.randomUUID(), text: '', order: 0 }]);
     }
   }, [editingBatch, open]);
+
+  // Enhanced keyboard event handling
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // ESC to close (Radix Dialog handles this automatically, but we add custom logic)
+      if (event.key === 'Escape' && !isSaving) {
+        onClose();
+      } 
+      // Enter or Ctrl+Enter to save
+      else if ((event.key === 'Enter' && (event.ctrlKey || event.metaKey)) || 
+               (event.key === 'Enter' && event.target && 
+                (event.target as HTMLElement).tagName !== 'INPUT' && 
+                (event.target as HTMLElement).tagName !== 'TEXTAREA')) {
+        event.preventDefault();
+        if (isValid && !isSaving) {
+          handleSave();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [open, isSaving, name, targetUrl, prompts]);
 
   const handleAddPrompt = () => {
     const newPrompt: TextPrompt = {
