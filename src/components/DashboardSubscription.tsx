@@ -41,16 +41,19 @@ const DashboardSubscription = ({ isCompact = false }: DashboardSubscriptionProps
               {isSysOp ? '∞' : `${usagePercentage}%`}
             </span>
           </div>
-          <div className="w-full bg-white/20 rounded-full h-2">
-            <div 
-              className={`h-2 rounded-full transition-all duration-300 ${
-                isSysOp 
-                  ? 'bg-gradient-to-r from-red-500 to-purple-500 w-full animate-pulse' 
-                  : 'bg-gradient-to-r from-blue-500 to-purple-500'
-              }`}
-              style={{ width: isSysOp ? '100%' : `${usagePercentage}%` }}
-            />
-          </div>
+          {!isSysOp && (
+            <div className="w-full bg-white/20 rounded-full h-2">
+              <div 
+                className="h-2 rounded-full transition-all duration-300 bg-gradient-to-r from-blue-500 to-purple-500"
+                style={{ width: `${usagePercentage}%` }}
+              />
+            </div>
+          )}
+          {isSysOp && (
+            <div className="text-center py-2">
+              <span className="text-red-300 font-medium">Unlimited Access</span>
+            </div>
+          )}
         </div>
 
         {!isCompact && (

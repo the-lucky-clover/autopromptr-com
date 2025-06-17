@@ -7,6 +7,7 @@ import { useDashboardModules } from "@/hooks/useDashboardModules";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardContent from "@/components/dashboard/DashboardContent";
+import Dashboard3DBackground from "@/components/Dashboard3DBackground";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -49,6 +50,7 @@ const Dashboard = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full overflow-x-hidden" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
+        <Dashboard3DBackground />
         <div className="shadow-2xl">
           <AppSidebar />
         </div>

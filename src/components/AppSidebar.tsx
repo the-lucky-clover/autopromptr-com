@@ -24,6 +24,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
 import BrandLogo from "@/components/BrandLogo";
 import UserProfile from "@/components/UserProfile";
+import SynthwaveBackground from "@/components/SynthwaveBackground";
+import SynthwaveBrandLogo from "@/components/SynthwaveBrandLogo";
 
 // Navigation items with proper typing
 const items: Array<{
@@ -87,10 +89,19 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="bg-white/5 backdrop-blur-sm border-white/10 shadow-2xl">
-      <SidebarHeader className="p-4 border-b border-white/10">
-        <div className="flex justify-center">
-          <BrandLogo size="small" variant="horizontal" />
+      <SidebarHeader className="p-4 border-b border-white/10 relative">
+        {/* Synthwave Background Container - positioned behind the brand area */}
+        <div className="absolute left-0 top-0 w-full h-24 overflow-hidden rounded-t-2xl">
+          <SynthwaveBackground />
         </div>
+        
+        {/* Brand Logo floating above the background */}
+        <div className="relative z-30 flex justify-center">
+          <SynthwaveBrandLogo size="small" variant="horizontal" />
+        </div>
+        
+        {/* Subtle gradient overlay for better text readability */}
+        <div className="absolute left-0 top-0 w-full h-24 bg-gradient-to-r from-black/20 via-transparent to-black/20 pointer-events-none z-20 rounded-t-2xl" />
       </SidebarHeader>
 
       <SidebarContent>
