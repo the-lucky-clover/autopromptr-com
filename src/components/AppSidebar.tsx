@@ -104,7 +104,7 @@ export function AppSidebar() {
         <div className="absolute left-0 top-0 w-full h-24 bg-gradient-to-r from-black/20 via-transparent to-black/20 pointer-events-none z-20 rounded-t-2xl" />
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="mt-4">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>

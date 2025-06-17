@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { HealthDataService, HealthMetrics } from '@/services/healthDataService';
 import HealthMetricsHeader from './health/HealthMetricsHeader';
 import HealthMetricsError from './health/HealthMetricsError';
@@ -43,7 +43,6 @@ const BackendHealthMetrics = () => {
   if (error) {
     return (
       <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-        <HealthMetricsHeader onRefresh={fetchHealthData} loading={loading} />
         <HealthMetricsError error={error} />
       </Card>
     );
@@ -51,8 +50,21 @@ const BackendHealthMetrics = () => {
 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-      <HealthMetricsHeader onRefresh={fetchHealthData} loading={loading} />
-      <div className="px-6 pb-6 space-y-4">
+      <div className="px-6 py-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className={`w-3 h-3 rounded-full ${healthData ? 'bg-green-400' : 'bg-red-400'} animate-pulse`} />
+            <span className="text-white font-medium">Backend Health</span>
+          </div>
+          <button
+            onClick={fetchHealthData}
+            disabled={loading}
+            className="text-white/60 hover:text-white text-xs px-2 py-1 rounded bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Refreshing...' : 'Refresh'}
+          </button>
+        </div>
+        
         <HealthMetricsStatus healthData={healthData} loading={loading} />
         {healthData && (
           <HealthMetricsGrid healthData={healthData} lastUpdated={lastUpdated} />

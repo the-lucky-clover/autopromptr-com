@@ -43,23 +43,14 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl relative overflow-hidden">
-      {/* BETA Banner */}
+      {/* BETA Banner - Centered */}
       <div className="absolute top-0 right-0 w-32 h-20 overflow-hidden">
-        <div className="absolute top-3 right-[-32px] bg-orange-500/90 text-white text-xs font-mono font-bold px-12 py-1 transform rotate-45 shadow-lg">
+        <div className="absolute top-4 right-[-32px] bg-orange-500/90 text-white text-xs font-mono font-bold px-12 py-1 transform rotate-45 shadow-lg flex items-center justify-center">
           beta
         </div>
       </div>
       
-      <CardHeader className={isCompact ? "pb-2" : "pb-3"}>
-        <CardTitle className={`text-white flex items-center space-x-2 ${isCompact ? 'text-sm' : 'text-sm md:text-base'}`}>
-          <Zap className={`${isCompact ? 'w-3 h-3' : 'w-4 h-4'} text-blue-400`} />
-          <span>Batch Extractor</span>
-        </CardTitle>
-        <CardDescription className={`text-purple-200 ${isCompact ? 'text-xs' : 'text-xs md:text-sm'}`}>
-          Extract and process multiple prompts from large text blocks
-        </CardDescription>
-      </CardHeader>
-      <CardContent className={`space-y-4 ${isCompact ? 'space-y-2' : ''}`}>
+      <CardContent className={`space-y-4 pt-6 ${isCompact ? 'space-y-2' : ''}`}>
         <div className="space-y-2">
           <Input
             value={batchName}
