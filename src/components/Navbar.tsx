@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -8,7 +7,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
 import AuthModal from "@/components/AuthModal";
 import BrandLogo from "@/components/BrandLogo";
-import NavbarAnimatedBackground from "@/components/NavbarAnimatedBackground";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -80,11 +78,8 @@ const Navbar = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8">
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
-              <div className="relative w-40 sm:w-48 lg:w-64 h-12 sm:h-14 lg:h-16 overflow-hidden rounded-xl">
-                <NavbarAnimatedBackground />
-                <div className="relative z-10">
-                  <BrandLogo size="small" variant="horizontal" />
-                </div>
+              <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16">
+                <BrandLogo size="small" variant="horizontal" />
               </div>
             </Link>
             
@@ -119,13 +114,10 @@ const Navbar = () => {
         {/* Navbar content - always visible with responsive padding */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center h-20">
-            {/* Logo with responsive sizing and animated background */}
+            {/* Logo without animated background */}
             <Link to="/" className="flex items-center group flex-shrink-0">
-              <div className="relative w-40 sm:w-48 lg:w-56 h-12 sm:h-14 lg:h-16 overflow-hidden rounded-xl">
-                <NavbarAnimatedBackground />
-                <div className="relative z-10 flex items-center justify-center h-full">
-                  <BrandLogo size="small" variant="horizontal" />
-                </div>
+              <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16">
+                <BrandLogo size="small" variant="horizontal" />
               </div>
             </Link>
             
