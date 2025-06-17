@@ -77,13 +77,13 @@ const Navbar = () => {
             : 'transform -translate-y-20 opacity-0'
         } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg rounded-b-2xl`} />
         
-        <div className="relative z-10 max-w-7xl mx-auto px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8">
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
-              <div className="relative w-64 h-16 overflow-hidden rounded-xl">
+              <div className="relative w-40 sm:w-48 lg:w-64 h-12 sm:h-14 lg:h-16 overflow-hidden rounded-xl">
                 <NavbarAnimatedBackground />
                 <div className="relative z-10">
-                  <BrandLogo size="medium" variant="horizontal" />
+                  <BrandLogo size="small" variant="horizontal" />
                 </div>
               </div>
             </Link>
@@ -116,20 +116,21 @@ const Navbar = () => {
             : 'transform -translate-y-20 opacity-0'
         } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-2xl rounded-b-2xl`} />
         
-        {/* Navbar content - always visible */}
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
+        {/* Navbar content - always visible with responsive padding */}
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center h-20">
-            <Link to="/" className="flex items-center group">
-              <div className="relative w-48 h-14 overflow-hidden rounded-xl">
+            {/* Logo with responsive sizing and animated background */}
+            <Link to="/" className="flex items-center group flex-shrink-0">
+              <div className="relative w-40 sm:w-48 lg:w-56 h-12 sm:h-14 lg:h-16 overflow-hidden rounded-xl">
                 <NavbarAnimatedBackground />
-                <div className="relative z-10">
+                <div className="relative z-10 flex items-center justify-center h-full">
                   <BrandLogo size="small" variant="horizontal" />
                 </div>
               </div>
             </Link>
             
             {/* Desktop buttons - only show for non-authenticated users */}
-            <div className="hidden md:flex items-center space-x-3">
+            <div className="hidden md:flex items-center space-x-3 flex-shrink-0">
               <Button 
                 onClick={handleSignInClick}
                 variant="ghost"
@@ -148,14 +149,14 @@ const Navbar = () => {
               </Button>
             </div>
 
-            {/* Mobile hamburger menu */}
-            <div className="md:hidden">
+            {/* Mobile hamburger menu - properly aligned */}
+            <div className="md:hidden flex-shrink-0 ml-2">
               <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-white hover:text-purple-300 rounded-2xl"
+                    className="text-white hover:text-purple-300 rounded-2xl p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                   </Button>
