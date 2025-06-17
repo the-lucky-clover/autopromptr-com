@@ -114,16 +114,16 @@ const Navbar = () => {
           isScrolled 
             ? 'transform translate-y-0 opacity-100' 
             : 'transform -translate-y-20 opacity-0'
-        } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg rounded-b-2xl`} />
+        } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-2xl rounded-b-2xl`} />
         
         {/* Navbar content - always visible */}
-        <div className="relative z-10 max-w-7xl mx-auto px-8">
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
-              <div className="relative w-64 h-16 overflow-hidden rounded-xl">
+              <div className="relative w-48 h-14 overflow-hidden rounded-xl">
                 <NavbarAnimatedBackground />
                 <div className="relative z-10">
-                  <BrandLogo size="medium" variant="horizontal" />
+                  <BrandLogo size="small" variant="horizontal" />
                 </div>
               </div>
             </Link>
@@ -133,13 +133,15 @@ const Navbar = () => {
               <Button 
                 onClick={handleSignInClick}
                 variant="ghost"
-                className="text-white hover:text-purple-300 px-4 py-2 rounded-2xl font-semibold transition-all duration-200"
+                size="sm"
+                className="text-white hover:text-purple-300 px-4 py-2 rounded-2xl font-medium transition-all duration-200"
               >
                 Sign In
               </Button>
               <Button 
                 onClick={handleGetStartedClick}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-2 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-2"
+                size="sm"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-5 py-2 rounded-2xl font-medium transition-all duration-200 flex items-center gap-2 shadow-lg"
               >
                 <span>⭐︎</span>
                 Get Started
@@ -155,11 +157,11 @@ const Navbar = () => {
                     size="sm"
                     className="text-white hover:text-purple-300 rounded-2xl"
                   >
-                    {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                    {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent 
-                  className="w-80 bg-gray-900/95 backdrop-blur-xl border-gray-700 rounded-2xl mr-4"
+                  className="w-72 bg-gray-900/95 backdrop-blur-xl border-gray-700 rounded-2xl mr-4 shadow-2xl"
                   align="end"
                   sideOffset={8}
                 >
@@ -173,7 +175,7 @@ const Navbar = () => {
                     </Button>
                     <Button 
                       onClick={() => { handleGetStartedClick(); setIsOpen(false); }}
-                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl flex items-center justify-center gap-2"
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl flex items-center justify-center gap-2 shadow-lg"
                     >
                       <span>⭐︎</span>
                       Get Started

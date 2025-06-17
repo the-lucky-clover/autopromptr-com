@@ -40,7 +40,7 @@
     animation: gridFloat 30s linear infinite;
   }
 
-  /* Enhanced Glassmorphism Cards with Enhanced Drop Shadows */
+  /* Enhanced Glassmorphism Cards with Golden Ratio Spacing */
   .glassmorphism-card {
     position: relative;
     backdrop-filter: blur(16px);
@@ -48,12 +48,15 @@
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.4),
-      0 24px 80px rgba(0, 0, 0, 0.3),
-      0 8px 32px rgba(0, 0, 0, 0.2),
+      0 16px 48px rgba(0, 0, 0, 0.5),
+      0 32px 120px rgba(0, 0, 0, 0.35),
+      0 8px 32px rgba(0, 0, 0, 0.25),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Golden ratio spacing */
+    padding: 1.618rem;
+    margin-bottom: 1.618rem;
   }
 
   .glassmorphism-card::before {
@@ -79,30 +82,67 @@
   }
 
   .glassmorphism-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
     box-shadow: 
-      0 16px 64px rgba(0, 0, 0, 0.5),
-      0 32px 120px rgba(0, 0, 0, 0.35),
-      0 12px 48px rgba(0, 0, 0, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.2);
+      0 20px 80px rgba(0, 0, 0, 0.6),
+      0 40px 160px rgba(0, 0, 0, 0.4),
+      0 16px 64px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.25);
   }
 
-  /* Enhanced Button Shadows */
+  /* Enhanced Button Shadows with Golden Ratio */
   .btn-with-shadow {
-    box-shadow: 
-      0 6px 20px rgba(0, 0, 0, 0.3),
-      0 12px 40px rgba(0, 0, 0, 0.15),
-      0 4px 16px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-  }
-
-  .btn-with-shadow:hover {
     box-shadow: 
       0 8px 32px rgba(0, 0, 0, 0.4),
       0 16px 64px rgba(0, 0, 0, 0.2),
       0 6px 24px rgba(0, 0, 0, 0.3);
-    transform: translateY(-2px);
+    transition: all 0.3s ease;
+    /* Golden ratio padding */
+    padding: calc(0.618rem) calc(1rem);
+    margin: calc(0.618rem / 2);
+  }
+
+  .btn-with-shadow:hover {
+    box-shadow: 
+      0 12px 48px rgba(0, 0, 0, 0.5),
+      0 24px 96px rgba(0, 0, 0, 0.3),
+      0 8px 32px rgba(0, 0, 0, 0.4);
+    transform: translateY(-3px);
+  }
+
+  /* Compact View Golden Ratio Spacing */
+  .compact-module {
+    padding: calc(1.618rem / 1.618);
+    margin-bottom: calc(1.618rem / 1.618);
+  }
+
+  .compact-module .btn-with-shadow {
+    padding: calc(0.618rem / 1.618) calc(1rem / 1.618);
+    margin: calc(0.618rem / 3);
+  }
+
+  /* Enhanced Module Cards */
+  .module-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 
+      0 16px 48px rgba(0, 0, 0, 0.5),
+      0 32px 120px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 20px 80px rgba(0, 0, 0, 0.6),
+      0 40px 160px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
 
   /* Interactive Particle Layer */
@@ -160,6 +200,17 @@
     animation: intermittentShimmer 8s ease-in-out infinite;
     animation-delay: var(--shimmer-delay, 0s);
     pointer-events: none;
+  }
+
+  /* Golden Ratio Typography */
+  .golden-text {
+    line-height: 1.618;
+    margin-bottom: calc(1rem * 1.618);
+  }
+
+  .golden-text-compact {
+    line-height: 1.382;
+    margin-bottom: calc(1rem / 1.618);
   }
 }
 
@@ -230,15 +281,20 @@
   }
 }
 
-/* Responsive Design */
+/* Responsive Design with Golden Ratio */
 @media (max-width: 768px) {
   .glassmorphism-card {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    padding: calc(1.618rem / 1.618);
   }
   
   .dashboard-3d-background::after {
     background-size: 40px 40px;
+  }
+
+  .btn-with-shadow {
+    padding: calc(0.618rem / 1.618) calc(1rem / 1.618);
   }
 }
 

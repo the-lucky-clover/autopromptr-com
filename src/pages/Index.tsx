@@ -13,25 +13,34 @@ import Footer from "@/components/Footer";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   console.log("Index page rendering...");
   
   const { user, isEmailVerified, isInitialized } = useAuth();
+  const navigate = useNavigate();
   
   useScrollAnimation();
 
-  // Auto-redirect authenticated users to dashboard
+  // Auto-redirect authenticated users to dashboard immediately
   useEffect(() => {
     if (isInitialized && user && isEmailVerified) {
       console.log("Authenticated user detected, redirecting to dashboard...");
-      window.location.href = '/dashboard';
+      navigate('/dashboard', { replace: true });
     }
-  }, [isInitialized, user, isEmailVerified]);
+  }, [isInitialized, user, isEmailVerified, navigate]);
 
   // Show loading state while auth is initializing
   if (!isInitialized) {
-    return null; // Let AuthProvider handle the loading UI
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-slate-900 via-blue-900 to-purple-600">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-400 mx-auto mb-4"></div>
+          <p className="text-white text-lg">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   // Don't render landing page content for authenticated users
