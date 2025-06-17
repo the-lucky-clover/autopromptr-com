@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
 import AuthModal from "@/components/AuthModal";
 import BrandLogo from "@/components/BrandLogo";
+import NavbarAnimatedBackground from "@/components/NavbarAnimatedBackground";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +80,12 @@ const Navbar = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-8">
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
-              <BrandLogo size="medium" variant="horizontal" />
+              <div className="relative w-64 h-16 overflow-hidden rounded-xl">
+                <NavbarAnimatedBackground />
+                <div className="relative z-10">
+                  <BrandLogo size="medium" variant="horizontal" />
+                </div>
+              </div>
             </Link>
             
             <div className="hidden md:flex items-center space-x-4">
@@ -109,7 +115,12 @@ const Navbar = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-8">
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
-              <BrandLogo size="medium" variant="horizontal" />
+              <div className="relative w-64 h-16 overflow-hidden rounded-xl">
+                <NavbarAnimatedBackground />
+                <div className="relative z-10">
+                  <BrandLogo size="medium" variant="horizontal" />
+                </div>
+              </div>
             </Link>
             
             {/* Desktop buttons */}

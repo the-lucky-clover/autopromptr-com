@@ -36,10 +36,13 @@ const HealthMetricsGrid = ({ healthData, lastUpdated }: HealthMetricsGridProps) 
     }
   };
 
+  // Use the health status directly from healthData since systemStatus might not exist
+  const backendStatus = healthData.status || 'unknown';
+  
   const statusItems = [
     {
       label: 'Backend Server Echo',
-      status: healthData.systemStatus.lovableSupabase,
+      status: backendStatus,
       description: 'Primary server health check'
     }
   ];
