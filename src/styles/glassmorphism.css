@@ -40,7 +40,7 @@
     animation: gridFloat 30s linear infinite;
   }
 
-  /* Enhanced Glassmorphism Cards */
+  /* Enhanced Glassmorphism Cards with Drop Shadows */
   .glassmorphism-card {
     position: relative;
     backdrop-filter: blur(16px);
@@ -49,6 +49,7 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 
       0 8px 32px rgba(0, 0, 0, 0.3),
+      0 16px 64px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -80,8 +81,24 @@
     transform: translateY(-2px);
     box-shadow: 
       0 12px 48px rgba(0, 0, 0, 0.4),
+      0 20px 80px rgba(0, 0, 0, 0.25),
       inset 0 1px 0 rgba(255, 255, 255, 0.15);
     border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Enhanced Button Shadows */
+  .btn-with-shadow {
+    box-shadow: 
+      0 4px 16px rgba(0, 0, 0, 0.2),
+      0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .btn-with-shadow:hover {
+    box-shadow: 
+      0 6px 24px rgba(0, 0, 0, 0.3),
+      0 12px 48px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
   }
 
   /* Interactive Particle Layer */

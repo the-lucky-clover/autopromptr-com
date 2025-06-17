@@ -12,8 +12,6 @@ import BlogPosts from "@/components/BlogPosts";
 import Footer from "@/components/Footer";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import { useEffect } from "react";
 
 const Index = () => {
@@ -23,10 +21,11 @@ const Index = () => {
   
   useScrollAnimation();
 
-  // Move any potential state updates to useEffect to prevent render-time updates
+  // Auto-redirect authenticated users to dashboard
   useEffect(() => {
     if (isInitialized && user && isEmailVerified) {
-      console.log("User is authenticated and email verified");
+      console.log("Authenticated user detected, redirecting to dashboard...");
+      window.location.href = '/dashboard';
     }
   }, [isInitialized, user, isEmailVerified]);
 
@@ -35,31 +34,21 @@ const Index = () => {
     return null; // Let AuthProvider handle the loading UI
   }
 
+  // Don't render landing page content for authenticated users
+  if (user && isEmailVerified) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-slate-900 via-blue-900 to-purple-600">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-400 mx-auto mb-4"></div>
+          <p className="text-white text-lg">Redirecting to dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <Navbar />
-      
-      {/* Show welcome message for authenticated users */}
-      {user && isEmailVerified && (
-        <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-b border-purple-500/30">
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
-              <p className="text-purple-100">
-                Welcome back! Ready to supercharge your AI workflow?
-              </p>
-              <Button 
-                onClick={() => window.location.href = '/dashboard'}
-                className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
-                size="sm"
-              >
-                Go to Dashboard
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-      
       <Hero />
       <ProvenResults />
       <Features />

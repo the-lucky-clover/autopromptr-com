@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
 import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
@@ -111,7 +112,7 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
                 <Button 
                   onClick={handleNewBatch}
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl btn-with-shadow"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   New Batch
@@ -121,7 +122,7 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
                   onClick={handleRefresh}
                   size="sm"
                   variant="outline"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl"
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl btn-with-shadow"
                   title="Refresh batch list"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -133,7 +134,7 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
                   onClick={detectAndFixFailedBatches}
                   variant="outline"
                   size="sm"
-                  className="bg-orange-500/20 border-orange-500/30 text-orange-300 hover:bg-orange-500/30"
+                  className="bg-orange-500/20 border-orange-500/30 text-orange-300 hover:bg-orange-500/30 btn-with-shadow"
                 >
                   <AlertTriangle className="w-4 h-4 mr-2" />
                   Fix {stuckBatchCount} Stuck Batch{stuckBatchCount > 1 ? 'es' : ''}

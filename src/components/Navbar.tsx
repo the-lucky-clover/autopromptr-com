@@ -15,7 +15,7 @@ const Navbar = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isScrolled, setIsScrolled] = useState(false);
-  const { user, signOut, isInitialized } = useAuth();
+  const { user, signOut, isInitialized, isEmailVerified } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -101,6 +101,11 @@ const Navbar = () => {
     );
   }
 
+  // Don't render navbar for authenticated users (they should be redirected)
+  if (user && isEmailVerified) {
+    return null;
+  }
+
   return (
     <>
       <nav className="fixed top-0 w-full z-40">
@@ -123,37 +128,22 @@ const Navbar = () => {
               </div>
             </Link>
             
-            {/* Desktop buttons */}
-            <div className="hidden md:flex items-center space-x-4">
-              {user ? (
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm text-gray-300">Welcome back!</span>
-                  <Button 
-                    onClick={signOut}
-                    variant="ghost" 
-                    className="text-white hover:text-gray-300 px-4 py-2 rounded-2xl"
-                  >
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-3">
-                  <Button 
-                    onClick={handleSignInClick}
-                    variant="ghost"
-                    className="text-white hover:text-purple-300 px-4 py-2 rounded-2xl font-semibold transition-all duration-200"
-                  >
-                    Sign In
-                  </Button>
-                  <Button 
-                    onClick={handleGetStartedClick}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-2 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-2"
-                  >
-                    <span>⭐︎</span>
-                    Get Started
-                  </Button>
-                </div>
-              )}
+            {/* Desktop buttons - only show for non-authenticated users */}
+            <div className="hidden md:flex items-center space-x-3">
+              <Button 
+                onClick={handleSignInClick}
+                variant="ghost"
+                className="text-white hover:text-purple-300 px-4 py-2 rounded-2xl font-semibold transition-all duration-200"
+              >
+                Sign In
+              </Button>
+              <Button 
+                onClick={handleGetStartedClick}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-2 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-2"
+              >
+                <span>⭐︎</span>
+                Get Started
+              </Button>
             </div>
 
             {/* Mobile hamburger menu */}
@@ -173,36 +163,21 @@ const Navbar = () => {
                   align="end"
                   sideOffset={8}
                 >
-                  <div className="p-4">
-                    {user ? (
-                      <div className="space-y-4">
-                        <div className="text-sm text-gray-300 text-center">Welcome back!</div>
-                        <Button 
-                          onClick={() => { signOut(); setIsOpen(false); }}
-                          variant="ghost" 
-                          className="w-full text-white hover:text-gray-300 rounded-2xl"
-                        >
-                          Sign Out
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <Button 
-                          onClick={() => { handleSignInClick(); setIsOpen(false); }}
-                          variant="ghost"
-                          className="w-full text-white hover:text-purple-300 rounded-2xl"
-                        >
-                          Sign In
-                        </Button>
-                        <Button 
-                          onClick={() => { handleGetStartedClick(); setIsOpen(false); }}
-                          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl flex items-center justify-center gap-2"
-                        >
-                          <span>⭐︎</span>
-                          Get Started
-                        </Button>
-                      </div>
-                    )}
+                  <div className="p-4 space-y-3">
+                    <Button 
+                      onClick={() => { handleSignInClick(); setIsOpen(false); }}
+                      variant="ghost"
+                      className="w-full text-white hover:text-purple-300 rounded-2xl"
+                    >
+                      Sign In
+                    </Button>
+                    <Button 
+                      onClick={() => { handleGetStartedClick(); setIsOpen(false); }}
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl flex items-center justify-center gap-2"
+                    >
+                      <span>⭐︎</span>
+                      Get Started
+                    </Button>
                   </div>
                 </PopoverContent>
               </Popover>

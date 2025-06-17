@@ -16,7 +16,16 @@ const DashboardSubscription = ({ isCompact = false }: DashboardSubscriptionProps
   const usagePercentage = isSysOp ? 0 : 68;
 
   return (
-    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl relative">
+      {/* Beta Badge - Centered */}
+      <div className="absolute -top-2 -right-2 z-10">
+        <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-3 py-1 rounded-full font-bold transform rotate-12 shadow-lg">
+          <div className="flex items-center justify-center">
+            BETA
+          </div>
+        </div>
+      </div>
+      
       <CardHeader className={isCompact ? "pb-2" : "pb-3"}>
         <div className="flex items-center justify-between">
           <div>
@@ -80,7 +89,7 @@ const DashboardSubscription = ({ isCompact = false }: DashboardSubscriptionProps
         )}
 
         <Button 
-          className={`w-full ${
+          className={`w-full btn-with-shadow ${
             isSysOp 
               ? 'bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700' 
               : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700'
