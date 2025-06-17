@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
 import AuthModal from "@/components/AuthModal";
 import BrandLogo from "@/components/BrandLogo";
 
@@ -95,118 +96,118 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="fixed top-0 w-full z-40">
-      {/* Glassmorphism background that slides down */}
-      <div className={`absolute top-0 left-0 right-0 h-20 transition-all duration-700 ease-out ${
-        isScrolled 
-          ? 'transform translate-y-0 opacity-100' 
-          : 'transform -translate-y-20 opacity-0'
-      } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg rounded-b-2xl`} />
-      
-      {/* Navbar content - always visible */}
-      <div className="relative z-10 max-w-7xl mx-auto px-8">
-        <div className="flex justify-between items-center h-20">
-          <Link to="/" className="flex items-center group">
-            <BrandLogo size="medium" variant="horizontal" />
-          </Link>
-          
-          {/* Desktop buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            {user ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-300">Welcome back!</span>
-                <Button 
-                  onClick={signOut}
-                  variant="ghost" 
-                  className="text-white hover:text-gray-300 px-4 py-2 rounded-2xl"
-                >
-                  Sign Out
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <Button 
-                  onClick={handleSignInClick}
-                  variant="ghost"
-                  className="text-white hover:text-purple-300 px-4 py-2 rounded-2xl font-semibold transition-all duration-200"
-                >
-                  Sign In
-                </Button>
-                <Button 
-                  onClick={handleGetStartedClick}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-2 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-2"
-                >
-                  <span>⭐︎</span>
-                  Get Started
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile hamburger menu */}
-          <div className="md:hidden">
-            <Popover open={isOpen} onOpenChange={setIsOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-white hover:text-purple-300 rounded-2xl"
-                >
-                  {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent 
-                className="w-80 bg-gray-900/95 backdrop-blur-xl border-gray-700 rounded-2xl mr-4"
-                align="end"
-                sideOffset={8}
-              >
-                <div className="p-4">
-                  {user ? (
-                    <div className="space-y-4">
-                      <div className="text-sm text-gray-300 text-center">Welcome back!</div>
-                      <Button 
-                        onClick={() => { signOut(); setIsOpen(false); }}
-                        variant="ghost" 
-                        className="w-full text-white hover:text-gray-300 rounded-2xl"
-                      >
-                        Sign Out
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <Button 
-                        onClick={() => { handleSignInClick(); setIsOpen(false); }}
-                        variant="ghost"
-                        className="w-full text-white hover:text-purple-300 rounded-2xl"
-                      >
-                        Sign In
-                      </Button>
-                      <Button 
-                        onClick={() => { handleGetStartedClick(); setIsOpen(false); }}
-                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl flex items-center justify-center gap-2"
-                      >
-                        <span>⭐︎</span>
-                        Get Started
-                      </Button>
-                    </div>
-                  )}
+    <>
+      <nav className="fixed top-0 w-full z-40">
+        {/* Glassmorphism background that slides down */}
+        <div className={`absolute top-0 left-0 right-0 h-20 transition-all duration-700 ease-out ${
+          isScrolled 
+            ? 'transform translate-y-0 opacity-100' 
+            : 'transform -translate-y-20 opacity-0'
+        } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg rounded-b-2xl`} />
+        
+        {/* Navbar content - always visible */}
+        <div className="relative z-10 max-w-7xl mx-auto px-8">
+          <div className="flex justify-between items-center h-20">
+            <Link to="/" className="flex items-center group">
+              <BrandLogo size="medium" variant="horizontal" />
+            </Link>
+            
+            {/* Desktop buttons */}
+            <div className="hidden md:flex items-center space-x-4">
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm text-gray-300">Welcome back!</span>
+                  <Button 
+                    onClick={signOut}
+                    variant="ghost" 
+                    className="text-white hover:text-gray-300 px-4 py-2 rounded-2xl"
+                  >
+                    Sign Out
+                  </Button>
                 </div>
-              </PopoverContent>
-            </Popover>
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <Button 
+                    onClick={handleSignInClick}
+                    variant="ghost"
+                    className="text-white hover:text-purple-300 px-4 py-2 rounded-2xl font-semibold transition-all duration-200"
+                  >
+                    Sign In
+                  </Button>
+                  <Button 
+                    onClick={handleGetStartedClick}
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-2 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-2"
+                  >
+                    <span>⭐︎</span>
+                    Get Started
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile hamburger menu */}
+            <div className="md:hidden">
+              <Popover open={isOpen} onOpenChange={setIsOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white hover:text-purple-300 rounded-2xl"
+                  >
+                    {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="w-80 bg-gray-900/95 backdrop-blur-xl border-gray-700 rounded-2xl mr-4"
+                  align="end"
+                  sideOffset={8}
+                >
+                  <div className="p-4">
+                    {user ? (
+                      <div className="space-y-4">
+                        <div className="text-sm text-gray-300 text-center">Welcome back!</div>
+                        <Button 
+                          onClick={() => { signOut(); setIsOpen(false); }}
+                          variant="ghost" 
+                          className="w-full text-white hover:text-gray-300 rounded-2xl"
+                        >
+                          Sign Out
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <Button 
+                          onClick={() => { handleSignInClick(); setIsOpen(false); }}
+                          variant="ghost"
+                          className="w-full text-white hover:text-purple-300 rounded-2xl"
+                        >
+                          Sign In
+                        </Button>
+                        <Button 
+                          onClick={() => { handleGetStartedClick(); setIsOpen(false); }}
+                          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl flex items-center justify-center gap-2"
+                        >
+                          <span>⭐︎</span>
+                          Get Started
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
         </div>
-      </div>
+      </nav>
       
-      {/* Desktop auth modal */}
-      <Popover open={authModalOpen && !isOpen} onOpenChange={setAuthModalOpen}>
-        <PopoverTrigger asChild>
-          <div className="hidden" />
-        </PopoverTrigger>
-        <PopoverContent className="w-96 bg-gray-900/95 backdrop-blur-xl border-gray-700 rounded-2xl">
+      {/* Centered Auth Modal with Blurred Background */}
+      <Dialog open={authModalOpen && !isOpen} onOpenChange={setAuthModalOpen}>
+        <DialogOverlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md" />
+        <DialogContent className="fixed left-[50%] top-[45%] z-50 translate-x-[-50%] translate-y-[-50%] border-0 bg-transparent p-0 shadow-none">
           <AuthModal mode={authMode} onClose={() => setAuthModalOpen(false)} />
-        </PopoverContent>
-      </Popover>
-    </nav>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
