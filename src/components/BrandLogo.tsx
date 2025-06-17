@@ -44,7 +44,7 @@ const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: 
         {/* Brand text with fallback styling and enhanced effects */}
         {variant === 'horizontal' && (
           <span 
-            className={`${currentSize.text} font-bold transition-all duration-300 group-hover:scale-105 text-white`}
+            className={`${currentSize.text} font-bold transition-all duration-300 group-hover:scale-105 text-white brand-logo-text`}
             style={{
               background: 'linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
               backgroundSize: '300% 300%',
@@ -93,15 +93,17 @@ const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: 
       </svg>
       
       {/* CSS fallback for browsers that don't support background-clip: text */}
-      <style jsx>{`
-        @supports not (-webkit-background-clip: text) {
-          span[style*="background-clip"] {
-            background: none !important;
-            -webkit-text-fill-color: white !important;
-            color: white !important;
+      <style>
+        {`
+          @supports not (-webkit-background-clip: text) {
+            .brand-logo-text {
+              background: none !important;
+              -webkit-text-fill-color: white !important;
+              color: white !important;
+            }
           }
-        }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
