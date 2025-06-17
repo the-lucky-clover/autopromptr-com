@@ -184,6 +184,40 @@
   .delay-600 { animation-delay: 0.6s; }
   .delay-700 { animation-delay: 0.7s; }
   .delay-800 { animation-delay: 0.8s; }
+
+  /* Synthwave Performance Optimizations */
+  .synthwave-logo,
+  .synthwave-icon,
+  .synthwave-text,
+  .wireframe-grid,
+  .stars-container {
+    will-change: transform, opacity;
+  }
+
+  /* Reduced motion support for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .synthwave-logo,
+    .synthwave-bolt,
+    .synthwave-text,
+    .grid-line-horizontal,
+    .grid-line-vertical,
+    .star,
+    .terrain-mountain,
+    .palm-tree,
+    .cactus {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+
+  /* Hardware acceleration for smooth animations */
+  .synthwave-logo,
+  .wireframe-grid,
+  .stars-container {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
 }
 
 /* Keyframes */
