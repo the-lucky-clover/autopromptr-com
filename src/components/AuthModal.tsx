@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ interface AuthModalProps {
 const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [showEmailSent, setShowEmailSent] = useState(false);
   const [mode, setMode] = useState(initialMode);
@@ -56,7 +58,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
     
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(email, password, fullName);
     
     if (error) {
       setProgressStep('error');
@@ -271,6 +273,8 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
         setEmail={setEmail}
         password={password}
         setPassword={setPassword}
+        fullName={fullName}
+        setFullName={setFullName}
         loading={loading}
       />
     </div>

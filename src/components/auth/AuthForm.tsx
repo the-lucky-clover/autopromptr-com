@@ -3,19 +3,20 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Eye, EyeOff } from 'lucide-react';
 
 interface AuthFormProps {
   mode: 'signin' | 'signup';
   onModeChange: (mode: 'signin' | 'signup') => void;
-  onSignIn: (e: React.FormEvent) => Promise<void>;
-  onSignUp: (e: React.FormEvent) => Promise<void>;
+  onSignIn: (e: React.FormEvent) => void;
+  onSignUp: (e: React.FormEvent) => void;
   onForgotPassword: () => void;
   email: string;
   setEmail: (email: string) => void;
   password: string;
   setPassword: (password: string) => void;
+  fullName: string;
+  setFullName: (fullName: string) => void;
   loading: boolean;
 }
 
@@ -29,137 +30,109 @@ const AuthForm = ({
   setEmail,
   password,
   setPassword,
+  fullName,
+  setFullName,
   loading
 }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <Tabs value={mode} onValueChange={(value) => onModeChange(value as 'signin' | 'signup')} className="w-full">
-      <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-gray-700 rounded-xl">
-        <TabsTrigger value="signin" className="text-gray-300 data-[state=active]:text-white data-[state=active]:bg-purple-600 rounded-xl">
-          Sign In
-        </TabsTrigger>
-        <TabsTrigger value="signup" className="text-gray-300 data-[state=active]:text-white data-[state=active]:bg-purple-600 rounded-xl">
-          Sign Up
-        </TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="signin" className="mt-4">
-        <form onSubmit={onSignIn} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-gray-300">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 rounded-xl"
-              placeholder="Enter your email"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-gray-300">Password</Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 pr-10 rounded-xl"
-                placeholder="Enter your password"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-400 hover:text-white rounded-xl"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
-          <Button 
-            type="submit" 
-            className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 rounded-xl" 
-            disabled={loading}
+    <form onSubmit={mode === 'signup' ? onSignUp : onSignIn} className="space-y-4">
+      {mode === 'signup' && (
+        <div className="space-y-2">
+          <Label htmlFor="fullName" className="text-sm font-medium text-gray-200">
+            Full Name
+          </Label>
+          <Input
+            id="fullName"
+            type="text"
+            placeholder="Enter your full name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            required
+            className="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+          />
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <Label htmlFor="email" className="text-sm font-medium text-gray-200">
+          Email
+        </Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="password" className="text-sm font-medium text-gray-200">
+          Password
+        </Label>
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full px-3 py-2 pr-10 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1 h-auto"
+            onClick={() => setShowPassword(!showPassword)}
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>
-          <div className="text-center">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={onForgotPassword}
-              className="text-sm text-purple-300 hover:text-purple-200 hover:bg-purple-500/10 rounded-xl"
-            >
-              Forgot password?
-            </Button>
-          </div>
-        </form>
-      </TabsContent>
-      
-      <TabsContent value="signup" className="mt-4">
-        <form onSubmit={onSignUp} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="signup-email" className="text-gray-300">Email</Label>
-            <Input
-              id="signup-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 rounded-xl"
-              placeholder="Enter your email"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="signup-password" className="text-gray-300">Password</Label>
-            <div className="relative">
-              <Input
-                id="signup-password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 pr-10 rounded-xl"
-                placeholder="Create a password (min 6 characters)"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-400 hover:text-white rounded-xl"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
-          <Button 
-            type="submit" 
-            className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 rounded-xl" 
-            disabled={loading}
+        </div>
+      </div>
+
+      <Button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl py-2 font-medium transition-all duration-200 disabled:opacity-50"
+      >
+        {loading ? 'Please wait...' : mode === 'signup' ? 'Create Account' : 'Sign In'}
+      </Button>
+
+      <div className="flex items-center justify-center space-x-2 text-sm">
+        <span className="text-gray-400">
+          {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}
+        </span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => onModeChange(mode === 'signup' ? 'signin' : 'signup')}
+          className="text-purple-400 hover:text-purple-300 p-0 h-auto font-medium"
+        >
+          {mode === 'signup' ? 'Sign In' : 'Sign Up'}
+        </Button>
+      </div>
+
+      {mode === 'signin' && (
+        <div className="text-center">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onForgotPassword}
+            className="text-gray-400 hover:text-white p-0 h-auto text-sm"
           >
-            {loading ? "Creating account..." : "Create Account"}
+            Forgot your password?
           </Button>
-          <p className="text-xs text-gray-400 text-center">
-            Check your email after signup to verify your account.
-          </p>
-        </form>
-      </TabsContent>
-    </Tabs>
+        </div>
+      )}
+    </form>
   );
 };
 
