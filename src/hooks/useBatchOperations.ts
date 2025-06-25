@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useBatchAutomation } from '@/hooks/useBatchAutomation';
+import { useLangChainBatchRunner } from '@/hooks/useLangChainBatchRunner';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
 import { Batch, BatchFormData, TextPrompt } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
@@ -10,6 +11,7 @@ export const useBatchOperations = () => {
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const { toast } = useToast();
   const { status: batchStatus, loading: automationLoading, error: automationError, runBatch, stopBatch } = useBatchAutomation(selectedBatchId || undefined);
+  const { handleRunBatchWithLangChain } = useLangChainBatchRunner();
 
   const createBatch = (formData: BatchFormData) => {
     // Auto-detect platform from target URL
@@ -42,7 +44,7 @@ export const useBatchOperations = () => {
     
     toast({
       title: "Batch created",
-      description: `Batch "${batch.name}" created with auto-detected platform: ${platformName}. Wait for idle: ${formData.waitForIdle ? 'enabled' : 'disabled'}.`,
+      description: `Batch "${batch.name}" created with auto-detected platform: ${platformName}. Primary processor: LangChain. Wait for idle: ${formData.waitForIdle ? 'enabled' : 'disabled'}.`,
     });
   };
 
@@ -85,44 +87,64 @@ export const useBatchOperations = () => {
     setSelectedBatchId(batch.id);
     
     try {
-      // Pass the complete batch object with updated settings
-      const batchWithPlatform = {
-        ...batch,
-        platform: detectedPlatform,
-        settings: {
-          waitForIdle: batch.settings?.waitForIdle ?? true,
-          maxRetries: batch.settings?.maxRetries ?? 0
-        }
-      };
+      // Primary method: LangChain processing
+      console.log('🔗 Using LangChain as primary batch processor');
       
-      await runBatch(batchWithPlatform, detectedPlatform, batchWithPlatform.settings);
+      // For now, we'll use a placeholder API key - in production this should come from settings
+      const apiKey = localStorage.getItem('openai_api_key') || '';
       
-      setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { ...b, status: 'running', platform: detectedPlatform } : b
-      ));
-      
-      toast({
-        title: "Batch started",
-        description: `Automation started for "${batch.name}" using ${platformName} with idle detection.`,
-      });
-    } catch (err) {
-      let errorTitle = "Failed to start batch";
-      let errorDescription = err instanceof Error ? err.message : 'Unknown error';
-      
-      // Enhanced error handling for specific backend configuration issues
-      if (err instanceof Error && err.message.includes('AUTOMATION_ENDPOINTS_NOT_CONFIGURED')) {
-        errorTitle = "Backend not configured for automation";
-        errorDescription = "The backend service needs to be configured with automation endpoints. Please check the Settings page and verify your backend supports batch automation.";
-      } else if (err instanceof Error && err.message.includes('not found')) {
-        errorTitle = "Automation service unavailable";
-        errorDescription = "The automation service endpoints were not found. This may be a temporary issue or the backend may need updates.";
+      if (!apiKey) {
+        toast({
+          title: "Configuration required",
+          description: "OpenAI API key required for LangChain processing. Please add it to localStorage with key 'openai_api_key' or configure in settings.",
+          variant: "destructive",
+        });
+        return;
       }
       
-      toast({
-        title: errorTitle,
-        description: errorDescription,
-        variant: "destructive",
-      });
+      await handleRunBatchWithLangChain(batch, setBatches, apiKey);
+      
+    } catch (err) {
+      console.error('LangChain processing failed, falling back to legacy methods:', err);
+      
+      // Fallback to existing automation methods (Playwright/Puppeteer)
+      try {
+        // Pass the complete batch object with updated settings
+        const batchWithPlatform = {
+          ...batch,
+          platform: detectedPlatform,
+          settings: {
+            waitForIdle: batch.settings?.waitForIdle ?? true,
+            maxRetries: batch.settings?.maxRetries ?? 0
+          }
+        };
+        
+        await runBatch(batchWithPlatform, detectedPlatform, batchWithPlatform.settings);
+        
+        setBatches(prev => prev.map(b => 
+          b.id === batch.id ? { ...b, status: 'running', platform: detectedPlatform } : b
+        ));
+        
+        toast({
+          title: "Fallback batch started",
+          description: `LangChain failed, using fallback automation for "${batch.name}" with ${platformName}.`,
+        });
+      } catch (fallbackErr) {
+        let errorTitle = "All batch processing methods failed";
+        let errorDescription = fallbackErr instanceof Error ? fallbackErr.message : 'Unknown error';
+        
+        // Enhanced error handling for specific backend configuration issues
+        if (fallbackErr instanceof Error && fallbackErr.message.includes('AUTOMATION_ENDPOINTS_NOT_CONFIGURED')) {
+          errorTitle = "Backend not configured for automation";
+          errorDescription = "Both LangChain and backend automation services failed. Please check configuration.";
+        }
+        
+        toast({
+          title: errorTitle,
+          description: errorDescription,
+          variant: "destructive",
+        });
+      }
     }
   };
 
