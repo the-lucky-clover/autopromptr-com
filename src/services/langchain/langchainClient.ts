@@ -1,6 +1,6 @@
 
-import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { HumanMessage, SystemMessage } from 'langchain/schema';
+import { ChatOpenAI } from '@langchain/openai';
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { AutoPromtrError } from '../autoPromptr';
 
 export interface LangChainConfig {
@@ -39,10 +39,10 @@ export class LangChainClient {
         new HumanMessage(prompt)
       ];
 
-      const response = await this.chatModel.call(messages);
+      const response = await this.chatModel.invoke(messages);
       
       console.log('✅ LangChain prompt processed successfully');
-      return response.content;
+      return response.content as string;
       
     } catch (error) {
       console.error('❌ LangChain processing failed:', error);

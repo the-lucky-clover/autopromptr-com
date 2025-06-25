@@ -65,7 +65,7 @@ export const useLangChainBatchRunner = () => {
     try {
       // Update batch status to pending
       setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { ...b, status: 'pending' as const, errorMessage: undefined } : b
+        b.id === batch.id ? { ...b, status: 'pending', errorMessage: undefined } : b
       ));
 
       // Enhanced settings for LangChain processing
@@ -130,13 +130,13 @@ export const useLangChainBatchRunner = () => {
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { 
           ...b, 
-          status: finalStatus as const,
+          status: finalStatus,
           errorMessage: finalStatus === 'failed' ? 'Some prompts failed processing' : undefined
         } : b
       ));
       
       // Save final status to database
-      const finalBatch = { ...batchToRun, status: finalStatus as const };
+      const finalBatch = { ...batchToRun, status: finalStatus };
       await saveBatchToDatabase(finalBatch);
       
       console.log('🎉 LangChain batch processing completed:', results);
@@ -159,7 +159,7 @@ export const useLangChainBatchRunner = () => {
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { 
           ...b, 
-          status: 'failed' as const,
+          status: 'failed',
           errorMessage: errorMessage
         } : b
       ));
