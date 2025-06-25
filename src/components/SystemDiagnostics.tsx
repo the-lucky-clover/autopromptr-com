@@ -1,6 +1,7 @@
 
-import { AutoPromptr } from '@/services/autoPromptr';
+import { AutoPromtr } from '@/services/autoPromptr';
 import { Batch } from '@/types/batch';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LogEntry {
   id: string;
@@ -22,19 +23,15 @@ export const useSystemDiagnostics = ({ batches, addLog, setSystemStatus }: Syste
     try {
       addLog('info', 'Lovable-Supabase', 'Testing connection handshake...');
       
-      // Test Supabase connection
-      const response = await fetch('https://raahpoyciwuyhwlcenpy.supabase.co/rest/v1/', {
-        headers: {
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhYWhwb3ljaXd1eWh3bGNlbnB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5Njc4NTAsImV4cCI6MjA2NDU0Mzg1MH0.lAzBUV4PumqVGQqJNhS-5snJIt_qnSAARSYKb5WEUQo'
-        }
-      });
+      // Test Supabase connection using the configured client
+      const { data, error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
       
-      if (response.ok) {
+      if (!error) {
         setSystemStatus((prev: any) => ({ ...prev, lovableSupabase: 'connected' }));
-        addLog('success', 'Lovable-Supabase', 'Connection established successfully', `Status: ${response.status}`);
+        addLog('success', 'Lovable-Supabase', 'Connection established successfully', 'Database accessible');
       } else {
         setSystemStatus((prev: any) => ({ ...prev, lovableSupabase: 'error' }));
-        addLog('error', 'Lovable-Supabase', 'Connection failed', `Status: ${response.status}`);
+        addLog('error', 'Lovable-Supabase', 'Connection failed', error.message);
       }
     } catch (error) {
       setSystemStatus((prev: any) => ({ ...prev, lovableSupabase: 'error' }));
@@ -46,7 +43,7 @@ export const useSystemDiagnostics = ({ batches, addLog, setSystemStatus }: Syste
     try {
       addLog('info', 'Supabase-Render', 'Testing AutoPromptr backend connection at https://autopromptr-backend.onrender.com...');
       
-      const autoPromptr = new AutoPromptr();
+      const autoPromptr = new AutoPromtr();
       const healthCheck = await autoPromptr.healthCheck();
       
       setSystemStatus((prev: any) => ({ ...prev, supabaseRender: 'connected' }));
@@ -61,9 +58,22 @@ export const useSystemDiagnostics = ({ batches, addLog, setSystemStatus }: Syste
     try {
       addLog('info', 'Render-Target', `Testing connectivity to target URL: ${targetUrl}...`);
       
+      // Validate URL format before testing
       try {
-        // Basic connectivity test (note: CORS may block this, but we'll log the attempt)
-        const response = await fetch(targetUrl, { mode: 'no-cors' });
+        new URL(targetUrl);
+      } catch {
+        addLog('error', 'Render-Target', 'Invalid URL format', `URL: ${targetUrl}`);
+        setSystemStatus((prev: any) => ({ ...prev, renderTarget: 'error' }));
+        return;
+      }
+      
+      // Basic connectivity test (note: CORS may block this, but we'll log the attempt)
+      try {
+        const response = await fetch(targetUrl, { 
+          method: 'HEAD',
+          mode: 'no-cors',
+          signal: AbortSignal.timeout(5000) // 5 second timeout
+        });
         addLog('info', 'Render-Target', `Testing connectivity to ${targetUrl}`, 'CORS may prevent full validation');
       } catch (error) {
         addLog('warning', 'Render-Target', `Cannot directly test ${targetUrl}`, 'CORS restrictions - backend will handle actual connections');

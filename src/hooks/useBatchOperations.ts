@@ -3,8 +3,10 @@ import { useToast } from '@/hooks/use-toast';
 import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { useLangChainBatchRunner } from '@/hooks/useLangChainBatchRunner';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
+import { useSecureApiKeys } from '@/hooks/useSecureApiKeys';
 import { Batch, BatchFormData, TextPrompt } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
+import { InputValidationService } from '@/services/security/inputValidation';
 
 export const useBatchOperations = () => {
   const { batches, setBatches, triggerManualSync } = usePersistentBatches();
@@ -12,20 +14,51 @@ export const useBatchOperations = () => {
   const { toast } = useToast();
   const { status: batchStatus, loading: automationLoading, error: automationError, runBatch, stopBatch } = useBatchAutomation(selectedBatchId || undefined);
   const { handleRunBatchWithLangChain } = useLangChainBatchRunner();
+  const { getApiKey, hasApiKey } = useSecureApiKeys();
 
   const createBatch = (formData: BatchFormData) => {
+    // Input validation
+    const nameValidation = InputValidationService.validateBatchName(formData.name);
+    if (!nameValidation.isValid) {
+      toast({
+        title: "Invalid batch name",
+        description: nameValidation.error,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!InputValidationService.validateUrl(formData.targetUrl)) {
+      toast({
+        title: "Invalid URL",
+        description: "Please enter a valid HTTP or HTTPS URL.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const promptValidation = InputValidationService.validatePromptText(formData.initialPrompt);
+    if (!promptValidation.isValid) {
+      toast({
+        title: "Invalid prompt",
+        description: promptValidation.error,
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Auto-detect platform from target URL
     const detectedPlatform = detectPlatformFromUrl(formData.targetUrl);
     const platformName = getPlatformName(detectedPlatform);
 
     const batch: Batch = {
       id: crypto.randomUUID(),
-      name: formData.name,
+      name: InputValidationService.sanitizeInput(formData.name),
       targetUrl: formData.targetUrl,
-      description: formData.description,
+      description: formData.description ? InputValidationService.sanitizeInput(formData.description) : undefined,
       prompts: [{
         id: crypto.randomUUID(),
-        text: formData.initialPrompt,
+        text: InputValidationService.sanitizeInput(formData.initialPrompt),
         order: 0
       }],
       status: 'pending',
@@ -33,7 +66,7 @@ export const useBatchOperations = () => {
       platform: detectedPlatform,
       settings: {
         waitForIdle: formData.waitForIdle,
-        maxRetries: formData.maxRetries
+        maxRetries: Math.min(formData.maxRetries || 0, 5) // Security: Limit max retries
       }
     };
 
@@ -43,8 +76,8 @@ export const useBatchOperations = () => {
     triggerManualSync();
     
     toast({
-      title: "Batch created",
-      description: `Batch "${batch.name}" created with auto-detected platform: ${platformName}. Primary processor: LangChain. Wait for idle: ${formData.waitForIdle ? 'enabled' : 'disabled'}.`,
+      title: "Batch created securely",
+      description: `Batch "${batch.name}" created with auto-detected platform: ${platformName}. Input has been validated and sanitized.`,
     });
   };
 
@@ -87,16 +120,16 @@ export const useBatchOperations = () => {
     setSelectedBatchId(batch.id);
     
     try {
-      // Primary method: LangChain processing
+      // Primary method: LangChain processing with secure API key
       console.log('🔗 Using LangChain as primary batch processor');
       
-      // For now, we'll use a placeholder API key - in production this should come from settings
-      const apiKey = localStorage.getItem('openai_api_key') || '';
+      // Get API key from secure storage
+      const apiKey = getApiKey('openai_api_key');
       
-      if (!apiKey) {
+      if (!apiKey || !hasApiKey('openai_api_key')) {
         toast({
-          title: "Configuration required",
-          description: "OpenAI API key required for LangChain processing. Please add it to localStorage with key 'openai_api_key' or configure in settings.",
+          title: "API Key Required",
+          description: "OpenAI API key required for LangChain processing. Please configure it in the secure API key manager.",
           variant: "destructive",
         });
         return;
@@ -115,7 +148,7 @@ export const useBatchOperations = () => {
           platform: detectedPlatform,
           settings: {
             waitForIdle: batch.settings?.waitForIdle ?? true,
-            maxRetries: batch.settings?.maxRetries ?? 0
+            maxRetries: Math.min(batch.settings?.maxRetries ?? 0, 3) // Security: Limit retries
           }
         };
         
@@ -170,12 +203,25 @@ export const useBatchOperations = () => {
   };
 
   const updatePrompt = (batchId: string, promptId: string, text: string) => {
+    // Input validation
+    const validation = InputValidationService.validatePromptText(text);
+    if (!validation.isValid) {
+      toast({
+        title: "Invalid prompt text",
+        description: validation.error,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const sanitizedText = InputValidationService.sanitizeInput(text);
+
     setBatches(prev => prev.map(batch => {
       if (batch.id === batchId) {
         return {
           ...batch,
           prompts: batch.prompts.map(prompt => 
-            prompt.id === promptId ? { ...prompt, text } : prompt
+            prompt.id === promptId ? { ...prompt, text: sanitizedText } : prompt
           )
         };
       }

@@ -1,238 +1,238 @@
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/hooks/use-toast';
-import { AutoPromptr } from '@/services/autoPromptr';
-import { Platform, BatchFormData } from '@/types/batch';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { BatchFormData } from '@/types/batch';
+import { InputValidationService } from '@/services/security/inputValidation';
+import { AlertCircle, Shield } from 'lucide-react';
 
 interface BatchFormProps {
   onSubmit: (data: BatchFormData) => void;
   onCancel: () => void;
 }
 
-const BatchForm = ({ onSubmit, onCancel }: BatchFormProps) => {
-  const [platforms, setPlatforms] = useState<Platform[]>([]);
+const BatchForm: React.FC<BatchFormProps> = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState<BatchFormData>({
     name: '',
     targetUrl: '',
     description: '',
     initialPrompt: '',
-    platform: '',
     waitForIdle: true,
-    maxRetries: 0
+    maxRetries: 2
   });
-  const [selectedTargetPlatform, setSelectedTargetPlatform] = useState('');
-  const { toast } = useToast();
 
-  useEffect(() => {
-    const autoPromptr = new AutoPromptr();
-    autoPromptr.getPlatforms()
-      .then((platformArray) => {
-        // platformArray is now correctly an array
-        setPlatforms(platformArray.filter((p: Platform) => p.type === 'web'));
-      })
-      .catch((err) => {
-        console.error('Failed to load platforms:', err);
-        toast({
-          title: "Warning",
-          description: "Failed to load automation platforms. Manual batch creation is still available.",
-          variant: "destructive",
-        });
-      });
-  }, [toast]);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
-    if (!formData.name.trim() || !formData.initialPrompt.trim()) {
-      toast({
-        title: "Missing required fields",
-        description: "Name and at least one prompt are required.",
-        variant: "destructive",
-      });
-      return;
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    // Validate batch name
+    const nameValidation = InputValidationService.validateBatchName(formData.name);
+    if (!nameValidation.isValid) {
+      errors.name = nameValidation.error || 'Invalid batch name';
     }
 
-    // Validate that either URL or platform is selected
-    if (!formData.targetUrl.trim() && !selectedTargetPlatform) {
-      toast({
-        title: "Missing target",
-        description: "Please enter a target URL or select a platform.",
-        variant: "destructive",
-      });
-      return;
+    // Validate URL
+    if (!InputValidationService.validateUrl(formData.targetUrl)) {
+      errors.targetUrl = 'Please enter a valid HTTP or HTTPS URL';
     }
 
-    // Use selected platform URL if no custom URL is provided
-    let finalTargetUrl = formData.targetUrl.trim();
-    if (!finalTargetUrl && selectedTargetPlatform) {
-      const platformUrls: Record<string, string> = {
-        'lovable': 'https://lovable.dev',
-        'chatgpt': 'https://chat.openai.com',
-        'claude': 'https://claude.ai',
-        'gemini': 'https://gemini.google.com',
-        'perplexity': 'https://perplexity.ai',
-        'bolt': 'https://bolt.new',
-        'v0': 'https://v0.dev',
-        'replit': 'https://replit.com',
-        'generic-web': 'https://example.com'
-      };
-      finalTargetUrl = platformUrls[selectedTargetPlatform] || 'https://lovable.dev';
+    // Validate prompt
+    const promptValidation = InputValidationService.validatePromptText(formData.initialPrompt);
+    if (!promptValidation.isValid) {
+      errors.initialPrompt = promptValidation.error || 'Invalid prompt text';
     }
 
-    onSubmit({
-      ...formData,
-      targetUrl: finalTargetUrl
-    });
-    
-    setFormData({
-      name: '',
-      targetUrl: '',
-      description: '',
-      initialPrompt: '',
-      platform: '',
-      waitForIdle: true,
-      maxRetries: 0
-    });
-    setSelectedTargetPlatform('');
+    // Validate max retries
+    if (formData.maxRetries < 0 || formData.maxRetries > 5) {
+      errors.maxRetries = 'Max retries must be between 0 and 5';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  const showTargetPlatformDropdown = !formData.targetUrl.trim();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      // Sanitize form data before submission
+      const sanitizedData: BatchFormData = {
+        name: InputValidationService.sanitizeInput(formData.name),
+        targetUrl: formData.targetUrl, // URLs don't need sanitization, already validated
+        description: formData.description ? InputValidationService.sanitizeInput(formData.description) : '',
+        initialPrompt: InputValidationService.sanitizeInput(formData.initialPrompt),
+        waitForIdle: formData.waitForIdle,
+        maxRetries: Math.min(Math.max(formData.maxRetries, 0), 5) // Enforce limits
+      };
+
+      onSubmit(sanitizedData);
+    } catch (error) {
+      console.error('Form submission error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInputChange = (field: keyof BatchFormData, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear validation error when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => {
+        const updated = { ...prev };
+        delete updated[field];
+        return updated;
+      });
+    }
+  };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <Card className="bg-white/10 backdrop-blur-xl border-white/20 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <CardHeader className="rounded-t-2xl">
-          <CardTitle className="text-white">Create New Batch</CardTitle>
-          <CardDescription className="text-white/70">Enter batch details, platform, and initial prompt for automation</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Input
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                placeholder="Enter batch name..."
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl"
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-green-500" />
+          Create New Batch
+        </CardTitle>
+        <CardDescription>
+          All inputs are validated and sanitized for security
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="name">Batch Name *</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => handleInputChange('name', e.target.value)}
+              placeholder="Enter batch name (3-100 characters)"
+              className={validationErrors.name ? 'border-red-500' : ''}
+              maxLength={100}
+            />
+            {validationErrors.name && (
+              <div className="flex items-center gap-2 text-red-500 text-sm">
+                <AlertCircle className="h-4 w-4" />
+                {validationErrors.name}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="targetUrl">Target URL *</Label>
+            <Input
+              id="targetUrl"
+              type="url"
+              value={formData.targetUrl}
+              onChange={(e) => handleInputChange('targetUrl', e.target.value)}
+              placeholder="https://example.com"
+              className={validationErrors.targetUrl ? 'border-red-500' : ''}
+            />
+            {validationErrors.targetUrl && (
+              <div className="flex items-center gap-2 text-red-500 text-sm">
+                <AlertCircle className="h-4 w-4" />
+                {validationErrors.targetUrl}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              placeholder="Optional description of the batch"
+              maxLength={1000}
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="initialPrompt">Initial Prompt *</Label>
+            <Textarea
+              id="initialPrompt"
+              value={formData.initialPrompt}
+              onChange={(e) => handleInputChange('initialPrompt', e.target.value)}
+              placeholder="Enter the initial prompt for automation"
+              className={validationErrors.initialPrompt ? 'border-red-500' : ''}
+              maxLength={5000}
+              rows={4}
+            />
+            {validationErrors.initialPrompt && (
+              <div className="flex items-center gap-2 text-red-500 text-sm">
+                <AlertCircle className="h-4 w-4" />
+                {validationErrors.initialPrompt}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label htmlFor="waitForIdle">Wait for Page Idle</Label>
+                <p className="text-sm text-gray-500">
+                  Wait for page to be idle before processing
+                </p>
+              </div>
+              <Switch
+                id="waitForIdle"
+                checked={formData.waitForIdle}
+                onCheckedChange={(checked) => handleInputChange('waitForIdle', checked)}
               />
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="target-url" className="text-white">Target URL</Label>
+              <Label htmlFor="maxRetries">Max Retries (0-5)</Label>
               <Input
-                id="target-url"
-                value={formData.targetUrl}
-                onChange={(e) => {
-                  setFormData({...formData, targetUrl: e.target.value});
-                  if (e.target.value.trim()) {
-                    setSelectedTargetPlatform('');
-                  }
-                }}
-                placeholder="https://example.com (or leave empty to select platform)"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl"
+                id="maxRetries"
+                type="number"
+                min="0"
+                max="5"
+                value={formData.maxRetries}
+                onChange={(e) => handleInputChange('maxRetries', parseInt(e.target.value) || 0)}
+                className={validationErrors.maxRetries ? 'border-red-500' : ''}
               />
+              {validationErrors.maxRetries && (
+                <div className="flex items-center gap-2 text-red-500 text-sm">
+                  <AlertCircle className="h-4 w-4" />
+                  {validationErrors.maxRetries}
+                </div>
+              )}
             </div>
           </div>
 
-          {showTargetPlatformDropdown && (
-            <div className="space-y-2">
-              <Label htmlFor="target-platform" className="text-white">Target Platform</Label>
-              <Select value={selectedTargetPlatform} onValueChange={setSelectedTargetPlatform}>
-                <SelectTrigger className="bg-white/10 border-white/20 text-white rounded-xl">
-                  <SelectValue placeholder="Select a platform for new projects..." />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-800/90 backdrop-blur-sm border-gray-700 rounded-xl">
-                  {platforms.map(platform => (
-                    <SelectItem key={platform.id} value={platform.id}>
-                      {platform.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="platform" className="text-white">Automation Platform</Label>
-              <Select 
-                value={formData.platform} 
-                onValueChange={(value) => setFormData({...formData, platform: value})}
-              >
-                <SelectTrigger className="bg-white/10 border-white/20 text-white rounded-xl">
-                  <SelectValue placeholder="Select platform..." />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-800/90 backdrop-blur-sm border-gray-700 rounded-xl">
-                  {platforms.map(platform => (
-                    <SelectItem key={platform.id} value={platform.id}>
-                      {platform.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="wait-for-idle" className="text-white">Wait for Idle State</Label>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="wait-for-idle"
-                  checked={formData.waitForIdle}
-                  onCheckedChange={(checked) => setFormData({...formData, waitForIdle: checked})}
-                />
-                <span className="text-sm text-white/70">
-                  {formData.waitForIdle ? 'Enabled' : 'Disabled'}
-                </span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="retries" className="text-white">Max Retries</Label>
-              <Input
-                id="retries"
-                type="number"
-                value={formData.maxRetries}
-                onChange={(e) => setFormData({...formData, maxRetries: parseInt(e.target.value)})}
-                min="0"
-                max="5"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl"
-              />
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="description" className="text-white">Description (Optional)</Label>
-            <Input
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              placeholder="Brief description of this batch"
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="initial-prompt" className="text-white">Initial Text Prompt *</Label>
-            <Textarea
-              id="initial-prompt"
-              value={formData.initialPrompt}
-              onChange={(e) => setFormData({...formData, initialPrompt: e.target.value})}
-              placeholder="Enter your first prompt for this batch"
-              rows={3}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl resize-none"
-            />
-          </div>
-          <div className="flex space-x-2">
-            <Button onClick={handleSubmit} className="bg-green-600 hover:bg-green-700 rounded-xl">
-              Create Batch
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1"
+            >
+              {isSubmitting ? 'Creating...' : 'Create Batch'}
             </Button>
-            <Button variant="outline" onClick={onCancel} className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
