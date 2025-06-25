@@ -12,10 +12,11 @@ import { InputValidationService } from '@/services/security/inputValidation';
 
 interface BatchFormProps {
   onSubmit: (data: BatchFormData) => void;
+  onCancel?: () => void;
   isSubmitting?: boolean;
 }
 
-const BatchForm: React.FC<BatchFormProps> = ({ onSubmit, isSubmitting = false }) => {
+const BatchForm: React.FC<BatchFormProps> = ({ onSubmit, onCancel, isSubmitting = false }) => {
   const [formData, setFormData] = useState<BatchFormData>({
     name: '',
     targetUrl: '',
@@ -172,13 +173,25 @@ const BatchForm: React.FC<BatchFormProps> = ({ onSubmit, isSubmitting = false })
             />
           </div>
 
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
-          >
-            {isSubmitting ? 'Creating...' : 'Create Batch'}
-          </Button>
+          <div className="flex space-x-2">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+            >
+              {isSubmitting ? 'Creating...' : 'Create Batch'}
+            </Button>
+            {onCancel && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl"
+              >
+                Cancel
+              </Button>
+            )}
+          </div>
         </form>
       </CardContent>
     </Card>

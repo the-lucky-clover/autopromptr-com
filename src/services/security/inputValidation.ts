@@ -19,14 +19,18 @@ export class InputValidationService {
       .substring(0, 1000); // Limit length
   }
 
-  // URL Validation
-  static validateUrl(url: string): boolean {
+  // URL Validation - Updated to return validation object
+  static validateUrl(url: string): { isValid: boolean; error?: string } {
     try {
       const urlObj = new URL(url);
       // Only allow https and http protocols
-      return ['http:', 'https:'].includes(urlObj.protocol);
+      if (['http:', 'https:'].includes(urlObj.protocol)) {
+        return { isValid: true };
+      } else {
+        return { isValid: false, error: 'Only HTTP and HTTPS URLs are allowed' };
+      }
     } catch {
-      return false;
+      return { isValid: false, error: 'Invalid URL format' };
     }
   }
 
