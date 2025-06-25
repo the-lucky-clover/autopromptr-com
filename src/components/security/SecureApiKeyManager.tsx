@@ -4,8 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Key, Trash2, Save } from "lucide-react";
+import { Eye, EyeOff, Key, Trash2, Save, Shield, AlertTriangle } from "lucide-react";
 import { useSecureApiKeys } from '@/hooks/useSecureApiKeys';
+import { SecurityMonitor } from '@/services/security/securityMonitor';
 
 export const SecureApiKeyManager = () => {
   const { apiKeys, loading, storeApiKey, removeApiKey, hasApiKey } = useSecureApiKeys();
@@ -13,6 +14,13 @@ export const SecureApiKeyManager = () => {
   const [tempKeys, setTempKeys] = useState<Record<string, string>>({});
 
   const toggleShowKey = (keyName: string) => {
+    SecurityMonitor.logSecurityEvent(
+      'api_key_access',
+      'low',
+      `API key visibility toggled for ${keyName}`,
+      { keyName, action: showKeys[keyName] ? 'hide' : 'show' }
+    );
+    
     setShowKeys(prev => ({
       ...prev,
       [keyName]: !prev[keyName]
@@ -20,6 +28,19 @@ export const SecureApiKeyManager = () => {
   };
 
   const handleKeyChange = (keyName: string, value: string) => {
+    // Validate input for security threats
+    const validation = SecurityMonitor.validateInput(value, `api_key_${keyName}`);
+    
+    if (!validation.isValid) {
+      SecurityMonitor.logSecurityEvent(
+        'suspicious_activity',
+        'high',
+        `Suspicious input detected in API key field: ${keyName}`,
+        { threats: validation.threats, keyName }
+      );
+      return; // Don't update if suspicious
+    }
+
     setTempKeys(prev => ({
       ...prev,
       [keyName]: value
@@ -29,16 +50,39 @@ export const SecureApiKeyManager = () => {
   const handleSaveKey = async (keyName: string) => {
     const value = tempKeys[keyName];
     if (value) {
-      await storeApiKey(keyName, value);
-      setTempKeys(prev => {
-        const updated = { ...prev };
-        delete updated[keyName];
-        return updated;
-      });
+      try {
+        await storeApiKey(keyName, value);
+        setTempKeys(prev => {
+          const updated = { ...prev };
+          delete updated[keyName];
+          return updated;
+        });
+        
+        SecurityMonitor.logSecurityEvent(
+          'api_key_access',
+          'medium',
+          `API key stored securely: ${keyName}`,
+          { keyName }
+        );
+      } catch (error) {
+        SecurityMonitor.logSecurityEvent(
+          'api_key_access',
+          'high',
+          `Failed to store API key: ${keyName}`,
+          { keyName, error: error instanceof Error ? error.message : 'Unknown error' }
+        );
+      }
     }
   };
 
   const handleRemoveKey = (keyName: string) => {
+    SecurityMonitor.logSecurityEvent(
+      'api_key_access',
+      'medium',
+      `API key removed: ${keyName}`,
+      { keyName }
+    );
+    
     removeApiKey(keyName);
     setTempKeys(prev => {
       const updated = { ...prev };
@@ -73,11 +117,11 @@ export const SecureApiKeyManager = () => {
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl" data-component="SecureApiKeyManager">
       <CardHeader>
         <div className="flex items-center space-x-2">
-          <Key className="h-5 w-5 text-white" />
-          <CardTitle className="text-white">Secure API Key Manager</CardTitle>
+          <Shield className="h-5 w-5 text-green-400" />
+          <CardTitle className="text-white">Enhanced Secure API Key Manager</CardTitle>
         </div>
         <CardDescription className="text-purple-200">
-          API keys are encrypted and stored securely in your browser
+          API keys are encrypted with AES-256-GCM and monitored for security threats
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -89,7 +133,10 @@ export const SecureApiKeyManager = () => {
               </Label>
               {hasApiKey(config.name) && (
                 <div className="flex items-center gap-2">
-                  <span className="text-green-400 text-sm">✓ Stored</span>
+                  <span className="text-green-400 text-sm flex items-center gap-1">
+                    <Shield className="h-3 w-3" />
+                    Secured
+                  </span>
                   <Button
                     variant="outline"
                     size="sm"
@@ -138,14 +185,29 @@ export const SecureApiKeyManager = () => {
           </div>
         ))}
         
-        <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-          <h4 className="text-white font-medium mb-2">🔒 Security Notes</h4>
+        <div className="mt-6 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+          <h4 className="text-white font-medium mb-2 flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Enhanced Security Features
+          </h4>
           <ul className="text-gray-300 text-sm space-y-1">
-            <li>• API keys are encrypted using AES-256-GCM encryption</li>
-            <li>• Keys are stored locally in your browser only</li>
-            <li>• No keys are transmitted to our servers</li>
-            <li>• Clear browser data will remove stored keys</li>
+            <li>• AES-256-GCM encryption with PBKDF2 key derivation</li>
+            <li>• Input validation against XSS and injection attacks</li>
+            <li>• Security event monitoring and audit logging</li>
+            <li>• Rate limiting on API key operations</li>
+            <li>• Automatic migration from legacy storage formats</li>
+            <li>• Metadata integrity verification</li>
           </ul>
+        </div>
+
+        <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="h-4 w-4 text-yellow-400" />
+            <span className="text-yellow-400 font-medium text-sm">Security Notice</span>
+          </div>
+          <p className="text-gray-300 text-sm">
+            All API key operations are monitored for security. Suspicious activity will be logged and may trigger additional security measures.
+          </p>
         </div>
       </CardContent>
     </Card>
