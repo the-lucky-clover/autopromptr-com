@@ -1,235 +1,184 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Plus } from "lucide-react";
 import { BatchFormData } from '@/types/batch';
 import { InputValidationService } from '@/services/security/inputValidation';
-import { AlertCircle, Shield } from 'lucide-react';
 
 interface BatchFormProps {
   onSubmit: (data: BatchFormData) => void;
-  onCancel: () => void;
+  isSubmitting?: boolean;
 }
 
-const BatchForm: React.FC<BatchFormProps> = ({ onSubmit, onCancel }) => {
+const BatchForm: React.FC<BatchFormProps> = ({ onSubmit, isSubmitting = false }) => {
   const [formData, setFormData] = useState<BatchFormData>({
     name: '',
     targetUrl: '',
     description: '',
     initialPrompt: '',
+    platform: 'web',
     waitForIdle: true,
-    maxRetries: 2
+    maxRetries: 3,
   });
 
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateForm = (): boolean => {
-    const errors: Record<string, string> = {};
+    const newErrors: Record<string, string> = {};
 
     // Validate batch name
     const nameValidation = InputValidationService.validateBatchName(formData.name);
     if (!nameValidation.isValid) {
-      errors.name = nameValidation.error || 'Invalid batch name';
+      newErrors.name = nameValidation.error || 'Invalid batch name';
     }
 
     // Validate URL
-    if (!InputValidationService.validateUrl(formData.targetUrl)) {
-      errors.targetUrl = 'Please enter a valid HTTP or HTTPS URL';
+    const urlValidation = InputValidationService.validateUrl(formData.targetUrl);
+    if (!urlValidation.isValid) {
+      newErrors.targetUrl = urlValidation.error || 'Invalid URL';
     }
 
     // Validate prompt
     const promptValidation = InputValidationService.validatePromptText(formData.initialPrompt);
     if (!promptValidation.isValid) {
-      errors.initialPrompt = promptValidation.error || 'Invalid prompt text';
+      newErrors.initialPrompt = promptValidation.error || 'Invalid prompt';
     }
 
-    // Validate max retries
-    if (formData.maxRetries < 0 || formData.maxRetries > 5) {
-      errors.maxRetries = 'Max retries must be between 0 and 5';
-    }
-
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
       return;
     }
 
-    setIsSubmitting(true);
-    
-    try {
-      // Sanitize form data before submission
-      const sanitizedData: BatchFormData = {
-        name: InputValidationService.sanitizeInput(formData.name),
-        targetUrl: formData.targetUrl, // URLs don't need sanitization, already validated
-        description: formData.description ? InputValidationService.sanitizeInput(formData.description) : '',
-        initialPrompt: InputValidationService.sanitizeInput(formData.initialPrompt),
-        waitForIdle: formData.waitForIdle,
-        maxRetries: Math.min(Math.max(formData.maxRetries, 0), 5) // Enforce limits
-      };
+    // Sanitize form data before submission
+    const sanitizedData: BatchFormData = {
+      ...formData,
+      name: InputValidationService.sanitizeInput(formData.name),
+      targetUrl: InputValidationService.sanitizeInput(formData.targetUrl),
+      description: InputValidationService.sanitizeInput(formData.description),
+      initialPrompt: InputValidationService.sanitizeInput(formData.initialPrompt),
+    };
 
-      onSubmit(sanitizedData);
-    } catch (error) {
-      console.error('Form submission error:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    onSubmit(sanitizedData);
   };
 
-  const handleInputChange = (field: keyof BatchFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear validation error when user starts typing
-    if (validationErrors[field]) {
-      setValidationErrors(prev => {
-        const updated = { ...prev };
-        delete updated[field];
-        return updated;
-      });
+  const handleInputChange = (field: keyof BatchFormData, value: string | boolean | number) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
     }
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-green-500" />
+        <CardTitle className="text-white flex items-center gap-2">
+          <Plus className="h-5 w-5" />
           Create New Batch
         </CardTitle>
-        <CardDescription>
-          All inputs are validated and sanitized for security
-        </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Batch Name *</Label>
+            <Label htmlFor="name" className="text-white">Batch Name *</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
-              placeholder="Enter batch name (3-100 characters)"
-              className={validationErrors.name ? 'border-red-500' : ''}
-              maxLength={100}
+              placeholder="Enter batch name"
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+              required
             />
-            {validationErrors.name && (
-              <div className="flex items-center gap-2 text-red-500 text-sm">
-                <AlertCircle className="h-4 w-4" />
-                {validationErrors.name}
-              </div>
-            )}
+            {errors.name && <p className="text-red-400 text-sm">{errors.name}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="targetUrl">Target URL *</Label>
+            <Label htmlFor="targetUrl" className="text-white">Target URL *</Label>
             <Input
               id="targetUrl"
               type="url"
               value={formData.targetUrl}
               onChange={(e) => handleInputChange('targetUrl', e.target.value)}
               placeholder="https://example.com"
-              className={validationErrors.targetUrl ? 'border-red-500' : ''}
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+              required
             />
-            {validationErrors.targetUrl && (
-              <div className="flex items-center gap-2 text-red-500 text-sm">
-                <AlertCircle className="h-4 w-4" />
-                {validationErrors.targetUrl}
-              </div>
-            )}
+            {errors.targetUrl && <p className="text-red-400 text-sm">{errors.targetUrl}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description" className="text-white">Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
-              placeholder="Optional description of the batch"
-              maxLength={1000}
+              placeholder="Describe what this batch will do"
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
               rows={3}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="initialPrompt">Initial Prompt *</Label>
+            <Label htmlFor="initialPrompt" className="text-white">Initial Prompt *</Label>
             <Textarea
               id="initialPrompt"
               value={formData.initialPrompt}
               onChange={(e) => handleInputChange('initialPrompt', e.target.value)}
               placeholder="Enter the initial prompt for automation"
-              className={validationErrors.initialPrompt ? 'border-red-500' : ''}
-              maxLength={5000}
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
               rows={4}
+              required
             />
-            {validationErrors.initialPrompt && (
-              <div className="flex items-center gap-2 text-red-500 text-sm">
-                <AlertCircle className="h-4 w-4" />
-                {validationErrors.initialPrompt}
-              </div>
-            )}
+            {errors.initialPrompt && <p className="text-red-400 text-sm">{errors.initialPrompt}</p>}
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label htmlFor="waitForIdle">Wait for Page Idle</Label>
-                <p className="text-sm text-gray-500">
-                  Wait for page to be idle before processing
-                </p>
-              </div>
-              <Switch
-                id="waitForIdle"
-                checked={formData.waitForIdle}
-                onCheckedChange={(checked) => handleInputChange('waitForIdle', checked)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="maxRetries">Max Retries (0-5)</Label>
-              <Input
-                id="maxRetries"
-                type="number"
-                min="0"
-                max="5"
-                value={formData.maxRetries}
-                onChange={(e) => handleInputChange('maxRetries', parseInt(e.target.value) || 0)}
-                className={validationErrors.maxRetries ? 'border-red-500' : ''}
-              />
-              {validationErrors.maxRetries && (
-                <div className="flex items-center gap-2 text-red-500 text-sm">
-                  <AlertCircle className="h-4 w-4" />
-                  {validationErrors.maxRetries}
-                </div>
-              )}
-            </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="waitForIdle"
+              checked={formData.waitForIdle}
+              onCheckedChange={(checked) => handleInputChange('waitForIdle', checked)}
+            />
+            <Label htmlFor="waitForIdle" className="text-white">Wait for page idle</Label>
           </div>
 
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1"
-            >
-              {isSubmitting ? 'Creating...' : 'Create Batch'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
+          <div className="space-y-2">
+            <Label htmlFor="maxRetries" className="text-white">Max Retries</Label>
+            <Input
+              id="maxRetries"
+              type="number"
+              value={formData.maxRetries}
+              onChange={(e) => handleInputChange('maxRetries', parseInt(e.target.value) || 3)}
+              min="1"
+              max="10"
+              className="bg-white/10 border-white/20 text-white"
+            />
           </div>
+
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+          >
+            {isSubmitting ? 'Creating...' : 'Create Batch'}
+          </Button>
         </form>
       </CardContent>
     </Card>

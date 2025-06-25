@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { LogOut, CreditCard, User, Key, Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useSecureApiKeys } from '@/hooks/useSecureApiKeys';
 
 const UserProfile = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { hasApiKey } = useSecureApiKeys();
 
   const getInitial = () => {
     if (!user?.email) return 'U';
@@ -22,6 +24,8 @@ const UserProfile = () => {
       console.error('Error signing out:', error);
     }
   };
+
+  const hasSecureApiKeys = hasApiKey('openai_api_key');
 
   return (
     <div className="relative">
@@ -41,7 +45,15 @@ const UserProfile = () => {
             <p className="text-white text-sm font-medium truncate">
               {user?.email}
             </p>
-            <p className="text-white/70 text-xs">Online</p>
+            <div className="flex items-center space-x-2">
+              <p className="text-white/70 text-xs">Online</p>
+              {hasSecureApiKeys && (
+                <div className="flex items-center">
+                  <Shield className="h-3 w-3 text-green-400" />
+                  <span className="text-green-400 text-xs ml-1">Secure</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </Button>
@@ -64,7 +76,15 @@ const UserProfile = () => {
                   <p className="text-white text-sm font-medium truncate">
                     {user?.email}
                   </p>
-                  <p className="text-white/70 text-xs">Signed in</p>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-white/70 text-xs">Signed in</p>
+                    {hasSecureApiKeys && (
+                      <div className="flex items-center">
+                        <Shield className="h-3 w-3 text-green-400" />
+                        <span className="text-green-400 text-xs ml-1">Keys Secured</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               

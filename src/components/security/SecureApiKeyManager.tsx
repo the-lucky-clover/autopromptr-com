@@ -58,7 +58,7 @@ export const SecureApiKeyManager = () => {
 
   if (loading) {
     return (
-      <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+      <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl" data-component="SecureApiKeyManager">
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <Key className="h-5 w-5" />
@@ -70,7 +70,7 @@ export const SecureApiKeyManager = () => {
   }
 
   return (
-    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl" data-component="SecureApiKeyManager">
       <CardHeader>
         <div className="flex items-center space-x-2">
           <Key className="h-5 w-5 text-white" />

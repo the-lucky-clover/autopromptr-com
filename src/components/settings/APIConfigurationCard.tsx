@@ -4,15 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Copy, Eye, EyeOff, Key } from "lucide-react";
-import { useState } from "react";
+import { Key, ExternalLink } from "lucide-react";
+import { useSecureApiKeys } from "@/hooks/useSecureApiKeys";
 
 export const APIConfigurationCard = () => {
-  const [showApiKey, setShowApiKey] = useState(false);
-
-  const handleCopyApiKey = () => {
-    navigator.clipboard.writeText("sk-proj-1234567890abcdef...");
-  };
+  const { hasApiKey } = useSecureApiKeys();
 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
@@ -22,41 +18,35 @@ export const APIConfigurationCard = () => {
           <CardTitle className="text-white">API Configuration</CardTitle>
         </div>
         <CardDescription className="text-purple-200">
-          Manage your API keys and settings
+          Manage your API settings and webhooks
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="apiKey" className="text-white">API Key</Label>
-          <div className="flex space-x-2">
-            <Input
-              id="apiKey"
-              type={showApiKey ? "text" : "password"}
-              value="sk-proj-1234567890abcdef..."
-              disabled
-              className="bg-white/5 border-white/10 text-gray-400 flex-1"
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setShowApiKey(!showApiKey)}
-              className="border-white/20 text-white hover:bg-white/10"
-            >
-              {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleCopyApiKey}
-              className="border-white/20 text-white hover:bg-white/10"
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
+        <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-white font-medium">🔐 Secure API Keys</h4>
+            {hasApiKey('openai_api_key') && (
+              <span className="text-green-400 text-sm">✓ Keys Configured</span>
+            )}
           </div>
+          <p className="text-gray-300 text-sm mb-3">
+            API keys are now managed through our secure encryption system above. 
+            Your keys are encrypted with AES-256-GCM and stored safely in your browser.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-blue-500/20 text-blue-300 hover:bg-blue-500/10"
+            onClick={() => {
+              const element = document.querySelector('[data-component="SecureApiKeyManager"]');
+              element?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Go to Secure API Manager
+          </Button>
         </div>
-        <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/10 rounded-xl">
-          Generate New Key
-        </Button>
+
         <div className="space-y-2">
           <Label htmlFor="webhookUrl" className="text-white">Webhook URL</Label>
           <Input

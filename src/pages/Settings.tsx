@@ -11,6 +11,7 @@ import { EnhancedAutomationCard } from "@/components/settings/EnhancedAutomation
 import DashboardResetCard from "@/components/settings/DashboardResetCard";
 import { LayoutSettingsCard } from "@/components/settings/LayoutSettingsCard";
 import { ThemeCustomizationCard } from "@/components/settings/ThemeCustomizationCard";
+import { SecureApiKeyManager } from "@/components/security/SecureApiKeyManager";
 
 const Settings = () => {
   return (
@@ -30,6 +31,7 @@ const Settings = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SecureApiKeyManager />
             <ProfileSettingsCard />
             <APIConfigurationCard />
             <PreferencesCard />

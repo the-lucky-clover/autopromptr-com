@@ -1,5 +1,5 @@
 
-import { AutoPromtr } from '@/services/autoPromptr';
+import { AutoPromptr } from '@/services/autoPromptr';
 import { Batch } from '@/types/batch';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -43,7 +43,7 @@ export const useSystemDiagnostics = ({ batches, addLog, setSystemStatus }: Syste
     try {
       addLog('info', 'Supabase-Render', 'Testing AutoPromptr backend connection at https://autopromptr-backend.onrender.com...');
       
-      const autoPromptr = new AutoPromtr();
+      const autoPromptr = new AutoPromptr();
       const healthCheck = await autoPromptr.healthCheck();
       
       setSystemStatus((prev: any) => ({ ...prev, supabaseRender: 'connected' }));
