@@ -96,7 +96,7 @@ export const useLangChainBatchRunner = () => {
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { 
           ...b, 
-          status: 'running' as const, 
+          status: 'running', 
           platform: detectedPlatform, 
           settings: enhancedSettings,
           errorMessage: undefined
@@ -123,7 +123,7 @@ export const useLangChainBatchRunner = () => {
       
       // Determine final status based on results
       const successCount = results.filter(r => r.success).length;
-      const finalStatus = successCount === results.length ? 'completed' : 
+      const finalStatus: Batch['status'] = successCount === results.length ? 'completed' : 
                          successCount > 0 ? 'completed' : 'failed';
       
       // Update batch status
