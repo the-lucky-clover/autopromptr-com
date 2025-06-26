@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Zap, X } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import EmailVerificationScreen from './auth/EmailVerificationScreen';
 import AuthForm from './auth/AuthForm';
@@ -209,16 +208,6 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
             </p>
           </div>
         </div>
-        {!isMobile && (
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            size="sm"
-            className="text-gray-400 hover:text-white rounded-xl"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        )}
       </div>
 
       {/* Enhanced Progress Bar Section */}
