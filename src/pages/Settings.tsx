@@ -1,4 +1,3 @@
-
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ProfileSettingsCard } from "@/components/settings/ProfileSettingsCard";
@@ -12,38 +11,29 @@ import DashboardResetCard from "@/components/settings/DashboardResetCard";
 import { LayoutSettingsCard } from "@/components/settings/LayoutSettingsCard";
 import { ThemeCustomizationCard } from "@/components/settings/ThemeCustomizationCard";
 import { SecureApiKeyManager } from "@/components/security/SecureApiKeyManager";
+import { LocalSimulationCard } from "@/components/settings/LocalSimulationCard";
+import { SidebarInset } from "@/components/ui/sidebar";
 
 const Settings = () => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         <AppSidebar />
-        <main className="flex-1 p-8">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-4">
-              <SidebarTrigger className="text-white hover:text-purple-200 rounded-xl" />
-              <div>
-                <h1 className="text-2xl font-semibold text-white">Settings</h1>
-                <p className="text-purple-200">Manage your account and application preferences</p>
-              </div>
+        <SidebarInset>
+          <div className="flex-1 space-y-8 p-8 pt-6">
+            <div className="space-y-0.5">
+              <h2 className="text-3xl font-bold tracking-tight text-white">Settings</h2>
+              <p className="text-purple-200">
+                Configure your AutoPromptr application settings and preferences.
+              </p>
+            </div>
+            
+            <div className="space-y-6">
+              <BackendConfigurationCard />
+              <LocalSimulationCard />
             </div>
           </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <SecureApiKeyManager />
-            <ProfileSettingsCard />
-            <APIConfigurationCard />
-            <PreferencesCard />
-            <NotificationsCard />
-            <AutomationSettingsCard />
-            <BackendConfigurationCard />
-            <EnhancedAutomationCard />
-            <LayoutSettingsCard />
-            <ThemeCustomizationCard />
-            <DashboardResetCard />
-          </div>
-        </main>
+        </SidebarInset>
       </div>
     </SidebarProvider>
   );
