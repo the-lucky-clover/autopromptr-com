@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -114,9 +115,9 @@ const Navbar = () => {
         {/* Navbar content - always visible with responsive padding */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center h-20">
-            {/* Logo without animated background */}
+            {/* Logo with inverted colors */}
             <Link to="/" className="flex items-center group flex-shrink-0">
-              <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16">
+              <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16 navbar-logo-inverted">
                 <BrandLogo size="small" variant="horizontal" />
               </div>
             </Link>
@@ -188,6 +189,48 @@ const Navbar = () => {
           <AuthModal mode={authMode} onClose={() => setAuthModalOpen(false)} />
         </DialogContent>
       </Dialog>
+
+      {/* Inverted logo styles for navbar */}
+      <style>
+        {`
+          .navbar-logo-inverted .brand-logo-text {
+            background: linear-gradient(90deg, #FF4081, #7B1FA2, #1976D2, #7B1FA2, #FF4081) !important;
+            background-size: 300% 300% !important;
+            animation: heroGradientFlowInverted 6s ease-in-out infinite !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            filter: drop-shadow(0 0 8px rgba(255, 64, 129, 0.4)) !important;
+          }
+
+          .navbar-logo-inverted svg stop {
+            animation-name: invertedIconGradient !important;
+          }
+
+          @keyframes heroGradientFlowInverted {
+            0%, 100% {
+              background-position: 0% 50%;
+            }
+            25% {
+              background-position: 50% 0%;
+            }
+            50% {
+              background-position: 100% 50%;
+            }
+            75% {
+              background-position: 50% 100%;
+            }
+          }
+
+          @keyframes invertedIconGradient {
+            0% { stop-color: #FF4081; }
+            25% { stop-color: #7B1FA2; }
+            50% { stop-color: #1976D2; }
+            75% { stop-color: #7B1FA2; }
+            100% { stop-color: #FF4081; }
+          }
+        `}
+      </style>
     </>
   );
 };

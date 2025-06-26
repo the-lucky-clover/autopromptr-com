@@ -46,7 +46,7 @@ const CookieBanner = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50">
       <div 
-        className="glass-cookie-banner text-white relative"
+        className="glass-cookie-banner text-white relative transform scale-50 origin-bottom"
         style={{
           backgroundColor: '#0a0e17',
           background: 'linear-gradient(135deg, rgba(10, 14, 23, 1.0) 0%, rgba(15, 20, 35, 0.98) 50%, rgba(30, 27, 75, 0.95) 100%)',
