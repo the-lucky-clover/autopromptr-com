@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 
 export type ModuleState = 'full' | 'minimized' | 'closed';
@@ -36,10 +35,21 @@ export const useDashboardModules = () => {
         
         if (missingModules.length > 0) {
           // Add missing modules to the saved modules
-          return [...filteredModules, ...missingModules].sort((a, b) => a.order - b.order);
+          const combinedModules = [...filteredModules, ...missingModules];
+          // Ensure batch-processor is always first by reordering
+          return combinedModules.sort((a, b) => {
+            if (a.id === 'batch-processor') return -1;
+            if (b.id === 'batch-processor') return 1;
+            return a.order - b.order;
+          });
         }
         
-        return filteredModules;
+        // Ensure batch-processor is always first in saved modules
+        return filteredModules.sort((a, b) => {
+          if (a.id === 'batch-processor') return -1;
+          if (b.id === 'batch-processor') return 1;
+          return a.order - b.order;
+        });
       } catch (error) {
         console.error('Error parsing saved modules, using defaults:', error);
         return defaultModules;
@@ -51,8 +61,14 @@ export const useDashboardModules = () => {
   const saveModules = useCallback((newModules: DashboardModule[]) => {
     // Always filter out QuickActions before saving
     const filteredModules = newModules.filter(m => m.id !== 'quick-actions');
-    setModules(filteredModules);
-    localStorage.setItem('dashboard-modules', JSON.stringify(filteredModules));
+    // Ensure batch-processor is always first when saving
+    const reorderedModules = filteredModules.sort((a, b) => {
+      if (a.id === 'batch-processor') return -1;
+      if (b.id === 'batch-processor') return 1;
+      return a.order - b.order;
+    });
+    setModules(reorderedModules);
+    localStorage.setItem('dashboard-modules', JSON.stringify(reorderedModules));
   }, []);
 
   const updateModuleState = useCallback((moduleId: string, newState: ModuleState) => {
@@ -65,7 +81,12 @@ export const useDashboardModules = () => {
   }, [modules, saveModules]);
 
   const reorderModules = useCallback((reorderedModules: DashboardModule[]) => {
-    const modulesWithOrder = reorderedModules.map((module, index) => ({
+    // Prevent batch-processor from being moved from first position
+    const batchProcessor = reorderedModules.find(m => m.id === 'batch-processor');
+    const otherModules = reorderedModules.filter(m => m.id !== 'batch-processor');
+    
+    const finalModules = batchProcessor ? [batchProcessor, ...otherModules] : reorderedModules;
+    const modulesWithOrder = finalModules.map((module, index) => ({
       ...module,
       order: index
     }));
@@ -86,7 +107,12 @@ export const useDashboardModules = () => {
 
   const visibleModules = modules
     .filter(module => module.isVisible)
-    .sort((a, b) => a.order - b.order);
+    .sort((a, b) => {
+      // Always keep batch-processor first
+      if (a.id === 'batch-processor') return -1;
+      if (b.id === 'batch-processor') return 1;
+      return a.order - b.order;
+    });
 
   const closedModules = modules.filter(module => !module.isVisible);
 
