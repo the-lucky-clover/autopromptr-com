@@ -87,47 +87,26 @@ export class AutoPromptr {
   }
 
   async runBatch(batch: Batch, platform: string, options?: { waitForIdle?: boolean; maxRetries?: number }) {
-    console.log('🚀 Starting batch run (with local fallback capability):', batch.id);
+    console.log('🚀 Starting batch run:', batch.id);
     
     try {
-      // First check if we should use local simulation
-      if (this.shouldUseLocalSimulation()) {
-        return await this.simulateBatchExecution(batch, platform, options);
-      }
-
-      // Try backend connection
-      const healthResponse = await fetch(`${this.baseUrl}/health`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!healthResponse.ok) {
-        console.warn('Backend health check failed, falling back to local simulation');
-        return await this.simulateBatchExecution(batch, platform, options);
-      }
-
-      // Try actual backend processing
+      // Try actual backend processing without fallback
       return await this.processWithBackend(batch, platform, options);
       
     } catch (error) {
       console.error('💥 Error in runBatch:', error);
       
       if (error instanceof AutoPromtrError) {
-        // If it's a backend connectivity issue, try local simulation
-        if (error.code === 'AUTOMATION_ENDPOINTS_NOT_CONFIGURED' || 
-            error.code === 'NETWORK_CONNECTION_FAILED') {
-          console.log('🔄 Falling back to local simulation due to backend issues');
-          return await this.simulateBatchExecution(batch, platform, options);
-        }
         throw error;
       }
       
-      // Handle network errors with local fallback
+      // Handle network errors
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.log('🔄 Network error detected, using local simulation');
-        return await this.simulateBatchExecution(batch, platform, options);
+        throw new AutoPromtrError(
+          `Network connection failed when trying to connect to ${this.baseUrl}. Please verify the backend URL is correct and the service is running.`,
+          'NETWORK_CONNECTION_FAILED',
+          0
+        );
       }
       
       throw new AutoPromtrError(
@@ -136,40 +115,6 @@ export class AutoPromptr {
         0
       );
     }
-  }
-
-  private shouldUseLocalSimulation(): boolean {
-    // Check if user has enabled local simulation mode
-    return localStorage.getItem('autopromptr_local_simulation') === 'true' ||
-           // Or if we're in development and no backend URL is configured
-           (process.env.NODE_ENV === 'development' && !localStorage.getItem('autopromptr_backend_url'));
-  }
-
-  private async simulateBatchExecution(batch: Batch, platform: string, options: any = {}): Promise<any> {
-    console.log('🎭 Running batch in local simulation mode');
-    
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
-    
-    // Simulate successful completion
-    const result = {
-      success: true,
-      batchId: batch.id,
-      platform: platform,
-      mode: 'local_simulation',
-      processedPrompts: batch.prompts.length,
-      message: 'Batch processed successfully in simulation mode. In a real deployment, this would interact with the target platform.',
-      timestamp: new Date().toISOString(),
-      prompts: batch.prompts.map((prompt, index) => ({
-        id: prompt.id,
-        status: 'completed',
-        message: `Prompt ${index + 1} would be sent to ${batch.targetUrl}`,
-        simulatedDelay: Math.floor(Math.random() * 5000) + 1000
-      }))
-    };
-    
-    console.log('✅ Local simulation completed:', result);
-    return result;
   }
 
   private async processWithBackend(batch: Batch, platform: string, options: any = {}): Promise<any> {
@@ -198,6 +143,7 @@ export class AutoPromptr {
 
     for (const endpoint of endpoints) {
       try {
+        console.log(`Trying endpoint: ${this.baseUrl}${endpoint}`);
         const response = await fetch(`${this.baseUrl}${endpoint}`, {
           method: 'POST',
           headers: {
@@ -213,34 +159,35 @@ export class AutoPromptr {
         }
 
         if (response.status === 404) {
+          console.log(`Endpoint ${endpoint} returned 404, trying next...`);
           continue;
         }
 
         const errorText = await response.text();
         console.error('❌ Backend error response:', response.status, errorText);
         
-        if (response.status >= 500) {
-          throw new AutoPromtrError(
-            'Backend server error. The backend may be down or misconfigured.',
-            'SERVER_ERROR',
-            response.status
-          );
-        } else {
-          throw new AutoPromtrError(
-            `Backend returned error: ${errorText}`,
-            'BACKEND_ERROR',
-            response.status
-          );
-        }
+        throw new AutoPromtrError(
+          `Backend returned ${response.status} error: ${errorText || response.statusText}`,
+          'BACKEND_ERROR',
+          response.status
+        );
       } catch (fetchError) {
+        console.error(`Fetch error for ${endpoint}:`, fetchError);
         lastError = fetchError instanceof Error ? fetchError : new Error('Unknown fetch error');
+        
+        // If it's not a 404, throw the error immediately
+        if (fetchError instanceof AutoPromtrError && fetchError.statusCode !== 404) {
+          throw fetchError;
+        }
+        
         continue;
       }
     }
 
     // All endpoints failed
+    console.error('All automation endpoints returned 404. Backend may need configuration.');
     throw new AutoPromtrError(
-      'Backend automation service endpoints not found or not responding. Using local simulation as fallback.',
+      `The backend automation service is not configured with the expected endpoints. This could mean: 1) The backend needs to be updated to support batch automation, 2) The backend URL is incorrect, or 3) The automation service is not deployed. Please check your backend configuration in Settings.`,
       'AUTOMATION_ENDPOINTS_NOT_CONFIGURED',
       404
     );
@@ -248,11 +195,6 @@ export class AutoPromptr {
 
   async stopBatch(batchId: string) {
     try {
-      if (this.shouldUseLocalSimulation()) {
-        console.log('🎭 Simulating batch stop for:', batchId);
-        return { success: true, message: 'Batch stopped in simulation mode' };
-      }
-
       const stopEndpoints = ['/api/batch/stop', '/stop-batch', '/api/stop'];
       
       for (const endpoint of stopEndpoints) {
@@ -283,9 +225,11 @@ export class AutoPromptr {
         }
       }
       
-      // Fallback to local simulation
-      console.log('🎭 Backend stop endpoints not found, using simulation');
-      return { success: true, message: 'Batch stopped in simulation mode' };
+      throw new AutoPromtrError(
+        'Backend stop endpoints not found or not responding',
+        'STOP_ENDPOINTS_NOT_CONFIGURED',
+        404
+      );
       
     } catch (error) {
       if (error instanceof AutoPromtrError) {
@@ -302,15 +246,6 @@ export class AutoPromptr {
 
   async getBatchStatus(batchId: string) {
     try {
-      if (this.shouldUseLocalSimulation()) {
-        console.log('🎭 Simulating batch status for:', batchId);
-        return { 
-          status: 'completed', 
-          message: 'Batch completed in simulation mode',
-          timestamp: new Date().toISOString()
-        };
-      }
-
       const statusEndpoints = ['/api/batch/status', '/batch-status', '/api/status'];
       
       for (const endpoint of statusEndpoints) {
@@ -341,13 +276,11 @@ export class AutoPromptr {
         }
       }
       
-      // Fallback to simulated status
-      console.log('🎭 Backend status endpoints not found, using simulation');
-      return { 
-        status: 'completed', 
-        message: 'Status retrieved from simulation mode',
-        timestamp: new Date().toISOString()
-      };
+      throw new AutoPromtrError(
+        'Backend status endpoints not found or not responding',
+        'STATUS_ENDPOINTS_NOT_CONFIGURED',
+        404
+      );
       
     } catch (error) {
       if (error instanceof AutoPromtrError) {
