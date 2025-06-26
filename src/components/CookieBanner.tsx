@@ -46,13 +46,13 @@ const CookieBanner = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 w-full">
       <div 
-        className="glass-cookie-banner text-white relative w-full"
+        className="glass-cookie-banner text-white relative w-full px-6 py-4"
         style={{
           backgroundColor: '#0a0e17',
           background: 'linear-gradient(135deg, rgba(10, 14, 23, 1.0) 0%, rgba(15, 20, 35, 0.98) 50%, rgba(30, 27, 75, 0.95) 100%)',
           backdropFilter: 'blur(25px) saturate(180%) brightness(95%)',
           WebkitBackdropFilter: 'blur(25px) saturate(180%) brightness(95%)',
-          height: '80px'
+          minHeight: '100px'
         }}
       >
         {/* Close button positioned absolutely in upper right */}
@@ -60,42 +60,44 @@ const CookieBanner = () => {
           onClick={() => setIsVisible(false)}
           variant="ghost"
           size="sm"
-          className="absolute top-2 right-4 text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 w-8 h-8 p-0 z-10"
+          className="absolute top-3 right-4 text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 w-8 h-8 p-0 z-10"
         >
           <X className="w-4 h-4" />
         </Button>
 
-        <div className="container mx-auto px-6 py-3 h-full">
-          {/* Unified layout: text on top, icon and buttons below - same for mobile and desktop */}
-          <div className="flex flex-col h-full">
-            {/* Text section - full width horizontal */}
-            <div className="w-full mb-2">
-              <h3 className="text-sm font-semibold mb-1 text-white">Cookie Notice</h3>
-              <p className="text-gray-200 text-xs leading-relaxed">
-                We use cookies to enhance your experience and analyze site usage. By continuing, you consent to our use of cookies.
-              </p>
+        <div className="max-w-7xl mx-auto">
+          {/* Main content layout */}
+          <div className="flex flex-col space-y-4">
+            {/* Text section */}
+            <div className="pr-12">
+              <div className="flex items-start gap-3">
+                <Cookie className="w-6 h-6 text-purple-300 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="text-lg font-semibold mb-2 text-white">Cookie Notice</h3>
+                  <p className="text-gray-200 text-sm leading-relaxed">
+                    We use cookies to enhance your experience and analyze site usage. By continuing, you consent to our use of cookies.
+                  </p>
+                </div>
+              </div>
             </div>
             
-            {/* Icon and buttons section */}
-            <div className="flex items-center justify-between">
-              <Cookie className="w-5 h-5 text-purple-300 flex-shrink-0" />
-              <div className="flex gap-3 ml-4">
-                <Button 
-                  onClick={acceptCookies}
-                  size="sm"
-                  className="bg-purple-600 hover:bg-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 text-xs px-3 py-1"
-                >
-                  Accept All
-                </Button>
-                <Button 
-                  onClick={declineCookies}
-                  variant="outline"
-                  size="sm"
-                  className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm transition-all duration-300 text-xs px-3 py-1"
-                >
-                  Decline
-                </Button>
-              </div>
+            {/* Buttons section */}
+            <div className="flex flex-wrap gap-3 justify-start">
+              <Button 
+                onClick={acceptCookies}
+                size="sm"
+                className="bg-purple-600 hover:bg-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-2"
+              >
+                Accept All
+              </Button>
+              <Button 
+                onClick={declineCookies}
+                variant="outline"
+                size="sm"
+                className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm transition-all duration-300 px-6 py-2"
+              >
+                Decline
+              </Button>
             </div>
           </div>
         </div>
