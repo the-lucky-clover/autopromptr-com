@@ -73,8 +73,7 @@ const CookieBanner = () => {
                 <div className="flex-1">
                   <h3 className="text-sm font-semibold mb-1 text-white">Cookie Notice</h3>
                   <p className="text-gray-200 text-xs leading-relaxed">
-                    We use essential cookies to ensure our website works properly and analytical cookies to improve your experience. 
-                    By clicking "Accept All", you consent to our use of cookies.
+                    Intelligently batch process, enhance, and deploy prompts across all major AI coding platforms, local or remote.
                   </p>
                 </div>
                 <div className="flex gap-3 flex-shrink-0">
