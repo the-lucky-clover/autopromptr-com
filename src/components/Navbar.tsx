@@ -115,7 +115,7 @@ const Navbar = () => {
         {/* Navbar content - always visible with responsive padding */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center h-20">
-            {/* Logo with inverted colors */}
+            {/* Logo with opposite colors and increased luminosity */}
             <Link to="/" className="flex items-center group flex-shrink-0">
               <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16 navbar-logo-inverted">
                 <BrandLogo size="small" variant="horizontal" />
@@ -190,21 +190,25 @@ const Navbar = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Inverted logo styles for navbar */}
+      {/* Opposite colors and increased luminosity styles for navbar logo */}
       <style>
         {`
           .navbar-logo-inverted .brand-logo-text {
-            background: linear-gradient(90deg, #FF4081, #7B1FA2, #1976D2, #7B1FA2, #FF4081) !important;
+            background: linear-gradient(90deg, #FF6B9D, #9B59B6, #3498DB, #9B59B6, #FF6B9D) !important;
             background-size: 300% 300% !important;
             animation: heroGradientFlowInverted 6s ease-in-out infinite !important;
             -webkit-background-clip: text !important;
             background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
-            filter: drop-shadow(0 0 8px rgba(255, 64, 129, 0.4)) !important;
+            filter: drop-shadow(0 0 12px rgba(255, 107, 157, 0.6)) brightness(1.4) !important;
           }
 
           .navbar-logo-inverted svg stop {
             animation-name: invertedIconGradient !important;
+          }
+
+          .navbar-logo-inverted svg {
+            filter: brightness(1.4) drop-shadow(0 0 12px rgba(255, 107, 157, 0.5)) !important;
           }
 
           @keyframes heroGradientFlowInverted {
@@ -223,11 +227,11 @@ const Navbar = () => {
           }
 
           @keyframes invertedIconGradient {
-            0% { stop-color: #FF4081; }
-            25% { stop-color: #7B1FA2; }
-            50% { stop-color: #1976D2; }
-            75% { stop-color: #7B1FA2; }
-            100% { stop-color: #FF4081; }
+            0% { stop-color: #FF6B9D; }
+            25% { stop-color: #9B59B6; }
+            50% { stop-color: #3498DB; }
+            75% { stop-color: #9B59B6; }
+            100% { stop-color: #FF6B9D; }
           }
         `}
       </style>
