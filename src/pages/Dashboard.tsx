@@ -2,7 +2,7 @@
 import React from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { DashboardContent } from "@/components/dashboard/DashboardContent";
+import DashboardContent from "@/components/dashboard/DashboardContent";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
 
 const Dashboard = () => {
