@@ -66,10 +66,10 @@ const CookieBanner = () => {
         </Button>
 
         <div className="max-w-7xl mx-auto">
-          {/* Full width layout with text spanning entire width */}
-          <div className="flex flex-col space-y-4 pr-12">
-            {/* Text section - full width */}
-            <div className="w-full">
+          {/* Horizontal layout: wider text on left, buttons on right */}
+          <div className="flex flex-col md:flex-row md:items-center gap-6 pr-12">
+            {/* Text section - wider block taking more space */}
+            <div className="flex-1 md:flex-[3]">
               <div className="flex items-start gap-3">
                 <Cookie className="w-6 h-6 text-purple-300 flex-shrink-0 mt-1" />
                 <div className="flex-1">
@@ -81,8 +81,8 @@ const CookieBanner = () => {
               </div>
             </div>
             
-            {/* Buttons section - side by side in lower right */}
-            <div className="flex gap-3 justify-end">
+            {/* Buttons section - positioned on right side with spacing */}
+            <div className="flex gap-4 md:flex-shrink-0 md:ml-8">
               <Button 
                 onClick={acceptCookies}
                 size="sm"
