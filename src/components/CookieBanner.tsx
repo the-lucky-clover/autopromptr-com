@@ -81,15 +81,8 @@ const CookieBanner = () => {
               </div>
             </div>
             
-            {/* Buttons section - positioned on right side with spacing */}
+            {/* Buttons section - swapped order */}
             <div className="flex gap-4 md:flex-shrink-0 md:ml-8">
-              <Button 
-                onClick={acceptCookies}
-                size="sm"
-                className="bg-purple-600 hover:bg-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-2"
-              >
-                Accept All
-              </Button>
               <Button 
                 onClick={declineCookies}
                 variant="outline"
@@ -97,6 +90,13 @@ const CookieBanner = () => {
                 className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm transition-all duration-300 px-6 py-2"
               >
                 Decline Non Essential
+              </Button>
+              <Button 
+                onClick={acceptCookies}
+                size="sm"
+                className="bg-purple-600 hover:bg-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-2"
+              >
+                Accept All
               </Button>
             </div>
           </div>
