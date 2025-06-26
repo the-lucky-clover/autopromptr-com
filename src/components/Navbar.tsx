@@ -182,10 +182,10 @@ const Navbar = () => {
         </div>
       </nav>
       
-      {/* Centered Auth Modal with Blurred Background */}
+      {/* Enhanced Auth Modal with Proper Background Blur and Darkening */}
       <Dialog open={authModalOpen && !isOpen} onOpenChange={setAuthModalOpen}>
-        <DialogOverlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md" />
-        <DialogContent className="fixed left-[50%] top-[45%] z-50 translate-x-[-50%] translate-y-[-50%] border-0 bg-transparent p-0 shadow-none">
+        <DialogOverlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <DialogContent className="fixed left-[50%] top-[45%] z-50 translate-x-[-50%] translate-y-[-50%] border-0 bg-transparent p-0 shadow-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95">
           <AuthModal mode={authMode} onClose={() => setAuthModalOpen(false)} />
         </DialogContent>
       </Dialog>
