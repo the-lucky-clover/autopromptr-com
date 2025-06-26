@@ -66,10 +66,10 @@ const CookieBanner = () => {
         </Button>
 
         <div className="max-w-7xl mx-auto">
-          {/* Main content layout */}
-          <div className="flex flex-col space-y-4">
-            {/* Text section */}
-            <div className="pr-12">
+          {/* Horizontal layout: text on left, buttons on right */}
+          <div className="flex flex-col md:flex-row md:items-center gap-6 pr-12">
+            {/* Text section - left side */}
+            <div className="flex-1">
               <div className="flex items-start gap-3">
                 <Cookie className="w-6 h-6 text-purple-300 flex-shrink-0 mt-1" />
                 <div>
@@ -81,12 +81,12 @@ const CookieBanner = () => {
               </div>
             </div>
             
-            {/* Buttons section */}
-            <div className="flex flex-wrap gap-3 justify-start">
+            {/* Buttons section - right side, stacked vertically */}
+            <div className="flex flex-col gap-3 md:flex-shrink-0">
               <Button 
                 onClick={acceptCookies}
                 size="sm"
-                className="bg-purple-600 hover:bg-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-2"
+                className="bg-purple-600 hover:bg-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-2 w-full md:w-auto"
               >
                 Accept All
               </Button>
@@ -94,9 +94,9 @@ const CookieBanner = () => {
                 onClick={declineCookies}
                 variant="outline"
                 size="sm"
-                className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm transition-all duration-300 px-6 py-2"
+                className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm transition-all duration-300 px-6 py-2 w-full md:w-auto"
               >
-                Decline
+                Decline Non Essential
               </Button>
             </div>
           </div>
