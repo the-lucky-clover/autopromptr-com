@@ -10,6 +10,7 @@ import SocialProof from "@/components/SocialProof";
 import TrustedBy from "@/components/TrustedBy";
 import BlogPosts from "@/components/BlogPosts";
 import Footer from "@/components/Footer";
+import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
@@ -68,6 +69,7 @@ const Index = () => {
       <NewsletterSignup />
       <CTA />
       <Footer />
+      <FloatingConsoleButton />
     </div>
   );
 };
