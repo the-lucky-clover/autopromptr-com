@@ -66,13 +66,13 @@ const CookieBanner = () => {
         </Button>
 
         <div className="container mx-auto px-6 py-3 h-full">
-          {/* Mobile layout: text on top, icon and buttons below */}
-          <div className="md:hidden flex flex-col h-full">
+          {/* Unified layout: text on top, icon and buttons below - same for mobile and desktop */}
+          <div className="flex flex-col h-full">
             {/* Text section - full width horizontal */}
             <div className="w-full mb-2">
               <h3 className="text-sm font-semibold mb-1 text-white">Cookie Notice</h3>
               <p className="text-gray-200 text-xs leading-relaxed">
-                Intelligently batch process, enhance, and deploy prompts across all major AI coding platforms, local or remote.
+                We use cookies to enhance your experience and analyze site usage. By continuing, you consent to our use of cookies.
               </p>
             </div>
             
@@ -95,38 +95,6 @@ const CookieBanner = () => {
                 >
                   Decline
                 </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Desktop layout: original horizontal layout */}
-          <div className="hidden md:flex items-center gap-4 h-full">
-            <Cookie className="w-5 h-5 text-purple-300 flex-shrink-0" />
-            <div className="flex-1 pr-12">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex-1">
-                  <h3 className="text-sm font-semibold mb-1 text-white">Cookie Notice</h3>
-                  <p className="text-gray-200 text-xs leading-relaxed">
-                    Intelligently batch process, enhance, and deploy prompts across all major AI coding platforms, local or remote.
-                  </p>
-                </div>
-                <div className="flex gap-3 flex-shrink-0">
-                  <Button 
-                    onClick={acceptCookies}
-                    size="sm"
-                    className="bg-purple-600 hover:bg-purple-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 text-xs px-3 py-1"
-                  >
-                    Accept All
-                  </Button>
-                  <Button 
-                    onClick={declineCookies}
-                    variant="outline"
-                    size="sm"
-                    className="border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm transition-all duration-300 text-xs px-3 py-1"
-                  >
-                    Decline
-                  </Button>
-                </div>
               </div>
             </div>
           </div>
