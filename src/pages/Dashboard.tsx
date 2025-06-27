@@ -1,10 +1,11 @@
 
+
 import React, { useState, useCallback } from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
 import { useDashboardModules } from "@/hooks/useDashboardModules";
-import { DashboardModuleWrapper } from "@/components/DashboardModuleWrapper";
+import DashboardModuleWrapper from "@/components/DashboardModuleWrapper";
 import DashboardBatchManager from "@/components/DashboardBatchManager";
 import SystemLogsPanel from "@/components/SystemLogsPanel";
 import HealthStatusDashboardWrapper from "@/components/HealthStatusDashboardWrapper";
@@ -15,7 +16,7 @@ import BatchExtractorModule from "@/components/BatchExtractorModule";
 import AnalyticsModule from "@/components/AnalyticsModule";
 
 const Dashboard = () => {
-  const { visibleModules, toggleModule, minimizeModule, restoreModule } = useDashboardModules();
+  const { visibleModules, updateModuleState } = useDashboardModules();
   
   const [stats, setStats] = useState({
     totalBatches: 0,
@@ -83,12 +84,12 @@ const Dashboard = () => {
               {visibleModules.map((module) => (
                 <DashboardModuleWrapper
                   key={module.id}
-                  module={module}
-                  onToggle={toggleModule}
-                  onMinimize={minimizeModule}
-                  onRestore={restoreModule}
+                  id={module.id}
+                  title={module.title}
+                  state={module.state}
+                  onStateChange={(newState) => updateModuleState(module.id, newState)}
                 >
-                  {renderModuleContent(module.id, module.component, module.isMinimized)}
+                  {renderModuleContent(module.id, module.component, module.state === 'minimized')}
                 </DashboardModuleWrapper>
               ))}
             </div>
@@ -101,3 +102,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
