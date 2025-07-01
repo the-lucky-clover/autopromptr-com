@@ -1,3 +1,4 @@
+
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ProfileSettingsCard } from "@/components/settings/ProfileSettingsCard";
@@ -12,6 +13,7 @@ import { LayoutSettingsCard } from "@/components/settings/LayoutSettingsCard";
 import { ThemeCustomizationCard } from "@/components/settings/ThemeCustomizationCard";
 import { SecureApiKeyManager } from "@/components/security/SecureApiKeyManager";
 import { LocalSimulationCard } from "@/components/settings/LocalSimulationCard";
+import { VideoBackgroundCard } from "@/components/settings/VideoBackgroundCard";
 import { SidebarInset } from "@/components/ui/sidebar";
 
 const Settings = () => {
@@ -30,6 +32,7 @@ const Settings = () => {
             
             <div className="space-y-6">
               <BackendConfigurationCard />
+              <VideoBackgroundCard />
               <LocalSimulationCard />
             </div>
           </div>

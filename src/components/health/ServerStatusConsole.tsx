@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Terminal, RefreshCw, Server } from 'lucide-react';
+import { Terminal, RefreshCw, Server, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface HealthResponse {
@@ -26,53 +26,122 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [consoleOutput, setConsoleOutput] = useState<string[]>([]);
+  const [errorType, setErrorType] = useState<'cors' | 'network' | 'timeout' | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
-  const addConsoleLog = (message: string) => {
+  const addConsoleLog = (message: string, type: 'info' | 'error' | 'warning' = 'info') => {
     const timestamp = new Date().toLocaleTimeString();
-    setConsoleOutput(prev => [...prev.slice(-10), `[${timestamp}] ${message}`]);
+    const prefix = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : '✅';
+    setConsoleOutput(prev => [...prev.slice(-10), `[${timestamp}] ${prefix} ${message}`]);
   };
 
-  const fetchHealthData = async () => {
+  const categorizeError = (error: any): 'cors' | 'network' | 'timeout' => {
+    const errorMessage = error.message || error.toString();
+    
+    if (errorMessage.includes('CORS') || errorMessage.includes('Access-Control-Allow-Origin')) {
+      return 'cors';
+    }
+    if (errorMessage.includes('timeout') || errorMessage.includes('aborted')) {
+      return 'timeout';
+    }
+    return 'network';
+  };
+
+  const fetchHealthData = async (isRetry = false) => {
+    if (loading) return;
+    
     setLoading(true);
-    addConsoleLog('Initiating health check...');
+    setErrorType(null);
+    
+    if (!isRetry) {
+      addConsoleLog('Initiating health check...');
+    } else {
+      addConsoleLog(`Retry attempt ${retryCount + 1}...`, 'warning');
+    }
     
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
       const response = await fetch('https://autopromptr-backend.onrender.com/health', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
         },
-        signal: AbortSignal.timeout(10000)
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       if (response.ok) {
         const data = await response.json();
         setHealthData(data);
         setLastUpdated(new Date());
+        setRetryCount(0);
         addConsoleLog(`Health check successful - Status: ${data.status}`);
       } else {
-        addConsoleLog(`Health check failed - HTTP ${response.status}`);
-        setHealthData({
-          status: 'unhealthy',
-          timestamp: new Date().toISOString()
-        });
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
-      addConsoleLog(`Health check error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const errorCategory = categorizeError(error);
+      setErrorType(errorCategory);
+      
+      let errorMessage = '';
+      switch (errorCategory) {
+        case 'cors':
+          errorMessage = 'CORS policy blocking request - Backend configuration needed';
+          break;
+        case 'timeout':
+          errorMessage = 'Request timeout - Backend may be starting up (cold start)';
+          break;
+        case 'network':
+          errorMessage = 'Network error - Backend may be unavailable';
+          break;
+      }
+      
+      addConsoleLog(errorMessage, 'error');
+      
       setHealthData({
         status: 'unhealthy',
         timestamp: new Date().toISOString()
       });
+      
+      // Exponential backoff for retries
+      if (retryCount < 3 && errorCategory !== 'cors') {
+        const backoffDelay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1);
+          fetchHealthData(true);
+        }, backoffDelay);
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  const manualRefresh = () => {
+    setRetryCount(0);
+    fetchHealthData(false);
+  };
+
   useEffect(() => {
-    fetchHealthData();
-    const interval = setInterval(fetchHealthData, 60000); // Check every minute
-    return () => clearInterval(interval);
-  }, []);
+    // Initial check with 3 second delay
+    const initialTimeout = setTimeout(() => {
+      fetchHealthData(false);
+    }, 3000);
+
+    // Set up interval for periodic checks (every 2 minutes)
+    const interval = setInterval(() => {
+      if (errorType !== 'cors') { // Don't spam CORS errors
+        fetchHealthData(false);
+      }
+    }, 120000);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
+  }, [errorType]);
 
   const getStatusLight = (status: string) => {
     switch (status) {
@@ -108,6 +177,14 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
   };
 
   const getStatusBadge = (status: string) => {
+    if (errorType === 'cors') {
+      return (
+        <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30 px-3 py-1">
+          CORS BLOCKED
+        </Badge>
+      );
+    }
+
     switch (status) {
       case 'healthy':
         return (
@@ -147,7 +224,7 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
           <div className="flex items-center space-x-3">
             {healthData && getStatusBadge(healthData.status)}
             <Button
-              onClick={fetchHealthData}
+              onClick={manualRefresh}
               disabled={loading}
               size="sm"
               variant="outline"
@@ -170,6 +247,20 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
           )}
         </div>
 
+        {/* CORS Information Banner */}
+        {errorType === 'cors' && (
+          <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-3">
+            <div className="flex items-center space-x-2 mb-2">
+              <AlertTriangle className="w-4 h-4 text-orange-400" />
+              <span className="text-orange-300 font-medium text-sm">CORS Configuration Required</span>
+            </div>
+            <p className="text-orange-200 text-xs">
+              The backend server needs to be configured to allow requests from this domain. 
+              This is normal for development environments.
+            </p>
+          </div>
+        )}
+
         {/* Console Output */}
         <div className="bg-black/50 rounded-lg p-4 border border-white/10">
           <div className="flex items-center space-x-2 mb-3">
@@ -182,7 +273,14 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
               <div className="text-gray-500">Initializing health monitor...</div>
             ) : (
               consoleOutput.map((log, index) => (
-                <div key={index} className="text-green-300">
+                <div 
+                  key={index} 
+                  className={`${
+                    log.includes('❌') ? 'text-red-300' : 
+                    log.includes('⚠️') ? 'text-yellow-300' : 
+                    'text-green-300'
+                  }`}
+                >
                   {log}
                 </div>
               ))
@@ -225,6 +323,11 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
         {lastUpdated && (
           <div className="text-xs text-white/50 border-t border-white/10 pt-3">
             Last updated: {lastUpdated.toLocaleTimeString()}
+            {retryCount > 0 && (
+              <span className="ml-2 text-yellow-400">
+                (Retry {retryCount}/3)
+              </span>
+            )}
           </div>
         )}
       </CardContent>
