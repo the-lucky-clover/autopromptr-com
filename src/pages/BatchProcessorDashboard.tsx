@@ -6,6 +6,8 @@ import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton"
 import DashboardBatchManager from "@/components/DashboardBatchManager";
 import BatchProcessorControlBar from "@/components/BatchProcessorControlBar";
 import AnimatedDropdownClock from "@/components/AnimatedDropdownClock";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 const BatchProcessorDashboard = () => {
   const [stats, setStats] = useState({
@@ -31,8 +33,10 @@ const BatchProcessorDashboard = () => {
   }, []);
 
   const handleNewBatch = useCallback(() => {
-    // This will be handled by the DashboardBatchManager
-    console.log('New batch requested from control bar');
+    // Call the dashboard's new batch handler
+    if (window.dashboardNewBatchHandler) {
+      window.dashboardNewBatchHandler();
+    }
   }, []);
 
   return (
@@ -47,13 +51,21 @@ const BatchProcessorDashboard = () => {
                 <h1 className="text-3xl font-bold text-white mb-2">Batch Processor</h1>
                 <p className="text-purple-200">Manage and execute your prompt batches</p>
               </div>
+              
+              {/* Single New Batch Button */}
+              <Button
+                onClick={handleNewBatch}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-2 font-medium shadow-lg"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Batch
+              </Button>
             </div>
             
             <div className="p-6 space-y-6">
-              {/* Big Beautiful Control Bar */}
+              {/* Control Bar - removed onNewBatch prop since we handle it in header */}
               <BatchProcessorControlBar 
                 onRefresh={handleRefresh}
-                onNewBatch={handleNewBatch}
               />
               
               {/* Batch Manager */}
@@ -62,6 +74,7 @@ const BatchProcessorDashboard = () => {
                   onStatsUpdate={handleStatsUpdate} 
                   onBatchesUpdate={handleBatchesUpdate}
                   isCompact={false}
+                  onNewBatchRequest={handleNewBatch}
                   key={refreshTrigger}
                 />
               </div>

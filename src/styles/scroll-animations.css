@@ -1,0 +1,94 @@
+
+@layer base {
+  /* Smooth animations for content with enhanced easing */
+  .animate-on-scroll {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-on-scroll.animate {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .stagger-animation {
+    animation-delay: var(--animation-delay, 0s);
+  }
+
+  /* Enhanced fade-in animation */
+  .animate-fade-in {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+    animation: fadeInUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Slide up animation for cards and features */
+  .animate-slide-up {
+    opacity: 0;
+    transform: translateY(60px);
+    animation: slideUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Floating animation for hero elements */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* Slower, more visible scrolling animation */
+  .animate-scroll-left {
+    animation: scroll-left 60s linear infinite;
+    width: max-content;
+  }
+
+  /* Staggered animation delays */
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .delay-300 { animation-delay: 0.3s; }
+  .delay-400 { animation-delay: 0.4s; }
+  .delay-500 { animation-delay: 0.5s; }
+  .delay-600 { animation-delay: 0.6s; }
+  .delay-700 { animation-delay: 0.7s; }
+  .delay-800 { animation-delay: 0.8s; }
+}
+
+/* Keyframes */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.33%);
+  }
+}

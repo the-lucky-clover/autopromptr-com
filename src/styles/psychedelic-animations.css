@@ -1,0 +1,151 @@
+
+@layer base {
+  /* Hero gradient animation matching the "Supercharge" text */
+  .animate-gradient-hero {
+    background: linear-gradient(
+      90deg,
+      #3B82F6,
+      #8B5CF6,
+      #EC4899,
+      #8B5CF6,
+      #3B82F6
+    );
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: heroGradientFlow 6s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
+  }
+
+  /* Psychedelic animations for the logo */
+  .animate-psychedelic-text {
+    background: linear-gradient(
+      45deg,
+      #ff6b6b,
+      #4ecdc4,
+      #45b7d1,
+      #f9ca24,
+      #6c5ce7,
+      #a29bfe,
+      #fd79a8,
+      #fdcb6e,
+      #55a3ff,
+      #ff7675
+    );
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: psychedelicFlow 8s ease-in-out infinite;
+    filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.2));
+  }
+
+  .animate-psychedelic-bolt {
+    background: linear-gradient(
+      135deg,
+      #ff6b6b,
+      #4ecdc4,
+      #45b7d1,
+      #f9ca24,
+      #6c5ce7,
+      #a29bfe,
+      #fd79a8,
+      #fdcb6e
+    );
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: psychedelicBolt 6s ease-in-out infinite;
+    filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.15));
+  }
+
+  /* Synthwave Performance Optimizations */
+  .synthwave-logo,
+  .synthwave-icon,
+  .synthwave-text,
+  .wireframe-grid,
+  .stars-container {
+    will-change: transform, opacity;
+  }
+
+  /* Hardware acceleration for smooth animations */
+  .synthwave-logo,
+  .wireframe-grid,
+  .stars-container {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+}
+
+/* Hero gradient keyframes matching the "Supercharge" gradient */
+@keyframes heroGradientFlow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 50% 0%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 100%;
+  }
+}
+
+/* Psychedelic keyframes for serene, magical oasis effect */
+@keyframes psychedelicFlow {
+  0% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 25%;
+  }
+  50% {
+    background-position: 75% 100%;
+  }
+  75% {
+    background-position: 25% 75%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+@keyframes psychedelicBolt {
+  0% {
+    background-position: 0% 50%;
+  }
+  33% {
+    background-position: 100% 0%;
+  }
+  66% {
+    background-position: 50% 100%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes gradientShiftSubtle {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes glossySheen {
+  0%, 90%, 100% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    opacity: 0;
+  }
+  5%, 15% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+    opacity: 1;
+  }
+}

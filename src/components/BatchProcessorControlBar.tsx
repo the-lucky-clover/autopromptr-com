@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Settings, Globe, Sparkles, Target, Play, RefreshCw } from "lucide-react";
+import { Settings, Globe, Sparkles, Target, RefreshCw } from "lucide-react";
 
 interface BatchProcessorControlBarProps {
   onRefresh?: () => void;
@@ -36,14 +36,6 @@ const BatchProcessorControlBar = ({ onRefresh, onNewBatch }: BatchProcessorContr
             </div>
             
             <Separator orientation="vertical" className="h-8 bg-white/20" />
-            
-            <Button
-              onClick={onNewBatch}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-2 font-medium shadow-lg"
-            >
-              <Play className="w-4 h-4 mr-2" />
-              New Batch
-            </Button>
             
             <Button
               onClick={onRefresh}

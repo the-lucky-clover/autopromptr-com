@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
 import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
@@ -6,7 +7,7 @@ import BatchModal from './BatchModal';
 import DashboardBatchList from './DashboardBatchList';
 import DashboardEmptyState from './DashboardEmptyState';
 import { Button } from './ui/button';
-import { AlertTriangle, Plus, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface DashboardBatchManagerProps {
   onStatsUpdate?: (stats: {
@@ -17,9 +18,15 @@ interface DashboardBatchManagerProps {
   }) => void;
   onBatchesUpdate?: (batches: any[]) => void;
   isCompact?: boolean;
+  onNewBatchRequest?: () => void;
 }
 
-const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = false }: DashboardBatchManagerProps) => {
+const DashboardBatchManager = ({ 
+  onStatsUpdate, 
+  onBatchesUpdate, 
+  isCompact = false,
+  onNewBatchRequest 
+}: DashboardBatchManagerProps) => {
   const {
     batches,
     showModal,
@@ -41,6 +48,23 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
 
   const { detectAndFixFailedBatches } = useBatchStatusManager();
   const { triggerBatchSync } = useBatchSync();
+
+  // Listen for new batch requests from control bar
+  useEffect(() => {
+    if (onNewBatchRequest) {
+      // This will be called when the control bar triggers a new batch
+      const handleExternalNewBatch = () => {
+        handleNewBatch();
+      };
+      
+      // Store the handler so parent can call it
+      window.dashboardNewBatchHandler = handleExternalNewBatch;
+    }
+    
+    return () => {
+      delete window.dashboardNewBatchHandler;
+    };
+  }, [handleNewBatch, onNewBatchRequest]);
 
   // Manual refresh function
   const handleRefresh = () => {
@@ -108,15 +132,6 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
           <>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Button 
-                  onClick={handleNewBatch}
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl btn-with-shadow"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Batch
-                </Button>
-                
                 <Button
                   onClick={handleRefresh}
                   size="sm"
