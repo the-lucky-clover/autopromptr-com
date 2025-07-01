@@ -9,7 +9,7 @@ import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetectio
 import { InputValidationService } from '@/services/security/inputValidation';
 
 export const useBatchOperations = () => {
-  const { batches, setBatches, triggerManualSync } = usePersistentBatches();
+  const { batches, setBatches } = usePersistentBatches();
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const { toast } = useToast();
   const { status: batchStatus, loading: automationLoading, error: automationError, runBatch, stopBatch } = useBatchAutomation(selectedBatchId || undefined);
@@ -72,9 +72,6 @@ export const useBatchOperations = () => {
 
     setBatches(prev => [...prev, batch]);
     
-    // Manually trigger sync only for this explicit user action
-    triggerManualSync();
-    
     toast({
       title: "Batch created securely",
       description: `Batch "${batch.name}" created with auto-detected platform: ${platformName}. Input has been validated and sanitized.`,
@@ -93,9 +90,6 @@ export const useBatchOperations = () => {
     if (selectedBatchId === batchId) {
       setSelectedBatchId(null);
     }
-    
-    // Manually trigger sync only for this explicit user action
-    triggerManualSync();
     
     toast({
       title: "Batch deleted",

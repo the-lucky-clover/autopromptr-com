@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useSecureAuth } from './useSecureAuth';
@@ -9,7 +8,7 @@ import { Batch, BatchFormData, TextPrompt } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 
 export const useSecureBatchOperations = () => {
-  const { batches, setBatches, triggerManualSync } = usePersistentBatches();
+  const { batches, setBatches } = usePersistentBatches();
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const { toast } = useToast();
   const { requireAuth, hasPermission } = useSecureAuth();
@@ -80,7 +79,6 @@ export const useSecureBatchOperations = () => {
     };
 
     setBatches(prev => [...prev, batch]);
-    triggerManualSync();
     
     toast({
       title: "Batch created securely",
@@ -110,8 +108,6 @@ export const useSecureBatchOperations = () => {
     if (selectedBatchId === batchId) {
       setSelectedBatchId(null);
     }
-    
-    triggerManualSync();
     
     toast({
       title: "Batch deleted securely",
