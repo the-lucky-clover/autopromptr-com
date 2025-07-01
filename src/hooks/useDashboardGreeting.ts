@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from "@/integrations/supabase/client";
 import { getTimeBasedGreeting } from "@/services/simpleGreetingService";
+import { useAuth } from './useAuth';
 
-export const useDashboardGreeting = (user: User | null) => {
+export const useDashboardGreeting = () => {
+  const { user } = useAuth();
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [currentGreeting, setCurrentGreeting] = useState<any>(null);
+  const [currentGreeting, setCurrentGreeting] = useState<string>('');
 
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -28,11 +30,13 @@ export const useDashboardGreeting = (user: User | null) => {
           const greeting = getTimeBasedGreeting(firstName);
           setCurrentGreeting(greeting);
         }
+      } else {
+        setCurrentGreeting('Hello there');
       }
     };
 
     loadUserProfile();
   }, [user]);
 
-  return { userProfile, currentGreeting };
+  return currentGreeting;
 };

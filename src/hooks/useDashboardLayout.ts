@@ -7,6 +7,8 @@ export interface ModuleLayout {
   visible: boolean;
 }
 
+export type DashboardLayoutType = 'static' | 'overview';
+
 const DEFAULT_LAYOUT: ModuleLayout[] = [
   { id: 'batch-processor', order: 0, visible: true },
   { id: 'system-logs', order: 1, visible: true },
@@ -19,7 +21,8 @@ const DEFAULT_LAYOUT: ModuleLayout[] = [
 const STORAGE_KEY = 'dashboard-layout';
 
 export const useDashboardLayout = () => {
-  const [layout, setLayout] = useState<ModuleLayout[]>(DEFAULT_LAYOUT);
+  const [layout, setLayout] = useState<DashboardLayoutType>('static');
+  const [moduleLayout, setModuleLayout] = useState<ModuleLayout[]>(DEFAULT_LAYOUT);
 
   // Load layout from localStorage on mount
   useEffect(() => {
@@ -27,7 +30,7 @@ export const useDashboardLayout = () => {
     if (savedLayout) {
       try {
         const parsedLayout = JSON.parse(savedLayout);
-        setLayout(parsedLayout);
+        setModuleLayout(parsedLayout);
       } catch (error) {
         console.error('Failed to parse saved layout:', error);
       }
@@ -36,12 +39,12 @@ export const useDashboardLayout = () => {
 
   // Save layout to localStorage whenever it changes
   const updateLayout = (newLayout: ModuleLayout[]) => {
-    setLayout(newLayout);
+    setModuleLayout(newLayout);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newLayout));
   };
 
   const toggleModuleVisibility = (moduleId: string) => {
-    setLayout((items) => {
+    setModuleLayout((items) => {
       const updatedItems = items.map(item =>
         item.id === moduleId ? { ...item, visible: !item.visible } : item
       );
@@ -57,6 +60,8 @@ export const useDashboardLayout = () => {
 
   return {
     layout,
+    setLayout,
+    moduleLayout,
     toggleModuleVisibility,
     resetLayout,
   };

@@ -32,7 +32,13 @@ export const useUserRole = () => {
           }
           setRole('user'); // Default to user role on error
         } else {
-          setRole(data || 'user');
+          const userRole = data || 'user';
+          // Ensure the role is valid
+          if (['user', 'admin', 'sysop'].includes(userRole)) {
+            setRole(userRole as UserRole);
+          } else {
+            setRole('user');
+          }
         }
       } catch (error) {
         // Reduced logging

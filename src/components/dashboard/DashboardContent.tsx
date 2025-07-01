@@ -3,12 +3,12 @@ import React from 'react';
 import { useDashboardLayout } from '@/hooks/useDashboardLayout';
 import { useDashboardModules } from '@/hooks/useDashboardModules';
 import CleanDashboardWelcomeCard from './CleanDashboardWelcomeCard';
-import { StaticDashboardLayout } from './StaticDashboardLayout';
-import { OverviewDashboardLayout } from './OverviewDashboardLayout';
+import StaticDashboardLayout from './StaticDashboardLayout';
+import OverviewDashboardLayout from './OverviewDashboardLayout';
 
 const DashboardContent = () => {
   const { layout } = useDashboardLayout();
-  const { availableModules, isModuleEnabled } = useDashboardModules();
+  const { visibleModules } = useDashboardModules();
 
   // Always show the welcome card at the top for all layouts
   const welcomeModule = (
@@ -17,13 +17,19 @@ const DashboardContent = () => {
     </div>
   );
 
+  const renderModuleContent = (moduleId: string, componentName: string) => {
+    // This would be implemented based on your module components
+    return <div>Module content for {componentName}</div>;
+  };
+
   if (layout === 'overview') {
     return (
       <div className="space-y-6">
         {welcomeModule}
         <OverviewDashboardLayout 
-          availableModules={availableModules}
-          isModuleEnabled={isModuleEnabled}
+          visibleModules={visibleModules}
+          reorderModules={() => {}}
+          renderModuleContent={renderModuleContent}
         />
       </div>
     );
@@ -33,8 +39,8 @@ const DashboardContent = () => {
     <div className="space-y-6">
       {welcomeModule}
       <StaticDashboardLayout 
-        availableModules={availableModules}
-        isModuleEnabled={isModuleEnabled}
+        visibleModules={visibleModules}
+        renderModuleContent={renderModuleContent}
       />
     </div>
   );
