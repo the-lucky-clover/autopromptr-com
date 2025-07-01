@@ -236,7 +236,7 @@ const ConsoleMonitorModule = ({ isCompact = false }: ConsoleMonitorModuleProps) 
           ))}
         </div>
 
-        <ScrollArea className="h-48">
+        <ScrollArea className="h-96">
           <div className="space-y-2">
             {filteredErrors.length === 0 ? (
               <p className="text-white/60 text-sm text-center py-4">No console messages captured</p>

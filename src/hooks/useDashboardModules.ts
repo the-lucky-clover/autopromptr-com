@@ -13,7 +13,7 @@ export interface DashboardModule {
   defaultVisible: boolean;
 }
 
-// Clean default modules - removed duplicates, especially SystemReliabilityScore
+// UPDATED module order: Console Monitor positioned after System Health
 const DEFAULT_MODULES: DashboardModule[] = [
   {
     id: 'health-status',
@@ -24,11 +24,19 @@ const DEFAULT_MODULES: DashboardModule[] = [
     defaultVisible: true
   },
   {
+    id: 'console-monitor',
+    title: 'Console Monitor',
+    component: 'ConsoleMonitorModule',
+    state: 'full',
+    order: 1,
+    defaultVisible: true
+  },
+  {
     id: 'dashboard-stats',
     title: 'Dashboard Statistics',
     component: 'DashboardStatsModule',
     state: 'full',
-    order: 1,
+    order: 2,
     defaultVisible: true
   },
   {
@@ -36,21 +44,13 @@ const DEFAULT_MODULES: DashboardModule[] = [
     title: 'System Logs',
     component: 'SystemLogsPanel',
     state: 'full',
-    order: 2,
+    order: 3,
     defaultVisible: true
   },
   {
     id: 'analytics',
     title: 'Analytics Overview',
     component: 'AnalyticsModule',
-    state: 'full',
-    order: 3,
-    defaultVisible: true
-  },
-  {
-    id: 'console-monitor',
-    title: 'Console Monitor',
-    component: 'ConsoleMonitorModule',
     state: 'full',
     order: 4,
     defaultVisible: true
@@ -61,6 +61,14 @@ const DEFAULT_MODULES: DashboardModule[] = [
     component: 'DashboardSubscription',
     state: 'full',
     order: 5,
+    defaultVisible: true
+  },
+  {
+    id: 'quick-actions',
+    title: 'Quick Actions',
+    component: 'QuickActionsModule',
+    state: 'full',
+    order: 6,
     defaultVisible: true
   }
 ];

@@ -10,21 +10,18 @@ import DashboardSubscription from "@/components/DashboardSubscription";
 import DashboardStatsModule from "@/components/DashboardStatsModule";
 import AnalyticsModule from "@/components/AnalyticsModule";
 import ConsoleMonitorModule from "@/components/ConsoleMonitorModule";
+import QuickActionsModule from "@/components/dashboard/QuickActionsModule";
 import RecentActivity from "@/components/RecentActivity";
 import StaticDashboardLayout from "@/components/dashboard/StaticDashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import DashboardWelcomeCard from "@/components/dashboard/DashboardWelcomeCard";
+import CleanDashboardWelcomeCard from "@/components/dashboard/CleanDashboardWelcomeCard";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { useDashboardVideoSettings } from "@/hooks/useDashboardVideoSettings";
-import { useDashboardGreeting } from "@/hooks/useDashboardGreeting";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { visibleModules } = useDashboardModules();
-  const { videoSettings } = useDashboardVideoSettings(user);
-  const currentGreeting = useDashboardGreeting();
-  const { stats, batches, hasActiveBatch, handleStatsUpdate, handleBatchesUpdate } = useDashboardStats();
+  const { stats, batches, hasActiveBatch } = useDashboardStats();
 
   // Filter out batch manager and extractor modules for overview
   const overviewModules = visibleModules.filter(module => 
@@ -52,6 +49,9 @@ const Dashboard = () => {
 
         case 'ConsoleMonitorModule':
           return <ConsoleMonitorModule isCompact={false} />;
+
+        case 'QuickActionsModule':
+          return <QuickActionsModule isCompact={false} />;
         
         default:
           return <div className="text-white/60">Module content not found</div>;
@@ -78,11 +78,7 @@ const Dashboard = () => {
             </ErrorBoundary>
             
             <ErrorBoundary>
-              <DashboardWelcomeCard 
-                currentGreeting={currentGreeting}
-                stats={stats}
-                videoSettings={videoSettings}
-              />
+              <CleanDashboardWelcomeCard />
             </ErrorBoundary>
 
             <div className="px-6 pb-6">

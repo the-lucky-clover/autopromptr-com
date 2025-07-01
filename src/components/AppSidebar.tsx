@@ -18,15 +18,14 @@ import {
   LucideIcon,
   MessageCircle,
   BookOpen,
-  PlayCircle,
-  Layout
+  PlayCircle
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
 import ZapBrandLogo from "@/components/ZapBrandLogo";
 import UserProfile from "@/components/UserProfile";
 
-// Navigation items with proper typing - removed Profile
+// Navigation items - REMOVED "Dashboard Layout"
 const items: Array<{
   title: string;
   url: string;
@@ -56,11 +55,6 @@ const items: Array<{
     title: "Settings",
     url: "/dashboard/settings",
     icon: Settings,
-  },
-  {
-    title: "Dashboard Layout",
-    url: "/dashboard/layout",
-    icon: Layout,
   },
   {
     title: "Contact",
