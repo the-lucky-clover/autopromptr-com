@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTimezone } from '@/hooks/useTimezone';
 import ClockDisplay from './clock/ClockDisplay';
-import ReactorStatus from './clock/ReactorStatus';
 import MeltdownPhases from './clock/MeltdownPhases';
 
 interface AnimatedDropdownClockProps {
@@ -109,8 +108,6 @@ const AnimatedDropdownClock = ({ enableEasterEgg = false }: AnimatedDropdownCloc
           countdown={countdown}
         />
       )}
-
-      <ReactorStatus showMeltdown={showMeltdown} />
 
       {/* Animated Glass Dropdown Clock */}
       <div 

@@ -2,13 +2,16 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ConnectionStatus } from '@/components/ConnectionStatus';
-import { useDashboardGreeting } from '@/hooks/useDashboardGreeting';
-import { useDashboardVideoSettings } from '@/hooks/useDashboardVideoSettings';
 import { useAuth } from '@/hooks/useAuth';
+import { useDashboardVideoSettings } from '@/hooks/useDashboardVideoSettings';
 import EnhancedWelcomeVideoBackground from './EnhancedWelcomeVideoBackground';
 
-const CleanDashboardWelcomeCard = () => {
-  const currentGreeting = useDashboardGreeting();
+interface DashboardWelcomeModuleProps {
+  title: string;
+  subtitle: string;
+}
+
+const DashboardWelcomeModule = ({ title, subtitle }: DashboardWelcomeModuleProps) => {
   const { user } = useAuth();
   const { videoSettings } = useDashboardVideoSettings(user);
 
@@ -22,7 +25,7 @@ const CleanDashboardWelcomeCard = () => {
 
   return (
     <Card 
-      className="bg-white/10 backdrop-blur-sm border-white/20 relative overflow-hidden mb-6 mx-6 rounded-xl"
+      className="bg-white/10 backdrop-blur-sm border-white/20 relative overflow-hidden mb-6 mx-6 rounded-xl animate-shimmer hover:shadow-indigo-500/20 transition-all duration-300"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
@@ -44,7 +47,6 @@ const CleanDashboardWelcomeCard = () => {
             <div className="space-y-6">
               <div className="space-y-4">
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white drop-shadow-lg font-sans">
-                  {currentGreeting.greeting}{' '}
                   <span 
                     className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent drop-shadow-none"
                     style={{
@@ -54,13 +56,13 @@ const CleanDashboardWelcomeCard = () => {
                       WebkitTextFillColor: 'transparent'
                     }}
                   >
-                    {currentGreeting.firstName}.
+                    {title}
                   </span>
                 </h1>
                 {/* Clean Subheading without border */}
                 <div className="ml-12">
-                  <p className="text-white/90 text-lg font-medium leading-relaxed drop-shadow-md font-sans">
-                    {currentGreeting.encouragement}
+                  <p className="text-purple-200/90 text-lg font-medium leading-relaxed drop-shadow-md font-sans">
+                    {subtitle}
                   </p>
                 </div>
               </div>
@@ -77,4 +79,4 @@ const CleanDashboardWelcomeCard = () => {
   );
 };
 
-export default CleanDashboardWelcomeCard;
+export default DashboardWelcomeModule;

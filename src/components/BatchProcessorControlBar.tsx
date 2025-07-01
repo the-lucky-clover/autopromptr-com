@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Settings, Globe, Sparkles, Target, RefreshCw } from "lucide-react";
+import { Settings, Globe, Sparkles, Target, RefreshCw, Plus } from "lucide-react";
 
 interface BatchProcessorControlBarProps {
   onRefresh?: () => void;
@@ -40,6 +40,14 @@ const BatchProcessorControlBar = ({ onRefresh, onNewBatch }: BatchProcessorContr
           <div className="flex flex-col xl:flex-row items-start xl:items-center gap-8">
             {/* Left Section - Main Controls */}
             <div className="flex items-center gap-6">
+              <Button
+                onClick={onNewBatch}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl px-8 py-3 font-medium shadow-lg hover:shadow-purple-500/25 transition-all duration-300 animate-glow"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                New Batch
+              </Button>
+              
               <Button
                 onClick={onRefresh}
                 variant="outline"
