@@ -1,4 +1,3 @@
-
 import { AutoPromtrError } from './errors';
 import { Batch } from '@/types/batch';
 
@@ -162,18 +161,20 @@ export class EnhancedAutoPromtrClient {
 
   async testConnection(): Promise<boolean> {
     try {
-      const response = await this.makeRequest<{ status: string }>('/api/health');
-      return response.status === 'ok';
+      const response = await this.makeRequest<{ status: string }>(`${this.baseUrl}/health`, {
+        method: 'GET',
+      });
+      
+      // Handle both uppercase and lowercase status responses
+      const status = response.status?.toLowerCase();
+      if (status !== 'ok') {
+        throw new AutoPromtrError('Backend health check failed');
+      }
+      
+      return true;
     } catch (error) {
       console.error('❌ Backend connection test failed:', error);
-      throw new AutoPromtrError(
-        'Backend health check failed',
-        'HEALTH_CHECK_FAILED',
-        503,
-        true,
-        'Cannot verify backend service availability. The service may be starting up or experiencing issues.',
-        error instanceof Error ? error.message : 'Unknown error'
-      );
+      throw new AutoPromtrError('Backend health check failed');
     }
   }
 
