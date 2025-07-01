@@ -1,15 +1,9 @@
 
 import React from 'react';
-
-interface Module {
-  id: string;
-  title: string;
-  component: string;
-  enabled: boolean;
-}
+import { DashboardModule } from '@/hooks/useDashboardModules';
 
 interface StaticDashboardLayoutProps {
-  visibleModules: Module[];
+  visibleModules: DashboardModule[];
   renderModuleContent: (moduleId: string, componentName: string) => React.ReactNode;
 }
 
