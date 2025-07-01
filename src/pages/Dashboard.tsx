@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -24,7 +23,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { visibleModules } = useDashboardModules();
   const { videoSettings } = useDashboardVideoSettings(user);
-  const { currentGreeting } = useDashboardGreeting(user);
+  const currentGreeting = useDashboardGreeting();
   const { stats, batches, hasActiveBatch, handleStatsUpdate, handleBatchesUpdate } = useDashboardStats();
 
   // Filter out batch manager and extractor modules for overview

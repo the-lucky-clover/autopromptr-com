@@ -3,8 +3,14 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import RealTimeClock from "@/components/RealTimeClock";
 
+interface GreetingObject {
+  greeting: string;
+  firstName: string;
+  encouragement: string;
+}
+
 interface DashboardWelcomeCardProps {
-  currentGreeting: any;
+  currentGreeting: GreetingObject;
   stats: {
     totalBatches: number;
     activeBatches: number;
@@ -27,29 +33,27 @@ const DashboardWelcomeCard = ({ currentGreeting, stats, videoSettings }: Dashboa
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-8 flex items-center min-h-[120px]">
             <div className="space-y-4">
-              {currentGreeting && (
-                <div className="space-y-3">
-                  <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-                    <span className="text-white">
-                      {currentGreeting.greeting}{' '}
-                    </span>
-                    <span 
-                      className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent"
-                      style={{
-                        backgroundImage: 'linear-gradient(90deg, #3B82F6, #EC4899)',
-                        WebkitBackgroundClip: 'text',
-                        backgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
-                      }}
-                    >
-                      {currentGreeting.firstName}
-                    </span>
-                  </h1>
-                  <p className="text-white/80 text-lg font-medium">
-                    {currentGreeting.encouragement}
-                  </p>
-                </div>
-              )}
+              <div className="space-y-3">
+                <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+                  <span className="text-white">
+                    {currentGreeting.greeting}{' '}
+                  </span>
+                  <span 
+                    className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent"
+                    style={{
+                      backgroundImage: 'linear-gradient(90deg, #3B82F6, #EC4899)',
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent'
+                    }}
+                  >
+                    {currentGreeting.firstName}
+                  </span>
+                </h1>
+                <p className="text-white/80 text-lg font-medium">
+                  {currentGreeting.encouragement}
+                </p>
+              </div>
             </div>
           </div>
           

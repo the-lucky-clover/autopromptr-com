@@ -5,10 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { getTimeBasedGreeting } from "@/services/simpleGreetingService";
 import { useAuth } from './useAuth';
 
+interface GreetingObject {
+  greeting: string;
+  firstName: string;
+  encouragement: string;
+}
+
 export const useDashboardGreeting = () => {
   const { user } = useAuth();
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [currentGreeting, setCurrentGreeting] = useState<string>('');
+  const [currentGreeting, setCurrentGreeting] = useState<GreetingObject>({
+    greeting: 'Good morning',
+    firstName: 'there',
+    encouragement: 'Ready to automate your workflow!'
+  });
 
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -31,7 +41,11 @@ export const useDashboardGreeting = () => {
           setCurrentGreeting(greeting);
         }
       } else {
-        setCurrentGreeting('Hello there');
+        setCurrentGreeting({
+          greeting: 'Hello',
+          firstName: 'there',
+          encouragement: 'Welcome to AutoPromptr!'
+        });
       }
     };
 
