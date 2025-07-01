@@ -2,7 +2,6 @@
 import React, { useState, useCallback } from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
 import { useDashboardModules } from "@/hooks/useDashboardModules";
 import SystemLogsPanel from "@/components/SystemLogsPanel";
 import HealthStatusDashboardWrapper from "@/components/HealthStatusDashboardWrapper";
@@ -10,6 +9,7 @@ import DashboardSubscription from "@/components/DashboardSubscription";
 import DashboardStatsModule from "@/components/DashboardStatsModule";
 import SystemReliabilityScore from "@/components/SystemReliabilityScore";
 import AnalyticsModule from "@/components/AnalyticsModule";
+import ConsoleMonitorModule from "@/components/ConsoleMonitorModule";
 import RecentActivity from "@/components/RecentActivity";
 import PsychedelicZapIcon from "@/components/PsychedelicZapIcon";
 import { Card, CardContent } from "@/components/ui/card";
@@ -61,6 +61,9 @@ const Dashboard = () => {
 
       case 'AnalyticsModule':
         return <AnalyticsModule isCompact={isMinimized} />;
+
+      case 'ConsoleMonitorModule':
+        return <ConsoleMonitorModule isCompact={isMinimized} />;
       
       default:
         return <div>Module content not found</div>;
@@ -97,14 +100,9 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Left Column - Main Content */}
                 <div className="lg:col-span-8 space-y-6">
-                  {overviewModules.map((module) => (
-                    <Card key={module.id} className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-                      <CardContent className="p-4">
-                        <h3 className="text-white font-medium mb-3">{module.title}</h3>
-                        {renderModuleContent(module.id, module.component, false)}
-                      </CardContent>
-                    </Card>
-                  ))}
+                  {overviewModules.map((module) => 
+                    renderModuleContent(module.id, module.component, false)
+                  )}
                 </div>
 
                 {/* Right Column - Recent Activity */}
@@ -116,7 +114,6 @@ const Dashboard = () => {
           </SidebarInset>
         </div>
       </SidebarProvider>
-      <FloatingConsoleButton />
     </div>
   );
 };

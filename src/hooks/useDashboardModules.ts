@@ -16,10 +16,11 @@ const defaultModules: DashboardModule[] = [
   { id: 'batch-extractor', title: 'Batch Extractor', component: 'BatchExtractorModule', state: 'full', order: 1, isVisible: true },
   { id: 'analytics', title: 'System Overview', component: 'AnalyticsModule', state: 'full', order: 2, isVisible: true },
   { id: 'system-reliability', title: 'System Reliability Score', component: 'SystemReliabilityScore', state: 'full', order: 3, isVisible: true },
-  { id: 'system-logs', title: 'System Diagnostics & Logs', component: 'SystemLogsPanel', state: 'full', order: 4, isVisible: true },
-  { id: 'backend-health', title: 'Backend Health', component: 'HealthStatusDashboard', state: 'full', order: 5, isVisible: true },
-  { id: 'subscription', title: 'Subscription', component: 'DashboardSubscription', state: 'full', order: 6, isVisible: true },
-  { id: 'stats-cards', title: 'Statistics', component: 'DashboardStatsModule', state: 'full', order: 7, isVisible: true },
+  { id: 'console-monitor', title: 'Console Monitor', component: 'ConsoleMonitorModule', state: 'full', order: 4, isVisible: true },
+  { id: 'system-logs', title: 'System Diagnostics & Logs', component: 'SystemLogsPanel', state: 'full', order: 5, isVisible: true },
+  { id: 'backend-health', title: 'Backend Health', component: 'HealthStatusDashboard', state: 'full', order: 6, isVisible: true },
+  { id: 'subscription', title: 'Subscription', component: 'DashboardSubscription', state: 'full', order: 7, isVisible: true },
+  { id: 'stats-cards', title: 'Statistics', component: 'DashboardStatsModule', state: 'full', order: 8, isVisible: true },
 ];
 
 export const useDashboardModules = () => {

@@ -1,117 +1,121 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Activity, CheckCircle, Shield, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Shield, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface SystemReliabilityScoreProps {
-  className?: string;
   isCompact?: boolean;
 }
 
-const SystemReliabilityScore = ({ className = '', isCompact = false }: SystemReliabilityScoreProps) => {
-  const score = 99.999; // Five 9's reliability - stable score
-  const status = 'Excellent';
+const SystemReliabilityScore = ({ isCompact = false }: SystemReliabilityScoreProps) => {
+  // Mock reliability data
+  const reliabilityScore = 94.5;
+  const uptime = 99.8;
+  const lastIncident = '12 days ago';
+  const status = reliabilityScore >= 95 ? 'excellent' : reliabilityScore >= 85 ? 'good' : 'needs attention';
+
+  const getStatusColor = () => {
+    switch (status) {
+      case 'excellent': return 'text-green-500';
+      case 'good': return 'text-yellow-500';
+      default: return 'text-red-500';
+    }
+  };
+
+  const getStatusIcon = () => {
+    switch (status) {
+      case 'excellent': return <CheckCircle className="w-5 h-5 text-green-500" />;
+      case 'good': return <TrendingUp className="w-5 h-5 text-yellow-500" />;
+      default: return <AlertTriangle className="w-5 h-5 text-red-500" />;
+    }
+  };
 
   if (isCompact) {
     return (
-      <div className="space-y-3">
-        {/* Compact Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <CheckCircle className="w-4 h-4 text-green-400" />
-            <span className="text-white font-medium text-xs">System Score</span>
+      <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-white flex items-center gap-2 text-sm">
+              <Shield className="w-4 h-4" />
+              Reliability
+            </CardTitle>
+            <Badge className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+              {reliabilityScore}%
+            </Badge>
           </div>
-          <div className="text-lg font-bold text-green-400">
-            {score}%
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="text-center">
+            <div className={`text-2xl font-bold ${getStatusColor()}`}>
+              {reliabilityScore}%
+            </div>
+            <p className="text-white/60 text-xs">System Score</p>
           </div>
-        </div>
-
-        <div className="text-center">
-          <Badge variant="outline" className="text-green-600 border-green-300 bg-green-500/20">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            All Systems Operational
-          </Badge>
-        </div>
-
-        {/* Compact Metrics */}
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <div>
-            <div className="text-green-400 text-xs font-semibold">99.999%</div>
-            <div className="text-white/60 text-[10px]">Uptime</div>
-          </div>
-          <div>
-            <div className="text-blue-400 text-xs font-semibold">Multi-AZ</div>
-            <div className="text-white/60 text-[10px]">Redundancy</div>
-          </div>
-          <div>
-            <div className="text-purple-400 text-xs font-semibold">24/7</div>
-            <div className="text-white/60 text-[10px]">Monitoring</div>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <Card className={`${className} bg-white/10 backdrop-blur-sm border-white/20 rounded-xl`}>
+    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
       <CardHeader className="pb-4">
-        <CardTitle className="text-white flex items-center space-x-2">
-          <CheckCircle className="w-5 h-5 text-green-400" />
-          <span>System Reliability</span>
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-white flex items-center gap-2">
+            <Shield className="w-5 h-5" />
+            System Reliability Score
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            {getStatusIcon()}
+            <Badge className={`${
+              status === 'excellent' ? 'bg-green-500/20 text-green-300 border-green-500/30' :
+              status === 'good' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30' :
+              'bg-red-500/20 text-red-300 border-red-500/30'
+            }`}>
+              {status}
+            </Badge>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Score Display */}
-        <div className="text-center space-y-4">
-          <div className="text-4xl font-bold text-green-400">
-            {score}%
+      <CardContent className="space-y-4">
+        <div className="text-center">
+          <div className={`text-6xl font-bold mb-2 ${getStatusColor()}`}>
+            {reliabilityScore}%
           </div>
-          <Badge variant="outline" className="text-green-600 border-green-300 bg-green-500/20">
-            <CheckCircle className="w-4 h-4 mr-2" />
-            All Systems Operational
-          </Badge>
+          <p className="text-white/70">Overall System Reliability</p>
         </div>
 
-        {/* Robustness Indicators */}
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="space-y-1">
-            <div className="text-green-400 text-lg font-semibold flex items-center justify-center">
-              <Shield className="w-4 h-4 mr-1" />
-              99.999%
-            </div>
-            <div className="text-white/60 text-xs">Uptime SLA</div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+            <p className="text-white/60 text-sm">Uptime</p>
+            <p className="text-white text-xl font-bold">{uptime}%</p>
           </div>
-          <div className="space-y-1">
-            <div className="text-blue-400 text-lg font-semibold flex items-center justify-center">
-              <Zap className="w-4 h-4 mr-1" />
-              Multi-AZ
-            </div>
-            <div className="text-white/60 text-xs">Redundancy</div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-purple-400 text-lg font-semibold flex items-center justify-center">
-              <Activity className="w-4 h-4 mr-1" />
-              24/7
-            </div>
-            <div className="text-white/60 text-xs">Monitoring</div>
+          <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+            <p className="text-white/60 text-sm">Last Incident</p>
+            <p className="text-white text-xl font-bold">{lastIncident}</p>
           </div>
         </div>
 
-        {/* System Features */}
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center text-white/80">
-            <CheckCircle className="w-3 h-3 text-green-400 mr-2" />
-            <span>Automated failover & recovery</span>
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-white/70">Reliability Score</span>
+            <span className="text-white font-medium">{reliabilityScore}/100</span>
           </div>
-          <div className="flex items-center text-white/80">
-            <CheckCircle className="w-3 h-3 text-green-400 mr-2" />
-            <span>Real-time health monitoring</span>
+          <div className="w-full bg-white/10 rounded-full h-3">
+            <div 
+              className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-300"
+              style={{ width: `${reliabilityScore}%` }}
+            />
           </div>
-          <div className="flex items-center text-white/80">
-            <CheckCircle className="w-3 h-3 text-green-400 mr-2" />
-            <span>Geographic redundancy</span>
-          </div>
+        </div>
+
+        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+          <p className="text-white/60 text-sm mb-1">System Status</p>
+          <p className={`font-medium capitalize ${getStatusColor()}`}>
+            {status === 'excellent' ? 'All systems operational' : 
+             status === 'good' ? 'Minor issues detected' : 
+             'Attention required'}
+          </p>
         </div>
       </CardContent>
     </Card>

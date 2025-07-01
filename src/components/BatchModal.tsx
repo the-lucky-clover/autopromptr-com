@@ -1,339 +1,353 @@
-
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Progress } from '@/components/ui/progress';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Plus, Minus, GripVertical, Save } from 'lucide-react';
-import { Batch, TextPrompt } from '@/types/batch';
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Plus, Trash2, X } from "lucide-react";
+import { Batch, TextPrompt } from "@/types/batch";
 
 interface BatchModalProps {
-  open: boolean;
+  isOpen: boolean;
   onClose: () => void;
-  onSave: (batch: Batch | Omit<Batch, 'id' | 'createdAt'>) => Promise<void> | void;
-  editingBatch?: Batch | null;
+  batch?: Batch | null;
+  onSave: (batch: Omit<Batch, 'id' | 'createdAt'>) => void;
 }
 
-const BatchModal = ({ open, onClose, onSave, editingBatch }: BatchModalProps) => {
-  const [name, setName] = useState('');
-  const [targetUrl, setTargetUrl] = useState('');
-  const [prompts, setPrompts] = useState<TextPrompt[]>([]);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [deletePromptId, setDeletePromptId] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveProgress, setSaveProgress] = useState(0);
+export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModalProps) {
+  const [formData, setFormData] = useState({
+    name: batch?.name || '',
+    targetUrl: batch?.targetUrl || '',
+    description: batch?.description || '',
+    platform: batch?.platform || 'website',
+    waitForIdle: batch?.settings?.waitForIdle || true,
+    maxRetries: batch?.settings?.maxRetries || 3,
+  });
+
+  const [prompts, setPrompts] = useState<TextPrompt[]>(
+    batch?.prompts || [{ id: '1', text: '', order: 0 }]
+  );
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
-    if (editingBatch) {
-      setName(editingBatch.name);
-      setTargetUrl(editingBatch.targetUrl);
-      setPrompts(editingBatch.prompts);
+    if (batch) {
+      setFormData({
+        name: batch.name,
+        targetUrl: batch.targetUrl,
+        description: batch.description || '',
+        platform: batch.platform || 'website',
+        waitForIdle: batch.settings?.waitForIdle || true,
+        maxRetries: batch.settings?.maxRetries || 3,
+      });
+      setPrompts(batch.prompts);
     } else {
-      setName('');
-      setTargetUrl('');
-      setPrompts([{ id: crypto.randomUUID(), text: '', order: 0 }]);
+      // Reset form data when creating a new batch
+      setFormData({
+        name: '',
+        targetUrl: '',
+        description: '',
+        platform: 'website',
+        waitForIdle: true,
+        maxRetries: 3,
+      });
+      setPrompts([{ id: '1', text: '', order: 0 }]);
+      setErrors({});
     }
-  }, [editingBatch, open]);
+  }, [batch]);
 
-  // Enhanced keyboard event handling
-  useEffect(() => {
-    if (!open) return;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // ESC to close (Radix Dialog handles this automatically, but we add custom logic)
-      if (event.key === 'Escape' && !isSaving) {
-        onClose();
-      } 
-      // Enter or Ctrl+Enter to save
-      else if ((event.key === 'Enter' && (event.ctrlKey || event.metaKey)) || 
-               (event.key === 'Enter' && event.target && 
-                (event.target as HTMLElement).tagName !== 'INPUT' && 
-                (event.target as HTMLElement).tagName !== 'TEXTAREA')) {
-        event.preventDefault();
-        if (isValid && !isSaving) {
-          handleSave();
-        }
-      }
-    };
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({ ...prev, [name]: checked }));
+  };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open, isSaving, name, targetUrl, prompts]);
+  const handleSelectChange = (value: string) => {
+    setFormData(prev => ({ ...prev, platform: value }));
+  };
 
-  const handleAddPrompt = () => {
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Batch name is required';
+    }
+
+    if (!formData.targetUrl.trim()) {
+      newErrors.targetUrl = 'Target URL is required';
+    }
+
+    // Validate prompts
+    const nonEmptyPrompts = prompts.filter(prompt => prompt.text.trim() !== '');
+    
+    if (nonEmptyPrompts.length === 0) {
+      newErrors.prompts = 'At least one non-empty prompt is required';
+    }
+
+    if (prompts.length > 50) {
+      newErrors.prompts = 'Maximum 50 prompts allowed per batch';
+    }
+
+    // Check for empty prompts
+    const hasEmptyPrompts = prompts.some(prompt => prompt.text.trim() === '');
+    if (hasEmptyPrompts) {
+      newErrors.prompts = 'All prompts must contain text. Remove empty prompts before saving.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const addPrompt = () => {
+    if (prompts.length >= 50) {
+      setErrors(prev => ({...prev, prompts: 'Maximum 50 prompts allowed per batch'}));
+      return;
+    }
+
     const newPrompt: TextPrompt = {
-      id: crypto.randomUUID(),
+      id: Date.now().toString(),
       text: '',
       order: prompts.length
     };
     setPrompts([...prompts, newPrompt]);
+    setErrors(prev => ({...prev, prompts: ''}));
   };
 
-  const handleRemovePrompt = (promptId: string) => {
-    if (prompts.length === 1) return; // Don't allow removing the last prompt
-    setDeletePromptId(promptId);
-  };
-
-  const confirmRemovePrompt = () => {
-    if (deletePromptId) {
-      setPrompts(prompts.filter(p => p.id !== deletePromptId));
-      setDeletePromptId(null);
-    }
-  };
-
-  const handlePromptChange = (promptId: string, text: string) => {
-    setPrompts(prompts.map(p => 
-      p.id === promptId ? { ...p, text } : p
+  const updatePrompt = (id: string, text: string) => {
+    setPrompts(prompts.map(prompt =>
+      prompt.id === id ? { ...prompt, text } : prompt
     ));
-  };
-
-  const handleDragStart = (index: number) => {
-    setDraggedIndex(index);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
-    e.preventDefault();
-    
-    if (draggedIndex === null) return;
-    
-    const newPrompts = [...prompts];
-    const draggedPrompt = newPrompts[draggedIndex];
-    newPrompts.splice(draggedIndex, 1);
-    newPrompts.splice(dropIndex, 0, draggedPrompt);
-    
-    // Update order indices
-    const reorderedPrompts = newPrompts.map((prompt, index) => ({
-      ...prompt,
-      order: index
-    }));
-    
-    setPrompts(reorderedPrompts);
-    setDraggedIndex(null);
-  };
-
-  const handleSave = async () => {
-    if (!name.trim() || !targetUrl.trim() || prompts.some(p => !p.text.trim())) {
-      return; // Don't save if required fields are empty
-    }
-
-    setIsSaving(true);
-    setSaveProgress(0);
-
-    // Simulate progress steps
-    const progressSteps = [
-      { step: 20, delay: 100, message: 'Validating batch data...' },
-      { step: 40, delay: 200, message: 'Preparing prompts...' },
-      { step: 60, delay: 150, message: 'Saving to database...' },
-      { step: 80, delay: 200, message: 'Finalizing...' },
-      { step: 100, delay: 100, message: 'Complete!' }
-    ];
-
-    try {
-      // Animate progress
-      for (const { step, delay } of progressSteps) {
-        await new Promise(resolve => setTimeout(resolve, delay));
-        setSaveProgress(step);
-      }
-
-      const batchData = {
-        name: name.trim(),
-        targetUrl: targetUrl.trim(),
-        prompts: prompts.filter(p => p.text.trim()),
-        status: 'pending' as const,
-        description: ''
-      };
-
-      if (editingBatch) {
-        await onSave({
-          ...editingBatch,
-          ...batchData
-        });
-      } else {
-        await onSave(batchData);
-      }
-
-      // Small delay to show completion
-      await new Promise(resolve => setTimeout(resolve, 300));
-    } catch (error) {
-      console.error('Error saving batch:', error);
-    } finally {
-      setIsSaving(false);
-      setSaveProgress(0);
+    // Clear errors when user starts typing
+    if (text.trim() !== '') {
+      setErrors(prev => ({...prev, prompts: ''}));
     }
   };
 
-  const isValid = name.trim() && targetUrl.trim() && prompts.some(p => p.text.trim());
+  const removePrompt = (id: string) => {
+    if (prompts.length > 1) {
+      setPrompts(prompts.filter(prompt => prompt.id !== id));
+      setErrors(prev => ({...prev, prompts: ''}));
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    // Filter out empty prompts before saving
+    const validPrompts = prompts.filter(prompt => prompt.text.trim() !== '');
+
+    const batchData = {
+      name: formData.name,
+      targetUrl: formData.targetUrl,
+      description: formData.description,
+      prompts: validPrompts.map((prompt, index) => ({
+        ...prompt,
+        order: index
+      })),
+      status: 'pending' as const,
+      platform: formData.platform,
+      settings: {
+        waitForIdle: formData.waitForIdle,
+        maxRetries: parseInt(String(formData.maxRetries), 10),
+        automationDelay: 1000,
+        elementTimeout: 30000,
+        debugLevel: 'standard' as const,
+      },
+    };
+
+    onSave(batchData);
+    onClose();
+  };
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="w-[95vw] max-w-4xl h-[95vh] max-h-[95vh] md:h-auto md:max-h-[85vh] rounded-3xl bg-gray-900/95 backdrop-blur-xl border border-gray-700 shadow-2xl flex flex-col p-0">
-          <DialogHeader className="text-left p-6 pb-4 flex-shrink-0">
-            <DialogTitle className="text-2xl font-semibold text-left text-white">
-              {editingBatch ? 'Edit Batch' : 'Create New Batch'}
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/10 backdrop-blur-xl border-white/20 text-white">
+        <div className="flex items-center justify-between">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-white">
+              {batch ? 'Edit Batch' : 'Create New Batch'}
             </DialogTitle>
           </DialogHeader>
-          
-          <div className="flex-1 flex flex-col min-h-0">
-            <ScrollArea className="flex-1 px-6">
-              <div className="pb-6">
-                {isSaving && (
-                  <div className="mb-6 p-4 bg-purple-900/30 rounded-xl border border-purple-500/30">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <Save className="w-5 h-5 text-purple-400 animate-pulse" />
-                      <span className="text-purple-200 font-medium">Saving batch...</span>
-                    </div>
-                    <Progress value={saveProgress} className="h-2" />
-                    <div className="text-sm text-purple-300 mt-2">
-                      {saveProgress < 20 && "Validating batch data..."}
-                      {saveProgress >= 20 && saveProgress < 40 && "Preparing prompts..."}
-                      {saveProgress >= 40 && saveProgress < 60 && "Saving to database..."}
-                      {saveProgress >= 60 && saveProgress < 80 && "Finalizing..."}
-                      {saveProgress >= 80 && saveProgress < 100 && "Almost done..."}
-                      {saveProgress === 100 && "Complete!"}
-                    </div>
-                  </div>
-                )}
+          <Button
+            onClick={onClose}
+            variant="ghost"
+            size="sm"
+            className="text-white hover:bg-white/20 rounded-full p-2"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
 
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Input
-                      id="batch-name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter a descriptive name for your batch (e.g., 'Product Research Q4 2024')"
-                      className="text-base h-12 md:h-10 rounded-xl bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500"
-                      disabled={isSaving}
-                    />
-                  </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <Label htmlFor="name" className="text-base font-medium text-white">
+              Batch Name
+            </Label>
+            <Input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder="Enter batch name"
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg"
+            />
+            {errors.name && (
+              <p className="text-red-400 text-sm mt-1">{errors.name}</p>
+            )}
+          </div>
 
-                  <div className="space-y-2">
-                    <Input
-                      id="target-url"
-                      value={targetUrl}
-                      onChange={(e) => setTargetUrl(e.target.value)}
-                      placeholder="Enter your project URL where prompts will be executed (e.g., https://chat.openai.com)"
-                      className="text-base h-12 md:h-10 rounded-xl bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500"
-                      disabled={isSaving}
-                    />
-                  </div>
+          <div>
+            <Label htmlFor="targetUrl" className="text-base font-medium text-white">
+              Target URL
+            </Label>
+            <Input
+              type="url"
+              id="targetUrl"
+              name="targetUrl"
+              value={formData.targetUrl}
+              onChange={handleInputChange}
+              placeholder="Enter target URL"
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg"
+            />
+            {errors.targetUrl && (
+              <p className="text-red-400 text-sm mt-1">{errors.targetUrl}</p>
+            )}
+          </div>
 
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium text-white">Prompts</h3>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleAddPrompt}
-                        className="h-10 md:h-8 rounded-xl border-white/20 text-white hover:bg-white/10 hover:border-white/40"
-                        disabled={isSaving}
-                      >
-                        <Plus className="w-4 h-4 mr-1" />
-                        Add Prompt
-                      </Button>
-                    </div>
+          <div>
+            <Label htmlFor="description" className="text-base font-medium text-white">
+              Description
+            </Label>
+            <Textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="Enter batch description"
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg resize-none"
+            />
+          </div>
 
-                    <div className="space-y-4">
-                      {prompts.map((prompt, index) => (
-                        <div
-                          key={prompt.id}
-                          className="flex items-start space-x-3 p-4 border border-white/20 rounded-xl bg-white/5"
-                          draggable={!isSaving}
-                          onDragStart={() => handleDragStart(index)}
-                          onDragOver={handleDragOver}
-                          onDrop={(e) => handleDrop(e, index)}
-                        >
-                          <GripVertical className="w-5 h-5 text-gray-400 cursor-move mt-3" />
-                          <div className="flex-1">
-                            <Textarea
-                              value={prompt.text}
-                              onChange={(e) => handlePromptChange(prompt.id, e.target.value)}
-                              placeholder={`Enter your prompt here (e.g., "Analyze the following data and provide insights about customer behavior patterns")`}
-                              rows={4}
-                              className="w-full text-base min-h-[100px] rounded-xl bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500 resize-none"
-                              disabled={isSaving}
-                            />
-                          </div>
-                          {prompts.length > 1 && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRemovePrompt(prompt.id)}
-                              className="text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-xl h-10 w-10 p-0 mt-2"
-                              disabled={isSaving}
-                            >
-                              <Minus className="w-4 h-4" />
-                            </Button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+          <div>
+            <Label htmlFor="platform" className="text-base font-medium text-white">
+              Platform
+            </Label>
+            <Select onValueChange={handleSelectChange} defaultValue={formData.platform}>
+              <SelectTrigger className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg">
+                <SelectValue placeholder="Select a platform" />
+              </SelectTrigger>
+              <SelectContent className="bg-black/70 backdrop-blur-md border-white/10 text-white">
+                <SelectItem value="website">Website</SelectItem>
+                <SelectItem value="desktop-app">Desktop App</SelectItem>
+                <SelectItem value="mobile-app">Mobile App</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Text Prompts Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-medium text-white">
+                Text Prompts ({prompts.length}/50)
+              </Label>
+              <Button
+                type="button"
+                onClick={addPrompt}
+                disabled={prompts.length >= 50}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Prompt
+              </Button>
+            </div>
+            
+            {errors.prompts && (
+              <div className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                {errors.prompts}
               </div>
-            </ScrollArea>
+            )}
 
-            {/* Mobile-optimized sticky footer */}
-            <div className="flex-shrink-0 p-6 pt-4 border-t border-white/20 bg-gray-900/95 rounded-b-3xl">
-              <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
-                <Button 
-                  variant="outline" 
-                  onClick={onClose} 
-                  className="h-12 sm:h-10 rounded-xl border-white/20 text-white hover:bg-white/10 hover:border-white/40 order-2 sm:order-1"
-                  disabled={isSaving}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={handleSave}
-                  disabled={!isValid || isSaving}
-                  className="h-12 sm:h-10 bg-purple-600 hover:bg-purple-700 text-white rounded-xl disabled:opacity-50 min-w-[120px] order-1 sm:order-2"
-                >
-                  {isSaving ? (
-                    <div className="flex items-center space-x-2">
-                      <Save className="w-4 h-4 animate-pulse" />
-                      <span>Saving...</span>
-                    </div>
-                  ) : (
-                    'Save Batch'
+            <div className="space-y-3 max-h-60 overflow-y-auto">
+              {prompts.map((prompt, index) => (
+                <div key={prompt.id} className="flex items-center space-x-3 bg-white/5 rounded-lg p-3 border border-white/10">
+                  <span className="text-white/60 text-sm font-mono min-w-[2rem]">
+                    {index + 1}.
+                  </span>
+                  <Textarea
+                    value={prompt.text}
+                    onChange={(e) => updatePrompt(prompt.id, e.target.value)}
+                    placeholder="Enter your automation prompt..."
+                    className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg resize-none"
+                    rows={2}
+                  />
+                  {prompts.length > 1 && (
+                    <Button
+                      type="button"
+                      onClick={() => removePrompt(prompt.id)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-400 hover:bg-red-500/20 rounded-lg p-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   )}
-                </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Settings */}
+          <div className="space-y-2">
+            <Label className="text-base font-medium text-white">
+              Settings
+            </Label>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="waitForIdle"
+                name="waitForIdle"
+                checked={formData.waitForIdle}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, waitForIdle: !!checked }))}
+                className="bg-white/10 border-white/20 text-blue-500 rounded-md"
+              />
+              <Label htmlFor="waitForIdle" className="text-sm text-white">
+                Wait For Idle
+              </Label>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="maxRetries" className="text-sm text-white">
+                  Max Retries
+                </Label>
+                <Input
+                  type="number"
+                  id="maxRetries"
+                  name="maxRetries"
+                  value={formData.maxRetries}
+                  onChange={handleInputChange}
+                  placeholder="Enter max retries"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg"
+                />
               </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
 
-      <AlertDialog open={!!deletePromptId} onOpenChange={() => setDeletePromptId(null)}>
-        <AlertDialogContent className="rounded-xl bg-gray-900/95 backdrop-blur-xl border border-gray-700">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Remove Prompt</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-300">
-              Are you sure you want to remove this prompt? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl bg-white/10 border-white/20 text-white hover:bg-white/20">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmRemovePrompt}
-              className="bg-red-600 hover:bg-red-700 rounded-xl"
-            >
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+          <div className="flex justify-end">
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl">
+              {batch ? 'Update Batch' : 'Create Batch'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
-};
-
-export default BatchModal;
+}
