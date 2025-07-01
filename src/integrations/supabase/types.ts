@@ -184,6 +184,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           id: string
+          is_super_user: boolean | null
           name: string | null
           preferred_language: string | null
           role: string | null
@@ -197,6 +198,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           id: string
+          is_super_user?: boolean | null
           name?: string | null
           preferred_language?: string | null
           role?: string | null
@@ -210,6 +212,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           id?: string
+          is_super_user?: boolean | null
           name?: string | null
           preferred_language?: string | null
           role?: string | null
@@ -466,6 +469,10 @@ export type Database = {
           | { _user_id: string; _role: Database["public"]["Enums"]["app_role"] }
           | { user_id: string; roles: string[] }
         Returns: boolean
+      }
+      set_super_user: {
+        Args: { _user_id: string; _is_super: boolean }
+        Returns: undefined
       }
       update_batch_status: {
         Args: { batch_id: string; new_status: string }

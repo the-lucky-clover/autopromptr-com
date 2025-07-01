@@ -13,10 +13,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { SecurityStatus } from "@/components/security/SecurityStatus";
 
 const AdminPanel = () => {
-  const { isSysOp, loading: roleLoading } = useUserRole();
+  const { isSysOp, loading: roleLoading, setSuperUser } = useUserRole();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [securityEvents, setSecurityEvents] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!roleLoading && !isSysOp) {
@@ -27,6 +29,7 @@ const AdminPanel = () => {
   useEffect(() => {
     if (isSysOp) {
       fetchSecurityEvents();
+      fetchUsers();
     }
   }, [isSysOp]);
 
@@ -48,16 +51,43 @@ const AdminPanel = () => {
     }
   };
 
-  const mockUsers = [
-    { id: 1, email: 'pounds1@gmail.com', role: 'sysop', status: 'active', batches: '∞', lastLogin: '2 mins ago' },
-    { id: 2, email: 'user1@example.com', role: 'user', status: 'active', batches: 12, lastLogin: '1 hour ago' },
-    { id: 3, email: 'user2@example.com', role: 'user', status: 'inactive', batches: 5, lastLogin: '3 days ago' },
-    { id: 4, email: 'admin@example.com', role: 'admin', status: 'active', batches: 45, lastLogin: '30 mins ago' },
-  ];
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, name, role, is_super_user, created_at')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching users:', error);
+      } else {
+        setUsers(data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    }
+  };
+
+  const handleToggleSuperUser = async (userId: string, currentStatus: boolean) => {
+    setLoading(true);
+    try {
+      const result = await setSuperUser(userId, !currentStatus);
+      if (result.success) {
+        // Refresh users list
+        await fetchUsers();
+      } else {
+        console.error('Failed to update user privileges:', result.error);
+      }
+    } catch (error) {
+      console.error('Error updating user privileges:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const systemStats = [
-    { title: 'Total Users', value: '1,247', icon: Users, color: 'text-blue-400' },
-    { title: 'Active Batches', value: '89', icon: Zap, color: 'text-orange-400' },
+    { title: 'Total Users', value: users.length.toString(), icon: Users, color: 'text-blue-400' },
+    { title: 'Super Users', value: users.filter(u => u.is_super_user).length.toString(), icon: Shield, color: 'text-purple-400' },
     { title: 'Security Events', value: securityEvents.length.toString(), icon: Shield, color: 'text-red-400' },
     { title: 'System Health', value: '98.5%', icon: Database, color: 'text-green-400' },
   ];
@@ -87,7 +117,7 @@ const AdminPanel = () => {
               <SidebarTrigger className="text-white hover:text-purple-200 rounded-xl" />
               <div>
                 <h1 className="text-2xl font-semibold text-white">System Administration</h1>
-                <p className="text-purple-200">Enhanced Security Control Panel</p>
+                <p className="text-purple-200">Database-Based Security Control Panel</p>
               </div>
             </div>
             <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
@@ -199,42 +229,41 @@ const AdminPanel = () => {
                     placeholder="Search users..." 
                     className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl"
                   />
-                  <Select>
-                    <SelectTrigger className="w-[180px] bg-white/10 border-white/20 text-white rounded-xl">
-                      <SelectValue placeholder="Filter by role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Roles</SelectItem>
-                      <SelectItem value="sysop">SysOp</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="user">User</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Button onClick={fetchUsers} className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl">
+                    Refresh
+                  </Button>
                 </div>
                 
                 <div className="space-y-2">
-                  {mockUsers.map((user) => (
+                  {users.map((user) => (
                     <div key={user.id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
                       <div className="flex items-center space-x-4">
                         <div>
-                          <p className="text-white font-medium">{user.email}</p>
-                          <p className="text-purple-200 text-sm">Last login: {user.lastLogin}</p>
+                          <p className="text-white font-medium">{user.name || 'Unnamed User'}</p>
+                          <p className="text-purple-200 text-sm">ID: {user.id}</p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-4">
-                        <Badge variant={user.role === 'sysop' ? 'destructive' : user.role === 'admin' ? 'secondary' : 'outline'}>
-                          {user.role}
+                        <Badge variant={user.is_super_user ? 'destructive' : user.role === 'admin' ? 'secondary' : 'outline'}>
+                          {user.is_super_user ? 'Super User' : user.role || 'user'}
                         </Badge>
-                        <span className="text-white/60 text-sm">{user.batches} batches</span>
-                        <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>
-                          {user.status}
-                        </Badge>
-                        <Button size="sm" variant="outline" className="text-white border-white/20 hover:bg-white/10 rounded-xl">
-                          Edit
+                        <Button 
+                          size="sm" 
+                          variant={user.is_super_user ? "destructive" : "default"}
+                          className="rounded-xl"
+                          onClick={() => handleToggleSuperUser(user.id, user.is_super_user)}
+                          disabled={loading}
+                        >
+                          {user.is_super_user ? 'Revoke Admin' : 'Make Admin'}
                         </Button>
                       </div>
                     </div>
                   ))}
+                  {users.length === 0 && (
+                    <div className="text-center text-white/60 py-8">
+                      No users found
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

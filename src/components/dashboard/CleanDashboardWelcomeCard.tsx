@@ -8,7 +8,7 @@ import EnhancedRealTimeClock from '@/components/EnhancedRealTimeClock';
 import { useDashboardGreeting } from '@/hooks/useDashboardGreeting';
 
 const CleanDashboardWelcomeCard = () => {
-  const greeting = useDashboardGreeting();
+  const currentGreeting = useDashboardGreeting();
 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 relative overflow-hidden">
@@ -24,10 +24,10 @@ const CleanDashboardWelcomeCard = () => {
             </div>
             <div>
               <CardTitle className="text-white text-xl">
-                {greeting}
+                {currentGreeting.greeting} {currentGreeting.firstName}
               </CardTitle>
               <p className="text-purple-200 text-sm mt-1">
-                Welcome to your AutoPromptr dashboard
+                {currentGreeting.encouragement}
               </p>
             </div>
           </div>
