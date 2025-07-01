@@ -1,4 +1,3 @@
-
 import { SecurityMonitor } from './securityMonitor';
 
 export class SecurityHeaders {
@@ -12,14 +11,14 @@ export class SecurityHeaders {
     }
 
     try {
-      // Enhanced Content Security Policy
+      // Enhanced Content Security Policy - Updated to allow video and font sources
       const csp = [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://lovable.dev https://cdn.gpteng.co",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com data:",
         "img-src 'self' data: https: blob:",
-        "media-src 'self' data: blob:",
+        "media-src 'self' data: blob: https://videos.pexels.com",
         "connect-src 'self' https://raahpoyciwuyhwlcenpy.supabase.co https://api.openai.com https://autopromptr-backend.onrender.com wss: https:",
         "frame-src 'self' https://dashboard.render.com",
         "frame-ancestors 'none'",

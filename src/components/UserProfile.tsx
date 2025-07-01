@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,31 +13,39 @@ const UserProfile = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, signOut } = useAuth();
   const { hasApiKey } = useSecureApiKeys();
   const { toast } = useToast();
 
-  // Load user profile on mount
-  useState(() => {
-    if (user) {
-      loadProfile();
-    }
-  });
-
   const loadProfile = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('avatar_url')
-      .eq('id', user.id)
-      .single();
-    
-    if (profile?.avatar_url) {
-      setAvatarUrl(profile.avatar_url);
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile?.avatar_url) {
+        setAvatarUrl(profile.avatar_url);
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Load user profile on mount
+  useEffect(() => {
+    loadProfile();
+  }, [user]);
 
   const getInitial = () => {
     if (!user?.email) return 'U';
@@ -100,6 +108,15 @@ const UserProfile = () => {
   const handleClose = () => {
     setIsOpen(false);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center space-x-3 p-2 rounded-xl">
+        <div className="h-8 w-8 bg-gray-600 rounded-full animate-pulse"></div>
+        <div className="h-4 w-24 bg-gray-600 rounded animate-pulse"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
