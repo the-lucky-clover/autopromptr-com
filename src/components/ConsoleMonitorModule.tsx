@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,7 @@ const ConsoleMonitorModule = ({ isCompact = false }: ConsoleMonitorModuleProps) 
   const [filter, setFilter] = useState<'all' | 'error' | 'warn' | 'info'>('all');
   const { toast } = useToast();
 
-  const addError = useCallback((type: ConsoleError['type'], message: string, stack?:   ) => {
+  const addError = useCallback((type: ConsoleError['type'], message: string, stack?: string) => {
     const error: ConsoleError = {
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       timestamp: new Date(),

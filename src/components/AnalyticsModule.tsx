@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +14,7 @@ const AnalyticsModule = ({ isCompact = false }: AnalyticsModuleProps) => {
     { name: 'Mon', batches: 12 },
     { name: 'Tue', batches: 8 },
     { name: 'Wed', batches: 15 },
-    { name: 'Thu', batches:  },
+    { name: 'Thu', batches: 10 },
     { name: 'Fri', batches: 18 },
     { name: 'Sat', batches: 6 },
     { name: 'Sun', batches: 9 },

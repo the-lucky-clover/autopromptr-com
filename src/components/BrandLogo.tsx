@@ -9,9 +9,9 @@ interface BrandLogoProps {
 
 const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: BrandLogoProps) => {
   const sizeClasses = {
-    small: { icon: 'w-5 h-5', text: 'text-lg' },
-    medium: { icon: 'w-8 h-8', text: 'text-2xl' },
-    large: { icon: 'w-12 h-12', text: 'text-4xl' }
+    small: { icon: 'w-10 h-10', text: 'text-2xl' },
+    medium: { icon: 'w-16 h-16', text: 'text-4xl' },
+    large: { icon: 'w-24 h-24', text: 'text-6xl' }
   };
 
   const currentSize = sizeClasses[size];

@@ -1,26 +1,72 @@
-import { useState, useCallback } from 'react';
-
-export type ModuleState = 'full' | 'minimized' | 'closed';
+import { useState, useEffect } from 'react';
 
 export interface DashboardModule {
   id: string;
-  title: string;
+  name: string;
   component: string;
-  state: ModuleState;
-  order: number;
   isVisible: boolean;
+  isMinimized: boolean;
+  order: number;
+  isLocked?: boolean;
 }
 
 const defaultModules: DashboardModule[] = [
-  { id: 'batch-processor', title: 'Batch Processor', component: 'DashboardBatchManager', state: 'full', order: 0, isVisible: true },
-  { id: 'batch-extractor', title: 'Batch Extractor', component: 'BatchExtractorModule', state: 'full', order: 1, isVisible: true },
-  { id: 'analytics', title: 'System Overview', component: 'AnalyticsModule', state: 'full', order: 2, isVisible: true },
-  { id: 'system-reliability', title: 'System Reliability Score', component: 'SystemReliabilityScore', state: 'full', order: 3, isVisible: true },
-  { id: 'console-monitor', title: 'Console Monitor', component: 'ConsoleMonitorModule', state: 'full', order: 4, isVisible: true },
-  { id: 'system-logs', title: 'System Diagnostics & Logs', component: 'SystemLogsPanel', state: 'full', order: 5, isVisible: true },
-  { id: 'backend-health', title: 'Backend Health', component: 'HealthStatusDashboard', state: 'full', order: 6, isVisible: true },
-  { id: 'subscription', title: 'Subscription', component: 'DashboardSubscription', state: 'full', order: 7, isVisible: true },
-  { id: 'stats-cards', title: 'Statistics', component: 'DashboardStatsModule', state: 'full', order: 8, isVisible: true },
+  {
+    id: 'health-status',
+    name: 'Backend Health',
+    component: 'HealthStatusDashboard',
+    isVisible: true,
+    isMinimized: false,
+    order: 0,
+  },
+  {
+    id: 'system-logs',
+    name: 'System Logs',
+    component: 'SystemLogsPanel',
+    isVisible: true,
+    isMinimized: false,
+    order: 1,
+  },
+  {
+    id: 'subscription',
+    name: 'Subscription',
+    component: 'DashboardSubscription',
+    isVisible: true,
+    isMinimized: false,
+    order: 2,
+  },
+  {
+    id: 'stats',
+    name: 'Statistics',
+    component: 'DashboardStatsModule',
+    isVisible: true,
+    isMinimized: false,
+    order: 3,
+  },
+  {
+    id: 'reliability',
+    name: 'System Reliability',
+    component: 'SystemReliabilityScore',
+    isVisible: true,
+    isMinimized: false,
+    order: 4,
+  },
+  {
+    id: 'analytics',
+    name: 'Analytics',
+    component: 'AnalyticsModule',
+    isVisible: true,
+    isMinimized: false,
+    order: 5,
+  },
+  {
+    id: 'console-monitor',
+    name: 'Console Monitor',
+    component: 'ConsoleMonitorModule',
+    isVisible: true,
+    isMinimized: false,
+    order: 6,
+  }
 ];
 
 export const useDashboardModules = () => {
@@ -29,101 +75,55 @@ export const useDashboardModules = () => {
     if (saved) {
       try {
         const parsedModules = JSON.parse(saved);
-        // Filter out QuickActions permanently and ensure all default modules exist
-        const filteredModules = parsedModules.filter((m: DashboardModule) => m.id !== 'quick-actions');
-        const moduleIds = filteredModules.map((m: DashboardModule) => m.id);
-        const missingModules = defaultModules.filter(dm => !moduleIds.includes(dm.id));
-        
-        if (missingModules.length > 0) {
-          // Add missing modules to the saved modules
-          const combinedModules = [...filteredModules, ...missingModules];
-          // Ensure batch-processor is always first by reordering
-          return combinedModules.sort((a, b) => {
-            if (a.id === 'batch-processor') return -1;
-            if (b.id === 'batch-processor') return 1;
-            return a.order - b.order;
-          });
-        }
-        
-        // Ensure batch-processor is always first in saved modules
-        return filteredModules.sort((a, b) => {
-          if (a.id === 'batch-processor') return -1;
-          if (b.id === 'batch-processor') return 1;
-          return a.order - b.order;
-        });
-      } catch (error) {
-        console.error('Error parsing saved modules, using defaults:', error);
+        // Ensure new modules are added to existing saved state
+        const existingIds = parsedModules.map((m: DashboardModule) => m.id);
+        const newModules = defaultModules.filter(m => !existingIds.includes(m.id));
+        return [...parsedModules, ...newModules].sort((a, b) => a.order - b.order);
+      } catch {
         return defaultModules;
       }
     }
     return defaultModules;
   });
 
-  const saveModules = useCallback((newModules: DashboardModule[]) => {
-    // Always filter out QuickActions before saving
-    const filteredModules = newModules.filter(m => m.id !== 'quick-actions');
-    // Ensure batch-processor is always first when saving
-    const reorderedModules = filteredModules.sort((a, b) => {
-      if (a.id === 'batch-processor') return -1;
-      if (b.id === 'batch-processor') return 1;
-      return a.order - b.order;
-    });
-    setModules(reorderedModules);
-    localStorage.setItem('dashboard-modules', JSON.stringify(reorderedModules));
-  }, []);
+  useEffect(() => {
+    localStorage.setItem('dashboard-modules', JSON.stringify(modules));
+  }, [modules]);
 
-  const updateModuleState = useCallback((moduleId: string, newState: ModuleState) => {
-    const newModules = modules.map(module =>
-      module.id === moduleId 
-        ? { ...module, state: newState, isVisible: newState !== 'closed' }
-        : module
+  const updateModuleState = (id: string, updates: Partial<DashboardModule>) => {
+    setModules(prev => 
+      prev.map(module => 
+        module.id === id ? { ...module, ...updates } : module
+      )
     );
-    saveModules(newModules);
-  }, [modules, saveModules]);
+  };
 
-  const reorderModules = useCallback((reorderedModules: DashboardModule[]) => {
-    // Prevent batch-processor from being moved from first position
-    const batchProcessor = reorderedModules.find(m => m.id === 'batch-processor');
-    const otherModules = reorderedModules.filter(m => m.id !== 'batch-processor');
-    
-    const finalModules = batchProcessor ? [batchProcessor, ...otherModules] : reorderedModules;
-    const modulesWithOrder = finalModules.map((module, index) => ({
+  const resetToDefault = () => {
+    setModules(defaultModules);
+  };
+
+  const reorderModules = (reorderedModules: DashboardModule[]) => {
+    const modulesWithUpdatedOrder = reorderedModules.map((module, index) => ({
       ...module,
       order: index
     }));
-    saveModules(modulesWithOrder);
-  }, [saveModules]);
-
-  const toggleModuleVisibility = useCallback((moduleId: string) => {
-    const module = modules.find(m => m.id === moduleId);
-    if (module) {
-      const newState = module.isVisible ? 'closed' : 'full';
-      updateModuleState(moduleId, newState);
-    }
-  }, [modules, updateModuleState]);
-
-  const resetLayout = useCallback(() => {
-    saveModules(defaultModules);
-  }, [saveModules]);
+    setModules(modulesWithUpdatedOrder);
+  };
 
   const visibleModules = modules
     .filter(module => module.isVisible)
-    .sort((a, b) => {
-      // Always keep batch-processor first
-      if (a.id === 'batch-processor') return -1;
-      if (b.id === 'batch-processor') return 1;
-      return a.order - b.order;
-    });
+    .sort((a, b) => a.order - b.order);
 
-  const closedModules = modules.filter(module => !module.isVisible);
+  const hiddenModules = modules
+    .filter(module => !module.isVisible)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return {
     modules,
     visibleModules,
-    closedModules,
+    hiddenModules,
     updateModuleState,
-    reorderModules,
-    toggleModuleVisibility,
-    resetLayout
+    resetToDefault,
+    reorderModules
   };
 };
