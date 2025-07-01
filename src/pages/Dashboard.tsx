@@ -14,7 +14,9 @@ import RecentActivity from "@/components/RecentActivity";
 import PromptIcon from "@/components/PromptIcon";
 import VideoBackground from "@/components/VideoBackground";
 import OverviewDashboardLayout from "@/components/dashboard/OverviewDashboardLayout";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent } from "@/components/ui/card";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const Dashboard = () => {
   const { visibleModules, updateModuleState, reorderModules } = useDashboardModules();
@@ -63,30 +65,35 @@ const Dashboard = () => {
   );
 
   const renderModuleContent = (moduleId: string, componentName: string) => {
-    switch (componentName) {
-      case 'HealthStatusDashboard':
-        return <HealthStatusDashboardWrapper isCompact={false} />;
-      
-      case 'SystemLogsPanel':
-        return <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} isCompact={false} />;
-      
-      case 'DashboardSubscription':
-        return <DashboardSubscription isCompact={false} />;
-      
-      case 'DashboardStatsModule':
-        return <DashboardStatsModule stats={stats} isCompact={false} />;
+    try {
+      switch (componentName) {
+        case 'HealthStatusDashboard':
+          return <HealthStatusDashboardWrapper isCompact={false} />;
+        
+        case 'SystemLogsPanel':
+          return <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} isCompact={false} />;
+        
+        case 'DashboardSubscription':
+          return <DashboardSubscription isCompact={false} />;
+        
+        case 'DashboardStatsModule':
+          return <DashboardStatsModule stats={stats} isCompact={false} />;
 
-      case 'SystemReliabilityScore':
-        return <SystemReliabilityScore isCompact={false} />;
+        case 'SystemReliabilityScore':
+          return <SystemReliabilityScore isCompact={false} />;
 
-      case 'AnalyticsModule':
-        return <AnalyticsModule isCompact={false} />;
+        case 'AnalyticsModule':
+          return <AnalyticsModule isCompact={false} />;
 
-      case 'ConsoleMonitorModule':
-        return <ConsoleMonitorModule isCompact={false} />;
-      
-      default:
-        return <div>Module content not found</div>;
+        case 'ConsoleMonitorModule':
+          return <ConsoleMonitorModule isCompact={false} />;
+        
+        default:
+          return <div>Module content not found</div>;
+      }
+    } catch (error) {
+      console.error(`Error rendering module ${moduleId}:`, error);
+      return <div className="text-red-400">Error loading module</div>;
     }
   };
 
@@ -110,40 +117,50 @@ const Dashboard = () => {
           <div className="min-h-screen flex w-full">
             <AppSidebar />
             <SidebarInset className="flex-1">
-              <Card className={`m-6 mb-4 ${
-                videoSettings.enabled 
-                  ? 'bg-black/40 backdrop-blur-md border-white/30' 
-                  : 'bg-white/10 backdrop-blur-sm border-white/20'
-              } rounded-xl`}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <h1 className="text-4xl font-bold text-white mb-2">
-                        👋 Welcome to AutoPromptr 😊
-                      </h1>
-                      <p className="text-purple-200 text-lg">
-                        Your intelligent batch processing dashboard - manage, monitor, and optimize your AI workflows
-                      </p>
+              <ErrorBoundary>
+                <DashboardHeader />
+              </ErrorBoundary>
+              
+              <ErrorBoundary>
+                <Card className={`m-6 mb-4 ${
+                  videoSettings.enabled 
+                    ? 'bg-black/40 backdrop-blur-md border-white/30' 
+                    : 'bg-white/10 backdrop-blur-sm border-white/20'
+                } rounded-xl`}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h1 className="text-4xl font-bold text-white mb-2">
+                          👋 Welcome to AutoPromptr 😊
+                        </h1>
+                        <p className="text-purple-200 text-lg">
+                          Your intelligent batch processing dashboard - manage, monitor, and optimize your AI workflows
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0 ml-6">
+                        <PromptIcon size="large" id="dashboard-welcome" />
+                      </div>
                     </div>
-                    <div className="flex-shrink-0 ml-6">
-                      <PromptIcon size="large" id="dashboard-welcome" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </ErrorBoundary>
 
               <div className="px-6 pb-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                   <div className="lg:col-span-8">
-                    <OverviewDashboardLayout
-                      visibleModules={overviewModules}
-                      reorderModules={reorderModules}
-                      renderModuleContent={renderModuleContent}
-                    />
+                    <ErrorBoundary>
+                      <OverviewDashboardLayout
+                        visibleModules={overviewModules}
+                        reorderModules={reorderModules}
+                        renderModuleContent={renderModuleContent}
+                      />
+                    </ErrorBoundary>
                   </div>
 
                   <div className="lg:col-span-4">
-                    <RecentActivity />
+                    <ErrorBoundary>
+                      <RecentActivity />
+                    </ErrorBoundary>
                   </div>
                 </div>
               </div>
