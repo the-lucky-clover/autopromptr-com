@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Trash2, GripVertical, Edit2, Save, X } from 'lucide-react';
 import { TextPrompt } from '@/types/batch';
+import PromptEnhancementButton from './batch/PromptEnhancementButton';
 
 interface PromptEditorProps {
   prompts: TextPrompt[];
@@ -48,48 +49,62 @@ const PromptEditor = ({ prompts, onUpdatePrompt, onDeletePrompt, onAddPrompt, di
                   rows={2}
                   className="w-full"
                 />
-                <div className="flex space-x-2">
-                  <Button
+                <div className="flex items-center justify-between">
+                  <PromptEnhancementButton
+                    promptText={editingText}
+                    onEnhanced={setEditingText}
                     size="sm"
-                    onClick={() => handleSaveEdit(prompt.id)}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    <Save className="h-3 w-3 mr-1" />
-                    Save
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleCancelEdit}
-                  >
-                    <X className="h-3 w-3 mr-1" />
-                    Cancel
-                  </Button>
+                  />
+                  <div className="flex space-x-2">
+                    <Button
+                      size="sm"
+                      onClick={() => handleSaveEdit(prompt.id)}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Save className="h-3 w-3 mr-1" />
+                      Save
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleCancelEdit}
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Cancel
+                    </Button>
+                  </div>
                 </div>
               </div>
             ) : (
               <div className="group">
                 <p className="text-sm text-gray-700">{prompt.text || 'Empty prompt - click to edit'}</p>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2 mt-2">
-                  <Button
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-between mt-2">
+                  <PromptEnhancementButton
+                    promptText={prompt.text}
+                    onEnhanced={(enhancedText) => onUpdatePrompt(prompt.id, enhancedText)}
                     size="sm"
-                    variant="ghost"
-                    onClick={() => handleStartEdit(prompt)}
-                    disabled={disabled}
-                  >
-                    <Edit2 className="h-3 w-3 mr-1" />
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onDeletePrompt(prompt.id)}
-                    className="text-red-600 hover:text-red-700"
-                    disabled={disabled}
-                  >
-                    <Trash2 className="h-3 w-3 mr-1" />
-                    Delete
-                  </Button>
+                  />
+                  <div className="flex space-x-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleStartEdit(prompt)}
+                      disabled={disabled}
+                    >
+                      <Edit2 className="h-3 w-3 mr-1" />
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => onDeletePrompt(prompt.id)}
+                      className="text-red-600 hover:text-red-700"
+                      disabled={disabled}
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Delete
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

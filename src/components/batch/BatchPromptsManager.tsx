@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2 } from "lucide-react";
 import { TextPrompt } from "@/types/batch";
+import PromptEnhancementButton from './PromptEnhancementButton';
 
 interface BatchPromptsManagerProps {
   prompts: TextPrompt[];
@@ -45,28 +46,37 @@ const BatchPromptsManager = ({
 
       <div className="space-y-3 max-h-60 overflow-y-auto">
         {prompts.map((prompt, index) => (
-          <div key={prompt.id} className="flex items-center space-x-3 bg-white/5 rounded-lg p-3 border border-white/10">
-            <span className="text-white/60 text-sm font-mono min-w-[2rem]">
+          <div key={prompt.id} className="flex items-start space-x-3 bg-white/5 rounded-lg p-3 border border-white/10">
+            <span className="text-white/60 text-sm font-mono min-w-[2rem] mt-2">
               {index + 1}.
             </span>
-            <Textarea
-              value={prompt.text}
-              onChange={(e) => onUpdatePrompt(prompt.id, e.target.value)}
-              placeholder="Enter your automation instruction (e.g., 'Update the hero section text to be more engaging')"
-              className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg resize-none"
-              rows={2}
-            />
-            {prompts.length > 1 && (
-              <Button
-                type="button"
-                onClick={() => onRemovePrompt(prompt.id)}
-                variant="ghost"
-                size="sm"
-                className="text-red-400 hover:bg-red-500/20 rounded-lg p-2"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            )}
+            <div className="flex-1 space-y-2">
+              <Textarea
+                value={prompt.text}
+                onChange={(e) => onUpdatePrompt(prompt.id, e.target.value)}
+                placeholder="Enter your automation instruction (e.g., 'Update the hero section text to be more engaging')"
+                className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg resize-none"
+                rows={2}
+              />
+              <div className="flex items-center justify-between">
+                <PromptEnhancementButton
+                  promptText={prompt.text}
+                  onEnhanced={(enhancedText) => onUpdatePrompt(prompt.id, enhancedText)}
+                  size="sm"
+                />
+                {prompts.length > 1 && (
+                  <Button
+                    type="button"
+                    onClick={() => onRemovePrompt(prompt.id)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-400 hover:bg-red-500/20 rounded-lg p-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
         ))}
       </div>
