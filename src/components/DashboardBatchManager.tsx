@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
 import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
@@ -6,7 +5,7 @@ import BatchModal from './BatchModal';
 import DashboardBatchList from './DashboardBatchList';
 import DashboardEmptyState from './DashboardEmptyState';
 import { Button } from './ui/button';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Plus, Database } from 'lucide-react';
 import BatchErrorDisplay from './batch/BatchErrorDisplay';
 
 interface DashboardBatchManagerProps {
@@ -162,6 +161,9 @@ const DashboardBatchManager = ({
     return (batch.status === 'pending' || batch.status === 'running') && timeDiff > tenMinutes;
   }).length;
 
+  const activeBatches = batches.filter(b => b.status === 'running').length;
+  const completedBatches = batches.filter(b => b.status === 'completed').length;
+
   return (
     <div className={`space-y-6 ${isCompact ? 'space-y-4' : ''}`}>
       {/* Error Display */}
@@ -185,31 +187,54 @@ const DashboardBatchManager = ({
           <DashboardEmptyState onNewBatch={handleNewBatch} />
         ) : (
           <>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Button
-                  onClick={handleRefresh}
-                  size="sm"
-                  variant="outline"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl px-4 py-2 font-medium transition-all duration-300"
-                  title="Refresh batch list"
-                >
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Refresh
-                </Button>
+            {/* Professional Batch List Header */}
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <Database className="h-6 w-6 text-blue-400" />
+                    <div>
+                      <h3 className="text-xl font-bold text-white">Your Batches</h3>
+                      <p className="text-white/60 text-sm">
+                        {batches.length} total • {activeBatches} active • {completedBatches} completed
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <Button
+                    onClick={handleRefresh}
+                    size="sm"
+                    variant="outline"
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl px-4 py-2 font-medium transition-all duration-300"
+                    title="Refresh batch list"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Refresh
+                  </Button>
+                  
+                  {stuckBatchCount > 0 && (
+                    <Button
+                      onClick={detectAndFixFailedBatches}
+                      variant="outline"
+                      size="sm"
+                      className="bg-orange-500/20 border-orange-500/30 text-orange-300 hover:bg-orange-500/30 px-4 py-2 font-medium transition-all duration-300"
+                    >
+                      <AlertTriangle className="w-4 h-4 mr-2" />
+                      Fix {stuckBatchCount} Stuck
+                    </Button>
+                  )}
+                  
+                  <Button
+                    onClick={handleNewBatch}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl px-6 py-2 font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Batch
+                  </Button>
+                </div>
               </div>
-              
-              {stuckBatchCount > 0 && (
-                <Button
-                  onClick={detectAndFixFailedBatches}
-                  variant="outline"
-                  size="sm"
-                  className="bg-orange-500/20 border-orange-500/30 text-orange-300 hover:bg-orange-500/30 px-4 py-2 font-medium transition-all duration-300"
-                >
-                  <AlertTriangle className="w-4 h-4 mr-2" />
-                  Fix {stuckBatchCount} Stuck Batch{stuckBatchCount > 1 ? 'es' : ''}
-                </Button>
-              )}
             </div>
             
             <DashboardBatchList 

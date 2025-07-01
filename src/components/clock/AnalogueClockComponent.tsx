@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useTimezone } from '@/hooks/useTimezone';
 
@@ -6,12 +5,14 @@ interface AnalogueClockComponentProps {
   onMeltdownTrigger?: () => void;
   isMeltdownAvailable?: boolean;
   clockColor?: string;
+  hideDigitalDisplay?: boolean;
 }
 
 const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
   onMeltdownTrigger,
   isMeltdownAvailable = true,
-  clockColor = "#10B981"
+  clockColor = "#10B981",
+  hideDigitalDisplay = false
 }) => {
   const { getCurrentTime, getTimezoneAbbr } = useTimezone();
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -20,25 +21,23 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Update time every 16ms for smooth second hand
   useEffect(() => {
     const updateTime = () => setCurrentTime(new Date());
     updateTime();
     
-    const interval = setInterval(updateTime, 16); // 60fps
+    const interval = setInterval(updateTime, 16);
     return () => clearInterval(interval);
   }, []);
 
-  // Calculate hand positions
   const getHandPositions = () => {
     const seconds = currentTime.getSeconds() + currentTime.getMilliseconds() / 1000;
     const minutes = currentTime.getMinutes() + seconds / 60;
     const hours = (currentTime.getHours() % 12) + minutes / 60;
 
     return {
-      secondAngle: (seconds * 6) - 90, // 6 degrees per second
-      minuteAngle: (minutes * 6) - 90, // 6 degrees per minute
-      hourAngle: (hours * 30) - 90 // 30 degrees per hour
+      secondAngle: (seconds * 6) - 90,
+      minuteAngle: (minutes * 6) - 90,
+      hourAngle: (hours * 30) - 90
     };
   };
 
@@ -50,15 +49,13 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
     setIsHovering(true);
     setHoverProgress(0);
     
-    // Progress timer (updates every 100ms)
     progressTimerRef.current = setInterval(() => {
       setHoverProgress(prev => {
-        const newProgress = prev + (100 / 13000) * 100; // 13 seconds total
+        const newProgress = prev + (100 / 13000) * 100;
         return Math.min(newProgress, 100);
       });
     }, 100);
     
-    // Meltdown trigger timer (13 seconds)
     hoverTimerRef.current = setTimeout(() => {
       onMeltdownTrigger?.();
       setHoverProgress(0);
@@ -256,30 +253,30 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
         </svg>
       </div>
       
-      {/* Professional Time Display - Grid Aligned */}
-      <div className="text-right space-y-2 min-w-[140px]">
-        {/* Primary Time Information */}
-        <div className="space-y-1">
-          <div className="text-lg font-mono font-semibold text-white tracking-wide">
-            {formatTime()}
+      {/* Conditional Digital Time Display */}
+      {!hideDigitalDisplay && (
+        <div className="text-right space-y-2 min-w-[140px]">
+          <div className="space-y-1">
+            <div className="text-lg font-mono font-semibold text-white tracking-wide">
+              {formatTime()}
+            </div>
+            <div className="text-sm text-gray-300 font-medium">
+              {formatDate()} • {getTimezoneAbbr()}
+            </div>
           </div>
-          <div className="text-sm text-gray-300 font-medium">
-            {formatDate()} • {getTimezoneAbbr()}
-          </div>
-        </div>
-        
-        {/* Status Display with Professional Spacing */}
-        <div className="pt-2 border-t border-gray-600/30">
-          <div className="text-xs text-gray-400 font-mono leading-relaxed">
-            <div className="text-gray-500">Sector 7-G</div>
-            <div className="text-emerald-400 font-medium" style={{ 
-              textShadow: '0 0 8px rgba(52, 211, 153, 0.4)' 
-            }}>
-              Reactor: Stable
+          
+          <div className="pt-2 border-t border-gray-600/30">
+            <div className="text-xs text-gray-400 font-mono leading-relaxed">
+              <div className="text-gray-500">Sector 7-G</div>
+              <div className="text-emerald-400 font-medium" style={{ 
+                textShadow: '0 0 8px rgba(52, 211, 153, 0.4)' 
+              }}>
+                Reactor: Stable
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
