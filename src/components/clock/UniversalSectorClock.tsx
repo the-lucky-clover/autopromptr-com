@@ -4,7 +4,7 @@ import ClockDisplay from './EnhancedClockDisplay';
 import ClockStatusDisplay from './EnhancedClockStatusDisplay';
 import ClockHoverHandler from './ClockHoverHandler';
 import ClockAudio from './ClockAudio';
-import { MeltdownPhases } from './MeltdownPhases';
+import MeltdownPhases from './MeltdownPhases';
 
 interface UniversalSectorClockProps {
   clockColor?: string;

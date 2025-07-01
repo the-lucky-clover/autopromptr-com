@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTimezone } from '@/hooks/useTimezone';
-import ClockDisplay from './clock/ClockDisplay';
+import AnimatedDropdownClockDisplay from './AnimatedDropdownClockDisplay';
 import MeltdownPhases from './clock/MeltdownPhases';
 
 interface AnimatedDropdownClockProps {
@@ -122,7 +122,7 @@ const AnimatedDropdownClock = ({ enableEasterEgg = false }: AnimatedDropdownCloc
             ? 'bg-red-900/30 border-red-500/40' 
             : 'bg-black/20 border-white/20'
         }`}>
-          <ClockDisplay
+          <AnimatedDropdownClockDisplay
             currentTime={currentTime}
             formatDate={formatDate}
             getTimezoneAbbr={getTimezoneAbbr}
