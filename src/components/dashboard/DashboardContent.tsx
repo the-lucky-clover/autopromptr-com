@@ -1,75 +1,43 @@
 
 import React from 'react';
-import DashboardBatchManager from "@/components/DashboardBatchManager";
-import SystemLogsPanel from "@/components/SystemLogsPanel";
-import HealthStatusDashboardWrapper from "@/components/HealthStatusDashboardWrapper";
-import DashboardSubscription from "@/components/DashboardSubscription";
-import DashboardStatsModule from "@/components/DashboardStatsModule";
-import SystemReliabilityScore from "@/components/SystemReliabilityScore";
-import BatchExtractorModule from "@/components/BatchExtractorModule";
-import AnalyticsModule from "@/components/AnalyticsModule";
-import { DashboardModule } from '@/hooks/useDashboardModules';
+import { useDashboardLayout } from '@/hooks/useDashboardLayout';
+import { useDashboardModules } from '@/hooks/useDashboardModules';
+import CleanDashboardWelcomeCard from './CleanDashboardWelcomeCard';
+import { StaticDashboardLayout } from './StaticDashboardLayout';
+import { OverviewDashboardLayout } from './OverviewDashboardLayout';
 
-interface DashboardContentProps {
-  visibleModules: DashboardModule[];
-  stats: {
-    totalBatches: number;
-    activeBatches: number;
-    completedBatches: number;
-    totalPrompts: number;
-  };
-  batches: any[];
-  hasActiveBatch: boolean;
-  onStatsUpdate: (stats: any) => void;
-  onBatchesUpdate: (batches: any[]) => void;
-}
+const DashboardContent = () => {
+  const { layout } = useDashboardLayout();
+  const { availableModules, isModuleEnabled } = useDashboardModules();
 
-const DashboardContent = ({
-  visibleModules,
-  stats,
-  batches,
-  hasActiveBatch,
-  onStatsUpdate,
-  onBatchesUpdate
-}: DashboardContentProps) => {
-  const renderModuleContent = (moduleId: string, componentName: string, isMinimized: boolean) => {
-    switch (componentName) {
-      case 'DashboardBatchManager':
-        return (
-          <DashboardBatchManager 
-            onStatsUpdate={onStatsUpdate} 
-            onBatchesUpdate={onBatchesUpdate}
-            isCompact={isMinimized}
-          />
-        );
-      
-      case 'HealthStatusDashboard':
-        return <HealthStatusDashboardWrapper isCompact={isMinimized} />;
-      
-      case 'SystemLogsPanel':
-        return <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} isCompact={isMinimized} />;
-      
-      case 'DashboardSubscription':
-        return <DashboardSubscription isCompact={isMinimized} />;
-      
-      case 'DashboardStatsModule':
-        return <DashboardStatsModule stats={stats} isCompact={isMinimized} />;
+  // Always show the welcome card at the top for all layouts
+  const welcomeModule = (
+    <div key="welcome" className="col-span-full">
+      <CleanDashboardWelcomeCard />
+    </div>
+  );
 
-      case 'SystemReliabilityScore':
-        return <SystemReliabilityScore isCompact={isMinimized} />;
+  if (layout === 'overview') {
+    return (
+      <div className="space-y-6">
+        {welcomeModule}
+        <OverviewDashboardLayout 
+          availableModules={availableModules}
+          isModuleEnabled={isModuleEnabled}
+        />
+      </div>
+    );
+  }
 
-      case 'BatchExtractorModule':
-        return <BatchExtractorModule isCompact={isMinimized} />;
-
-      case 'AnalyticsModule':
-        return <AnalyticsModule isCompact={isMinimized} />;
-      
-      default:
-        return <div>Module content not found</div>;
-    }
-  };
-
-  return { renderModuleContent };
+  return (
+    <div className="space-y-6">
+      {welcomeModule}
+      <StaticDashboardLayout 
+        availableModules={availableModules}
+        isModuleEnabled={isModuleEnabled}
+      />
+    </div>
+  );
 };
 
 export default DashboardContent;

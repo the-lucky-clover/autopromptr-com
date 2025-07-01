@@ -450,23 +450,26 @@ export type Database = {
     }
     Functions: {
       cleanup_old_logs: {
-        Args: { days_to_keep?: number }
-        Returns: number
+        Args: Record<PropertyKey, never> | { days_to_keep: number }
+        Returns: undefined
       }
       get_batch_stats: {
-        Args: Record<PropertyKey, never> | { batch_uuid: string }
+        Args: Record<PropertyKey, never> | { batch_id: string }
         Returns: Json
       }
       get_user_role: {
         Args: { _user_id: string }
-        Returns: Database["public"]["Enums"]["app_role"]
+        Returns: string
       }
       has_role: {
-        Args: {
-          _user_id: string
-          _role: Database["public"]["Enums"]["app_role"]
-        }
+        Args:
+          | { _user_id: string; _role: Database["public"]["Enums"]["app_role"] }
+          | { user_id: string; roles: string[] }
         Returns: boolean
+      }
+      update_batch_status: {
+        Args: { batch_id: string; new_status: string }
+        Returns: undefined
       }
     }
     Enums: {

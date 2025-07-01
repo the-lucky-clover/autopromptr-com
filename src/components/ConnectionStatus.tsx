@@ -10,8 +10,8 @@ const connectionCircuitBreaker = {
   failures: 0,
   isOpen: false,
   lastFailure: 0,
-  maxFailures: 3, // Reduced from 5 to be more responsive
-  timeout: 300000 // 5 minutes instead of 10
+  maxFailures: 3,
+  timeout: 300000 // 5 minutes
 };
 
 export const ConnectionStatus = () => {
@@ -29,7 +29,6 @@ export const ConnectionStatus = () => {
     if (connectionCircuitBreaker.isOpen) {
       const now = Date.now();
       if (now - connectionCircuitBreaker.lastFailure > connectionCircuitBreaker.timeout) {
-        console.log('ConnectionStatus: Circuit breaker reset');
         connectionCircuitBreaker.isOpen = false;
         connectionCircuitBreaker.failures = 0;
         return true;
@@ -46,7 +45,6 @@ export const ConnectionStatus = () => {
     
     if (connectionCircuitBreaker.failures >= connectionCircuitBreaker.maxFailures) {
       connectionCircuitBreaker.isOpen = true;
-      console.log('ConnectionStatus: Circuit breaker opened');
     }
   };
 
@@ -74,7 +72,10 @@ export const ConnectionStatus = () => {
       setStatus('connected');
       recordConnectionSuccess();
     } catch (err) {
-      console.log('ConnectionStatus: Connection validation failed');
+      // Reduced logging - only log first failure
+      if (connectionCircuitBreaker.failures === 0) {
+        console.log('ConnectionStatus: Backend connection failed, enabling circuit breaker protection');
+      }
       setStatus('disconnected');
       recordConnectionFailure();
     }
@@ -89,8 +90,8 @@ export const ConnectionStatus = () => {
       return;
     }
 
-    // Check every 5 minutes instead of more frequently
-    const interval = setInterval(checkConnection, 300000);
+    // Check every 10 minutes instead of 5 to reduce API calls
+    const interval = setInterval(checkConnection, 600000);
     return () => clearInterval(interval);
   }, [user, isEmailVerified]);
 

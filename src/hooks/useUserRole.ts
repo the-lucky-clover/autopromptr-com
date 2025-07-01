@@ -25,13 +25,21 @@ export const useUserRole = () => {
         });
 
         if (error) {
-          console.error('Error fetching user role:', error);
+          // Reduced logging - only log once per session
+          if (!sessionStorage.getItem('roleErrorLogged')) {
+            console.log('User role fetch failed, using default role');
+            sessionStorage.setItem('roleErrorLogged', 'true');
+          }
           setRole('user'); // Default to user role on error
         } else {
           setRole(data || 'user');
         }
       } catch (error) {
-        console.error('Failed to fetch user role:', error);
+        // Reduced logging
+        if (!sessionStorage.getItem('roleErrorLogged')) {
+          console.log('User role system unavailable, using default role');
+          sessionStorage.setItem('roleErrorLogged', 'true');
+        }
         setRole('user');
       } finally {
         setLoading(false);
