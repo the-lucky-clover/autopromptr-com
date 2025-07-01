@@ -1,19 +1,18 @@
 
-
 import React, { useState, useCallback } from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
 import { useDashboardModules } from "@/hooks/useDashboardModules";
 import DashboardModuleWrapper from "@/components/DashboardModuleWrapper";
-import DashboardBatchManager from "@/components/DashboardBatchManager";
 import SystemLogsPanel from "@/components/SystemLogsPanel";
 import HealthStatusDashboardWrapper from "@/components/HealthStatusDashboardWrapper";
 import DashboardSubscription from "@/components/DashboardSubscription";
 import DashboardStatsModule from "@/components/DashboardStatsModule";
 import SystemReliabilityScore from "@/components/SystemReliabilityScore";
-import BatchExtractorModule from "@/components/BatchExtractorModule";
 import AnalyticsModule from "@/components/AnalyticsModule";
+import RecentActivity from "@/components/RecentActivity";
+import { Card, CardContent } from "@/components/ui/card";
 
 const Dashboard = () => {
   const { visibleModules, updateModuleState } = useDashboardModules();
@@ -37,17 +36,14 @@ const Dashboard = () => {
 
   const hasActiveBatch = batches.some(batch => batch.status === 'running');
 
+  // Filter out batch manager and extractor modules for overview
+  const overviewModules = visibleModules.filter(module => 
+    module.id !== 'batch-processor' && 
+    module.id !== 'batch-extractor'
+  );
+
   const renderModuleContent = (moduleId: string, componentName: string, isMinimized: boolean) => {
     switch (componentName) {
-      case 'DashboardBatchManager':
-        return (
-          <DashboardBatchManager 
-            onStatsUpdate={handleStatsUpdate} 
-            onBatchesUpdate={handleBatchesUpdate}
-            isCompact={isMinimized}
-          />
-        );
-      
       case 'HealthStatusDashboard':
         return <HealthStatusDashboardWrapper isCompact={isMinimized} />;
       
@@ -63,9 +59,6 @@ const Dashboard = () => {
       case 'SystemReliabilityScore':
         return <SystemReliabilityScore isCompact={isMinimized} />;
 
-      case 'BatchExtractorModule':
-        return <BatchExtractorModule isCompact={isMinimized} />;
-
       case 'AnalyticsModule':
         return <AnalyticsModule isCompact={isMinimized} />;
       
@@ -80,18 +73,43 @@ const Dashboard = () => {
         <div className="min-h-screen flex w-full">
           <AppSidebar />
           <SidebarInset className="flex-1">
-            <div className="p-6 space-y-6">
-              {visibleModules.map((module) => (
-                <DashboardModuleWrapper
-                  key={module.id}
-                  id={module.id}
-                  title={module.title}
-                  state={module.state}
-                  onStateChange={(newState) => updateModuleState(module.id, newState)}
-                >
-                  {renderModuleContent(module.id, module.component, module.state === 'minimized')}
-                </DashboardModuleWrapper>
-              ))}
+            {/* Welcome Banner */}
+            <Card className="m-6 mb-4 bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-white/20 rounded-xl">
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <h1 className="text-4xl font-bold text-white mb-2">
+                    Welcome to AutoPromptr
+                  </h1>
+                  <p className="text-purple-200 text-lg">
+                    Your intelligent batch processing dashboard - manage, monitor, and optimize your AI workflows
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Three Column Layout */}
+            <div className="px-6 pb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* Left Column - Main Content */}
+                <div className="lg:col-span-8 space-y-6">
+                  {overviewModules.map((module) => (
+                    <DashboardModuleWrapper
+                      key={module.id}
+                      id={module.id}
+                      title={module.title}
+                      state={module.state}
+                      onStateChange={(newState) => updateModuleState(module.id, newState)}
+                    >
+                      {renderModuleContent(module.id, module.component, module.state === 'minimized')}
+                    </DashboardModuleWrapper>
+                  ))}
+                </div>
+
+                {/* Right Column - Recent Activity */}
+                <div className="lg:col-span-4">
+                  <RecentActivity />
+                </div>
+              </div>
             </div>
           </SidebarInset>
         </div>
@@ -102,4 +120,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

@@ -118,23 +118,16 @@ export const useBatchExtraction = () => {
       return;
     }
 
-    if (!batchName.trim()) {
+    // Only validate target URL/platform for processing, not for saving
+    const hasTarget = targetUrl.trim() || selectedPlatform;
+    
+    if (!hasTarget) {
       toast({
-        title: "Missing batch name",
-        description: "Please enter a name for your batch.",
+        title: "Missing target for processing",
+        description: "A target URL or platform is required to process batches. You can save the batch without a target, but it cannot be processed until a target is specified.",
         variant: "destructive",
       });
-      return;
-    }
-
-    // Validate that either URL or platform is selected
-    if (!targetUrl.trim() && !selectedPlatform) {
-      toast({
-        title: "Missing target",
-        description: "Please enter a target URL or select a platform.",
-        variant: "destructive",
-      });
-      return;
+      // Allow saving but prevent processing
     }
 
     setIsProcessing(true);
@@ -151,7 +144,8 @@ export const useBatchExtraction = () => {
         return;
       }
 
-      const effectiveUrl = getEffectiveTargetUrl();
+      const effectiveUrl = hasTarget ? getEffectiveTargetUrl() : '';
+      const effectiveName = batchName.trim() || `Untitled Batch ${new Date().toLocaleDateString()}`;
 
       // Create text prompts with proper structure
       const textPrompts: TextPrompt[] = extractedPrompts.map((prompt, index) => ({
@@ -163,11 +157,11 @@ export const useBatchExtraction = () => {
       // Create new batch
       const newBatch: Batch = {
         id: crypto.randomUUID(),
-        name: batchName,
+        name: effectiveName,
         targetUrl: effectiveUrl,
         description: `Extracted from batch extractor with ${textPrompts.length} prompts`,
         prompts: textPrompts,
-        status: 'pending',
+        status: hasTarget ? 'pending' : 'draft', // Use draft status if no target
         createdAt: new Date(),
         settings: {
           waitForIdle: true,
@@ -196,14 +190,13 @@ export const useBatchExtraction = () => {
       setSelectedPlatform('');
 
       // Show success message and navigate
-      const isLovableDefault = effectiveUrl === 'https://lovable.dev';
-      const platformName = selectedPlatform ? getPlatformName(selectedPlatform) : 'Lovable';
+      const statusMessage = hasTarget 
+        ? `Extracted ${textPrompts.length} prompts and saved as "${effectiveName}". Ready for processing.`
+        : `Extracted ${textPrompts.length} prompts and saved as "${effectiveName}". Add a target URL to enable processing.`;
       
       toast({
         title: "Batch created successfully!",
-        description: isLovableDefault 
-          ? `Extracted ${textPrompts.length} prompts for new ${platformName} project. You'll be prompted to update the project URL after automation starts.`
-          : `Extracted ${textPrompts.length} prompts for "${batchName}". Navigating to dashboard...`,
+        description: statusMessage,
       });
 
       // Navigate to dashboard after a short delay
@@ -211,7 +204,7 @@ export const useBatchExtraction = () => {
         navigate('/dashboard');
       }, 1500);
 
-      console.log(`Successfully extracted ${textPrompts.length} prompts and created batch "${batchName}" with target URL: ${effectiveUrl}`);
+      console.log(`Successfully extracted ${textPrompts.length} prompts and created batch "${effectiveName}" with target URL: ${effectiveUrl || 'None (draft mode)'}`);
 
     } catch (error) {
       console.error('Error during batch extraction:', error);

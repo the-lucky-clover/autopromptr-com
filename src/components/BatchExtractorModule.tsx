@@ -43,10 +43,10 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl relative overflow-hidden shadow-lg shadow-black/20">
-      {/* BETA Banner - Centered */}
-      <div className="absolute top-0 right-0 w-32 h-20 overflow-hidden">
-        <div className="absolute top-3 right-[-32px] bg-orange-500/90 text-white text-xs font-mono font-bold px-12 py-1 transform rotate-45 shadow-lg flex items-center justify-center">
-          beta
+      {/* BETA Banner - Wider and Centered */}
+      <div className="absolute top-0 right-0 w-48 h-24 overflow-hidden">
+        <div className="absolute top-4 right-[-48px] bg-orange-500/90 text-white text-sm font-mono font-bold px-20 py-2 transform rotate-45 shadow-lg flex items-center justify-center">
+          BETA
         </div>
       </div>
       
@@ -54,11 +54,11 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
         {/* Batch Name and Target URL on same row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-white text-xs font-medium">Batch Name</Label>
+            <Label className="text-white text-xs font-medium">Batch Name (Optional)</Label>
             <Input
               value={batchName}
               onChange={(e) => setBatchName(e.target.value)}
-              placeholder="Enter batch name..."
+              placeholder="Enter batch name (optional)..."
               className={`bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl shadow-md ${isCompact ? 'h-8 text-xs' : 'h-10'}`}
             />
           </div>

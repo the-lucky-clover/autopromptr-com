@@ -55,10 +55,10 @@ const BatchExtractorPageContent = ({
 
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl relative overflow-hidden max-w-4xl">
-      {/* BETA Banner */}
-      <div className="absolute top-0 right-0 w-40 h-20 overflow-hidden pointer-events-none">
-        <div className="absolute top-3 right-[-40px] bg-orange-500/90 text-white text-xs font-mono font-bold px-16 py-1 transform rotate-45 shadow-lg">
-          beta
+      {/* BETA Banner - Wider and Centered */}
+      <div className="absolute top-0 right-0 w-48 h-24 overflow-hidden pointer-events-none">
+        <div className="absolute top-4 right-[-48px] bg-orange-500/90 text-white text-sm font-mono font-bold px-20 py-2 transform rotate-45 shadow-lg">
+          BETA
         </div>
       </div>
       
@@ -72,7 +72,7 @@ const BatchExtractorPageContent = ({
           <Input
             value={batchName}
             onChange={(e) => setBatchName(e.target.value)}
-            placeholder="Enter batch name..."
+            placeholder="Enter batch name (optional)..."
             className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl h-12 text-base"
           />
         </div>
@@ -90,11 +90,11 @@ const BatchExtractorPageContent = ({
                 setSelectedPlatform('');
               }
             }}
-            placeholder="https://lovable.dev (or leave empty to select platform)"
+            placeholder="https://lovable.dev (optional - required for processing)"
             className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl h-12 text-base"
           />
           <p className="text-white/60 text-xs">
-            Enter a specific project URL, or leave empty to select a platform below for new projects.
+            Enter a specific project URL, or leave empty to select a platform below. Target is required for processing but optional for saving.
           </p>
         </div>
 
