@@ -25,7 +25,7 @@ const DashboardWelcomeModule = ({ title, subtitle }: DashboardWelcomeModuleProps
 
   return (
     <Card 
-      className="bg-white/10 backdrop-blur-sm border-white/20 relative overflow-hidden mb-6 mx-6 rounded-xl hover:shadow-indigo-500/20 transition-all duration-300"
+      className="bg-white/10 backdrop-blur-sm border-white/20 relative overflow-hidden mb-8 mx-8 rounded-xl hover:shadow-indigo-500/20 transition-all duration-300 hover-shimmer-card"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
@@ -40,18 +40,18 @@ const DashboardWelcomeModule = ({ title, subtitle }: DashboardWelcomeModuleProps
         enabled={videoSettings.enabled}
       />
       
-      <CardContent className="p-8 relative z-10">
-        <div className="min-h-[200px] flex items-center relative">
-          {/* Clock positioned in upper-right corner */}
+      <CardContent className="p-10 relative z-10">
+        <div className="min-h-[220px] flex items-center relative">
+          {/* Clock positioned in upper-right corner with better spacing */}
           <div className="absolute top-0 right-0 z-20">
             <UniversalSectorClock />
           </div>
           
-          <div className="space-y-6 flex-1 pr-40">
-            <div className="space-y-4">
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white drop-shadow-lg">
+          <div className="space-y-8 flex-1 pr-48">
+            <div className="space-y-6">
+              <h1 className="text-5xl md:text-6xl font-bold leading-tight text-white drop-shadow-lg">
                 <span 
-                  className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent drop-shadow-none"
+                  className="hover-shimmer-text bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent drop-shadow-none"
                   style={{
                     backgroundImage: 'linear-gradient(90deg, #3B82F6, #EC4899)',
                     WebkitBackgroundClip: 'text',
@@ -62,11 +62,12 @@ const DashboardWelcomeModule = ({ title, subtitle }: DashboardWelcomeModuleProps
                   {title}
                 </span>
               </h1>
-              {/* Clean Professional Subheading */}
-              <div className="ml-12">
-                <p className="text-purple-200/90 text-lg font-medium leading-relaxed drop-shadow-md">
+              {/* Professional Subheading with improved spacing */}
+              <div className="ml-16 space-y-2">
+                <p className="text-purple-200/90 text-xl font-semibold leading-relaxed drop-shadow-md">
                   {subtitle}
                 </p>
+                <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
               </div>
             </div>
           </div>

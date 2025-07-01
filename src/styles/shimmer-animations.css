@@ -1,12 +1,38 @@
 
 @layer base {
-  /* Shimmer animations for logo - Much more subtle and rare */
-  .animate-shimmer {
+  /* Hover-only shimmer animations - Much more subtle and professional */
+  .hover-shimmer {
     position: relative;
     overflow: hidden;
+    transition: all 0.3s ease;
   }
 
-  .animate-shimmer::before {
+  .hover-shimmer:hover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      transparent,
+      rgba(255, 255, 255, 0.03),
+      transparent,
+      transparent
+    );
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    animation: shimmerHover 1.2s ease-out;
+  }
+
+  .hover-shimmer-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .hover-shimmer-card:hover::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -22,16 +48,39 @@
       transparent
     );
     transform: translateX(-100%) translateY(-100%) rotate(45deg);
-    animation: shimmer 8s ease-in-out infinite;
-    animation-delay: 8s;
+    animation: shimmerHover 1s ease-out;
   }
 
-  .animate-shimmer-delayed {
+  /* Button hover shimmer - Very subtle */
+  .hover-shimmer-button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+
+  .hover-shimmer-button:hover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    animation: shimmerButton 0.6s ease-out;
+  }
+
+  /* Remove old continuous animations - keep for backward compatibility but make them hover-only */
+  .animate-shimmer {
     position: relative;
     overflow: hidden;
   }
 
-  .animate-shimmer-delayed::before {
+  .animate-shimmer:hover::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -42,16 +91,39 @@
       45deg,
       transparent,
       transparent,
-      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.03),
       transparent,
       transparent
     );
     transform: translateX(-100%) translateY(-100%) rotate(45deg);
-    animation: shimmer 8s ease-in-out infinite;
-    animation-delay: 12s;
+    animation: shimmerHover 1s ease-out;
   }
 
-  /* Animated shimmer text effect for logo - More subtle */
+  .animate-shimmer-delayed {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .animate-shimmer-delayed:hover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      transparent,
+      rgba(255, 255, 255, 0.04),
+      transparent,
+      transparent
+    );
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    animation: shimmerHover 1.2s ease-out;
+  }
+
+  /* Keep shimmer text but make it less intense */
   .animate-shimmer-text {
     background: linear-gradient(
       90deg,
@@ -65,24 +137,45 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmerText 6s ease-in-out infinite;
+    filter: drop-shadow(0 0 2px rgba(168, 85, 247, 0.1));
+  }
+
+  .animate-shimmer-text:hover {
+    animation: shimmerText 2s ease-in-out;
     filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.2));
   }
 
-  /* Glow animation for buttons - More subtle */
-  .animate-glow {
-    animation: glow 3s ease-in-out infinite alternate;
+  /* Professional glow animation for buttons - hover only */
+  .hover-glow:hover {
+    animation: glow 1s ease-in-out;
   }
 }
 
-@keyframes shimmer {
-  0%, 85%, 100% {
+@keyframes shimmerHover {
+  0% {
     transform: translateX(-100%) translateY(-100%) rotate(45deg);
     opacity: 0;
   }
-  5%, 10% {
-    transform: translateX(100%) translateY(100%) rotate(45deg);
+  50% {
     opacity: 1;
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmerButton {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
   }
 }
 
@@ -97,9 +190,12 @@
 
 @keyframes glow {
   0% {
-    box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.4), 0 0 24px rgba(59, 130, 246, 0.1);
   }
   100% {
-    box-shadow: 0 0 25px rgba(168, 85, 247, 0.6), 0 0 35px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);
   }
 }

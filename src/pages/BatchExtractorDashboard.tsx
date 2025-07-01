@@ -17,7 +17,7 @@ const BatchExtractorDashboard = () => {
               subtitle="Extract and process multiple prompts from large text blocks"
             />
             
-            <div className="p-8">
+            <div className="px-8 pb-8">
               <div className="max-w-full">
                 <BatchExtractorModule isCompact={false} />
               </div>

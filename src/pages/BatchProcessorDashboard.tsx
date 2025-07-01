@@ -47,13 +47,13 @@ const BatchProcessorDashboard = () => {
               subtitle="Batch Automation Dashboard - Manage and execute your prompt batches"
             />
             
-            <div className="p-8 space-y-8">
-              {/* Batch Controls Module */}
+            <div className="px-8 pb-8 space-y-8">
+              {/* Batch Controls Module with professional spacing */}
               <BatchProcessorControlBar 
                 onRefresh={handleRefresh}
               />
               
-              {/* Your Batches Module */}
+              {/* Your Batches Module with improved spacing */}
               <YourBatchesModule 
                 onStatsUpdate={handleStatsUpdate} 
                 onBatchesUpdate={handleBatchesUpdate}
