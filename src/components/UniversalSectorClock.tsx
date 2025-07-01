@@ -174,11 +174,9 @@ const UniversalSectorClock = () => {
         />
       )}
 
-      {/* Clock - Now positioned within welcome module, not fixed */}
+      {/* Clock - Synchronized with welcome module hover transforms */}
       <div 
-        className={`transition-all duration-400 ease-out pointer-events-auto select-none cursor-pointer ${
-          isHovered ? 'transform perspective-800 -rotate-x-3 translate-y-2 scale-102' : ''
-        } ${
+        className={`pointer-events-auto select-none cursor-pointer ${
           showMeltdown ? 'animate-pulse scale-110 rotate-12' : ''
         }`}
         style={{
@@ -189,7 +187,11 @@ const UniversalSectorClock = () => {
             ? '0 0 12px rgba(255, 0, 255, 0.8), 0 0 24px rgba(0, 255, 255, 0.6)' 
             : '0 0 8px rgba(0, 255, 65, 0.6), 0 0 16px rgba(0, 255, 65, 0.3)',
           filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8))',
-          transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          // Synchronized with welcome module transforms - same easing and duration
+          transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          // Match the welcome module's hover transform pattern
+          transform: isHovered ? 'translateY(2px) scale(1.02)' : 'translateY(0) scale(1)',
+          transformOrigin: 'center'
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
