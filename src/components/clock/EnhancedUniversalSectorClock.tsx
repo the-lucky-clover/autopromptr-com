@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import ClockDisplay from './EnhancedClockDisplay';
-import ClockStatusDisplay from './EnhancedClockStatusDisplay';
+import ClockDisplay from './ClockDisplay';
+import ClockStatusDisplay from './ClockStatusDisplay';
 import ClockHoverHandler from './ClockHoverHandler';
 import ClockAudio from './ClockAudio';
 import { MeltdownPhases } from './MeltdownPhases';

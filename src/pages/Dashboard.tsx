@@ -14,7 +14,7 @@ import QuickActionsModule from "@/components/dashboard/QuickActionsModule";
 import RecentActivity from "@/components/RecentActivity";
 import StaticDashboardLayout from "@/components/dashboard/StaticDashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import CleanDashboardWelcomeCard from "@/components/dashboard/CleanDashboardWelcomeCard";
+import DashboardWelcomeModule from "@/components/dashboard/DashboardWelcomeModule";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 
@@ -81,7 +81,11 @@ const Dashboard = () => {
             
             <ErrorBoundary>
               <div className="animate-shimmer">
-                <CleanDashboardWelcomeCard />
+                <DashboardWelcomeModule
+                  title="AutoPromptr Dashboard"
+                  subtitle="Welcome to your automation command center. Monitor, manage, and optimize your AI-powered workflows."
+                  clockColor="#10B981" // Green for main dashboard
+                />
               </div>
             </ErrorBoundary>
 

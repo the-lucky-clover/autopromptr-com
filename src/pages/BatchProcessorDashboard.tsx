@@ -1,70 +1,34 @@
 
-import { useState, useCallback } from 'react';
+import React from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
-import BatchProcessorControlBar from "@/components/BatchProcessorControlBar";
-import YourBatchesModule from "@/components/YourBatchesModule";
+import DashboardBatchManager from "@/components/DashboardBatchManager";
 import DashboardWelcomeModule from "@/components/dashboard/DashboardWelcomeModule";
 
 const BatchProcessorDashboard = () => {
-  const [stats, setStats] = useState({
-    totalBatches: 0,
-    activeBatches: 0,
-    completedBatches: 0,
-    totalPrompts: 0
-  });
-  
-  const [batches, setBatches] = useState<any[]>([]);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-  const handleStatsUpdate = useCallback((newStats: typeof stats) => {
-    setStats(newStats);
-  }, []);
-
-  const handleBatchesUpdate = useCallback((newBatches: any[]) => {
-    setBatches(newBatches);
-  }, []);
-
-  const handleRefresh = useCallback(() => {
-    setRefreshTrigger(prev => prev + 1);
-  }, []);
-
-  const handleNewBatch = useCallback(() => {
-    if (window.dashboardNewBatchHandler) {
-      window.dashboardNewBatchHandler();
-    }
-  }, []);
-
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
+    <div 
+      className="min-h-screen relative animate-shimmer"
+      style={{ 
+        background: 'linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%)' 
+      }}
+    >
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
           <AppSidebar />
-          <SidebarInset className="flex-1">
-            <DashboardWelcomeModule 
-              title="Automation" 
-              subtitle="Batch Automation Dashboard - Manage and execute your prompt batches"
+          <SidebarInset className="flex-1 relative">
+            <DashboardWelcomeModule
+              title="Batch Processor"
+              subtitle="Create, manage, and execute automated prompt batches across multiple AI platforms."
+              clockColor="#F59E0B" // Bright amber for automation dashboard
             />
             
-            <div className="px-8 pb-8 space-y-8">
-              {/* Batch Controls Module with professional spacing */}
-              <BatchProcessorControlBar 
-                onRefresh={handleRefresh}
-              />
-              
-              {/* Your Batches Module with improved spacing */}
-              <YourBatchesModule 
-                onStatsUpdate={handleStatsUpdate} 
-                onBatchesUpdate={handleBatchesUpdate}
-                onNewBatchRequest={handleNewBatch}
-                refreshTrigger={refreshTrigger}
-              />
+            <div className="px-6">
+              <DashboardBatchManager />
             </div>
           </SidebarInset>
         </div>
       </SidebarProvider>
-      <FloatingConsoleButton />
     </div>
   );
 };

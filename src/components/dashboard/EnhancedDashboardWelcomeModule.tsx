@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import UniversalSectorClock from "@/components/clock/EnhancedUniversalSectorClock";
+import UniversalSectorClock from "@/components/clock/UniversalSectorClock";
 
 interface DashboardWelcomeModuleProps {
   title: string;

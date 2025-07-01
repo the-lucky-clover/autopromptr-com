@@ -1,231 +1,209 @@
 
-import { useState } from "react";
+import React, { useState } from 'react';
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Phone, MapPin, Send, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { Mail, MessageSquare, Send } from "lucide-react";
+import DashboardWelcomeModule from "@/components/dashboard/DashboardWelcomeModule";
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: ""
-  });
-  const [captchaAnswer, setCaptchaAnswer] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [e.target.name]: e.target.value
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSubmitting(true);
 
     try {
-      console.log("Submitting contact form with data:", formData);
-      
-      const { data, error } = await supabase.functions.invoke('send-contact-email', {
-        body: {
-          ...formData,
-          captcha: parseInt(captchaAnswer)
-        }
+      const { error } = await supabase.functions.invoke('send-contact-email', {
+        body: formData
       });
 
-      if (error) {
-        console.error("Supabase function error:", error);
-        throw error;
-      }
-
-      console.log("Contact form submitted successfully:", data);
+      if (error) throw error;
 
       toast({
-        title: "Message Sent!",
-        description: "Thank you for your message. We'll get back to you soon.",
+        title: "Message sent successfully!",
+        description: "We'll get back to you as soon as possible.",
       });
-      
+
       setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: ""
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
       });
-      setCaptchaAnswer("");
-    } catch (error: any) {
-      console.error("Contact form submission error:", error);
+    } catch (error) {
+      console.error('Error sending message:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to send message. Please try again.",
+        title: "Failed to send message",
+        description: "Please try again later or contact us directly.",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #7c3aed 100%)' }}>
-      <Navbar />
-      
-      <main className="pt-20 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-white mb-4">
-              Get in Touch
-            </h1>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Have questions about AutoPromptr? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Contact Information */}
-            <div className="lg:col-span-1">
-              <Card className="glass-effect border-purple-500/20">
-                <CardHeader>
-                  <CardTitle className="text-white">Contact Information</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Reach out to us through any of these channels
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <Mail className="w-5 h-5 text-purple-400" />
-                    <span className="text-gray-300">thepremiumbrand@gmail.com</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Phone className="w-5 h-5 text-purple-400" />
-                    <span className="text-gray-300">+1 (555) 123-4567</span>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <MapPin className="w-5 h-5 text-purple-400 mt-1" />
-                    <span className="text-gray-300">
-                      123 Innovation Drive<br />
-                      San Francisco, CA 94105
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Contact Form */}
-            <div className="lg:col-span-2">
-              <Card className="glass-effect border-purple-500/20">
-                <CardHeader>
-                  <CardTitle className="text-white">Send us a Message</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Fill out the form below and we'll get back to you within 24 hours
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div 
+      className="min-h-screen relative animate-shimmer"
+      style={{ 
+        background: 'linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%)' 
+      }}
+    >
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
+          <SidebarInset className="flex-1 relative">
+            <DashboardWelcomeModule
+              title="Contact"
+              subtitle="Get in touch with our team for support, feedback, or inquiries."
+              clockColor="#3B82F6" // Blue for contact dashboard
+            />
+            
+            <div className="px-6 pb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5" />
+                      Send us a message
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="name" className="text-gray-300">Name</Label>
+                          <Input
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                            className="bg-gray-900 border-gray-600 text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="email" className="text-gray-300">Email</Label>
+                          <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                            className="bg-gray-900 border-gray-600 text-white"
+                          />
+                        </div>
+                      </div>
+                      
                       <div>
-                        <Label htmlFor="name" className="text-gray-300">Name</Label>
+                        <Label htmlFor="subject" className="text-gray-300">Subject</Label>
                         <Input
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                          placeholder="Your full name"
+                          id="subject"
+                          name="subject"
+                          value={formData.subject}
+                          onChange={handleChange}
                           required
+                          className="bg-gray-900 border-gray-600 text-white"
                         />
                       </div>
+                      
                       <div>
-                        <Label htmlFor="email" className="text-gray-300">Email</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                          placeholder="your@email.com"
+                        <Label htmlFor="message" className="text-gray-300">Message</Label>
+                        <Textarea
+                          id="message"
+                          name="message"
+                          value={formData.message}
+                          onChange={handleChange}
                           required
+                          rows={6}
+                          className="bg-gray-900 border-gray-600 text-white"
                         />
                       </div>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="subject" className="text-gray-300">Subject</Label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleInputChange}
-                        className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                        placeholder="What's this about?"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="message" className="text-gray-300">Message</Label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        rows={6}
-                        className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                        placeholder="Tell us more about your inquiry..."
-                        required
-                      />
-                    </div>
+                      
+                      <Button 
+                        type="submit" 
+                        disabled={isSubmitting}
+                        className="w-full"
+                      >
+                        <Send className="h-4 w-4 mr-2" />
+                        {isSubmitting ? 'Sending...' : 'Send Message'}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
 
-                    {/* Simple Captcha */}
+                <Card className="bg-gray-800/50 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Mail className="h-5 w-5" />
+                      Contact Information
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Other ways to reach us
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
                     <div>
-                      <Label htmlFor="captcha" className="text-gray-300 flex items-center space-x-2">
-                        <Shield className="w-4 h-4" />
-                        <span>Security Check: What is 7 + 3?</span>
-                      </Label>
-                      <Input
-                        id="captcha"
-                        type="number"
-                        value={captchaAnswer}
-                        onChange={(e) => setCaptchaAnswer(e.target.value)}
-                        className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                        placeholder="Enter the answer"
-                        required
-                      />
+                      <h3 className="text-lg font-semibold text-white mb-2">Support</h3>
+                      <p className="text-gray-400">
+                        For technical support and bug reports
+                      </p>
+                      <p className="text-blue-400">support@autopromptr.com</p>
                     </div>
                     
-                    <Button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-3 rounded-lg transition-all duration-200 disabled:opacity-50"
-                    >
-                      {isLoading ? (
-                        "Sending..."
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4 mr-2" />
-                          Send Message
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-2">Sales</h3>
+                      <p className="text-gray-400">
+                        For pricing and business inquiries
+                      </p>
+                      <p className="text-blue-400">sales@autopromptr.com</p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-2">General</h3>
+                      <p className="text-gray-400">
+                        For general questions and feedback
+                      </p>
+                      <p className="text-blue-400">hello@autopromptr.com</p>
+                    </div>
+                    
+                    <div className="pt-4 border-t border-gray-700">
+                      <p className="text-sm text-gray-400">
+                        We typically respond within 24 hours during business days.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </div>
+          </SidebarInset>
         </div>
-      </main>
-      
-      <Footer />
+      </SidebarProvider>
     </div>
   );
 };

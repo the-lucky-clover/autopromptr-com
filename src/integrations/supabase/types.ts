@@ -11,28 +11,55 @@ export type Database = {
     Tables: {
       automation_logs: {
         Row: {
+          ai_assistant_type: string | null
           batch_id: string | null
           id: string
           level: string
           message: string
           metadata: Json | null
+          prompt_sent_at: string | null
+          prompt_text: string | null
+          response_received_at: string | null
+          response_text: string | null
+          success_status: string | null
+          target_url: string | null
+          time_saved_seconds: number | null
           timestamp: string | null
+          user_id: string | null
         }
         Insert: {
+          ai_assistant_type?: string | null
           batch_id?: string | null
           id?: string
           level: string
           message: string
           metadata?: Json | null
+          prompt_sent_at?: string | null
+          prompt_text?: string | null
+          response_received_at?: string | null
+          response_text?: string | null
+          success_status?: string | null
+          target_url?: string | null
+          time_saved_seconds?: number | null
           timestamp?: string | null
+          user_id?: string | null
         }
         Update: {
+          ai_assistant_type?: string | null
           batch_id?: string | null
           id?: string
           level?: string
           message?: string
           metadata?: Json | null
+          prompt_sent_at?: string | null
+          prompt_text?: string | null
+          response_received_at?: string | null
+          response_text?: string | null
+          success_status?: string | null
+          target_url?: string | null
+          time_saved_seconds?: number | null
           timestamp?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -176,6 +203,45 @@ export type Database = {
           is_active?: boolean | null
           platform?: string
           session_data?: Json | null
+        }
+        Relationships: []
+      }
+      productivity_metrics: {
+        Row: {
+          created_at: string | null
+          date: string
+          failed_prompts: number | null
+          id: string
+          platforms_used: Json | null
+          successful_prompts: number | null
+          total_prompts_processed: number | null
+          total_time_saved_seconds: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string
+          failed_prompts?: number | null
+          id?: string
+          platforms_used?: Json | null
+          successful_prompts?: number | null
+          total_prompts_processed?: number | null
+          total_time_saved_seconds?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          failed_prompts?: number | null
+          id?: string
+          platforms_used?: Json | null
+          successful_prompts?: number | null
+          total_prompts_processed?: number | null
+          total_time_saved_seconds?: number | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }

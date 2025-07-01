@@ -1,50 +1,56 @@
 
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import React from 'react';
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { ProfileSettingsCard } from "@/components/settings/ProfileSettingsCard";
-import { APIConfigurationCard } from "@/components/settings/APIConfigurationCard";
-import { PreferencesCard } from "@/components/settings/PreferencesCard";
-import { NotificationsCard } from "@/components/settings/NotificationsCard";
-import { AutomationSettingsCard } from "@/components/settings/AutomationSettingsCard";
-import { BackendConfigurationCard } from "@/components/settings/BackendConfigurationCard";
-import { EnhancedAutomationCard } from "@/components/settings/EnhancedAutomationCard";
+import ProfileSettingsCard from "@/components/settings/ProfileSettingsCard";
+import PreferencesCard from "@/components/settings/PreferencesCard";
+import NotificationsCard from "@/components/settings/NotificationsCard";
+import AutomationSettingsCard from "@/components/settings/AutomationSettingsCard";
+import APIConfigurationCard from "@/components/settings/APIConfigurationCard";
+import ThemeCustomizationCard from "@/components/settings/ThemeCustomizationCard";
+import VideoBackgroundCard from "@/components/settings/VideoBackgroundCard";
 import DashboardResetCard from "@/components/settings/DashboardResetCard";
-import { LayoutSettingsCard } from "@/components/settings/LayoutSettingsCard";
-import { OverviewLayoutCard } from "@/components/settings/OverviewLayoutCard";
-import { ThemeCustomizationCard } from "@/components/settings/ThemeCustomizationCard";
-import { SecureApiKeyManager } from "@/components/security/SecureApiKeyManager";
-import { LocalSimulationCard } from "@/components/settings/LocalSimulationCard";
-import { VideoBackgroundCard } from "@/components/settings/VideoBackgroundCard";
-import TimezoneSettingsCard from "@/components/settings/TimezoneSettingsCard";
-import PromptEnhancementCard from "@/components/settings/PromptEnhancementCard";
-import { SidebarInset } from "@/components/ui/sidebar";
+import DashboardWelcomeModule from "@/components/dashboard/DashboardWelcomeModule";
 
 const Settings = () => {
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-        <AppSidebar />
-        <SidebarInset>
-          <div className="flex-1 space-y-8 p-8 pt-6">
-            <div className="space-y-0.5">
-              <h2 className="text-3xl font-bold tracking-tight text-white">Settings</h2>
-              <p className="text-purple-200">
-                Configure your AutoPromptr application settings and preferences.
-              </p>
-            </div>
+    <div 
+      className="min-h-screen relative animate-shimmer"
+      style={{ 
+        background: 'linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%)' 
+      }}
+    >
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
+          <SidebarInset className="flex-1 relative">
+            <DashboardWelcomeModule
+              title="Settings"
+              subtitle="Configure your AutoPromptr application settings and preferences."
+              clockColor="#EA580C" // Orange for settings dashboard
+            />
             
-            <div className="space-y-6">
-              <BackendConfigurationCard />
-              <PromptEnhancementCard />
-              <OverviewLayoutCard />
-              <TimezoneSettingsCard />
-              <VideoBackgroundCard />
-              <LocalSimulationCard />
+            <div className="px-6 pb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  <ProfileSettingsCard />
+                  <PreferencesCard />
+                  <NotificationsCard />
+                  <AutomationSettingsCard />
+                </div>
+                
+                <div className="space-y-6">
+                  <APIConfigurationCard />
+                  <ThemeCustomizationCard />
+                  <VideoBackgroundCard />
+                  <DashboardResetCard />
+                </div>
+              </div>
             </div>
-          </div>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    </div>
   );
 };
 
