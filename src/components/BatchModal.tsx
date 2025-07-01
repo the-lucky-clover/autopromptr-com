@@ -38,7 +38,7 @@ export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModa
     description: batch?.description || '',
     waitForIdle: batch?.settings?.waitForIdle ?? true,
     maxRetries: batch?.settings?.maxRetries || 3,
-    localAIAssistant: batch?.settings?.localAIAssistant || 'cursor',
+    localAIAssistant: batch?.settings?.localAIAssistant || 'cursor' as const,
   });
 
   const [prompts, setPrompts] = useState<TextPrompt[]>(
@@ -247,7 +247,12 @@ export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModa
               <Label htmlFor="localAIAssistant" className="text-base font-medium text-white">
                 Local AI Coding Assistant
               </Label>
-              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, localAIAssistant: value }))} defaultValue={formData.localAIAssistant}>
+              <Select 
+                onValueChange={(value: 'cursor' | 'windsurf' | 'github-copilot' | 'bolt-diy' | 'roocode') => 
+                  setFormData(prev => ({ ...prev, localAIAssistant: value }))
+                } 
+                defaultValue={formData.localAIAssistant}
+              >
                 <SelectTrigger className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg">
                   <SelectValue placeholder="Select AI assistant" />
                 </SelectTrigger>
