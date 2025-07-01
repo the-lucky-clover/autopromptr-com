@@ -4,9 +4,10 @@ import React from 'react';
 interface PromptIconProps {
   size?: 'small' | 'medium' | 'large';
   className?: string;
+  id?: string; // Allow custom ID for unique masks
 }
 
-const PromptIcon = ({ size = 'medium', className = '' }: PromptIconProps) => {
+const PromptIcon = ({ size = 'medium', className = '', id }: PromptIconProps) => {
   const sizeClasses = {
     small: 'w-6 h-6',
     medium: 'w-10 h-10',
@@ -14,6 +15,7 @@ const PromptIcon = ({ size = 'medium', className = '' }: PromptIconProps) => {
   };
 
   const currentSize = sizeClasses[size];
+  const maskId = id ? `promptMask-${id}` : `promptMask-${Math.random().toString(36).substr(2, 9)}`;
 
   return (
     <div className={`${currentSize} ${className} relative group`}>
@@ -23,13 +25,12 @@ const PromptIcon = ({ size = 'medium', className = '' }: PromptIconProps) => {
           background: 'linear-gradient(135deg, #3B82F6, #8B5CF6, #EC4899, #8B5CF6, #3B82F6)',
           backgroundSize: '300% 300%',
           animation: 'promptGradientFlow 6s ease-in-out infinite',
-          mask: 'url(#promptMask)',
-          WebkitMask: 'url(#promptMask)',
+          mask: `url(#${maskId})`,
+          WebkitMask: `url(#${maskId})`,
           filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.6)) drop-shadow(0 0 16px rgba(139, 92, 246, 0.4))'
         }}
       />
       
-      {/* Multiple glow layers for luminescence */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div 
           className="w-full h-full rounded-lg animate-pulse"
@@ -41,10 +42,9 @@ const PromptIcon = ({ size = 'medium', className = '' }: PromptIconProps) => {
         />
       </div>
 
-      {/* SVG mask definition */}
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
-          <mask id="promptMask">
+          <mask id={maskId}>
             <rect width="100%" height="100%" fill="white" />
             <g fill="black" fontSize="0.6em" fontFamily="monospace" fontWeight="bold">
               <text x="50%" y="35%" textAnchor="middle" dominantBaseline="middle">&gt;</text>
@@ -54,7 +54,6 @@ const PromptIcon = ({ size = 'medium', className = '' }: PromptIconProps) => {
         </defs>
       </svg>
 
-      {/* CSS animations */}
       <style>
         {`
           @keyframes promptGradientFlow {

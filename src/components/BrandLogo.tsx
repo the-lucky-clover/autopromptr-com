@@ -5,9 +5,10 @@ interface BrandLogoProps {
   size?: 'small' | 'medium' | 'large';
   variant?: 'horizontal' | 'icon-only';
   className?: string;
+  id?: string; // Allow unique identification
 }
 
-const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: BrandLogoProps) => {
+const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '', id }: BrandLogoProps) => {
   const sizeClasses = {
     small: { text: 'text-2xl' },
     medium: { text: 'text-4xl' },
@@ -19,10 +20,8 @@ const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: 
   return (
     <div className={`flex items-center group ${className}`}>
       <div className="flex items-center space-x-2 relative">
-        {/* PromptIcon with enhanced glow and gradient */}
-        <PromptIcon size={size} />
+        <PromptIcon size={size} id={id} />
         
-        {/* Brand text with fallback styling and enhanced effects */}
         {variant === 'horizontal' && (
           <span 
             className={`${currentSize.text} font-bold transition-all duration-300 group-hover:scale-105 text-white brand-logo-text`}
@@ -41,7 +40,6 @@ const BrandLogo = ({ size = 'medium', variant = 'horizontal', className = '' }: 
         )}
       </div>
       
-      {/* CSS fallback for browsers that don't support background-clip: text */}
       <style>
         {`
           @supports not (-webkit-background-clip: text) {

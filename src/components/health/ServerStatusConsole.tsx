@@ -1,24 +1,20 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Terminal, RefreshCw, Server, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
+import { Server, RefreshCw, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
+import { useConsoleOutput } from '@/hooks/useConsoleOutput';
+import { StatusLight, StatusBadge } from './StatusIndicators';
+import ConsoleOutputDisplay from './ConsoleOutputDisplay';
 
 const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => {
   const { healthStatus, isLoading, performManualCheck, resetCircuitBreaker } = useHealthMonitor();
-  const [consoleOutput, setConsoleOutput] = useState<string[]>([
+  const { consoleOutput, addConsoleLog } = useConsoleOutput([
     '[System] Health monitor initialized',
     '[System] Using global circuit breaker protection',
     '[System] Backend hammering prevention active'
   ]);
-
-  const addConsoleLog = (message: string, type: 'info' | 'error' | 'warning' = 'info') => {
-    const timestamp = new Date().toLocaleTimeString();
-    const prefix = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : '✅';
-    setConsoleOutput(prev => [...prev.slice(-8), `[${timestamp}] ${prefix} ${message}`]);
-  };
 
   const handleManualRefresh = async () => {
     addConsoleLog('Manual health check requested...', 'info');
@@ -36,84 +32,6 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
     addConsoleLog('Circuit breaker reset completed', 'info');
   };
 
-  const getStatusLight = (status: string) => {
-    switch (status) {
-      case 'healthy':
-        return (
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/50"></div>
-            <span className="text-green-400 font-medium">All Systems Operational</span>
-          </div>
-        );
-      case 'degraded':
-        return (
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse shadow-lg shadow-yellow-500/50"></div>
-            <span className="text-yellow-400 font-medium">System Warning</span>
-          </div>
-        );
-      case 'unhealthy':
-        return (
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-lg shadow-red-500/50"></div>
-            <span className="text-red-400 font-medium">System Failure</span>
-          </div>
-        );
-      default:
-        return (
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
-            <span className="text-gray-400 font-medium">Status Unknown</span>
-          </div>
-        );
-    }
-  };
-
-  const getStatusBadge = (status: string, circuitBreakerState?: any) => {
-    if (circuitBreakerState?.status === 'grace_period') {
-      return (
-        <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30 px-3 py-1">
-          GRACE PERIOD
-        </Badge>
-      );
-    }
-    
-    if (circuitBreakerState?.status === 'circuit_open') {
-      return (
-        <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30 px-3 py-1">
-          CIRCUIT OPEN
-        </Badge>
-      );
-    }
-
-    switch (status) {
-      case 'healthy':
-        return (
-          <Badge className="bg-green-500/20 text-green-300 border-green-500/30 px-3 py-1">
-            OPERATIONAL
-          </Badge>
-        );
-      case 'degraded':
-        return (
-          <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 px-3 py-1">
-            DEGRADED
-          </Badge>
-        );
-      case 'unhealthy':
-        return (
-          <Badge className="bg-red-500/20 text-red-300 border-red-500/30 px-3 py-1">
-            UNAVAILABLE
-          </Badge>
-        );
-      default:
-        return (
-          <Badge className="bg-gray-500/20 text-gray-300 border-gray-500/30 px-3 py-1">
-            UNKNOWN
-          </Badge>
-        );
-    }
-  };
-
   const circuitBreakerState = healthStatus.circuitBreakerState;
 
   return (
@@ -125,7 +43,7 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
             Server Status
           </CardTitle>
           <div className="flex items-center space-x-3">
-            {getStatusBadge(healthStatus.status, circuitBreakerState)}
+            <StatusBadge status={healthStatus.status} circuitBreakerState={circuitBreakerState} />
             <Button
               onClick={handleManualRefresh}
               disabled={isLoading}
@@ -140,12 +58,10 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {/* Status Light Indicator */}
         <div className="bg-black/30 rounded-lg p-4 border border-white/10">
-          {getStatusLight(healthStatus.status)}
+          <StatusLight status={healthStatus.status} />
         </div>
 
-        {/* Circuit Breaker Information */}
         {circuitBreakerState && (circuitBreakerState.status !== 'healthy') && (
           <div className="bg-purple-500/20 border border-purple-500/30 rounded-lg p-3">
             <div className="flex items-center space-x-2 mb-2">
@@ -171,28 +87,7 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
           </div>
         )}
 
-        {/* Console Output */}
-        <div className="bg-black/50 rounded-lg p-4 border border-white/10">
-          <div className="flex items-center space-x-2 mb-3">
-            <Terminal className="w-4 h-4 text-green-400" />
-            <span className="text-green-400 font-mono text-sm">Protected Health Monitor</span>
-          </div>
-          
-          <div className="font-mono text-xs space-y-1 max-h-32 overflow-y-auto">
-            {consoleOutput.map((log, index) => (
-              <div 
-                key={index} 
-                className={`${
-                  log.includes('❌') ? 'text-red-300' : 
-                  log.includes('⚠️') ? 'text-yellow-300' : 
-                  'text-green-300'
-                }`}
-              >
-                {log}
-              </div>
-            ))}
-          </div>
-        </div>
+        <ConsoleOutputDisplay consoleOutput={consoleOutput} />
 
         {healthStatus.error && (
           <div className="text-xs text-red-300 bg-red-500/20 border border-red-500/30 rounded-lg p-2">

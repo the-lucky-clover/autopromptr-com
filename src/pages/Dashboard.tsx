@@ -11,12 +11,13 @@ import SystemReliabilityScore from "@/components/SystemReliabilityScore";
 import AnalyticsModule from "@/components/AnalyticsModule";
 import ConsoleMonitorModule from "@/components/ConsoleMonitorModule";
 import RecentActivity from "@/components/RecentActivity";
-import PsychedelicZapIcon from "@/components/PsychedelicZapIcon";
+import PromptIcon from "@/components/PromptIcon";
 import VideoBackground from "@/components/VideoBackground";
+import OverviewDashboardLayout from "@/components/dashboard/OverviewDashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 
 const Dashboard = () => {
-  const { visibleModules, updateModuleState } = useDashboardModules();
+  const { visibleModules, updateModuleState, reorderModules } = useDashboardModules();
   
   const [stats, setStats] = useState({
     totalBatches: 0,
@@ -61,28 +62,28 @@ const Dashboard = () => {
     module.id !== 'batch-extractor'
   );
 
-  const renderModuleContent = (moduleId: string, componentName: string, isMinimized: boolean) => {
+  const renderModuleContent = (moduleId: string, componentName: string) => {
     switch (componentName) {
       case 'HealthStatusDashboard':
-        return <HealthStatusDashboardWrapper isCompact={isMinimized} />;
+        return <HealthStatusDashboardWrapper isCompact={false} />;
       
       case 'SystemLogsPanel':
-        return <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} isCompact={isMinimized} />;
+        return <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} isCompact={false} />;
       
       case 'DashboardSubscription':
-        return <DashboardSubscription isCompact={isMinimized} />;
+        return <DashboardSubscription isCompact={false} />;
       
       case 'DashboardStatsModule':
-        return <DashboardStatsModule stats={stats} isCompact={isMinimized} />;
+        return <DashboardStatsModule stats={stats} isCompact={false} />;
 
       case 'SystemReliabilityScore':
-        return <SystemReliabilityScore isCompact={isMinimized} />;
+        return <SystemReliabilityScore isCompact={false} />;
 
       case 'AnalyticsModule':
-        return <AnalyticsModule isCompact={isMinimized} />;
+        return <AnalyticsModule isCompact={false} />;
 
       case 'ConsoleMonitorModule':
-        return <ConsoleMonitorModule isCompact={isMinimized} />;
+        return <ConsoleMonitorModule isCompact={false} />;
       
       default:
         return <div>Module content not found</div>;
@@ -91,14 +92,12 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen relative">
-      {/* Video Background */}
       <VideoBackground
         enabled={videoSettings.enabled}
         videoUrl={videoSettings.videoUrl}
         showAttribution={videoSettings.showAttribution}
       />
       
-      {/* Main Content */}
       <div 
         className="min-h-screen relative z-10"
         style={{ 
@@ -111,7 +110,6 @@ const Dashboard = () => {
           <div className="min-h-screen flex w-full">
             <AppSidebar />
             <SidebarInset className="flex-1">
-              {/* Welcome Banner with Psychedelic Zap Icon */}
               <Card className={`m-6 mb-4 ${
                 videoSettings.enabled 
                   ? 'bg-black/40 backdrop-blur-md border-white/30' 
@@ -128,23 +126,22 @@ const Dashboard = () => {
                       </p>
                     </div>
                     <div className="flex-shrink-0 ml-6">
-                      <PsychedelicZapIcon />
+                      <PromptIcon size="large" id="dashboard-welcome" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Three Column Layout */}
               <div className="px-6 pb-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  {/* Left Column - Main Content */}
-                  <div className="lg:col-span-8 space-y-6">
-                    {overviewModules.map((module) => 
-                      renderModuleContent(module.id, module.component, false)
-                    )}
+                  <div className="lg:col-span-8">
+                    <OverviewDashboardLayout
+                      visibleModules={overviewModules}
+                      reorderModules={reorderModules}
+                      renderModuleContent={renderModuleContent}
+                    />
                   </div>
 
-                  {/* Right Column - Recent Activity */}
                   <div className="lg:col-span-4">
                     <RecentActivity />
                   </div>

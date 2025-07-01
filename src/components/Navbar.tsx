@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -80,7 +79,7 @@ const Navbar = () => {
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
               <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16">
-                <BrandLogo size="small" variant="horizontal" />
+                <BrandLogo size="small" variant="horizontal" id="navbar-loading" />
               </div>
             </Link>
             
@@ -118,7 +117,7 @@ const Navbar = () => {
             {/* Logo with opposite colors and increased luminosity */}
             <Link to="/" className="flex items-center group flex-shrink-0">
               <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16 navbar-logo-inverted">
-                <BrandLogo size="small" variant="horizontal" />
+                <BrandLogo size="small" variant="horizontal" id="navbar" />
               </div>
             </Link>
             

@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Linkedin, Twitter, Github } from 'lucide-react';
 import BrandLogo from '@/components/BrandLogo';
@@ -11,7 +10,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <BrandLogo size="medium" variant="horizontal" />
+            <BrandLogo size="medium" variant="horizontal" id="footer" />
             <p className="text-gray-300 text-sm">
               Revolutionizing AI workflows through intelligent prompt engineering and automation.
             </p>
