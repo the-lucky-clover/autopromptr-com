@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Trash2, GripVertical, Edit2, Save, X } from 'lucide-react';
 import { TextPrompt } from '@/types/batch';
-import PromptEnhancementButton from './batch/PromptEnhancementButton';
+import EnhancedPromptEditor from './batch/EnhancedPromptEditor';
 
 interface PromptEditorProps {
   prompts: TextPrompt[];
@@ -12,12 +12,37 @@ interface PromptEditorProps {
   onDeletePrompt: (promptId: string) => void;
   onAddPrompt: () => void;
   disabled?: boolean;
+  targetPlatform?: string;
+  useEnhancedEditor?: boolean;
 }
 
-const PromptEditor = ({ prompts, onUpdatePrompt, onDeletePrompt, onAddPrompt, disabled = false }: PromptEditorProps) => {
+const PromptEditor = ({ 
+  prompts, 
+  onUpdatePrompt, 
+  onDeletePrompt, 
+  onAddPrompt, 
+  disabled = false,
+  targetPlatform,
+  useEnhancedEditor = true
+}: PromptEditorProps) => {
   const [editingPrompt, setEditingPrompt] = useState<string | null>(null);
   const [editingText, setEditingText] = useState<string>('');
 
+  // Use enhanced editor by default
+  if (useEnhancedEditor) {
+    return (
+      <EnhancedPromptEditor
+        prompts={prompts}
+        onUpdatePrompt={onUpdatePrompt}
+        onDeletePrompt={onDeletePrompt}
+        onAddPrompt={onAddPrompt}
+        disabled={disabled}
+        targetPlatform={targetPlatform}
+      />
+    );
+  }
+
+  // Fallback to simple editor
   const handleStartEdit = (prompt: TextPrompt) => {
     setEditingPrompt(prompt.id);
     setEditingText(prompt.text);
@@ -49,41 +74,29 @@ const PromptEditor = ({ prompts, onUpdatePrompt, onDeletePrompt, onAddPrompt, di
                   rows={2}
                   className="w-full"
                 />
-                <div className="flex items-center justify-between">
-                  <PromptEnhancementButton
-                    promptText={editingText}
-                    onEnhanced={setEditingText}
+                <div className="flex justify-end space-x-2">
+                  <Button
                     size="sm"
-                  />
-                  <div className="flex space-x-2">
-                    <Button
-                      size="sm"
-                      onClick={() => handleSaveEdit(prompt.id)}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      <Save className="h-3 w-3 mr-1" />
-                      Save
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleCancelEdit}
-                    >
-                      <X className="h-3 w-3 mr-1" />
-                      Cancel
-                    </Button>
-                  </div>
+                    onClick={() => handleSaveEdit(prompt.id)}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Save className="h-3 w-3 mr-1" />
+                    Save
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleCancelEdit}
+                  >
+                    <X className="h-3 w-3 mr-1" />
+                    Cancel
+                  </Button>
                 </div>
               </div>
             ) : (
               <div className="group">
                 <p className="text-sm text-gray-700">{prompt.text || 'Empty prompt - click to edit'}</p>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-between mt-2">
-                  <PromptEnhancementButton
-                    promptText={prompt.text}
-                    onEnhanced={(enhancedText) => onUpdatePrompt(prompt.id, enhancedText)}
-                    size="sm"
-                  />
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-end mt-2">
                   <div className="flex space-x-2">
                     <Button
                       size="sm"
