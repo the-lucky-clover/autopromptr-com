@@ -25,6 +25,8 @@ export const useDashboardBatchManager = () => {
   const {
     selectedBatchId,
     automationLoading,
+    lastError,
+    clearError,
     handleRunBatch: runBatch,
     handleStopBatch: stopBatch,
     handlePauseBatch: pauseBatch,
@@ -68,6 +70,8 @@ export const useDashboardBatchManager = () => {
     setEditingBatch,
     selectedBatchId,
     automationLoading,
+    lastError,
+    clearError,
     handleCreateBatch,
     handleUpdateBatch,
     handleDeleteBatch,

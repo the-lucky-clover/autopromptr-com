@@ -39,6 +39,10 @@ export class EnhancedAutoPromtrClient {
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    
     try {
       console.log(`🔄 Making request to ${url} (attempt ${retryCount + 1})`);
       
@@ -48,8 +52,10 @@ export class EnhancedAutoPromtrClient {
           'Content-Type': 'application/json',
           ...options.headers,
         },
-        timeout: 30000, // 30 second timeout
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -73,6 +79,7 @@ export class EnhancedAutoPromtrClient {
       return data;
 
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error(`❌ Request failed to ${url}:`, error);
       
       if (error instanceof AutoPromtrError) {
@@ -155,7 +162,7 @@ export class EnhancedAutoPromtrClient {
 
   async testConnection(): Promise<boolean> {
     try {
-      const response = await this.makeRequest('/api/health');
+      const response = await this.makeRequest<{ status: string }>('/api/health');
       return response.status === 'ok';
     } catch (error) {
       console.error('❌ Backend connection test failed:', error);

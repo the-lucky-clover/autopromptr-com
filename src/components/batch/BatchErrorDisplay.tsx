@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { AutoPromtrError } from '@/services/autoPromtr/errors';
+import { AutoPromtrError } from '@/services/autoPromptr/errors';
 import BackendErrorHandler from './BackendErrorHandler';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
