@@ -6,7 +6,6 @@ import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton"
 import BatchProcessorControlBar from "@/components/BatchProcessorControlBar";
 import YourBatchesModule from "@/components/YourBatchesModule";
 import DashboardWelcomeModule from "@/components/dashboard/DashboardWelcomeModule";
-import UniversalSectorClock from "@/components/UniversalSectorClock";
 
 const BatchProcessorDashboard = () => {
   const [stats, setStats] = useState({
@@ -39,8 +38,6 @@ const BatchProcessorDashboard = () => {
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
-      <UniversalSectorClock />
-      
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
           <AppSidebar />

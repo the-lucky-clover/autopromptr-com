@@ -16,7 +16,6 @@ import StaticDashboardLayout from "@/components/dashboard/StaticDashboardLayout"
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import CleanDashboardWelcomeCard from "@/components/dashboard/CleanDashboardWelcomeCard";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import UniversalSectorClock from "@/components/UniversalSectorClock";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 
 const Dashboard = () => {
@@ -70,8 +69,6 @@ const Dashboard = () => {
         background: 'linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%)' 
       }}
     >
-      <UniversalSectorClock />
-      
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
           <AppSidebar />
