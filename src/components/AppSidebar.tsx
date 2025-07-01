@@ -94,8 +94,8 @@ export function AppSidebar() {
   return (
     <Sidebar className="bg-gray-900/60 backdrop-blur-sm border-white/10 shadow-2xl">
       <SidebarHeader className="p-4 border-b border-white/10">
-        <div className="flex justify-center">
-          <ZapBrandLogo size="small" variant="horizontal" />
+        <div className="flex justify-center items-center">
+          <ZapBrandLogo size="small" variant="horizontal" className="items-center" />
         </div>
       </SidebarHeader>
 

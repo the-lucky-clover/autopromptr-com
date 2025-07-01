@@ -17,9 +17,9 @@ export const VideoBackgroundCard = () => {
   const { toast } = useToast();
   const [settings, setSettings] = useState({
     enabled: true,
-    videoUrl: 'https://www.pexels.com/video/time-lapse-of-city-at-night-10182004/',
-    opacity: 100,
-    blendMode: 'normal'
+    videoUrl: 'https://videos.pexels.com/video-files/852435/852435-hd_1920_1080_30fps.mp4',
+    opacity: 85,
+    blendMode: 'multiply'
   });
   const [loading, setLoading] = useState(false);
 
@@ -36,9 +36,9 @@ export const VideoBackgroundCard = () => {
           const extendedProfile = profile as any;
           setSettings({
             enabled: extendedProfile.video_background_enabled ?? true,
-            opacity: extendedProfile.video_background_opacity || 100,
-            blendMode: extendedProfile.video_background_blend_mode || 'normal',
-            videoUrl: extendedProfile.video_background_url || 'https://www.pexels.com/video/time-lapse-of-city-at-night-10182004/'
+            opacity: extendedProfile.video_background_opacity || 85,
+            blendMode: extendedProfile.video_background_blend_mode || 'multiply',
+            videoUrl: extendedProfile.video_background_url || 'https://videos.pexels.com/video-files/852435/852435-hd_1920_1080_30fps.mp4'
           });
         }
       }
@@ -114,7 +114,7 @@ export const VideoBackgroundCard = () => {
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
               />
               <p className="text-sm text-purple-200">
-                Use Pexels share URLs or direct MP4 URLs for best performance
+                Use Pexels share URLs or direct MP4 URLs. Default: Aurora Borealis time-lapse
               </p>
             </div>
 

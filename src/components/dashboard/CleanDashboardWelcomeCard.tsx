@@ -22,6 +22,7 @@ const CleanDashboardWelcomeCard = () => {
         opacity={videoSettings.opacity}
         blendMode={videoSettings.blendMode}
         enabled={videoSettings.enabled}
+        showAttribution={videoSettings.showAttribution}
       />
       
       <div className="absolute top-4 right-4 z-20">
