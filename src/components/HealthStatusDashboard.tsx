@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useBackendTesting } from '@/hooks/useBackendTesting';
@@ -41,27 +42,15 @@ const HealthStatusDashboard = React.memo(({ isCompact = false }: HealthStatusDas
   } = useBackendTesting();
 
   const [primaryBackend, setPrimaryBackend] = useState<BackendStatus>({
-    name: 'Backend Server Echo',
-    shortName: 'Echo [∃]',
+    name: 'AutoPromptr Backend Server',
+    shortName: 'Server [AP]',
     url: 'https://autopromptr-backend.onrender.com',
     status: 'healthy',
     responseTime: 0,
     uptime: 'Connected',
     lastChecked: new Date(),
-    icon: '∃',
+    icon: 'AP',
     isConnected: true
-  });
-
-  const [fallbackBackend, setFallbackBackend] = useState<BackendStatus>({
-    name: 'Backup Server',
-    shortName: 'Backup [B]',
-    url: 'https://autopromptr-fallback.onrender.com',
-    status: 'healthy',
-    responseTime: 0,
-    uptime: 'Standby',
-    lastChecked: new Date(),
-    icon: 'B',
-    isConnected: false
   });
 
   const [overallHealth, setOverallHealth] = useState(75);
@@ -84,13 +73,8 @@ const HealthStatusDashboard = React.memo(({ isCompact = false }: HealthStatusDas
         console.log('HealthStatusDashboard: Running debounced health check');
       }
       
-      // Run health checks for backends with timeout
-      const healthCheckPromises = [
-        checkBackendHealth(primaryBackend, setPrimaryBackend, 'primaryBackend'),
-        checkBackendHealth(fallbackBackend, setFallbackBackend, 'fallbackBackend')
-      ];
-      
-      await Promise.allSettled(healthCheckPromises);
+      // Run health check for primary backend only
+      await checkBackendHealth(primaryBackend, setPrimaryBackend, 'primaryBackend');
       
       // Run quick health check but don't wait for it
       runQuickHealthCheck().catch(error => {
@@ -106,7 +90,7 @@ const HealthStatusDashboard = React.memo(({ isCompact = false }: HealthStatusDas
     } finally {
       healthCheckInProgress.current = false;
     }
-  }, [primaryBackend, fallbackBackend, runQuickHealthCheck, isDevelopment]);
+  }, [primaryBackend, runQuickHealthCheck, isDevelopment]);
 
   const runComprehensiveTests = useCallback(async () => {
     if (!mounted.current) return;
@@ -163,19 +147,10 @@ const HealthStatusDashboard = React.memo(({ isCompact = false }: HealthStatusDas
       setOverallHealth(testSummary.passRate);
     } else {
       // Base calculation on backend connectivity
-      const primaryWeight = 70;
-      const fallbackWeight = 30;
-      
       const primaryScore = primaryBackend.isConnected ? 100 : 0;
-      const fallbackScore = fallbackBackend.isConnected ? 100 : 0;
-      
-      const weightedScore = (
-        (primaryScore * primaryWeight + fallbackScore * fallbackWeight) / 100
-      );
-      
-      setOverallHealth(weightedScore);
+      setOverallHealth(primaryScore);
     }
-  }, [primaryBackend.isConnected, fallbackBackend.isConnected, testSummary]);
+  }, [primaryBackend.isConnected, testSummary]);
 
   if (isCompact) {
     return (
@@ -188,10 +163,9 @@ const HealthStatusDashboard = React.memo(({ isCompact = false }: HealthStatusDas
           onRunTests={runComprehensiveTests}
         />
 
-        {/* Compact Backend Cards */}
+        {/* Single Backend Card */}
         <div className="grid grid-cols-1 gap-2">
           <CompactBackendCard backend={primaryBackend} />
-          <CompactBackendCard backend={fallbackBackend} />
         </div>
 
         <TestResultsDisplay lastTestResults={lastTestResults} isCompact={true} />
@@ -209,10 +183,9 @@ const HealthStatusDashboard = React.memo(({ isCompact = false }: HealthStatusDas
         onRunTests={runComprehensiveTests}
       />
 
-      {/* Backend Status Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Single Backend Status Card */}
+      <div className="grid grid-cols-1 gap-4">
         <BackendCard backend={primaryBackend} />
-        <BackendCard backend={fallbackBackend} />
       </div>
 
       <TestResultsDisplay lastTestResults={lastTestResults} isCompact={false} />

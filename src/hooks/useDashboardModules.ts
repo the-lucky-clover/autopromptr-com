@@ -18,8 +18,8 @@ export interface DashboardModule {
 const defaultModules: DashboardModule[] = [
   {
     id: 'health-status',
-    name: 'Backend Health',
-    title: 'Backend Health',
+    name: 'Server Status',
+    title: 'Server Status',
     component: 'HealthStatusDashboard',
     isVisible: true,
     isMinimized: false,
