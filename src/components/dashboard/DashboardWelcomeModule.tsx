@@ -18,8 +18,8 @@ const DashboardWelcomeModule: React.FC<DashboardWelcomeModuleProps> = ({
     <div className="animate-shimmer-delayed mb-8 mx-8">
       <Card className="bg-gray-800/30 backdrop-blur-md border-gray-700/50 min-h-[220px]">
         <CardContent className="p-10">
-          <div className="flex items-center justify-between h-full">
-            <div className="flex-1">
+          <div className="flex items-start justify-between h-full">
+            <div className="flex-1 pr-8">
               <h1 className="text-4xl font-bold text-white mb-4">
                 {title}
               </h1>
@@ -28,13 +28,12 @@ const DashboardWelcomeModule: React.FC<DashboardWelcomeModuleProps> = ({
               </p>
             </div>
             
-            <div className="flex-shrink-0 ml-8">
-              <div className="relative">
-                <AnalogueClockComponent 
-                  clockColor={clockColor}
-                  isMeltdownAvailable={false}
-                />
-              </div>
+            {/* Analogue Clock - Right Aligned with Professional Spacing */}
+            <div className="flex-shrink-0 flex flex-col items-end">
+              <AnalogueClockComponent 
+                clockColor={clockColor}
+                isMeltdownAvailable={true}
+              />
             </div>
           </div>
         </CardContent>

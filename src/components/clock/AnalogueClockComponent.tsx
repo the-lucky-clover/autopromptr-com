@@ -109,13 +109,13 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
       onMouseLeave={handleMouseLeave}
     >
       {/* Clock Face */}
-      <div className="relative w-32 h-32">
-        <svg width="128" height="128" viewBox="0 0 128 128" className="w-full h-full">
+      <div className="relative w-28 h-28 mb-6">
+        <svg width="112" height="112" viewBox="0 0 112 112" className="w-full h-full">
           {/* Outer Ring */}
           <circle 
-            cx="64" 
-            cy="64" 
-            r="62" 
+            cx="56" 
+            cy="56" 
+            r="54" 
             fill="none" 
             stroke={clockColor}
             strokeWidth="2"
@@ -127,9 +127,9 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
           
           {/* Clock Face Background */}
           <circle 
-            cx="64" 
-            cy="64" 
-            r="60" 
+            cx="56" 
+            cy="56" 
+            r="52" 
             fill={`${clockColor}15`}
             className="transition-all duration-300"
           />
@@ -137,10 +137,10 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
           {/* Hour Markers */}
           {Array.from({ length: 12 }, (_, i) => {
             const angle = (i * 30) - 90;
-            const x1 = 64 + 50 * Math.cos(angle * Math.PI / 180);
-            const y1 = 64 + 50 * Math.sin(angle * Math.PI / 180);
-            const x2 = 64 + 45 * Math.cos(angle * Math.PI / 180);
-            const y2 = 64 + 45 * Math.sin(angle * Math.PI / 180);
+            const x1 = 56 + 44 * Math.cos(angle * Math.PI / 180);
+            const y1 = 56 + 44 * Math.sin(angle * Math.PI / 180);
+            const x2 = 56 + 38 * Math.cos(angle * Math.PI / 180);
+            const y2 = 56 + 38 * Math.sin(angle * Math.PI / 180);
             
             return (
               <line
@@ -160,10 +160,10 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
           {Array.from({ length: 60 }, (_, i) => {
             if (i % 5 === 0) return null; // Skip hour markers
             const angle = (i * 6) - 90;
-            const x1 = 64 + 50 * Math.cos(angle * Math.PI / 180);
-            const y1 = 64 + 50 * Math.sin(angle * Math.PI / 180);
-            const x2 = 64 + 48 * Math.cos(angle * Math.PI / 180);
-            const y2 = 64 + 48 * Math.sin(angle * Math.PI / 180);
+            const x1 = 56 + 44 * Math.cos(angle * Math.PI / 180);
+            const y1 = 56 + 44 * Math.sin(angle * Math.PI / 180);
+            const x2 = 56 + 42 * Math.cos(angle * Math.PI / 180);
+            const y2 = 56 + 42 * Math.sin(angle * Math.PI / 180);
             
             return (
               <line
@@ -172,7 +172,7 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
                 y1={y1}
                 x2={x2}
                 y2={y2}
-                stroke={`${clockColor}80`}
+                stroke={`${clockColor}60`}
                 strokeWidth="0.5"
               />
             );
@@ -180,12 +180,12 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
           
           {/* Hour Hand */}
           <line
-            x1="64"
-            y1="64"
-            x2={64 + 25 * Math.cos(hourAngle * Math.PI / 180)}
-            y2={64 + 25 * Math.sin(hourAngle * Math.PI / 180)}
+            x1="56"
+            y1="56"
+            x2={56 + 22 * Math.cos(hourAngle * Math.PI / 180)}
+            y2={56 + 22 * Math.sin(hourAngle * Math.PI / 180)}
             stroke={clockColor}
-            strokeWidth="4"
+            strokeWidth="3"
             strokeLinecap="round"
             className="transition-all duration-300"
             style={{
@@ -195,12 +195,12 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
           
           {/* Minute Hand */}
           <line
-            x1="64"
-            y1="64"
-            x2={64 + 35 * Math.cos(minuteAngle * Math.PI / 180)}
-            y2={64 + 35 * Math.sin(minuteAngle * Math.PI / 180)}
+            x1="56"
+            y1="56"
+            x2={56 + 30 * Math.cos(minuteAngle * Math.PI / 180)}
+            y2={56 + 30 * Math.sin(minuteAngle * Math.PI / 180)}
             stroke={clockColor}
-            strokeWidth="3"
+            strokeWidth="2"
             strokeLinecap="round"
             className="transition-all duration-300"
             style={{
@@ -210,10 +210,10 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
           
           {/* Second Hand - Sweeping */}
           <line
-            x1="64"
-            y1="64"
-            x2={64 + 40 * Math.cos(secondAngle * Math.PI / 180)}
-            y2={64 + 40 * Math.sin(secondAngle * Math.PI / 180)}
+            x1="56"
+            y1="56"
+            x2={56 + 35 * Math.cos(secondAngle * Math.PI / 180)}
+            y2={56 + 35 * Math.sin(secondAngle * Math.PI / 180)}
             stroke="#EF4444"
             strokeWidth="1"
             strokeLinecap="round"
@@ -224,9 +224,9 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
           
           {/* Center Dot */}
           <circle 
-            cx="64" 
-            cy="64" 
-            r="3" 
+            cx="56" 
+            cy="56" 
+            r="2" 
             fill={clockColor}
             className="transition-all duration-300"
             style={{
@@ -237,35 +237,47 @@ const AnalogueClockComponent: React.FC<AnalogueClockComponentProps> = ({
           {/* Hover Progress Ring */}
           {isHovering && isMeltdownAvailable && (
             <circle
-              cx="64"
-              cy="64"
-              r="58"
+              cx="56"
+              cy="56"
+              r="50"
               fill="none"
               stroke="#F59E0B"
-              strokeWidth="3"
-              strokeDasharray="364.42"
-              strokeDashoffset={364.42 - (364.42 * hoverProgress / 100)}
+              strokeWidth="2"
+              strokeDasharray="314.16"
+              strokeDashoffset={314.16 - (314.16 * hoverProgress / 100)}
               className="transition-all duration-100"
               style={{
                 filter: 'drop-shadow(0 0 6px #F59E0B80)',
                 transform: 'rotate(-90deg)',
-                transformOrigin: '64px 64px'
+                transformOrigin: '56px 56px'
               }}
             />
           )}
         </svg>
       </div>
       
-      {/* Time Display */}
-      <div className="absolute -bottom-16 right-0 text-right">
-        <div className="text-lg font-mono font-bold text-white">
-          {formatTime()}
+      {/* Professional Time Display - Grid Aligned */}
+      <div className="text-right space-y-2 min-w-[140px]">
+        {/* Primary Time Information */}
+        <div className="space-y-1">
+          <div className="text-lg font-mono font-semibold text-white tracking-wide">
+            {formatTime()}
+          </div>
+          <div className="text-sm text-gray-300 font-medium">
+            {formatDate()} • {getTimezoneAbbr()}
+          </div>
         </div>
-        <div className="text-sm text-gray-300">
-          {formatDate()} • {getTimezoneAbbr()}
-        </div>
-        <div className="text-xs text-gray-400 mt-1 font-mono">
-          Sector 7-G // Reactor: Stable
+        
+        {/* Status Display with Professional Spacing */}
+        <div className="pt-2 border-t border-gray-600/30">
+          <div className="text-xs text-gray-400 font-mono leading-relaxed">
+            <div className="text-gray-500">Sector 7-G</div>
+            <div className="text-emerald-400 font-medium" style={{ 
+              textShadow: '0 0 8px rgba(52, 211, 153, 0.4)' 
+            }}>
+              Reactor: Stable
+            </div>
+          </div>
         </div>
       </div>
     </div>

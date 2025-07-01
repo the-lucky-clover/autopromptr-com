@@ -168,13 +168,25 @@ export class EnhancedAutoPromtrClient {
       // Handle both uppercase and lowercase status responses
       const status = response.status?.toLowerCase();
       if (status !== 'ok') {
-        throw new AutoPromtrError('Backend health check failed');
+        throw new AutoPromtrError(
+          'Backend health check failed',
+          'HEALTH_CHECK_FAILED',
+          0,
+          false,
+          'Backend returned non-OK status'
+        );
       }
       
       return true;
     } catch (error) {
       console.error('❌ Backend connection test failed:', error);
-      throw new AutoPromtrError('Backend health check failed');
+      throw new AutoPromtrError(
+        'Backend health check failed',
+        'HEALTH_CHECK_FAILED',
+        0,
+        false,
+        'Unable to connect to backend'
+      );
     }
   }
 
