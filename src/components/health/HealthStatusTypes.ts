@@ -3,7 +3,7 @@ export interface BackendStatus {
   name: string;
   shortName: string;
   url: string;
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown';
   responseTime: number;
   uptime: string;
   lastChecked: Date;
