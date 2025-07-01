@@ -11,21 +11,8 @@ const StaticDashboardLayout = ({ visibleModules, renderModuleContent }: StaticDa
   return (
     <div className="space-y-6">
       {visibleModules.map((module) => (
-        <div
-          key={module.id}
-          className="bg-gray-900/50 backdrop-blur-sm border-white/20 rounded-xl border"
-        >
-          {/* Module Header - Consistent with Recent Activity */}
-          <div className="px-6 py-4">
-            <h3 className="text-lg font-semibold text-white">
-              {module.title}
-            </h3>
-          </div>
-          
-          {/* Module Content */}
-          <div className="px-6 pb-6">
-            {renderModuleContent(module.id, module.component)}
-          </div>
+        <div key={module.id}>
+          {renderModuleContent(module.id, module.component)}
         </div>
       ))}
     </div>
