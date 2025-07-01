@@ -17,9 +17,9 @@ export const VideoBackgroundCard = () => {
   const { toast } = useToast();
   const [settings, setSettings] = useState({
     enabled: true,
-    videoUrl: 'https://videos.pexels.com/video-files/3130284/3130284-uhd_2560_1440_25fps.mp4',
-    opacity: 85,
-    blendMode: 'multiply'
+    videoUrl: 'https://www.pexels.com/video/time-lapse-of-city-at-night-10182004/',
+    opacity: 100,
+    blendMode: 'normal'
   });
   const [loading, setLoading] = useState(false);
 
@@ -33,13 +33,12 @@ export const VideoBackgroundCard = () => {
           .single();
         
         if (profile) {
-          // Safely access the new properties
           const extendedProfile = profile as any;
           setSettings({
             enabled: extendedProfile.video_background_enabled ?? true,
-            opacity: extendedProfile.video_background_opacity || 85,
-            blendMode: extendedProfile.video_background_blend_mode || 'multiply',
-            videoUrl: settings.videoUrl // Keep default URL
+            opacity: extendedProfile.video_background_opacity || 100,
+            blendMode: extendedProfile.video_background_blend_mode || 'normal',
+            videoUrl: extendedProfile.video_background_url || 'https://www.pexels.com/video/time-lapse-of-city-at-night-10182004/'
           });
         }
       }
@@ -58,7 +57,8 @@ export const VideoBackgroundCard = () => {
         .update({
           video_background_enabled: settings.enabled,
           video_background_opacity: settings.opacity,
-          video_background_blend_mode: settings.blendMode
+          video_background_blend_mode: settings.blendMode,
+          video_background_url: settings.videoUrl
         } as any)
         .eq('id', user.id);
 
@@ -88,14 +88,14 @@ export const VideoBackgroundCard = () => {
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <Video className="w-5 h-5" />
-          Video Background Settings
+          Welcome Module Video Background
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <Label className="text-white">Enable Video Background</Label>
-            <p className="text-sm text-purple-200">Show animated background video in dashboard</p>
+            <p className="text-sm text-purple-200">Show animated background video in welcome module</p>
           </div>
           <Switch
             checked={settings.enabled}
@@ -105,6 +105,19 @@ export const VideoBackgroundCard = () => {
 
         {settings.enabled && (
           <>
+            <div className="space-y-2">
+              <Label className="text-white">Video URL (Pexels or Direct MP4)</Label>
+              <Input
+                value={settings.videoUrl}
+                onChange={(e) => setSettings(prev => ({ ...prev, videoUrl: e.target.value }))}
+                placeholder="https://www.pexels.com/video/... or direct MP4 URL"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+              />
+              <p className="text-sm text-purple-200">
+                Use Pexels share URLs or direct MP4 URLs for best performance
+              </p>
+            </div>
+
             <div className="space-y-2">
               <Label className="text-white">Background Opacity</Label>
               <div className="px-3">
@@ -130,25 +143,12 @@ export const VideoBackgroundCard = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="normal">Normal</SelectItem>
                   <SelectItem value="multiply">Multiply</SelectItem>
                   <SelectItem value="overlay">Overlay</SelectItem>
-                  <SelectItem value="normal">Normal</SelectItem>
                   <SelectItem value="soft-light">Soft Light</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-white">Video URL</Label>
-              <Input
-                value={settings.videoUrl}
-                onChange={(e) => setSettings(prev => ({ ...prev, videoUrl: e.target.value }))}
-                placeholder="Enter video URL"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-              />
-              <p className="text-sm text-purple-200">
-                Use Pexels videos or direct MP4 URLs for best performance
-              </p>
             </div>
           </>
         )}

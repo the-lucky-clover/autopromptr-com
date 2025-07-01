@@ -14,10 +14,10 @@ interface VideoSettings {
 export const useDashboardVideoSettings = (user: User | null) => {
   const [videoSettings, setVideoSettings] = useState<VideoSettings>({
     enabled: true,
-    videoUrl: 'https://videos.pexels.com/video-files/3130284/3130284-uhd_2560_1440_25fps.mp4',
+    videoUrl: 'https://www.pexels.com/video/time-lapse-of-city-at-night-10182004/',
     showAttribution: true,
-    opacity: 85,
-    blendMode: 'multiply'
+    opacity: 100,
+    blendMode: 'normal'
   });
 
   useEffect(() => {
@@ -34,8 +34,9 @@ export const useDashboardVideoSettings = (user: User | null) => {
           setVideoSettings(prev => ({
             ...prev,
             enabled: videoProfile.video_background_enabled ?? true,
-            opacity: videoProfile.video_background_opacity || 85,
-            blendMode: videoProfile.video_background_blend_mode || 'multiply'
+            opacity: videoProfile.video_background_opacity || 100,
+            blendMode: videoProfile.video_background_blend_mode || 'normal',
+            videoUrl: videoProfile.video_background_url || 'https://www.pexels.com/video/time-lapse-of-city-at-night-10182004/'
           }));
         }
       }

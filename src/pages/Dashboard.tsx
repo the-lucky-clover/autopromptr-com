@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -10,7 +11,6 @@ import DashboardStatsModule from "@/components/DashboardStatsModule";
 import AnalyticsModule from "@/components/AnalyticsModule";
 import ConsoleMonitorModule from "@/components/ConsoleMonitorModule";
 import RecentActivity from "@/components/RecentActivity";
-import VideoBackground from "@/components/VideoBackground";
 import StaticDashboardLayout from "@/components/dashboard/StaticDashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardWelcomeCard from "@/components/dashboard/DashboardWelcomeCard";
@@ -63,61 +63,49 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen relative bg-gray-900">
-      <VideoBackground
-        enabled={videoSettings.enabled}
-        videoUrl={videoSettings.videoUrl}
-        showAttribution={videoSettings.showAttribution}
-        opacity={videoSettings.opacity}
-        blendMode={videoSettings.blendMode}
-      />
-      
-      <div 
-        className="min-h-screen relative z-10"
-        style={{ 
-          background: videoSettings.enabled 
-            ? 'transparent' 
-            : 'linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%)' 
-        }}
-      >
-        <SidebarProvider>
-          <div className="min-h-screen flex w-full">
-            <AppSidebar />
-            <SidebarInset className="flex-1 relative">
-              <ErrorBoundary>
-                <DashboardHeader />
-              </ErrorBoundary>
-              
-              <ErrorBoundary>
-                <DashboardWelcomeCard 
-                  currentGreeting={currentGreeting}
-                  stats={stats}
-                  videoSettings={videoSettings}
-                />
-              </ErrorBoundary>
+    <div 
+      className="min-h-screen relative"
+      style={{ 
+        background: 'linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%)' 
+      }}
+    >
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
+          <SidebarInset className="flex-1 relative">
+            <ErrorBoundary>
+              <DashboardHeader />
+            </ErrorBoundary>
+            
+            <ErrorBoundary>
+              <DashboardWelcomeCard 
+                currentGreeting={currentGreeting}
+                stats={stats}
+                videoSettings={videoSettings}
+              />
+            </ErrorBoundary>
 
-              <div className="px-6 pb-6">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  <div className="lg:col-span-9">
-                    <ErrorBoundary>
-                      <StaticDashboardLayout
-                        visibleModules={overviewModules}
-                        renderModuleContent={renderModuleContent}
-                      />
-                    </ErrorBoundary>
-                  </div>
+            <div className="px-6 pb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div className="lg:col-span-9">
+                  <ErrorBoundary>
+                    <StaticDashboardLayout
+                      visibleModules={overviewModules}
+                      renderModuleContent={renderModuleContent}
+                    />
+                  </ErrorBoundary>
+                </div>
 
-                  <div className="lg:col-span-3">
-                    <ErrorBoundary>
-                      <RecentActivity />
-                    </ErrorBoundary>
-                  </div>
+                <div className="lg:col-span-3">
+                  <ErrorBoundary>
+                    <RecentActivity />
+                  </ErrorBoundary>
                 </div>
               </div>
-            </SidebarInset>
-          </div>
-        </SidebarProvider>
-      </div>
+            </div>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
     </div>
   );
 };

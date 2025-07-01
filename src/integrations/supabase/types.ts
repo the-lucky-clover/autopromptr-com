@@ -193,6 +193,7 @@ export type Database = {
           video_background_blend_mode: string | null
           video_background_enabled: boolean | null
           video_background_opacity: number | null
+          video_background_url: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -207,6 +208,7 @@ export type Database = {
           video_background_blend_mode?: string | null
           video_background_enabled?: boolean | null
           video_background_opacity?: number | null
+          video_background_url?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -221,6 +223,7 @@ export type Database = {
           video_background_blend_mode?: string | null
           video_background_enabled?: boolean | null
           video_background_opacity?: number | null
+          video_background_url?: string | null
         }
         Relationships: []
       }
