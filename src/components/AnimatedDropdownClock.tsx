@@ -1,47 +1,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTimezone } from '@/hooks/useTimezone';
+import ClockDisplay from './clock/ClockDisplay';
 import MeltdownPhases from './clock/MeltdownPhases';
 
 interface AnimatedDropdownClockProps {
   enableEasterEgg?: boolean;
 }
-
-interface ClockDisplayProps {
-  currentTime: string;
-  formatDate: () => string;
-  getTimezoneAbbr: () => string;
-  showMeltdown: boolean;
-  timezone: string;
-}
-
-const ClockDisplay: React.FC<ClockDisplayProps> = ({
-  currentTime,
-  formatDate,
-  getTimezoneAbbr,
-  showMeltdown,
-  timezone
-}) => {
-  return (
-    <div className="text-center">
-      <div className={`text-2xl font-mono font-bold ${
-        showMeltdown ? 'text-red-300 animate-pulse' : 'text-white/90'
-      }`}>
-        {currentTime}
-      </div>
-      <div className={`text-sm font-light ${
-        showMeltdown ? 'text-red-400' : 'text-white/60'
-      }`}>
-        {formatDate()} • {getTimezoneAbbr()}
-      </div>
-      {showMeltdown && (
-        <div className="text-xs text-red-500 font-mono animate-pulse mt-1">
-          ⚠️ SECTOR 7G ⚠️
-        </div>
-      )}
-    </div>
-  );
-};
 
 const AnimatedDropdownClock = ({ enableEasterEgg = false }: AnimatedDropdownClockProps) => {
   const { getCurrentTime, getTimezoneAbbr, timezone } = useTimezone();

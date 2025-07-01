@@ -4,7 +4,7 @@ import ClockDisplay from './EnhancedClockDisplay';
 import ClockStatusDisplay from './EnhancedClockStatusDisplay';
 import ClockHoverHandler from './ClockHoverHandler';
 import ClockAudio from './ClockAudio';
-import MeltdownPhases from './MeltdownPhases';
+import { MeltdownPhases } from './MeltdownPhases';
 
 interface UniversalSectorClockProps {
   clockColor?: string;
@@ -79,11 +79,7 @@ const UniversalSectorClock: React.FC<UniversalSectorClockProps> = ({
         </div>
       </ClockHoverHandler>
       
-      <MeltdownPhases 
-        meltdownPhase={meltdownPhase}
-        dashboardLocked={false}
-        countdown={10}
-      />
+      <MeltdownPhases phase={meltdownPhase} />
       <ClockAudio enabled={audioEnabled && isHovered} />
     </div>
   );
