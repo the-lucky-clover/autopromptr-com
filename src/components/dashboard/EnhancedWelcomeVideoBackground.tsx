@@ -15,66 +15,95 @@ const EnhancedWelcomeVideoBackground = ({
   blendMode = 'multiply',
   enabled = true
 }: EnhancedWelcomeVideoBackgroundProps) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef1 = useRef<HTMLVideoElement>(null);
+  const videoRef2 = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(1);
   const [loadAttempts, setLoadAttempts] = useState(0);
   const currentVideo = useTimeBasedVideo(userVideoUrl);
 
   useEffect(() => {
     if (!enabled || !currentVideo.url) return;
 
-    const video = videoRef.current;
-    if (!video) return;
+    const video1 = videoRef1.current;
+    const video2 = videoRef2.current;
+    if (!video1 || !video2) return;
 
     console.log(`Loading video: ${currentVideo.period} - ${currentVideo.url}`);
     setIsLoaded(false);
     setHasError(false);
 
-    const handleLoadedData = () => {
-      console.log('Video loaded successfully');
-      setIsLoaded(true);
-      setHasError(false);
-      setLoadAttempts(0);
-      
-      // Start playing immediately
-      video.play().catch(error => {
-        console.error('Video play failed:', error);
-      });
+    const setupVideo = (video: HTMLVideoElement) => {
+      const handleLoadedData = () => {
+        console.log('Video loaded successfully');
+        setIsLoaded(true);
+        setHasError(false);
+        setLoadAttempts(0);
+        
+        // Start playing immediately
+        video.play().catch(error => {
+          console.error('Video play failed:', error);
+        });
+      };
+
+      const handleError = (error: Event) => {
+        console.error('Video loading error:', error, 'URL:', currentVideo.url);
+        setHasError(true);
+        setIsLoaded(false);
+        
+        // Retry loading up to 3 times
+        if (loadAttempts < 3) {
+          setTimeout(() => {
+            setLoadAttempts(prev => prev + 1);
+            video.load();
+          }, 2000);
+        }
+      };
+
+      const handleTimeUpdate = () => {
+        // Create seamless crossfade by switching videos before the end
+        if (video.currentTime >= video.duration - 1) {
+          const otherVideo = video === video1 ? video2 : video1;
+          const currentVideoNum = video === video1 ? 1 : 2;
+          const otherVideoNum = currentVideoNum === 1 ? 2 : 1;
+          
+          // Reset the other video to start
+          otherVideo.currentTime = 0;
+          otherVideo.play().catch(console.error);
+          
+          // Crossfade with 0.5 second transition
+          setTimeout(() => {
+            setActiveVideo(otherVideoNum);
+            // Reset current video after crossfade
+            setTimeout(() => {
+              video.currentTime = 0;
+            }, 500);
+          }, 100);
+        }
+      };
+
+      video.addEventListener('loadeddata', handleLoadedData);
+      video.addEventListener('error', handleError);
+      video.addEventListener('timeupdate', handleTimeUpdate);
+
+      return () => {
+        video.removeEventListener('loadeddata', handleLoadedData);
+        video.removeEventListener('error', handleError);
+        video.removeEventListener('timeupdate', handleTimeUpdate);
+      };
     };
 
-    const handleError = (error: Event) => {
-      console.error('Video loading error:', error, 'URL:', currentVideo.url);
-      setHasError(true);
-      setIsLoaded(false);
-      
-      // Retry loading up to 3 times
-      if (loadAttempts < 3) {
-        setTimeout(() => {
-          setLoadAttempts(prev => prev + 1);
-          video.load();
-        }, 2000);
-      }
-    };
+    const cleanup1 = setupVideo(video1);
+    const cleanup2 = setupVideo(video2);
 
-    const handleTimeUpdate = () => {
-      // Create seamless loop by restarting slightly before the end
-      if (video.currentTime >= video.duration - 0.5) {
-        video.currentTime = 0;
-      }
-    };
-
-    video.addEventListener('loadeddata', handleLoadedData);
-    video.addEventListener('error', handleError);
-    video.addEventListener('timeupdate', handleTimeUpdate);
-
-    // Start loading the video
-    video.load();
+    // Start loading both videos
+    video1.load();
+    video2.load();
 
     return () => {
-      video.removeEventListener('loadeddata', handleLoadedData);
-      video.removeEventListener('error', handleError);
-      video.removeEventListener('timeupdate', handleTimeUpdate);
+      cleanup1();
+      cleanup2();
     };
   }, [enabled, currentVideo.url, loadAttempts]);
 
@@ -85,13 +114,36 @@ const EnhancedWelcomeVideoBackground = ({
     return null;
   }
 
+  const getVideoOpacity = (videoNum: number) => {
+    if (!isLoaded) return 0;
+    return activeVideo === videoNum ? opacity / 100 : 0;
+  };
+
   return (
     <div className="absolute inset-0 overflow-hidden rounded-b-xl">
+      {/* Video 1 */}
       <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+        ref={videoRef1}
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
         style={{
-          opacity: isLoaded ? opacity / 100 : 0,
+          opacity: getVideoOpacity(1),
+          mixBlendMode: blendMode as any,
+        }}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+      >
+        <source src={currentVideo.url} type="video/mp4" />
+      </video>
+
+      {/* Video 2 - for seamless crossfading */}
+      <video
+        ref={videoRef2}
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+        style={{
+          opacity: getVideoOpacity(2),
           mixBlendMode: blendMode as any,
         }}
         autoPlay
@@ -116,7 +168,7 @@ const EnhancedWelcomeVideoBackground = ({
             href={currentVideo.attribution}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white/30 hover:text-white/50 text-[9px] bg-black/10 px-1 py-0.5 rounded backdrop-blur-sm transition-colors font-sans"
+            className="text-white/20 hover:text-white/30 text-[8px] bg-black/10 px-1 py-0.5 rounded backdrop-blur-sm transition-colors font-sans"
           >
             Pexels
           </a>
