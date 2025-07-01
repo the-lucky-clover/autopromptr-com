@@ -1,7 +1,6 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface DraggableModuleProps {
@@ -30,17 +29,10 @@ const DraggableModule = ({ id, children, className = '', title }: DraggableModul
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative group ${className} ${isDragging ? 'z-50 opacity-75' : ''}`}
+      className={`relative ${className} ${isDragging ? 'z-50 opacity-75' : ''}`}
       {...attributes}
+      {...listeners}
     >
-      {/* Drag handle */}
-      <div
-        {...listeners}
-        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing z-10 bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20"
-        title={`Drag to reposition ${title || 'module'}`}
-      >
-        <GripVertical className="w-4 h-4 text-white" />
-      </div>
       {children}
     </div>
   );
