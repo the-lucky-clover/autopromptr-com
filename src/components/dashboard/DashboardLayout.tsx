@@ -61,7 +61,7 @@ const DashboardLayout = ({
       <div className="space-y-4">
         {/* Full-width modules */}
         {fullWidthModules.map((module) => (
-          <div key={module.id} className="shadow-2xl">
+          <div key={module.id}>
             <DashboardModuleWrapper
               id={module.id}
               title={module.title}
@@ -77,7 +77,7 @@ const DashboardLayout = ({
         {minimizedModules.length > 0 && (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             {minimizedModules.map((module) => (
-              <div key={module.id} className="shadow-2xl">
+              <div key={module.id}>
                 <DashboardModuleWrapper
                   id={module.id}
                   title={module.title}

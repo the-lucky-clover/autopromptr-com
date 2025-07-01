@@ -1,14 +1,11 @@
 
 import React from 'react';
-import { useDashboardLayout } from '@/hooks/useDashboardLayout';
 import { useDashboardModules } from '@/hooks/useDashboardModules';
 import CleanDashboardWelcomeCard from './CleanDashboardWelcomeCard';
 import StaticDashboardLayout from './StaticDashboardLayout';
-import OverviewDashboardLayout from './OverviewDashboardLayout';
 import AnimatedDropdownClock from '@/components/AnimatedDropdownClock';
 
 const DashboardContent = () => {
-  const { layout } = useDashboardLayout();
   const { visibleModules } = useDashboardModules();
 
   const renderModuleContent = (moduleId: string, componentName: string) => {
@@ -16,25 +13,9 @@ const DashboardContent = () => {
     return <div>Module content for {componentName}</div>;
   };
 
-  if (layout === 'overview') {
-    return (
-      <>
-        <AnimatedDropdownClock enableEasterEgg={true} />
-        <div className="space-y-6">
-          <CleanDashboardWelcomeCard />
-          <OverviewDashboardLayout 
-            visibleModules={visibleModules}
-            reorderModules={() => {}}
-            renderModuleContent={renderModuleContent}
-          />
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
-      <AnimatedDropdownClock enableEasterEgg={false} />
+      <AnimatedDropdownClock enableEasterEgg={true} />
       <div className="space-y-6">
         <CleanDashboardWelcomeCard />
         <StaticDashboardLayout 

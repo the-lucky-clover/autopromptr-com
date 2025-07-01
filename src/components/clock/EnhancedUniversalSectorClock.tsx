@@ -79,7 +79,7 @@ const UniversalSectorClock: React.FC<UniversalSectorClockProps> = ({
         </div>
       </ClockHoverHandler>
       
-      <MeltdownPhases phase={meltdownPhase} />
+      <MeltdownPhases meltdownPhase={meltdownPhase} dashboardLocked={false} countdown={10} />
       <ClockAudio enabled={audioEnabled && isHovered} />
     </div>
   );

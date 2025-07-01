@@ -64,7 +64,7 @@ const DashboardModuleWrapper = ({
     <Card
       ref={setNodeRef}
       style={style}
-      className={`${getModuleClasses()} ${className} ${isDragging ? 'z-50 shadow-2xl' : ''}`}
+      className={`${getModuleClasses()} ${className} ${isDragging ? 'z-50' : ''}`}
     >
       {/* Module Header */}
       <div className={`flex items-center justify-between bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-t-xl border-b border-white/10 ${

@@ -14,7 +14,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import CleanDraggableModuleWrapper from '@/components/CleanDraggableModuleWrapper';
+import SimpleDraggableModuleWrapper from '@/components/SimpleDraggableModuleWrapper';
 import { DashboardModule } from '@/hooks/useDashboardModules';
 
 interface OverviewDashboardLayoutProps {
@@ -61,13 +61,13 @@ const OverviewDashboardLayout = ({
       >
         <div className="space-y-6">
           {sortedModules.map((module) => (
-            <CleanDraggableModuleWrapper
+            <SimpleDraggableModuleWrapper
               key={module.id}
               id={module.id}
               title={module.title}
             >
               {renderModuleContent(module.id, module.component)}
-            </CleanDraggableModuleWrapper>
+            </SimpleDraggableModuleWrapper>
           ))}
         </div>
       </SortableContext>
