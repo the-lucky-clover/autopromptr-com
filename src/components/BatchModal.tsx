@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -22,7 +23,7 @@ export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModa
     targetUrl: batch?.targetUrl || '',
     description: batch?.description || '',
     platform: batch?.platform || 'website',
-    waitForIdle: batch?.settings?.waitForIdle || true,
+    waitForIdle: batch?.settings?.waitForIdle ?? true,
     maxRetries: batch?.settings?.maxRetries || 3,
   });
 
@@ -38,7 +39,7 @@ export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModa
         targetUrl: batch.targetUrl,
         description: batch.description || '',
         platform: batch.platform || 'website',
-        waitForIdle: batch.settings?.waitForIdle || true,
+        waitForIdle: batch.settings?.waitForIdle ?? true,
         maxRetries: batch.settings?.maxRetries || 3,
       });
       setPrompts(batch.prompts);

@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
 import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
@@ -157,13 +156,13 @@ const DashboardBatchManager = ({ onStatsUpdate, onBatchesUpdate, isCompact = fal
         )}
 
         <BatchModal
-          open={showModal}
+          isOpen={showModal}
           onClose={() => {
             setShowModal(false);
             setEditingBatch(null);
           }}
           onSave={editingBatch ? handleUpdateBatch : handleCreateBatch}
-          editingBatch={editingBatch}
+          batch={editingBatch}
         />
       </div>
     </div>

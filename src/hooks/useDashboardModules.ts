@@ -1,71 +1,90 @@
+
 import { useState, useEffect } from 'react';
+
+export type ModuleState = 'full' | 'minimized' | 'closed';
 
 export interface DashboardModule {
   id: string;
   name: string;
+  title: string;
   component: string;
   isVisible: boolean;
   isMinimized: boolean;
   order: number;
   isLocked?: boolean;
+  state: ModuleState;
 }
 
 const defaultModules: DashboardModule[] = [
   {
     id: 'health-status',
     name: 'Backend Health',
+    title: 'Backend Health',
     component: 'HealthStatusDashboard',
     isVisible: true,
     isMinimized: false,
     order: 0,
+    state: 'full',
   },
   {
     id: 'system-logs',
     name: 'System Logs',
+    title: 'System Logs',
     component: 'SystemLogsPanel',
     isVisible: true,
     isMinimized: false,
     order: 1,
+    state: 'full',
   },
   {
     id: 'subscription',
     name: 'Subscription',
+    title: 'Subscription',
     component: 'DashboardSubscription',
     isVisible: true,
     isMinimized: false,
     order: 2,
+    state: 'full',
   },
   {
     id: 'stats',
     name: 'Statistics',
+    title: 'Statistics',
     component: 'DashboardStatsModule',
     isVisible: true,
     isMinimized: false,
     order: 3,
+    state: 'full',
   },
   {
     id: 'reliability',
     name: 'System Reliability',
+    title: 'System Reliability',
     component: 'SystemReliabilityScore',
     isVisible: true,
     isMinimized: false,
     order: 4,
+    state: 'full',
   },
   {
     id: 'analytics',
     name: 'Analytics',
+    title: 'Analytics',
     component: 'AnalyticsModule',
     isVisible: true,
     isMinimized: false,
     order: 5,
+    state: 'full',
   },
   {
     id: 'console-monitor',
     name: 'Console Monitor',
+    title: 'Console Monitor',
     component: 'ConsoleMonitorModule',
     isVisible: true,
     isMinimized: false,
     order: 6,
+    state: 'full',
   }
 ];
 
