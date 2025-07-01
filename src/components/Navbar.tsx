@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
 import AuthModal from "@/components/AuthModal";
-import BrandLogo from "@/components/BrandLogo";
+import EnhancedBrandLogo from "@/components/EnhancedBrandLogo";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +79,7 @@ const Navbar = () => {
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
               <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16">
-                <BrandLogo size="small" variant="horizontal" id="navbar-loading" />
+                <EnhancedBrandLogo size="small" variant="horizontal" id="navbar-loading" />
               </div>
             </Link>
             
@@ -114,10 +114,10 @@ const Navbar = () => {
         {/* Navbar content - always visible with responsive padding */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center h-20">
-            {/* Logo with opposite colors and increased luminosity */}
+            {/* Enhanced Logo with Robot Icon */}
             <Link to="/" className="flex items-center group flex-shrink-0">
-              <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16 navbar-logo-inverted">
-                <BrandLogo size="small" variant="horizontal" id="navbar" />
+              <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16">
+                <EnhancedBrandLogo size="small" variant="horizontal" id="navbar" />
               </div>
             </Link>
             

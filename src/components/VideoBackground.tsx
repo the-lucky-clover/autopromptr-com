@@ -5,12 +5,21 @@ interface VideoBackgroundProps {
   enabled: boolean;
   videoUrl: string;
   showAttribution: boolean;
+  opacity?: number;
+  blendMode?: string;
 }
 
-const VideoBackground = ({ enabled, videoUrl, showAttribution }: VideoBackgroundProps) => {
+const VideoBackground = ({ 
+  enabled, 
+  videoUrl, 
+  showAttribution, 
+  opacity = 85,
+  blendMode = 'multiply'
+}: VideoBackgroundProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     if (!enabled || !videoUrl) return;
@@ -22,10 +31,15 @@ const VideoBackground = ({ enabled, videoUrl, showAttribution }: VideoBackground
       setIsLoaded(true);
       setHasError(false);
       
-      // Set up smooth looping at 14 seconds
+      // Set up seamless looping with dissolve transition
       const handleTimeUpdate = () => {
-        if (video.currentTime >= 14) {
-          video.currentTime = 0;
+        // Start fade transition 1 second before loop
+        if (video.currentTime >= 13 && !isTransitioning) {
+          setIsTransitioning(true);
+          setTimeout(() => {
+            video.currentTime = 0;
+            setIsTransitioning(false);
+          }, 1000);
         }
       };
 
@@ -45,13 +59,12 @@ const VideoBackground = ({ enabled, videoUrl, showAttribution }: VideoBackground
       video.removeEventListener('loadeddata', handleLoadedData);
       video.removeEventListener('error', handleError);
     };
-  }, [enabled, videoUrl]);
+  }, [enabled, videoUrl, isTransitioning]);
 
   if (!enabled || hasError) return null;
 
   const getVideoSource = (url: string) => {
     if (url.includes('pexels.com') && !url.includes('.mp4')) {
-      // Convert Pexels page URL to direct video URL
       return url.replace(/\/video\/.*\/(\d+)\/.*/, '/video-files/$1/$1-hd_1920_1080_25fps.mp4');
     }
     return url;
@@ -66,19 +79,22 @@ const VideoBackground = ({ enabled, videoUrl, showAttribution }: VideoBackground
         muted
         loop
         playsInline
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+        className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
+        } ${isTransitioning ? 'opacity-50' : ''}`}
         style={{
           filter: 'brightness(0.7) contrast(1.1)',
+          opacity: opacity / 100,
+          mixBlendMode: blendMode as any
         }}
       />
       
-      {/* Overlay for better module readability */}
+      {/* Enhanced overlay for better module readability */}
       <div 
-        className="absolute inset-0 bg-black/30"
+        className="absolute inset-0"
         style={{
-          background: 'linear-gradient(135deg, rgba(45, 27, 105, 0.4) 0%, rgba(75, 58, 159, 0.3) 100%)'
+          background: `linear-gradient(135deg, rgba(45, 27, 105, 0.${Math.floor(opacity/10)}) 0%, rgba(75, 58, 159, 0.${Math.floor(opacity/15)}) 100%)`,
+          mixBlendMode: 'overlay'
         }}
       />
       

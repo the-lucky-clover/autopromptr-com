@@ -3,6 +3,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useDashboardModules } from "@/hooks/useDashboardModules";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import SystemLogsPanel from "@/components/SystemLogsPanel";
 import HealthStatusDashboardWrapper from "@/components/HealthStatusDashboardWrapper";
 import DashboardSubscription from "@/components/DashboardSubscription";
@@ -11,14 +13,16 @@ import SystemReliabilityScore from "@/components/SystemReliabilityScore";
 import AnalyticsModule from "@/components/AnalyticsModule";
 import ConsoleMonitorModule from "@/components/ConsoleMonitorModule";
 import RecentActivity from "@/components/RecentActivity";
-import PromptIcon from "@/components/PromptIcon";
+import EnhancedBrandLogo from "@/components/EnhancedBrandLogo";
 import VideoBackground from "@/components/VideoBackground";
 import OverviewDashboardLayout from "@/components/dashboard/OverviewDashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { getRandomGreeting } from "@/services/greetingService";
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const { visibleModules, updateModuleState, reorderModules } = useDashboardModules();
   
   const [stats, setStats] = useState({
@@ -29,24 +33,62 @@ const Dashboard = () => {
   });
   
   const [batches, setBatches] = useState<any[]>([]);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [currentGreeting, setCurrentGreeting] = useState<any>(null);
   const [videoSettings, setVideoSettings] = useState({
-    enabled: false,
-    videoUrl: '',
-    showAttribution: true
+    enabled: true,
+    videoUrl: 'https://videos.pexels.com/video-files/3130284/3130284-uhd_2560_1440_25fps.mp4',
+    showAttribution: true,
+    opacity: 85,
+    blendMode: 'multiply'
   });
 
-  // Load video settings
+  // Load user profile and video settings
   useEffect(() => {
-    const saved = localStorage.getItem('videoBackgroundSettings');
-    if (saved) {
-      try {
-        const parsedSettings = JSON.parse(saved);
-        setVideoSettings(parsedSettings);
-      } catch (error) {
-        console.error('Failed to parse video settings:', error);
+    const loadUserData = async () => {
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile) {
+          setUserProfile(profile);
+          const greeting = getRandomGreeting(
+            profile.name || user.email?.split('@')[0] || 'there',
+            profile.preferred_language || 'en'
+          );
+          setCurrentGreeting(greeting);
+          
+          // Load video settings from profile
+          setVideoSettings(prev => ({
+            ...prev,
+            enabled: profile.video_background_enabled ?? true,
+            opacity: profile.video_background_opacity || 85,
+            blendMode: profile.video_background_blend_mode || 'multiply'
+          }));
+        }
       }
-    }
-  }, []);
+    };
+
+    loadUserData();
+  }, [user]);
+
+  // Rotate greeting every 30 seconds
+  useEffect(() => {
+    if (!userProfile) return;
+    
+    const interval = setInterval(() => {
+      const greeting = getRandomGreeting(
+        userProfile.name || user?.email?.split('@')[0] || 'there',
+        userProfile.preferred_language || 'en'
+      );
+      setCurrentGreeting(greeting);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [userProfile, user]);
 
   const handleStatsUpdate = useCallback((newStats: typeof stats) => {
     setStats(newStats);
@@ -103,6 +145,8 @@ const Dashboard = () => {
         enabled={videoSettings.enabled}
         videoUrl={videoSettings.videoUrl}
         showAttribution={videoSettings.showAttribution}
+        opacity={videoSettings.opacity}
+        blendMode={videoSettings.blendMode}
       />
       
       <div 
@@ -116,7 +160,7 @@ const Dashboard = () => {
         <SidebarProvider>
           <div className="min-h-screen flex w-full">
             <AppSidebar />
-            <SidebarInset className="flex-1">
+            <SidebarInset className="flex-1 relative">
               <ErrorBoundary>
                 <DashboardHeader />
               </ErrorBoundary>
@@ -126,19 +170,48 @@ const Dashboard = () => {
                   videoSettings.enabled 
                     ? 'bg-black/40 backdrop-blur-md border-white/30' 
                     : 'bg-white/10 backdrop-blur-sm border-white/20'
-                } rounded-xl`}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h1 className="text-4xl font-bold text-white mb-2">
-                          👋 Welcome to AutoPromptr 😊
-                        </h1>
-                        <p className="text-purple-200 text-lg">
-                          Your intelligent batch processing dashboard - manage, monitor, and optimize your AI workflows
-                        </p>
+                } rounded-xl relative overflow-hidden`}>
+                  <CardContent className="p-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                      <div className="lg:col-span-8">
+                        <div className="space-y-4">
+                          <div className="flex items-center space-x-4">
+                            <EnhancedBrandLogo 
+                              size="large" 
+                              variant="horizontal" 
+                              id="dashboard-welcome"
+                              showHoverAnimation={false}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            {currentGreeting && (
+                              <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+                                {currentGreeting.text}
+                              </h1>
+                            )}
+                            <p className="text-purple-200 text-lg">
+                              Your intelligent automation dashboard - streamline workflows, maximize efficiency, generate revenue
+                            </p>
+                            {currentGreeting && currentGreeting.language !== 'en' && (
+                              <p className="text-purple-300 text-sm font-medium">
+                                🌍 {currentGreeting.languageName}
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex-shrink-0 ml-6">
-                        <PromptIcon size="large" id="dashboard-welcome" />
+                      
+                      <div className="lg:col-span-4 flex justify-end">
+                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                          <div className="text-center space-y-3">
+                            <div className="text-3xl">🚀</div>
+                            <div className="text-white font-semibold">Ready to Automate</div>
+                            <div className="text-purple-200 text-sm">
+                              {stats.totalBatches} batches • {stats.activeBatches} active
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </CardContent>

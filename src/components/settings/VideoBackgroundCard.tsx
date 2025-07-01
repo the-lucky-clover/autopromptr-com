@@ -1,214 +1,164 @@
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Video, Eye, EyeOff, Monitor } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-
-interface VideoSettings {
-  enabled: boolean;
-  videoUrl: string;
-  showAttribution: boolean;
-}
-
-const DEFAULT_VIDEO_URL = 'https://videos.pexels.com/video-files/10182004/10182004-hd_1920_1080_25fps.mp4';
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Video, Save } from "lucide-react";
 
 export const VideoBackgroundCard = () => {
-  const [settings, setSettings] = useState<VideoSettings>({
-    enabled: false,
-    videoUrl: DEFAULT_VIDEO_URL,
-    showAttribution: true
-  });
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [isValidUrl, setIsValidUrl] = useState(true);
+  const { user } = useAuth();
   const { toast } = useToast();
+  const [settings, setSettings] = useState({
+    enabled: true,
+    videoUrl: 'https://videos.pexels.com/video-files/3130284/3130284-uhd_2560_1440_25fps.mp4',
+    opacity: 85,
+    blendMode: 'multiply'
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('videoBackgroundSettings');
-    if (saved) {
-      try {
-        const parsedSettings = JSON.parse(saved);
-        setSettings(parsedSettings);
-      } catch (error) {
-        console.error('Failed to parse video settings:', error);
+    const loadSettings = async () => {
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('video_background_enabled, video_background_opacity, video_background_blend_mode')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile) {
+          setSettings({
+            enabled: profile.video_background_enabled ?? true,
+            opacity: profile.video_background_opacity || 85,
+            blendMode: profile.video_background_blend_mode || 'multiply',
+            videoUrl: settings.videoUrl // Keep default URL
+          });
+        }
       }
-    }
-  }, []);
+    };
 
-  const saveSettings = (newSettings: VideoSettings) => {
-    setSettings(newSettings);
-    localStorage.setItem('videoBackgroundSettings', JSON.stringify(newSettings));
-    toast({
-      title: "Settings saved",
-      description: "Video background settings have been updated.",
-    });
-  };
+    loadSettings();
+  }, [user]);
 
-  const validateVideoUrl = (url: string) => {
-    if (!url) return false;
+  const handleSave = async () => {
+    if (!user) return;
     
-    const videoExtensions = ['.mp4', '.webm', '.ogg'];
-    const supportedDomains = ['pexels.com', 'youtube.com', 'vimeo.com'];
-    
+    setLoading(true);
     try {
-      const urlObj = new URL(url);
-      const hasValidExtension = videoExtensions.some(ext => url.toLowerCase().includes(ext));
-      const hasValidDomain = supportedDomains.some(domain => urlObj.hostname.includes(domain));
-      
-      return hasValidExtension || hasValidDomain;
-    } catch {
-      return false;
-    }
-  };
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          video_background_enabled: settings.enabled,
+          video_background_opacity: settings.opacity,
+          video_background_blend_mode: settings.blendMode
+        })
+        .eq('id', user.id);
 
-  const handleUrlChange = (url: string) => {
-    const valid = validateVideoUrl(url);
-    setIsValidUrl(valid);
-    setPreviewUrl(url);
-  };
+      if (error) throw error;
 
-  const applySettings = () => {
-    if (!isValidUrl && previewUrl) {
       toast({
-        title: "Invalid URL",
-        description: "Please enter a valid video URL.",
+        title: "Settings saved",
+        description: "Video background preferences updated successfully.",
+      });
+      
+      // Trigger page reload to apply changes
+      window.location.reload();
+    } catch (error) {
+      console.error('Error saving video settings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save video background settings.",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    const newSettings = {
-      ...settings,
-      videoUrl: previewUrl || settings.videoUrl
-    };
-
-    saveSettings(newSettings);
-  };
-
-  const resetToDefault = () => {
-    const defaultSettings = {
-      enabled: false,
-      videoUrl: DEFAULT_VIDEO_URL,
-      showAttribution: true
-    };
-    saveSettings(defaultSettings);
-    setPreviewUrl('');
   };
 
   return (
-    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+    <Card className="bg-white/10 backdrop-blur-sm border-white/20">
       <CardHeader>
-        <CardTitle className="text-white flex items-center space-x-2">
-          <Video className="h-5 w-5" />
-          <span>Video Background</span>
+        <CardTitle className="text-white flex items-center gap-2">
+          <Video className="w-5 h-5" />
+          Video Background Settings
         </CardTitle>
-        <CardDescription className="text-purple-200">
-          Customize your dashboard with a video background
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Enable/Disable Toggle */}
         <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <Label htmlFor="video-enabled" className="text-white">Enable Video Background</Label>
-            <p className="text-sm text-purple-200">Show video behind dashboard modules</p>
+          <div>
+            <Label className="text-white">Enable Video Background</Label>
+            <p className="text-sm text-purple-200">Show animated background video in dashboard</p>
           </div>
           <Switch
-            id="video-enabled"
             checked={settings.enabled}
-            onCheckedChange={(enabled) => saveSettings({ ...settings, enabled })}
+            onCheckedChange={(enabled) => setSettings(prev => ({ ...prev, enabled }))}
           />
         </div>
 
-        {/* Video URL Input */}
-        <div className="space-y-2">
-          <Label htmlFor="video-url" className="text-white">Video URL</Label>
-          <div className="space-y-2">
-            <Input
-              id="video-url"
-              type="url"
-              placeholder="Enter video URL..."
-              value={previewUrl || settings.videoUrl}
-              onChange={(e) => handleUrlChange(e.target.value)}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-            />
-            {!isValidUrl && previewUrl && (
-              <p className="text-red-400 text-sm">Please enter a valid video URL (.mp4, .webm, .ogg, YouTube, Vimeo, or Pexels)</p>
-            )}
-          </div>
-        </div>
-
-        {/* Default Demo Badge */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
-              <Monitor className="h-3 w-3 mr-1" />
-              Demo Video
-            </Badge>
-            <span className="text-sm text-purple-200">Pexels time-lapse city</span>
-          </div>
-          <Button
-            onClick={() => setPreviewUrl(DEFAULT_VIDEO_URL)}
-            variant="outline"
-            size="sm"
-            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-          >
-            Use Demo
-          </Button>
-        </div>
-
-        {/* Attribution Toggle */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <Label htmlFor="show-attribution" className="text-white">Show Attribution</Label>
-            <p className="text-sm text-purple-200">Display video source credit</p>
-          </div>
-          <Switch
-            id="show-attribution"
-            checked={settings.showAttribution}
-            onCheckedChange={(showAttribution) => saveSettings({ ...settings, showAttribution })}
-          />
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex space-x-3">
-          <Button
-            onClick={applySettings}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            Apply Changes
-          </Button>
-          <Button
-            onClick={resetToDefault}
-            variant="outline"
-            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-          >
-            Reset to Default
-          </Button>
-        </div>
-
-        {/* Settings Preview */}
-        <div className="bg-white/5 rounded-lg p-3 space-y-2">
-          <h4 className="text-white font-medium text-sm">Current Settings</h4>
-          <div className="space-y-1 text-xs">
-            <div className="flex justify-between">
-              <span className="text-purple-300">Status:</span>
-              <span className={settings.enabled ? 'text-green-400' : 'text-red-400'}>
-                {settings.enabled ? 'Enabled' : 'Disabled'}
-              </span>
+        {settings.enabled && (
+          <>
+            <div className="space-y-2">
+              <Label className="text-white">Background Opacity</Label>
+              <div className="px-3">
+                <Slider
+                  value={[settings.opacity]}
+                  onValueChange={(value) => setSettings(prev => ({ ...prev, opacity: value[0] }))}
+                  max={100}
+                  min={30}
+                  step={5}
+                  className="w-full"
+                />
+              </div>
+              <p className="text-sm text-purple-200">{settings.opacity}% opacity</p>
             </div>
-            <div className="flex justify-between">
-              <span className="text-purple-300">Attribution:</span>
-              <span className={settings.showAttribution ? 'text-green-400' : 'text-red-400'}>
-                {settings.showAttribution ? 'Visible' : 'Hidden'}
-              </span>
+
+            <div className="space-y-2">
+              <Label className="text-white">Blend Mode</Label>
+              <Select
+                value={settings.blendMode}
+                onValueChange={(blendMode) => setSettings(prev => ({ ...prev, blendMode }))}
+              >
+                <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="multiply">Multiply</SelectItem>
+                  <SelectItem value="overlay">Overlay</SelectItem>
+                  <SelectItem value="normal">Normal</SelectItem>
+                  <SelectItem value="soft-light">Soft Light</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </div>
-        </div>
+
+            <div className="space-y-2">
+              <Label className="text-white">Video URL</Label>
+              <Input
+                value={settings.videoUrl}
+                onChange={(e) => setSettings(prev => ({ ...prev, videoUrl: e.target.value }))}
+                placeholder="Enter video URL"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+              />
+              <p className="text-sm text-purple-200">
+                Use Pexels videos or direct MP4 URLs for best performance
+              </p>
+            </div>
+          </>
+        )}
+
+        <Button
+          onClick={handleSave}
+          disabled={loading}
+          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+        >
+          <Save className="w-4 h-4 mr-2" />
+          {loading ? 'Saving...' : 'Save Settings'}
+        </Button>
       </CardContent>
     </Card>
   );
