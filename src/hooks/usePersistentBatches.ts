@@ -1,17 +1,16 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Batch } from '@/types/batch';
-import { useBatchSync } from './useBatchSync';
 
 const STORAGE_KEY = 'autopromptr_batches';
 const BACKUP_STORAGE_KEY = 'autopromptr_batches_backup';
 
 export const usePersistentBatches = () => {
   const [batches, setBatches] = useState<Batch[]>([]);
-  const { subscribeToBatchSync } = useBatchSync();
   const isSavingRef = useRef(false);
   const isLoadingRef = useRef(false);
   const lastSavedDataRef = useRef<string>('');
+  const isInitializedRef = useRef(false);
 
   // Debounced save function
   const debouncedSave = useRef<NodeJS.Timeout | null>(null);
@@ -44,8 +43,11 @@ export const usePersistentBatches = () => {
 
   // Load batches from localStorage on mount
   useEffect(() => {
+    if (isInitializedRef.current) return; // Prevent multiple initializations
+    
     try {
       console.log('Loading batches from localStorage...');
+      isInitializedRef.current = true;
       
       const savedBatches = localStorage.getItem(STORAGE_KEY);
       console.log('Raw saved batches:', savedBatches);
@@ -106,19 +108,11 @@ export const usePersistentBatches = () => {
     }
   }, []);
 
-  // Subscribe to sync events from other components
+  // Save batches to localStorage with debouncing - REMOVED AUTOMATIC SYNC
   useEffect(() => {
-    const unsubscribe = subscribeToBatchSync(() => {
-      console.log('Received sync event, reloading batches...');
-      reloadBatches();
-    });
-
-    return unsubscribe;
-  }, [subscribeToBatchSync]);
-
-  // Save batches to localStorage with debouncing - REMOVED AUTO-SYNC
-  useEffect(() => {
-    if (batches.length > 0 && !isLoadingRef.current) {
+    if (!isInitializedRef.current || isLoadingRef.current) return;
+    
+    if (batches.length >= 0) { // Allow saving empty arrays too
       // Clear previous debounced save
       if (debouncedSave.current) {
         clearTimeout(debouncedSave.current);
@@ -143,7 +137,7 @@ export const usePersistentBatches = () => {
         } finally {
           isSavingRef.current = false;
         }
-      }, 300); // 300ms debounce
+      }, 500); // Increased debounce to 500ms
     }
 
     return () => {
@@ -154,6 +148,7 @@ export const usePersistentBatches = () => {
   }, [batches]);
 
   const updateBatches = (newBatches: Batch[] | ((prev: Batch[]) => Batch[])) => {
+    if (!isInitializedRef.current) return; // Prevent updates before initialization
     setBatches(newBatches);
   };
 
@@ -184,20 +179,11 @@ export const usePersistentBatches = () => {
     return false;
   };
 
-  // Manual sync trigger - only call this for explicit user actions
-  const triggerManualSync = () => {
-    const { triggerBatchSync } = useBatchSync();
-    setTimeout(() => {
-      triggerBatchSync();
-    }, 100);
-  };
-
   return {
     batches,
     setBatches: updateBatches,
     clearAllBatches,
     recoverFromBackup,
-    reloadBatches,
-    triggerManualSync
+    reloadBatches
   };
 };

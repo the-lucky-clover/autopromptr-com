@@ -1,5 +1,5 @@
 
-import { useEffect, useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 const BATCH_SYNC_EVENT = 'autopromptr_batch_sync';
 
@@ -15,7 +15,7 @@ export const useBatchSync = () => {
     debounceRef.current = setTimeout(() => {
       console.log('Triggering batch sync across components...');
       window.dispatchEvent(new CustomEvent(BATCH_SYNC_EVENT));
-    }, 100); // 100ms debounce
+    }, 200); // Increased debounce
   }, []);
 
   const subscribeToBatchSync = useCallback((callback: () => void) => {
@@ -28,30 +28,16 @@ export const useBatchSync = () => {
     return () => window.removeEventListener(BATCH_SYNC_EVENT, handleSync);
   }, []);
 
-  // Listen for localStorage changes from other tabs/windows
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'autopromptr_batches' && e.newValue !== e.oldValue) {
-        console.log('Detected localStorage change, triggering sync');
-        triggerBatchSync();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [triggerBatchSync]);
-
   // Cleanup debounce on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
+  const cleanup = useCallback(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
   }, []);
 
   return {
     triggerBatchSync,
-    subscribeToBatchSync
+    subscribeToBatchSync,
+    cleanup
   };
 };

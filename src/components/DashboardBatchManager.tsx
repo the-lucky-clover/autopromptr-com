@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+
+import { useEffect, useRef } from 'react';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
 import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
-import { useBatchSync } from '@/hooks/useBatchSync';
 import BatchModal from './BatchModal';
 import DashboardBatchList from './DashboardBatchList';
 import DashboardEmptyState from './DashboardEmptyState';
@@ -27,6 +27,9 @@ const DashboardBatchManager = ({
   isCompact = false,
   onNewBatchRequest 
 }: DashboardBatchManagerProps) => {
+  const isInitializedRef = useRef(false);
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const {
     batches,
     showModal,
@@ -49,11 +52,18 @@ const DashboardBatchManager = ({
   } = useDashboardBatchManager();
 
   const { detectAndFixFailedBatches } = useBatchStatusManager();
-  const { triggerBatchSync } = useBatchSync();
+
+  // Initialize component
+  useEffect(() => {
+    if (!isInitializedRef.current) {
+      isInitializedRef.current = true;
+      console.log('DashboardBatchManager initialized');
+    }
+  }, []);
 
   // Listen for new batch requests from control bar
   useEffect(() => {
-    if (onNewBatchRequest) {
+    if (onNewBatchRequest && isInitializedRef.current) {
       const handleExternalNewBatch = () => {
         handleNewBatch();
       };
@@ -69,18 +79,27 @@ const DashboardBatchManager = ({
   // Manual refresh function
   const handleRefresh = () => {
     console.log('Manual refresh triggered');
-    triggerBatchSync();
+    // Force a simple state refresh without triggering sync loops
+    if (batches.length > 0) {
+      console.log(`Refreshed view of ${batches.length} batches`);
+    }
   };
 
-  // Simple delete handler - removed extra sync calls
+  // Simple delete handler
   const handleEnhancedDeleteBatch = (batchId: string) => {
     console.log('Dashboard deleting batch:', batchId);
     handleDeleteBatch(batchId);
   };
 
-  // Update stats whenever batches change
+  // Update stats whenever batches change - with debouncing
   useEffect(() => {
-    if (onStatsUpdate) {
+    if (!isInitializedRef.current || !onStatsUpdate) return;
+
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+
+    updateTimeoutRef.current = setTimeout(() => {
       const stats = {
         totalBatches: batches.length,
         activeBatches: batches.filter(b => b.status === 'running').length,
@@ -88,18 +107,38 @@ const DashboardBatchManager = ({
         totalPrompts: batches.reduce((sum, batch) => sum + batch.prompts.length, 0)
       };
       onStatsUpdate(stats);
-    }
+    }, 300);
+
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
   }, [batches, onStatsUpdate]);
 
-  // Update batches for parent component
+  // Update batches for parent component - with debouncing
   useEffect(() => {
-    if (onBatchesUpdate) {
-      onBatchesUpdate(batches);
+    if (!isInitializedRef.current || !onBatchesUpdate) return;
+
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
     }
+
+    updateTimeoutRef.current = setTimeout(() => {
+      onBatchesUpdate(batches);
+    }, 300);
+
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
   }, [batches, onBatchesUpdate]);
 
   // Check for stuck/failed batches on component mount
   useEffect(() => {
+    if (!isInitializedRef.current) return;
+
     const timer = setTimeout(() => {
       const stuckBatches = batches.filter(batch => {
         const now = new Date();
