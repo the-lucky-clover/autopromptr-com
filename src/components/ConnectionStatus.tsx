@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { Wifi, WifiOff, Loader2 } from 'lucide-react';
 import { EnhancedAutoPromptr } from '@/services/enhancedAutoPromptr';
 import { useAuth } from '@/hooks/useAuth';
-import RealTimeClock from './RealTimeClock';
 
 // Circuit breaker state
 const connectionCircuitBreaker = {
@@ -99,28 +98,28 @@ export const ConnectionStatus = () => {
     switch (status) {
       case 'checking':
         return (
-          <Badge variant="outline" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+          <Badge variant="outline" className="bg-yellow-500/20 text-yellow-700 border-yellow-500/30">
             <Loader2 className="h-3 w-3 mr-1 animate-spin" />
             Checking...
           </Badge>
         );
       case 'connected':
         return (
-          <Badge variant="outline" className="bg-green-500/20 text-green-300 border-green-500/30">
+          <Badge variant="outline" className="bg-green-500/20 text-green-700 border-green-500/30">
             <Wifi className="h-3 w-3 mr-1" />
             Ready
           </Badge>
         );
       case 'offline':
         return (
-          <Badge variant="outline" className="bg-orange-500/20 text-orange-300 border-orange-500/30">
+          <Badge variant="outline" className="bg-orange-500/20 text-orange-700 border-orange-500/30">
             <WifiOff className="h-3 w-3 mr-1" />
             Protected Mode
           </Badge>
         );
       case 'disconnected':
         return (
-          <Badge variant="outline" className="bg-red-500/20 text-red-300 border-red-500/30">
+          <Badge variant="outline" className="bg-red-500/20 text-red-700 border-red-500/30">
             <WifiOff className="h-3 w-3 mr-1" />
             Offline
           </Badge>
@@ -128,12 +127,5 @@ export const ConnectionStatus = () => {
     }
   };
 
-  return (
-    <div className="flex items-center justify-end space-x-4">
-      {getStatusBadge()}
-      <div className="flex justify-end">
-        <RealTimeClock />
-      </div>
-    </div>
-  );
+  return getStatusBadge();
 };

@@ -14,7 +14,7 @@ import ConsoleMonitorModule from "@/components/ConsoleMonitorModule";
 import RecentActivity from "@/components/RecentActivity";
 import EnhancedBrandLogo from "@/components/EnhancedBrandLogo";
 import VideoBackground from "@/components/VideoBackground";
-import OverviewDashboardLayout from "@/components/dashboard/OverviewDashboardLayout";
+import StaticDashboardLayout from "@/components/dashboard/StaticDashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -22,7 +22,7 @@ import { getRandomGreeting } from "@/services/greetingService";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { visibleModules, updateModuleState, reorderModules } = useDashboardModules();
+  const { visibleModules } = useDashboardModules();
   
   const [stats, setStats] = useState({
     totalBatches: 0,
@@ -128,16 +128,16 @@ const Dashboard = () => {
           return <ConsoleMonitorModule isCompact={false} />;
         
         default:
-          return <div>Module content not found</div>;
+          return <div className="text-gray-500">Module content not found</div>;
       }
     } catch (error) {
       console.error(`Error rendering module ${moduleId}:`, error);
-      return <div className="text-red-400">Error loading module</div>;
+      return <div className="text-red-600">Error loading module</div>;
     }
   };
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative bg-gray-50">
       <VideoBackground
         enabled={videoSettings.enabled}
         videoUrl={videoSettings.videoUrl}
@@ -151,7 +151,7 @@ const Dashboard = () => {
         style={{ 
           background: videoSettings.enabled 
             ? 'transparent' 
-            : 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' 
+            : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)' 
         }}
       >
         <SidebarProvider>
@@ -165,9 +165,9 @@ const Dashboard = () => {
               <ErrorBoundary>
                 <Card className={`m-6 mb-4 ${
                   videoSettings.enabled 
-                    ? 'bg-black/40 backdrop-blur-md border-white/30' 
-                    : 'bg-white/10 backdrop-blur-sm border-white/20'
-                } rounded-xl relative overflow-hidden`}>
+                    ? 'bg-white/95 backdrop-blur-md border-gray-200' 
+                    : 'bg-white border-gray-200'
+                } rounded-xl shadow-sm`}>
                   <CardContent className="p-8">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                       <div className="lg:col-span-8">
@@ -183,15 +183,15 @@ const Dashboard = () => {
                           
                           <div className="space-y-2">
                             {currentGreeting && (
-                              <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+                              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
                                 {currentGreeting.text}
                               </h1>
                             )}
-                            <p className="text-purple-200 text-lg">
+                            <p className="text-gray-600 text-lg">
                               Your intelligent automation dashboard - streamline workflows, maximize efficiency, generate revenue
                             </p>
                             {currentGreeting && currentGreeting.language !== 'en' && (
-                              <p className="text-purple-300 text-sm font-medium">
+                              <p className="text-gray-500 text-sm font-medium">
                                 🌍 {currentGreeting.languageName}
                               </p>
                             )}
@@ -200,11 +200,11 @@ const Dashboard = () => {
                       </div>
                       
                       <div className="lg:col-span-4 flex justify-end">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
                           <div className="text-center space-y-3">
                             <div className="text-3xl">🚀</div>
-                            <div className="text-white font-semibold">Ready to Automate</div>
-                            <div className="text-purple-200 text-sm">
+                            <div className="text-gray-900 font-semibold">Ready to Automate</div>
+                            <div className="text-gray-600 text-sm">
                               {stats.totalBatches} batches • {stats.activeBatches} active
                             </div>
                           </div>
@@ -219,9 +219,8 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                   <div className="lg:col-span-8">
                     <ErrorBoundary>
-                      <OverviewDashboardLayout
+                      <StaticDashboardLayout
                         visibleModules={overviewModules}
-                        reorderModules={reorderModules}
                         renderModuleContent={renderModuleContent}
                       />
                     </ErrorBoundary>

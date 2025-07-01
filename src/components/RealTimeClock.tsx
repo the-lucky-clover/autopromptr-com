@@ -59,13 +59,13 @@ const RealTimeClock = ({ use24Hour = true }: RealTimeClockProps) => {
   };
 
   return (
-    <div className="flex items-center space-x-2 text-purple-200">
+    <div className="flex items-center space-x-2 text-gray-700">
       <Clock className="h-3 w-3" />
       <div className="flex flex-col text-xs text-right">
         <span className="font-mono font-medium">
           {formatTime(time)}
         </span>
-        <span className="text-[10px] text-purple-300">
+        <span className="text-[10px] text-gray-500">
           {getTimezone()}
         </span>
       </div>
