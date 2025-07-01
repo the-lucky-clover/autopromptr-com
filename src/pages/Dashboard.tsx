@@ -64,7 +64,7 @@ const Dashboard = () => {
 
   return (
     <div 
-      className="min-h-screen relative"
+      className="min-h-screen relative animate-shimmer"
       style={{ 
         background: 'linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%)' 
       }}
@@ -74,16 +74,20 @@ const Dashboard = () => {
           <AppSidebar />
           <SidebarInset className="flex-1 relative">
             <ErrorBoundary>
-              <DashboardHeader />
+              <div className="animate-shimmer-delayed">
+                <DashboardHeader />
+              </div>
             </ErrorBoundary>
             
             <ErrorBoundary>
-              <CleanDashboardWelcomeCard />
+              <div className="animate-shimmer">
+                <CleanDashboardWelcomeCard />
+              </div>
             </ErrorBoundary>
 
             <div className="px-6 pb-6">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div className="lg:col-span-9">
+                <div className="lg:col-span-9 animate-shimmer-delayed">
                   <ErrorBoundary>
                     <StaticDashboardLayout
                       visibleModules={overviewModules}
@@ -92,7 +96,7 @@ const Dashboard = () => {
                   </ErrorBoundary>
                 </div>
 
-                <div className="lg:col-span-3">
+                <div className="lg:col-span-3 animate-shimmer">
                   <ErrorBoundary>
                     <RecentActivity />
                   </ErrorBoundary>

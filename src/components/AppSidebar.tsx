@@ -84,8 +84,8 @@ export function AppSidebar() {
   const { isSysOp } = useUserRole();
 
   return (
-    <Sidebar className="bg-gray-900/60 backdrop-blur-sm border-white/10 shadow-2xl">
-      <SidebarHeader className="p-6 border-b border-white/10">
+    <Sidebar className="bg-gray-900/60 backdrop-blur-sm border-white/10 shadow-2xl animate-shimmer">
+      <SidebarHeader className="p-6 border-b border-white/10 animate-shimmer-delayed">
         <div className="flex justify-center items-center">
           <ZapBrandLogo size="small" variant="horizontal" className="items-center" showHoverAnimation={false} />
         </div>
@@ -94,7 +94,7 @@ export function AppSidebar() {
       <SidebarContent className="mt-8 px-4">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-3">
+            <SidebarMenu className="space-y-4">
               {items.map((item) => {
                 const IconComponent = item.icon;
                 const isActive = location.pathname === item.url;
@@ -103,20 +103,20 @@ export function AppSidebar() {
                     <SidebarMenuButton 
                       asChild
                       isActive={isActive}
-                      className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-500 ease-out rounded-xl text-xl px-6 py-4 my-2 transform hover:scale-105 ${
+                      className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-700 ease-out rounded-xl text-xl px-6 py-5 my-2 transform hover:scale-105 animate-shimmer ${
                         isActive 
-                          ? 'bg-gradient-to-r from-blue-600/80 to-purple-600/80 backdrop-blur-sm border border-blue-400/50 shadow-xl shadow-blue-500/30 scale-105' 
+                          ? 'bg-gradient-to-r from-blue-600/80 to-purple-600/80 backdrop-blur-sm border border-blue-400/50 shadow-xl shadow-blue-500/30 scale-105 animate-shimmer-delayed' 
                           : 'hover:shadow-lg hover:shadow-purple-500/20'
                       }`}
                       style={{
-                        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'all 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
                       }}
                     >
                       <Link to={item.url} className="w-full">
-                        <IconComponent className={`h-6 w-6 mr-4 transition-all duration-300 ${
+                        <IconComponent className={`h-7 w-7 mr-5 transition-all duration-500 ${
                           isActive ? 'text-white drop-shadow-lg' : 'text-white/80'
                         }`} />
-                        <span className={`text-xl font-medium transition-all duration-300 ${
+                        <span className={`text-xl font-medium transition-all duration-500 ${
                           isActive ? 'text-white drop-shadow-sm' : 'text-white/90'
                         }`}>
                           {item.title}
@@ -131,9 +131,9 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {isSysOp && (
-          <SidebarGroup className="mt-6">
+          <SidebarGroup className="mt-8">
             <SidebarGroupContent>
-              <SidebarMenu className="space-y-3">
+              <SidebarMenu className="space-y-4">
                 {adminItems.map((item) => {
                   const IconComponent = item.icon;
                   const isActive = location.pathname === item.url;
@@ -142,20 +142,20 @@ export function AppSidebar() {
                       <SidebarMenuButton 
                         asChild
                         isActive={isActive}
-                        className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-500 ease-out rounded-xl text-xl px-6 py-4 my-2 transform hover:scale-105 ${
+                        className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-700 ease-out rounded-xl text-xl px-6 py-5 my-2 transform hover:scale-105 animate-shimmer ${
                           isActive 
-                            ? 'bg-gradient-to-r from-blue-600/80 to-purple-600/80 backdrop-blur-sm border border-blue-400/50 shadow-xl shadow-blue-500/30 scale-105' 
+                            ? 'bg-gradient-to-r from-blue-600/80 to-purple-600/80 backdrop-blur-sm border border-blue-400/50 shadow-xl shadow-blue-500/30 scale-105 animate-shimmer-delayed' 
                             : 'hover:shadow-lg hover:shadow-purple-500/20'
                         }`}
                         style={{
-                          transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                          transition: 'all 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
                         }}
                       >
                         <Link to={item.url} className="w-full">
-                          <IconComponent className={`h-6 w-6 mr-4 transition-all duration-300 ${
+                          <IconComponent className={`h-7 w-7 mr-5 transition-all duration-500 ${
                             isActive ? 'text-white drop-shadow-lg' : 'text-white/80'
                           }`} />
-                          <span className={`text-xl font-medium transition-all duration-300 ${
+                          <span className={`text-xl font-medium transition-all duration-500 ${
                             isActive ? 'text-white drop-shadow-sm' : 'text-white/90'
                           }`}>
                             {item.title}
@@ -171,7 +171,7 @@ export function AppSidebar() {
         )}
       </SidebarContent>
 
-      <SidebarFooter className="p-6 border-t border-white/10">
+      <SidebarFooter className="p-6 border-t border-white/10 animate-shimmer">
         <UserProfile />
       </SidebarFooter>
     </Sidebar>

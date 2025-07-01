@@ -3,9 +3,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { LogOut, CreditCard, User, Key, Shield, Upload } from 'lucide-react';
+import { LogOut, User, Upload } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useSecureApiKeys } from '@/hooks/useSecureApiKeys';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -14,9 +13,9 @@ const UserProfile = () => {
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showGreeting, setShowGreeting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, signOut } = useAuth();
-  const { hasApiKey } = useSecureApiKeys();
   const { toast } = useToast();
 
   const loadProfile = async () => {
@@ -50,6 +49,11 @@ const UserProfile = () => {
   const getInitial = () => {
     if (!user?.email) return 'U';
     return user.email.charAt(0).toUpperCase();
+  };
+
+  const getUsername = () => {
+    if (!user?.email) return 'User';
+    return user.email.split('@')[0];
   };
 
   const handleSignOut = async () => {
@@ -103,31 +107,55 @@ const UserProfile = () => {
     }
   };
 
-  const hasSecureApiKeys = hasApiKey('openai_api_key');
+  const handleMouseEnter = () => {
+    setShowGreeting(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowGreeting(false);
+    setIsOpen(false);
+  };
 
   const handleClose = () => {
     setIsOpen(false);
+    setShowGreeting(false);
   };
 
   if (loading) {
     return (
-      <div className="flex items-center space-x-3 p-2 rounded-xl">
-        <div className="h-8 w-8 bg-gray-600 rounded-full animate-pulse"></div>
-        <div className="h-4 w-24 bg-gray-600 rounded animate-pulse"></div>
+      <div className="flex items-center justify-center p-4">
+        <div className="h-12 w-12 bg-gray-600 rounded-full animate-pulse"></div>
       </div>
     );
   }
 
   return (
-    <div className="relative">
+    <div className="relative" onMouseLeave={handleMouseLeave}>
+      {/* Animated greeting */}
+      <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 transition-all duration-500 ease-out ${
+        showGreeting 
+          ? 'opacity-100 translate-y-0 scale-100' 
+          : 'opacity-0 translate-y-2 scale-95 pointer-events-none'
+      }`}>
+        <div className="bg-gradient-to-r from-blue-600/90 to-purple-600/90 backdrop-blur-sm text-white px-4 py-2 rounded-xl shadow-lg border border-white/20 whitespace-nowrap">
+          <span className="text-sm font-medium">Hi {getUsername()}!</span>
+        </div>
+      </div>
+
+      {/* Avatar button */}
       <Button
         variant="ghost"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        className="p-0 h-auto hover:bg-white/10 rounded-xl"
+        onMouseEnter={handleMouseEnter}
+        className={`p-2 h-auto hover:bg-white/10 rounded-xl transition-all duration-300 ${
+          showGreeting ? 'scale-110 shadow-lg shadow-purple-500/25' : ''
+        }`}
       >
-        <div className="flex items-center space-x-3 p-2 rounded-xl hover:bg-white/10 transition-colors">
-          <Avatar className="h-8 w-8">
+        <div className="relative">
+          <Avatar className={`transition-all duration-300 ${
+            showGreeting ? 'h-12 w-12 ring-2 ring-purple-400/50' : 'h-10 w-10'
+          }`}>
             {avatarUrl ? (
               <AvatarImage src={avatarUrl} alt="Avatar" />
             ) : null}
@@ -135,45 +163,39 @@ const UserProfile = () => {
               {getInitial()}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1 min-w-0 text-left">
-            <p className="text-white text-sm font-medium truncate">
-              {user?.email}
-            </p>
-            <div className="flex items-center space-x-2">
-              <p className="text-white/70 text-xs">Online</p>
-              {hasSecureApiKeys && (
-                <div className="flex items-center">
-                  <Shield className="h-3 w-3 text-green-400" />
-                  <span className="text-green-400 text-xs ml-1">Secure</span>
-                </div>
-              )}
+          
+          {/* Upload indicator */}
+          {uploading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             </div>
-          </div>
+          )}
         </div>
       </Button>
 
+      {/* Minimalist profile menu */}
       {isOpen && (
         <>
           <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-md z-40 animate-fade-in" 
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 animate-fade-in" 
             onClick={handleClose}
           />
-          <Card className="absolute bottom-full left-0 mb-2 w-80 bg-gray-900/90 backdrop-blur-xl border-white/20 z-50 rounded-xl shadow-2xl shadow-black/50 animate-scale-in">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-3 mb-4 p-3 bg-white/5 rounded-xl">
+          <Card className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-4 w-48 bg-gray-900/95 backdrop-blur-xl border-white/20 z-50 rounded-xl shadow-2xl shadow-black/50 animate-scale-in">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-center mb-3">
                 <div className="relative">
-                  <Avatar className="h-12 w-12">
+                  <Avatar className="h-16 w-16 ring-2 ring-purple-400/30">
                     {avatarUrl ? (
                       <AvatarImage src={avatarUrl} alt="Avatar" />
                     ) : null}
-                    <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-medium">
+                    <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xl font-medium">
                       {getInitial()}
                     </AvatarFallback>
                   </Avatar>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="absolute -bottom-1 -right-1 h-6 w-6 p-0 bg-gray-800 border-white/20 hover:bg-gray-700"
+                    className="absolute -bottom-1 -right-1 h-6 w-6 p-0 bg-gray-800 border-white/20 hover:bg-gray-700 rounded-full"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
                   >
@@ -187,66 +209,35 @@ const UserProfile = () => {
                     onChange={handleAvatarUpload}
                   />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium truncate">
-                    {user?.email}
-                  </p>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-white/70 text-xs">Signed in</p>
-                    {hasSecureApiKeys && (
-                      <div className="flex items-center">
-                        <Shield className="h-3 w-3 text-green-400" />
-                        <span className="text-green-400 text-xs ml-1">Keys Secured</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
               </div>
               
-              <div className="space-y-2">
+              <div className="text-center mb-4">
+                <p className="text-white text-sm font-medium truncate">
+                  {getUsername()}
+                </p>
+                <p className="text-white/60 text-xs truncate">
+                  {user?.email}
+                </p>
+              </div>
+              
+              <div className="space-y-1">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start text-white hover:bg-white/10 rounded-xl"
-                >
-                  <CreditCard className="h-4 w-4 mr-3" />
-                  Subscription
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start text-white hover:bg-white/10 rounded-xl"
+                  className="w-full justify-start text-white hover:bg-white/10 rounded-lg text-sm py-2"
                 >
                   <User className="h-4 w-4 mr-3" />
-                  Change Email
+                  Profile
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start text-white hover:bg-white/10 rounded-xl"
+                  onClick={handleSignOut}
+                  className="w-full justify-start text-white hover:bg-red-500/20 hover:text-red-300 rounded-lg text-sm py-2"
                 >
-                  <Key className="h-4 w-4 mr-3" />
-                  Change Password
+                  <LogOut className="h-4 w-4 mr-3" />
+                  Sign out
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start text-white hover:bg-white/10 rounded-xl"
-                >
-                  <Shield className="h-4 w-4 mr-3" />
-                  Two-Factor Auth
-                </Button>
-                <div className="border-t border-white/10 pt-2 mt-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleSignOut}
-                    className="w-full justify-start text-white hover:bg-red-500/20 hover:text-red-300 rounded-xl"
-                  >
-                    <LogOut className="h-4 w-4 mr-3" />
-                    Sign out
-                  </Button>
-                </div>
               </div>
             </CardContent>
           </Card>
