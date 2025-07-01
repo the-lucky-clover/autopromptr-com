@@ -5,7 +5,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { useDashboardModules } from "@/hooks/useDashboardModules";
 import { useAuth } from "@/hooks/useAuth";
 import SystemLogsPanel from "@/components/SystemLogsPanel";
-import HealthStatusDashboardWrapper from "@/components/HealthStatusDashboardWrapper";
+import ServerStatusConsole from "@/components/health/ServerStatusConsole";
 import DashboardSubscription from "@/components/DashboardSubscription";
 import DashboardStatsModule from "@/components/DashboardStatsModule";
 import AnalyticsModule from "@/components/AnalyticsModule";
@@ -37,7 +37,7 @@ const Dashboard = () => {
     try {
       switch (componentName) {
         case 'HealthStatusDashboard':
-          return <HealthStatusDashboardWrapper isCompact={false} />;
+          return <ServerStatusConsole isCompact={false} />;
         
         case 'SystemLogsPanel':
           return <SystemLogsPanel batches={batches} hasActiveBatch={hasActiveBatch} isCompact={false} />;

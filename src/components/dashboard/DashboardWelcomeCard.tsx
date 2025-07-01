@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
+import RealTimeClock from "@/components/RealTimeClock";
 
 interface DashboardWelcomeCardProps {
   currentGreeting: any;
@@ -32,13 +33,16 @@ const DashboardWelcomeCard = ({ currentGreeting, stats, videoSettings }: Dashboa
     : 'Ready to automate your way to success? 💰';
 
   return (
-    <Card className={`m-6 mb-4 ${
-      videoSettings.enabled 
-        ? 'bg-white/10 backdrop-blur-sm border-white/20' 
-        : 'bg-white/10 backdrop-blur-sm border-white/20'
-    } rounded-xl border`}>
-      <CardContent className="p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl border m-6 mb-4">
+      <CardContent className="p-8 relative">
+        {/* Clock in upper-right corner */}
+        <div className="absolute top-6 right-6">
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+            <RealTimeClock />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pr-32">
           <div className="lg:col-span-8">
             <div className="space-y-4">
               <div className="space-y-2">
@@ -76,15 +80,15 @@ const DashboardWelcomeCard = ({ currentGreeting, stats, videoSettings }: Dashboa
           </div>
           
           <div className="lg:col-span-4 flex justify-end">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-12 border border-white/20 relative overflow-hidden">
-              {/* Glassmorphism effect overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl"></div>
-              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-purple-500/10 rounded-2xl"></div>
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-16 border border-white/20 relative overflow-hidden">
+              {/* Enhanced glassmorphism effects */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-2xl"></div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 rounded-2xl"></div>
               
-              <div className="text-center space-y-6 relative z-10">
-                <div className="text-6xl">🚀</div>
-                <div className="text-white font-semibold text-xl">Ready to Automate</div>
-                <div className="text-white/60 text-base">
+              <div className="text-center space-y-8 relative z-10">
+                <div className="text-8xl">🚀</div>
+                <div className="text-white font-semibold text-2xl">Ready to Automate</div>
+                <div className="text-white/60 text-lg">
                   {stats.totalBatches} batches • {stats.activeBatches} active
                 </div>
               </div>

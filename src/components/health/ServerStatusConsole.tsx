@@ -1,12 +1,14 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Server, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Server, RefreshCw, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useConsoleOutput } from '@/hooks/useConsoleOutput';
 import { StatusLight, StatusBadge } from './StatusIndicators';
 import ConsoleOutputDisplay from './ConsoleOutputDisplay';
+import { ConnectionStatus } from '@/components/ConnectionStatus';
 
 const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => {
   const { healthStatus, isLoading, performManualCheck, resetCircuitBreaker } = useHealthMonitor();
@@ -40,9 +42,10 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
         <div className="flex items-center justify-between">
           <CardTitle className="text-white flex items-center gap-3">
             <Server className="w-5 h-5 text-blue-400" />
-            Server Status
+            System Status
           </CardTitle>
           <div className="flex items-center space-x-3">
+            <ConnectionStatus />
             <StatusBadge status={healthStatus.status} circuitBreakerState={circuitBreakerState} />
             <Button
               onClick={handleManualRefresh}
