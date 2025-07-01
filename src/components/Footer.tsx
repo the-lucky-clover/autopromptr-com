@@ -1,6 +1,7 @@
+
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Linkedin, Twitter, Github } from 'lucide-react';
-import EnhancedBrandLogo from '@/components/EnhancedBrandLogo';
+import ZapBrandLogo from '@/components/ZapBrandLogo';
 
 const Footer = () => {
   return (
@@ -10,7 +11,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <EnhancedBrandLogo size="medium" variant="horizontal" id="footer" />
+            <ZapBrandLogo size="medium" variant="horizontal" id="footer" />
             <p className="text-gray-300 text-sm">
               Revolutionizing AI workflows through intelligent prompt engineering and automation.
             </p>

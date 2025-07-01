@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -6,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
 import AuthModal from "@/components/AuthModal";
-import EnhancedBrandLogo from "@/components/EnhancedBrandLogo";
+import ZapBrandLogo from "@/components/ZapBrandLogo";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +80,7 @@ const Navbar = () => {
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
               <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16">
-                <EnhancedBrandLogo size="small" variant="horizontal" id="navbar-loading" />
+                <ZapBrandLogo size="small" variant="horizontal" id="navbar-loading" />
               </div>
             </Link>
             
@@ -114,10 +115,10 @@ const Navbar = () => {
         {/* Navbar content - always visible with responsive padding */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center h-20">
-            {/* Enhanced Logo with Robot Icon */}
+            {/* Enhanced Logo with Zap Icon */}
             <Link to="/" className="flex items-center group flex-shrink-0">
               <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16">
-                <EnhancedBrandLogo size="small" variant="horizontal" id="navbar" />
+                <ZapBrandLogo size="small" variant="horizontal" id="navbar" />
               </div>
             </Link>
             
@@ -188,52 +189,6 @@ const Navbar = () => {
           <AuthModal mode={authMode} onClose={() => setAuthModalOpen(false)} />
         </DialogContent>
       </Dialog>
-
-      {/* Opposite colors and increased luminosity styles for navbar logo */}
-      <style>
-        {`
-          .navbar-logo-inverted .brand-logo-text {
-            background: linear-gradient(90deg, #FF6B9D, #9B59B6, #3498DB, #9B59B6, #FF6B9D) !important;
-            background-size: 300% 300% !important;
-            animation: heroGradientFlowInverted 6s ease-in-out infinite !important;
-            -webkit-background-clip: text !important;
-            background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            filter: drop-shadow(0 0 12px rgba(255, 107, 157, 0.6)) brightness(1.4) !important;
-          }
-
-          .navbar-logo-inverted svg stop {
-            animation-name: invertedIconGradient !important;
-          }
-
-          .navbar-logo-inverted svg {
-            filter: brightness(1.4) drop-shadow(0 0 12px rgba(255, 107, 157, 0.5)) !important;
-          }
-
-          @keyframes heroGradientFlowInverted {
-            0%, 100% {
-              background-position: 0% 50%;
-            }
-            25% {
-              background-position: 50% 0%;
-            }
-            50% {
-              background-position: 100% 50%;
-            }
-            75% {
-              background-position: 50% 100%;
-            }
-          }
-
-          @keyframes invertedIconGradient {
-            0% { stop-color: #FF6B9D; }
-            25% { stop-color: #9B59B6; }
-            50% { stop-color: #3498DB; }
-            75% { stop-color: #9B59B6; }
-            100% { stop-color: #FF6B9D; }
-          }
-        `}
-      </style>
     </>
   );
 };

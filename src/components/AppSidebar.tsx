@@ -19,11 +19,12 @@ import {
   LucideIcon,
   MessageCircle,
   BookOpen,
-  PlayCircle
+  PlayCircle,
+  Layout
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
-import BrandLogo from "@/components/BrandLogo";
+import ZapBrandLogo from "@/components/ZapBrandLogo";
 import UserProfile from "@/components/UserProfile";
 
 // Navigation items with proper typing
@@ -63,6 +64,11 @@ const items: Array<{
     icon: Settings,
   },
   {
+    title: "Dashboard Layout",
+    url: "/dashboard/layout",
+    icon: Layout,
+  },
+  {
     title: "Contact",
     url: "/dashboard/contact",
     icon: MessageCircle,
@@ -95,7 +101,7 @@ export function AppSidebar() {
     <Sidebar className="bg-white/5 backdrop-blur-sm border-white/10 shadow-2xl">
       <SidebarHeader className="p-4 border-b border-white/10">
         <div className="flex justify-center">
-          <BrandLogo size="small" variant="horizontal" />
+          <ZapBrandLogo size="small" variant="horizontal" />
         </div>
       </SidebarHeader>
 

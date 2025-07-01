@@ -13,10 +13,10 @@ const StaticModuleWrapper = ({
   className = ''
 }: StaticModuleWrapperProps) => {
   return (
-    <div className={`bg-white rounded-lg border border-gray-200 shadow-sm ${className}`}>
+    <div className={`bg-white/10 backdrop-blur-sm border-white/20 rounded-xl border ${className}`}>
       {/* Module Header */}
-      <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-        <h3 className="text-lg font-semibold text-gray-900">
+      <div className="px-6 py-4 border-b border-white/10">
+        <h3 className="text-lg font-semibold text-white">
           {title}
         </h3>
       </div>

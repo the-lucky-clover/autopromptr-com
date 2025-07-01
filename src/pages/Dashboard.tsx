@@ -55,11 +55,11 @@ const Dashboard = () => {
           return <ConsoleMonitorModule isCompact={false} />;
         
         default:
-          return <div className="text-gray-500">Module content not found</div>;
+          return <div className="text-white/60">Module content not found</div>;
       }
     } catch (error) {
       console.error(`Error rendering module ${moduleId}:`, error);
-      return <div className="text-red-600">Error loading module</div>;
+      return <div className="text-red-400">Error loading module</div>;
     }
   };
 
@@ -99,7 +99,7 @@ const Dashboard = () => {
 
               <div className="px-6 pb-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  <div className="lg:col-span-8">
+                  <div className="lg:col-span-9">
                     <ErrorBoundary>
                       <StaticDashboardLayout
                         visibleModules={overviewModules}
@@ -108,7 +108,7 @@ const Dashboard = () => {
                     </ErrorBoundary>
                   </div>
 
-                  <div className="lg:col-span-4">
+                  <div className="lg:col-span-3">
                     <ErrorBoundary>
                       <RecentActivity />
                     </ErrorBoundary>

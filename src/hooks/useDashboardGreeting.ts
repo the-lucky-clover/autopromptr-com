@@ -31,20 +31,7 @@ export const useDashboardGreeting = (user: User | null) => {
     loadUserProfile();
   }, [user]);
 
-  // Rotate greeting every 30 seconds
-  useEffect(() => {
-    if (!userProfile) return;
-    
-    const interval = setInterval(() => {
-      const greeting = getRandomGreeting(
-        userProfile.name || user?.email?.split('@')[0] || 'there',
-        (userProfile as any).preferred_language || 'en'
-      );
-      setCurrentGreeting(greeting);
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [userProfile, user]);
-
+  // Remove the auto-refresh interval - greeting only loads on page load
+  
   return { userProfile, currentGreeting };
 };
