@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
 import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
@@ -133,7 +134,7 @@ const DashboardBatchManager = ({
                   onClick={handleRefresh}
                   size="sm"
                   variant="outline"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl btn-with-shadow px-4 py-2"
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl px-4 py-2 font-medium transition-all duration-300"
                   title="Refresh batch list"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
@@ -146,7 +147,7 @@ const DashboardBatchManager = ({
                   onClick={detectAndFixFailedBatches}
                   variant="outline"
                   size="sm"
-                  className="bg-orange-500/20 border-orange-500/30 text-orange-300 hover:bg-orange-500/30 btn-with-shadow px-4 py-2"
+                  className="bg-orange-500/20 border-orange-500/30 text-orange-300 hover:bg-orange-500/30 px-4 py-2 font-medium transition-all duration-300"
                 >
                   <AlertTriangle className="w-4 h-4 mr-2" />
                   Fix {stuckBatchCount} Stuck Batch{stuckBatchCount > 1 ? 'es' : ''}

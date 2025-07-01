@@ -37,7 +37,7 @@ const UniversalSectorClock = () => {
 
   return (
     <div 
-      className={`fixed top-6 left-6 z-50 transition-all duration-400 ease-out pointer-events-none select-none ${
+      className={`fixed top-6 right-6 z-50 transition-all duration-400 ease-out pointer-events-none select-none ${
         isHovered ? 'transform perspective-800 -rotate-x-3 translate-y-2 scale-102' : ''
       }`}
       style={{
@@ -50,10 +50,10 @@ const UniversalSectorClock = () => {
         transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
       }}
     >
-      <div className="text-green-400" style={{ color: '#00ff41' }}>
+      <div className="text-green-400 text-right" style={{ color: '#00ff41' }}>
         SECTOR 7-G • REACTOR: STABLE
       </div>
-      <div className="text-green-300 mt-1" style={{ color: '#00dd33' }}>
+      <div className="text-green-300 mt-1 text-right" style={{ color: '#00dd33' }}>
         {currentTime} {getTimezoneAbbr()}
       </div>
     </div>

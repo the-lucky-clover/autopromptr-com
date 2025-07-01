@@ -6,14 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Settings, Globe, Sparkles, Target, RefreshCw, Plus } from "lucide-react";
+import { Settings, Globe, Sparkles, Target, RefreshCw, CheckCircle } from "lucide-react";
 
 interface BatchProcessorControlBarProps {
   onRefresh?: () => void;
   onNewBatch?: () => void;
 }
 
-const BatchProcessorControlBar = ({ onRefresh, onNewBatch }: BatchProcessorControlBarProps) => {
+const BatchProcessorControlBar = ({ onRefresh }: BatchProcessorControlBarProps) => {
   const [targetUrlOverride, setTargetUrlOverride] = useState('');
   const [promptEnhancement, setPromptEnhancement] = useState(() => {
     return localStorage.getItem('promptEnhancement') === 'true';
@@ -27,27 +27,19 @@ const BatchProcessorControlBar = ({ onRefresh, onNewBatch }: BatchProcessorContr
   return (
     <div className="space-y-8">
       {/* Batch Controls Module */}
-      <Card className="bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-indigo-900/30 backdrop-blur-sm border-white/20 text-white shadow-2xl animate-shimmer hover:shadow-purple-500/20 transition-all duration-300">
+      <Card className="bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-indigo-900/30 backdrop-blur-sm border-white/20 text-white shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
         <CardContent className="p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
               <Settings className="h-6 w-6 text-purple-400" />
               Batch Controls
             </h2>
-            <p className="text-purple-200 text-sm">Configure automation settings and batch processing options</p>
+            <p className="text-purple-200 text-sm font-medium">Configure automation settings and batch processing options</p>
           </div>
 
           <div className="flex flex-col xl:flex-row items-start xl:items-center gap-8">
             {/* Left Section - Main Controls */}
             <div className="flex items-center gap-6">
-              <Button
-                onClick={onNewBatch}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl px-8 py-3 font-medium shadow-lg hover:shadow-purple-500/25 transition-all duration-300 animate-glow"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                New Batch
-              </Button>
-              
               <Button
                 onClick={onRefresh}
                 variant="outline"
@@ -56,6 +48,15 @@ const BatchProcessorControlBar = ({ onRefresh, onNewBatch }: BatchProcessorContr
                 <RefreshCw className="w-5 h-5 mr-2" />
                 Refresh
               </Button>
+
+              {/* Ready Status Indicator */}
+              <div className="flex items-center gap-4 bg-green-500/20 border border-green-500/30 rounded-xl px-6 py-3">
+                <CheckCircle className="w-6 h-6 text-green-400" />
+                <div className="text-center">
+                  <div className="text-green-400 font-bold text-lg">Ready to Automate</div>
+                  <div className="text-green-300/80 text-sm font-medium">System Online</div>
+                </div>
+              </div>
             </div>
 
             <Separator orientation="vertical" className="h-12 bg-white/20 hidden xl:block" />
@@ -105,15 +106,15 @@ const BatchProcessorControlBar = ({ onRefresh, onNewBatch }: BatchProcessorContr
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-3">
                   <Globe className="w-5 h-5 text-blue-400" />
-                  <span className="text-blue-300 text-base">
+                  <span className="text-blue-300 text-base font-medium">
                     {targetUrlOverride ? `Override: ${targetUrlOverride}` : 'No URL override set'}
                   </span>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${promptEnhancement ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`} />
-                <span className="text-white/80 text-base">
+                <div className={`w-3 h-3 rounded-full ${promptEnhancement ? 'bg-green-400' : 'bg-gray-400'}`} />
+                <span className="text-white/80 text-base font-medium">
                   Enhancement {promptEnhancement ? 'Enabled' : 'Disabled'}
                 </span>
               </div>

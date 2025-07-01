@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { ConnectionStatus } from '@/components/ConnectionStatus';
 import { useDashboardGreeting } from '@/hooks/useDashboardGreeting';
 import { useDashboardVideoSettings } from '@/hooks/useDashboardVideoSettings';
 import { useAuth } from '@/hooks/useAuth';
@@ -38,38 +37,30 @@ const CleanDashboardWelcomeCard = () => {
       />
       
       <CardContent className="p-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center min-h-[200px]">
-          {/* Welcome Text - Lower Left with Clean Professional Spacing */}
-          <div className="lg:col-span-8 flex items-end">
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white drop-shadow-lg font-sans">
-                  {currentGreeting.greeting}{' '}
-                  <span 
-                    className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent drop-shadow-none"
-                    style={{
-                      backgroundImage: 'linear-gradient(90deg, #3B82F6, #EC4899)',
-                      WebkitBackgroundClip: 'text',
-                      backgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent'
-                    }}
-                  >
-                    {currentGreeting.firstName}.
-                  </span>
-                </h1>
-                {/* Clean Subheading without border */}
-                <div className="ml-12">
-                  <p className="text-white/90 text-lg font-medium leading-relaxed drop-shadow-md font-sans">
-                    {currentGreeting.encouragement}
-                  </p>
-                </div>
+        <div className="min-h-[200px] flex items-center">
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white drop-shadow-lg">
+                {currentGreeting.greeting}{' '}
+                <span 
+                  className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent drop-shadow-none"
+                  style={{
+                    backgroundImage: 'linear-gradient(90deg, #3B82F6, #EC4899)',
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
+                  }}
+                >
+                  {currentGreeting.firstName}.
+                </span>
+              </h1>
+              {/* Clean Professional Subheading */}
+              <div className="ml-12">
+                <p className="text-white/90 text-lg font-medium leading-relaxed drop-shadow-md">
+                  {currentGreeting.encouragement}
+                </p>
               </div>
             </div>
-          </div>
-          
-          {/* Connection Status - Right Side */}
-          <div className="lg:col-span-4 flex justify-end items-end">
-            <ConnectionStatus />
           </div>
         </div>
       </CardContent>

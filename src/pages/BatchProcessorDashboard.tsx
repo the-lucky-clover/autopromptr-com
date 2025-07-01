@@ -54,7 +54,6 @@ const BatchProcessorDashboard = () => {
               {/* Batch Controls Module */}
               <BatchProcessorControlBar 
                 onRefresh={handleRefresh}
-                onNewBatch={handleNewBatch}
               />
               
               {/* Your Batches Module */}

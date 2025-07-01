@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Database } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Database, Plus } from "lucide-react";
 import DashboardBatchManager from './DashboardBatchManager';
 
 interface YourBatchesModuleProps {
@@ -23,14 +24,25 @@ const YourBatchesModule = ({
   refreshTrigger 
 }: YourBatchesModuleProps) => {
   return (
-    <Card className="bg-gradient-to-r from-indigo-900/30 via-purple-900/30 to-pink-900/30 backdrop-blur-sm border-white/20 text-white shadow-2xl animate-shimmer hover:shadow-indigo-500/20 transition-all duration-300">
+    <Card className="bg-gradient-to-r from-indigo-900/30 via-purple-900/30 to-pink-900/30 backdrop-blur-sm border-white/20 text-white shadow-2xl hover:shadow-indigo-500/20 transition-all duration-300">
       <CardContent className="p-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
-            <Database className="h-6 w-6 text-indigo-400" />
-            Your Batches
-          </h2>
-          <p className="text-indigo-200 text-sm">Manage and monitor your automation batch queue</p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
+              <Database className="h-6 w-6 text-indigo-400" />
+              Your Batches
+            </h2>
+            <p className="text-indigo-200 text-sm font-medium">Manage and monitor your automation batch queue</p>
+          </div>
+          
+          {/* New Batch Button - Professional placement */}
+          <Button
+            onClick={onNewBatchRequest}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl px-6 py-3 font-medium shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            New Batch
+          </Button>
         </div>
 
         <div className="space-y-6">
