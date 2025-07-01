@@ -5,6 +5,7 @@ import { useDashboardGreeting } from '@/hooks/useDashboardGreeting';
 import { useDashboardVideoSettings } from '@/hooks/useDashboardVideoSettings';
 import { useAuth } from '@/hooks/useAuth';
 import EnhancedWelcomeVideoBackground from './EnhancedWelcomeVideoBackground';
+import UniversalSectorClock from '../UniversalSectorClock';
 
 const CleanDashboardWelcomeCard = () => {
   const currentGreeting = useDashboardGreeting();
@@ -37,8 +38,13 @@ const CleanDashboardWelcomeCard = () => {
       />
       
       <CardContent className="p-8 relative z-10">
-        <div className="min-h-[200px] flex items-center">
-          <div className="space-y-6">
+        <div className="min-h-[200px] flex items-center relative">
+          {/* Clock positioned in upper-right corner */}
+          <div className="absolute top-0 right-0 z-20">
+            <UniversalSectorClock />
+          </div>
+          
+          <div className="space-y-6 flex-1 pr-40">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white drop-shadow-lg">
                 {currentGreeting.greeting}{' '}
