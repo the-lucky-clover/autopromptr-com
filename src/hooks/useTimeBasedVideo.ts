@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 interface TimeBasedVideo {
   url: string;
   attribution: string;
-  period: 'morning' | 'afternoon' | 'evening';
+  period: 'morning' | 'afternoon' | 'evening' | 'custom';
 }
 
 const TIME_BASED_VIDEOS: TimeBasedVideo[] = [
@@ -37,7 +37,7 @@ export const useTimeBasedVideo = (userVideoUrl?: string) => {
         attribution: userVideoUrl.includes('pexels.com') 
           ? userVideoUrl.replace(/video-files.*/, '') 
           : ''
-      } as TimeBasedVideo);
+      });
       return;
     }
 

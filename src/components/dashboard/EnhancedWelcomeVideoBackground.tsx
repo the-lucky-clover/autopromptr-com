@@ -86,7 +86,7 @@ const EnhancedWelcomeVideoBackground = ({
   }
 
   return (
-    <div className="absolute inset-0 overflow-hidden rounded-xl">
+    <div className="absolute inset-0 overflow-hidden rounded-b-xl">
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
@@ -109,16 +109,16 @@ const EnhancedWelcomeVideoBackground = ({
         style={{ mixBlendMode: 'multiply' }}
       />
 
-      {/* Attribution link */}
+      {/* Micro Attribution link */}
       {currentVideo.attribution && (
-        <div className="absolute bottom-2 right-2 z-10">
+        <div className="absolute bottom-1 right-1 z-10">
           <a
             href={currentVideo.attribution}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white/60 hover:text-white/80 text-xs bg-black/20 px-2 py-1 rounded backdrop-blur-sm transition-colors"
+            className="text-white/30 hover:text-white/50 text-[9px] bg-black/10 px-1 py-0.5 rounded backdrop-blur-sm transition-colors font-sans"
           >
-            Video by Pexels
+            Pexels
           </a>
         </div>
       )}

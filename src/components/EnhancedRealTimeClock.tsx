@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Clock, Radiation } from 'lucide-react';
+import { Radiation } from 'lucide-react';
 import { useTimezone } from '@/hooks/useTimezone';
 
 const EnhancedRealTimeClock = () => {
@@ -97,25 +97,20 @@ const EnhancedRealTimeClock = () => {
 
       {/* Enhanced Clock */}
       <div 
-        className="flex items-center space-x-2 text-white/90 cursor-pointer select-none"
+        className="flex items-center space-x-3 text-white cursor-pointer select-none"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         title="Hover for 10 seconds for Sector 7G surprise..."
       >
-        <Radiation className="w-4 h-4 text-yellow-400 animate-pulse" />
-        <div className="text-right">
-          <div 
-            className="font-mono font-bold leading-tight tracking-wider text-sm"
-            style={{
-              fontFamily: '"Courier New", "Lucida Console", monospace',
-              textShadow: '0 0 8px rgba(59, 130, 246, 0.5)',
-              filter: 'contrast(1.2)'
-            }}
-          >
-            {formatDate()} • {currentTime} {getTimezoneAbbr()}
-          </div>
-          <div className="text-xs text-white/60 font-mono text-center">
+        <Radiation className="w-6 h-6 text-yellow-400 animate-pulse" />
+        <div className="text-left">
+          <div className="text-xs text-white/60 font-sans uppercase tracking-wider">
             SECTOR 7G
+          </div>
+          <div 
+            className="font-sans font-medium leading-tight text-sm text-white/90"
+          >
+            {formatDate()} • {currentTime} {getTimezoneAbbr()} • Ready
           </div>
         </div>
       </div>
