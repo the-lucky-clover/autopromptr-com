@@ -67,7 +67,7 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="/admin" element={
-                <ProtectedRoute requireRole="admin">
+                <ProtectedRoute>
                   <AdminPanel />
                 </ProtectedRoute>
               } />

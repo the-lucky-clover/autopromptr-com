@@ -24,7 +24,9 @@ const BatchExtractorDashboard = () => {
             />
             
             <div className="px-6">
-              <BatchExtractorPageContent />
+              <div className="text-center py-8">
+                <p className="text-gray-400">Batch Extractor functionality coming soon...</p>
+              </div>
             </div>
           </SidebarInset>
         </div>

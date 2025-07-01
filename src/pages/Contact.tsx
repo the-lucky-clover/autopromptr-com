@@ -20,6 +20,7 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -35,7 +36,10 @@ const Contact = () => {
 
     try {
       const { error } = await supabase.functions.invoke('send-contact-email', {
-        body: formData
+        body: {
+          ...formData,
+          captcha: parseInt(captchaAnswer)
+        }
       });
 
       if (error) throw error;
@@ -51,6 +55,7 @@ const Contact = () => {
         subject: '',
         message: ''
       });
+      setCaptchaAnswer('');
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -145,6 +150,21 @@ const Contact = () => {
                         />
                       </div>
                       
+                      <div>
+                        <Label htmlFor="captcha" className="text-gray-300">
+                          Anti-spam check: What is 7 + 3?
+                        </Label>
+                        <Input
+                          id="captcha"
+                          type="number"
+                          value={captchaAnswer}
+                          onChange={(e) => setCaptchaAnswer(e.target.value)}
+                          required
+                          className="bg-gray-900 border-gray-600 text-white"
+                          placeholder="Enter the answer"
+                        />
+                      </div>
+                      
                       <Button 
                         type="submit" 
                         disabled={isSubmitting}
@@ -173,7 +193,7 @@ const Contact = () => {
                       <p className="text-gray-400">
                         For technical support and bug reports
                       </p>
-                      <p className="text-blue-400">support@autopromptr.com</p>
+                      <p className="text-blue-400">autopromptr@proton.me</p>
                     </div>
                     
                     <div>
@@ -181,7 +201,7 @@ const Contact = () => {
                       <p className="text-gray-400">
                         For pricing and business inquiries
                       </p>
-                      <p className="text-blue-400">sales@autopromptr.com</p>
+                      <p className="text-blue-400">autopromptr@proton.me</p>
                     </div>
                     
                     <div>
@@ -189,7 +209,7 @@ const Contact = () => {
                       <p className="text-gray-400">
                         For general questions and feedback
                       </p>
-                      <p className="text-blue-400">hello@autopromptr.com</p>
+                      <p className="text-blue-400">autopromptr@proton.me</p>
                     </div>
                     
                     <div className="pt-4 border-t border-gray-700">
