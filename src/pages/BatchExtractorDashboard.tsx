@@ -3,10 +3,12 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
 import BatchExtractorModule from "@/components/BatchExtractorModule";
+import AnimatedDropdownClock from "@/components/AnimatedDropdownClock";
 
 const BatchExtractorDashboard = () => {
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
+      <AnimatedDropdownClock enableEasterEgg={false} />
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
           <AppSidebar />

@@ -5,17 +5,11 @@ import { useDashboardModules } from '@/hooks/useDashboardModules';
 import CleanDashboardWelcomeCard from './CleanDashboardWelcomeCard';
 import StaticDashboardLayout from './StaticDashboardLayout';
 import OverviewDashboardLayout from './OverviewDashboardLayout';
+import AnimatedDropdownClock from '@/components/AnimatedDropdownClock';
 
 const DashboardContent = () => {
   const { layout } = useDashboardLayout();
   const { visibleModules } = useDashboardModules();
-
-  // Always show the welcome card at the top for all layouts
-  const welcomeModule = (
-    <div key="welcome" className="col-span-full">
-      <CleanDashboardWelcomeCard />
-    </div>
-  );
 
   const renderModuleContent = (moduleId: string, componentName: string) => {
     // This would be implemented based on your module components
@@ -24,25 +18,31 @@ const DashboardContent = () => {
 
   if (layout === 'overview') {
     return (
-      <div className="space-y-6">
-        {welcomeModule}
-        <OverviewDashboardLayout 
-          visibleModules={visibleModules}
-          reorderModules={() => {}}
-          renderModuleContent={renderModuleContent}
-        />
-      </div>
+      <>
+        <AnimatedDropdownClock enableEasterEgg={true} />
+        <div className="space-y-6">
+          <CleanDashboardWelcomeCard />
+          <OverviewDashboardLayout 
+            visibleModules={visibleModules}
+            reorderModules={() => {}}
+            renderModuleContent={renderModuleContent}
+          />
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {welcomeModule}
-      <StaticDashboardLayout 
-        visibleModules={visibleModules}
-        renderModuleContent={renderModuleContent}
-      />
-    </div>
+    <>
+      <AnimatedDropdownClock enableEasterEgg={false} />
+      <div className="space-y-6">
+        <CleanDashboardWelcomeCard />
+        <StaticDashboardLayout 
+          visibleModules={visibleModules}
+          renderModuleContent={renderModuleContent}
+        />
+      </div>
+    </>
   );
 };
 

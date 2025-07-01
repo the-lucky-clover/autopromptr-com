@@ -89,7 +89,7 @@ export function AppSidebar() {
     <Sidebar className="bg-gray-900/60 backdrop-blur-sm border-white/10 shadow-2xl">
       <SidebarHeader className="p-4 border-b border-white/10">
         <div className="flex justify-center items-center">
-          <ZapBrandLogo size="small" variant="horizontal" className="items-center" />
+          <ZapBrandLogo size="small" variant="horizontal" className="items-center" showHoverAnimation={false} />
         </div>
       </SidebarHeader>
 
@@ -105,13 +105,13 @@ export function AppSidebar() {
                     <SidebarMenuButton 
                       asChild
                       isActive={isActive}
-                      className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-200 rounded-lg ${
+                      className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-200 rounded-lg text-lg ${
                         isActive ? 'bg-gradient-to-r from-blue-600/70 to-purple-600/70 backdrop-blur-sm border border-blue-400/40 shadow-lg shadow-blue-500/25' : ''
                       }`}
                     >
                       <Link to={item.url}>
-                        <IconComponent className={`h-4 w-4 ${isActive ? 'text-white' : ''}`} />
-                        <span className={`${isActive ? 'font-medium text-white' : ''}`}>{item.title}</span>
+                        <IconComponent className={`h-5 w-5 ${isActive ? 'text-white' : ''}`} />
+                        <span className={`text-lg ${isActive ? 'font-medium text-white' : ''}`}>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -133,13 +133,13 @@ export function AppSidebar() {
                       <SidebarMenuButton 
                         asChild
                         isActive={isActive}
-                        className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-200 rounded-lg ${
+                        className={`text-white hover:bg-white/20 data-[state=open]:bg-white/20 transition-all duration-200 rounded-lg text-lg ${
                           isActive ? 'bg-gradient-to-r from-blue-600/70 to-purple-600/70 backdrop-blur-sm border border-blue-400/40 shadow-lg shadow-blue-500/25' : ''
                         }`}
                       >
                         <Link to={item.url}>
-                          <IconComponent className={`h-4 w-4 ${isActive ? 'text-white' : ''}`} />
-                          <span className={`${isActive ? 'font-medium text-white' : ''}`}>{item.title}</span>
+                          <IconComponent className={`h-5 w-5 ${isActive ? 'text-white' : ''}`} />
+                          <span className={`text-lg ${isActive ? 'font-medium text-white' : ''}`}>{item.title}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

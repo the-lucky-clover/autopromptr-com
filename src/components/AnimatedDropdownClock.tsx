@@ -3,7 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Radiation, AlertTriangle, Zap, Shield, ShieldAlert } from 'lucide-react';
 import { useTimezone } from '@/hooks/useTimezone';
 
-const AnimatedDropdownClock = () => {
+interface AnimatedDropdownClockProps {
+  enableEasterEgg?: boolean;
+}
+
+const AnimatedDropdownClock = ({ enableEasterEgg = false }: AnimatedDropdownClockProps) => {
   const { getCurrentTime, getTimezoneAbbr } = useTimezone();
   const [currentTime, setCurrentTime] = useState(getCurrentTime());
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -29,6 +33,8 @@ const AnimatedDropdownClock = () => {
   }, [getCurrentTime]);
 
   const handleMouseEnter = () => {
+    if (!enableEasterEgg) return;
+    
     const timer = setTimeout(() => {
       console.log('🚨 SECTOR 7G REACTOR MELTDOWN INITIATED! 🚨');
       setShowMeltdown(true);
@@ -95,7 +101,7 @@ const AnimatedDropdownClock = () => {
   return (
     <>
       {/* Epic Nuclear Meltdown Animation System */}
-      {showMeltdown && (
+      {showMeltdown && enableEasterEgg && (
         <>
           {/* Phase 1: Initial Warning */}
           {meltdownPhase >= 1 && (
@@ -330,7 +336,7 @@ const AnimatedDropdownClock = () => {
       </div>
 
       {/* Custom Keyframes for Shake Effect */}
-      <style jsx>{`
+      <style>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0) translateY(0); }
           10% { transform: translateX(-2px) translateY(-1px); }
