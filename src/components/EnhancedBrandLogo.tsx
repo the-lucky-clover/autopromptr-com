@@ -1,5 +1,5 @@
 
-import { Robot } from 'lucide-react';
+import { Bot } from 'lucide-react';
 
 interface EnhancedBrandLogoProps {
   size?: 'small' | 'medium' | 'large';
@@ -40,7 +40,7 @@ const EnhancedBrandLogo = ({
   return (
     <div className={`flex items-center ${showHoverAnimation ? 'group' : ''} ${className}`}>
       <div className={`flex items-center ${currentSize.spacing} relative`}>
-        <Robot 
+        <Bot 
           className={`${currentSize.icon} transition-all duration-300 ${showHoverAnimation ? 'group-hover:scale-105' : ''}`}
           style={{
             stroke: `url(#${uniqueId})`,
@@ -100,7 +100,7 @@ const EnhancedBrandLogo = ({
       
       <style>
         {`
-          @supports not (-webkit-background-clip: text) {
+          @supports not (-webkit-background-click: text) {
             .brand-logo-text {
               background: none !important;
               -webkit-text-fill-color: white !important;

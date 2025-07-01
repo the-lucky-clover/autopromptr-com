@@ -28,15 +28,17 @@ export const VideoBackgroundCard = () => {
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('video_background_enabled, video_background_opacity, video_background_blend_mode')
+          .select('*')
           .eq('id', user.id)
           .single();
         
         if (profile) {
+          // Safely access the new properties
+          const extendedProfile = profile as any;
           setSettings({
-            enabled: profile.video_background_enabled ?? true,
-            opacity: profile.video_background_opacity || 85,
-            blendMode: profile.video_background_blend_mode || 'multiply',
+            enabled: extendedProfile.video_background_enabled ?? true,
+            opacity: extendedProfile.video_background_opacity || 85,
+            blendMode: extendedProfile.video_background_blend_mode || 'multiply',
             videoUrl: settings.videoUrl // Keep default URL
           });
         }
@@ -57,7 +59,7 @@ export const VideoBackgroundCard = () => {
           video_background_enabled: settings.enabled,
           video_background_opacity: settings.opacity,
           video_background_blend_mode: settings.blendMode
-        })
+        } as any)
         .eq('id', user.id);
 
       if (error) throw error;

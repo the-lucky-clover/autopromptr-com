@@ -9,7 +9,6 @@ import SystemLogsPanel from "@/components/SystemLogsPanel";
 import HealthStatusDashboardWrapper from "@/components/HealthStatusDashboardWrapper";
 import DashboardSubscription from "@/components/DashboardSubscription";
 import DashboardStatsModule from "@/components/DashboardStatsModule";
-import SystemReliabilityScore from "@/components/SystemReliabilityScore";
 import AnalyticsModule from "@/components/AnalyticsModule";
 import ConsoleMonitorModule from "@/components/ConsoleMonitorModule";
 import RecentActivity from "@/components/RecentActivity";
@@ -57,16 +56,17 @@ const Dashboard = () => {
           setUserProfile(profile);
           const greeting = getRandomGreeting(
             profile.name || user.email?.split('@')[0] || 'there',
-            profile.preferred_language || 'en'
+            (profile as any).preferred_language || 'en'
           );
           setCurrentGreeting(greeting);
           
-          // Load video settings from profile
+          // Load video settings from profile - safely access new columns
+          const videoProfile = profile as any;
           setVideoSettings(prev => ({
             ...prev,
-            enabled: profile.video_background_enabled ?? true,
-            opacity: profile.video_background_opacity || 85,
-            blendMode: profile.video_background_blend_mode || 'multiply'
+            enabled: videoProfile.video_background_enabled ?? true,
+            opacity: videoProfile.video_background_opacity || 85,
+            blendMode: videoProfile.video_background_blend_mode || 'multiply'
           }));
         }
       }
@@ -82,7 +82,7 @@ const Dashboard = () => {
     const interval = setInterval(() => {
       const greeting = getRandomGreeting(
         userProfile.name || user?.email?.split('@')[0] || 'there',
-        userProfile.preferred_language || 'en'
+        (userProfile as any).preferred_language || 'en'
       );
       setCurrentGreeting(greeting);
     }, 30000);
@@ -120,9 +120,6 @@ const Dashboard = () => {
         
         case 'DashboardStatsModule':
           return <DashboardStatsModule stats={stats} isCompact={false} />;
-
-        case 'SystemReliabilityScore':
-          return <SystemReliabilityScore isCompact={false} />;
 
         case 'AnalyticsModule':
           return <AnalyticsModule isCompact={false} />;

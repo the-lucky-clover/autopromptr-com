@@ -1,148 +1,119 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { arrayMove } from '@dnd-kit/sortable';
 
 export type ModuleState = 'full' | 'minimized' | 'closed';
 
 export interface DashboardModule {
   id: string;
-  name: string;
   title: string;
   component: string;
-  isVisible: boolean;
-  isMinimized: boolean;
-  order: number;
-  isLocked?: boolean;
   state: ModuleState;
+  order: number;
+  defaultVisible: boolean;
 }
 
-const defaultModules: DashboardModule[] = [
+// Clean default modules - removed duplicates, especially SystemReliabilityScore
+const DEFAULT_MODULES: DashboardModule[] = [
   {
     id: 'health-status',
-    name: 'Server Status',
-    title: 'Server Status',
+    title: 'System Health Status',
     component: 'HealthStatusDashboard',
-    isVisible: true,
-    isMinimized: false,
-    order: 0,
     state: 'full',
+    order: 0,
+    defaultVisible: true
+  },
+  {
+    id: 'dashboard-stats',
+    title: 'Dashboard Statistics',
+    component: 'DashboardStatsModule',
+    state: 'full',
+    order: 1,
+    defaultVisible: true
   },
   {
     id: 'system-logs',
-    name: 'System Logs',
     title: 'System Logs',
     component: 'SystemLogsPanel',
-    isVisible: true,
-    isMinimized: false,
-    order: 1,
     state: 'full',
-  },
-  {
-    id: 'subscription',
-    name: 'Subscription',
-    title: 'Subscription',
-    component: 'DashboardSubscription',
-    isVisible: true,
-    isMinimized: false,
     order: 2,
-    state: 'full',
-  },
-  {
-    id: 'stats',
-    name: 'Statistics',
-    title: 'Statistics',
-    component: 'DashboardStatsModule',
-    isVisible: true,
-    isMinimized: false,
-    order: 3,
-    state: 'full',
-  },
-  {
-    id: 'reliability',
-    name: 'System Reliability',
-    title: 'System Reliability',
-    component: 'SystemReliabilityScore',
-    isVisible: true,
-    isMinimized: false,
-    order: 4,
-    state: 'full',
+    defaultVisible: true
   },
   {
     id: 'analytics',
-    name: 'Analytics',
-    title: 'Analytics',
+    title: 'Analytics Overview',
     component: 'AnalyticsModule',
-    isVisible: true,
-    isMinimized: false,
-    order: 5,
     state: 'full',
+    order: 3,
+    defaultVisible: true
   },
   {
     id: 'console-monitor',
-    name: 'Console Monitor',
     title: 'Console Monitor',
     component: 'ConsoleMonitorModule',
-    isVisible: true,
-    isMinimized: false,
-    order: 6,
     state: 'full',
+    order: 4,
+    defaultVisible: true
+  },
+  {
+    id: 'subscription',
+    title: 'Subscription Status',
+    component: 'DashboardSubscription',
+    state: 'full',
+    order: 5,
+    defaultVisible: true
   }
 ];
 
 export const useDashboardModules = () => {
-  const [modules, setModules] = useState<DashboardModule[]>(() => {
-    const saved = localStorage.getItem('dashboard-modules');
-    if (saved) {
-      try {
-        const parsedModules = JSON.parse(saved);
-        // Ensure new modules are added to existing saved state
-        const existingIds = parsedModules.map((m: DashboardModule) => m.id);
-        const newModules = defaultModules.filter(m => !existingIds.includes(m.id));
-        return [...parsedModules, ...newModules].sort((a, b) => a.order - b.order);
-      } catch {
-        return defaultModules;
-      }
-    }
-    return defaultModules;
-  });
+  const [modules, setModules] = useState<DashboardModule[]>(DEFAULT_MODULES);
 
-  useEffect(() => {
-    localStorage.setItem('dashboard-modules', JSON.stringify(modules));
-  }, [modules]);
+  const visibleModules = modules.filter(module => module.state !== 'closed');
 
-  const updateModuleState = (id: string, updates: Partial<DashboardModule>) => {
+  const updateModuleState = useCallback((moduleId: string, newState: ModuleState) => {
     setModules(prev => 
       prev.map(module => 
-        module.id === id ? { ...module, ...updates } : module
+        module.id === moduleId 
+          ? { ...module, state: newState }
+          : module
       )
     );
-  };
+  }, []);
 
-  const resetToDefault = () => {
-    setModules(defaultModules);
-  };
+  const reorderModules = useCallback((activeId: string, overId: string) => {
+    setModules(prev => {
+      const oldIndex = prev.findIndex(module => module.id === activeId);
+      const newIndex = prev.findIndex(module => module.id === overId);
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const reordered = arrayMove(prev, oldIndex, newIndex);
+        return reordered.map((module, index) => ({
+          ...module,
+          order: index
+        }));
+      }
+      
+      return prev;
+    });
+  }, []);
 
-  const reorderModules = (reorderedModules: DashboardModule[]) => {
-    const modulesWithUpdatedOrder = reorderedModules.map((module, index) => ({
-      ...module,
-      order: index
-    }));
-    setModules(modulesWithUpdatedOrder);
-  };
+  const resetToDefaults = useCallback(() => {
+    setModules(DEFAULT_MODULES);
+  }, []);
 
-  const visibleModules = modules
-    .filter(module => module.isVisible)
-    .sort((a, b) => a.order - b.order);
+  const restoreModule = useCallback((moduleId: string) => {
+    updateModuleState(moduleId, 'full');
+  }, [updateModuleState]);
 
-  const hiddenModules = modules
-    .filter(module => !module.isVisible)
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const closedModules = modules.filter(module => module.state === 'closed');
 
   return {
     modules,
     visibleModules,
-    hiddenModules,
+    closedModules,
     updateModuleState,
-    resetToDefault,
-    reorderModules
+    reorderModules,
+    resetToDefaults,
+    restoreModule
   };
 };

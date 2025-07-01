@@ -10,43 +10,44 @@ import {
   DragEndEvent,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import SimpleDraggableModuleWrapper from "@/components/SimpleDraggableModuleWrapper";
+import CleanDraggableModuleWrapper from '@/components/CleanDraggableModuleWrapper';
 import { DashboardModule } from '@/hooks/useDashboardModules';
 
 interface OverviewDashboardLayoutProps {
   visibleModules: DashboardModule[];
-  reorderModules: (modules: DashboardModule[]) => void;
+  reorderModules: (activeId: string, overId: string) => void;
   renderModuleContent: (moduleId: string, componentName: string) => React.ReactNode;
 }
 
 const OverviewDashboardLayout = ({
   visibleModules,
   reorderModules,
-  renderModuleContent
+  renderModuleContent,
 }: OverviewDashboardLayoutProps) => {
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = visibleModules.findIndex(module => module.id === active.id);
-      const newIndex = visibleModules.findIndex(module => module.id === over.id);
-      
-      const reorderedModules = arrayMove(visibleModules, oldIndex, newIndex);
-      reorderModules(reorderedModules);
+      reorderModules(active.id as string, over.id as string);
     }
   };
+
+  const sortedModules = visibleModules.sort((a, b) => a.order - b.order);
 
   return (
     <DndContext
@@ -55,19 +56,18 @@ const OverviewDashboardLayout = ({
       onDragEnd={handleDragEnd}
     >
       <SortableContext
-        items={visibleModules.map(m => m.id)}
+        items={sortedModules.map(module => module.id)}
         strategy={verticalListSortingStrategy}
       >
         <div className="space-y-6">
-          {visibleModules.map((module) => (
-            <div key={module.id} className="shadow-2xl">
-              <SimpleDraggableModuleWrapper
-                id={module.id}
-                title={module.title}
-              >
-                {renderModuleContent(module.id, module.component)}
-              </SimpleDraggableModuleWrapper>
-            </div>
+          {sortedModules.map((module) => (
+            <CleanDraggableModuleWrapper
+              key={module.id}
+              id={module.id}
+              title={module.title}
+            >
+              {renderModuleContent(module.id, module.component)}
+            </CleanDraggableModuleWrapper>
           ))}
         </div>
       </SortableContext>

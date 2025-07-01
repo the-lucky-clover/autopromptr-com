@@ -184,25 +184,37 @@ export type Database = {
           created_at: string
           id: string
           name: string | null
+          preferred_language: string | null
           role: string | null
           subscription: string | null
           updated_at: string
+          video_background_blend_mode: string | null
+          video_background_enabled: boolean | null
+          video_background_opacity: number | null
         }
         Insert: {
           created_at?: string
           id: string
           name?: string | null
+          preferred_language?: string | null
           role?: string | null
           subscription?: string | null
           updated_at?: string
+          video_background_blend_mode?: string | null
+          video_background_enabled?: boolean | null
+          video_background_opacity?: number | null
         }
         Update: {
           created_at?: string
           id?: string
           name?: string | null
+          preferred_language?: string | null
           role?: string | null
           subscription?: string | null
           updated_at?: string
+          video_background_blend_mode?: string | null
+          video_background_enabled?: boolean | null
+          video_background_opacity?: number | null
         }
         Relationships: []
       }
