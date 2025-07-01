@@ -1,14 +1,12 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Server, RefreshCw, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
+import { Server, RefreshCw, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useHealthMonitor } from '@/hooks/useHealthMonitor';
 import { useConsoleOutput } from '@/hooks/useConsoleOutput';
 import { StatusLight, StatusBadge } from './StatusIndicators';
 import ConsoleOutputDisplay from './ConsoleOutputDisplay';
-import { ConnectionStatus } from '@/components/ConnectionStatus';
 
 const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => {
   const { healthStatus, isLoading, performManualCheck, resetCircuitBreaker } = useHealthMonitor();
@@ -24,7 +22,7 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
       await performManualCheck();
       addConsoleLog('Manual health check completed', 'info');
     } catch (error) {
-      addConsoleLog('Manual health check failed', 'error');
+      addConsoleLog('Manual health check failed - backend may be unreachable', 'error');
     }
   };
 
@@ -36,6 +34,28 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
 
   const circuitBreakerState = healthStatus.circuitBreakerState;
 
+  // Determine the appropriate status message
+  const getStatusMessage = () => {
+    if (circuitBreakerState?.status === 'circuit_open') {
+      return 'Backend Protected (Circuit Breaker)';
+    }
+    if (circuitBreakerState?.status === 'grace_period') {
+      return 'Recovery Mode';
+    }
+    switch (healthStatus.status) {
+      case 'healthy':
+        return 'All Systems Operational';
+      case 'degraded':
+        return 'System Performance Degraded';
+      case 'unhealthy':
+        return healthStatus.error?.includes('CORS') || healthStatus.error?.includes('500') 
+          ? 'Backend Unreachable (Connection Error)' 
+          : 'System Unavailable';
+      default:
+        return 'Status Unknown';
+    }
+  };
+
   return (
     <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
       <CardHeader className="pb-4">
@@ -45,7 +65,6 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
             System Status
           </CardTitle>
           <div className="flex items-center space-x-3">
-            <ConnectionStatus />
             <StatusBadge status={healthStatus.status} circuitBreakerState={circuitBreakerState} />
             <Button
               onClick={handleManualRefresh}
@@ -62,7 +81,24 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
       
       <CardContent className="space-y-4">
         <div className="bg-gray-800/50 rounded-lg p-4 border border-white/10">
-          <StatusLight status={healthStatus.status} />
+          <div className="flex items-center space-x-2">
+            <div className={`w-3 h-3 rounded-full ${
+              healthStatus.status === 'healthy' 
+                ? 'bg-green-500 animate-pulse shadow-lg shadow-green-500/50' 
+                : healthStatus.status === 'degraded'
+                ? 'bg-yellow-500 animate-pulse shadow-lg shadow-yellow-500/50'
+                : 'bg-red-500 animate-pulse shadow-lg shadow-red-500/50'
+            }`}></div>
+            <span className={`font-medium ${
+              healthStatus.status === 'healthy' 
+                ? 'text-green-400' 
+                : healthStatus.status === 'degraded'
+                ? 'text-yellow-400'
+                : 'text-red-400'
+            }`}>
+              {getStatusMessage()}
+            </span>
+          </div>
         </div>
 
         {circuitBreakerState && (circuitBreakerState.status !== 'healthy') && (
@@ -94,7 +130,13 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
 
         {healthStatus.error && (
           <div className="text-xs text-red-300 bg-red-500/20 border border-red-500/30 rounded-lg p-2">
-            Error: {healthStatus.error}
+            <strong>Connection Details:</strong> {
+              healthStatus.error.includes('CORS') 
+                ? 'Backend CORS configuration issue - this is expected in development'
+                : healthStatus.error.includes('500')
+                ? 'Backend server error - the service may be starting up'
+                : healthStatus.error
+            }
           </div>
         )}
 

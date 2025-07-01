@@ -10,6 +10,7 @@ import { BackendConfigurationCard } from "@/components/settings/BackendConfigura
 import { EnhancedAutomationCard } from "@/components/settings/EnhancedAutomationCard";
 import DashboardResetCard from "@/components/settings/DashboardResetCard";
 import { LayoutSettingsCard } from "@/components/settings/LayoutSettingsCard";
+import { OverviewLayoutCard } from "@/components/settings/OverviewLayoutCard";
 import { ThemeCustomizationCard } from "@/components/settings/ThemeCustomizationCard";
 import { SecureApiKeyManager } from "@/components/security/SecureApiKeyManager";
 import { LocalSimulationCard } from "@/components/settings/LocalSimulationCard";
@@ -32,6 +33,7 @@ const Settings = () => {
             
             <div className="space-y-6">
               <BackendConfigurationCard />
+              <OverviewLayoutCard />
               <VideoBackgroundCard />
               <LocalSimulationCard />
             </div>

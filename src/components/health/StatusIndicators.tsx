@@ -20,14 +20,14 @@ export const StatusLight = ({ status }: { status: string }) => {
       return (
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse shadow-lg shadow-yellow-500/50"></div>
-          <span className="text-yellow-400 font-medium">System Warning</span>
+          <span className="text-yellow-400 font-medium">Performance Degraded</span>
         </div>
       );
     case 'unhealthy':
       return (
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-lg shadow-red-500/50"></div>
-          <span className="text-red-400 font-medium">System Failure</span>
+          <span className="text-red-400 font-medium">Backend Unreachable</span>
         </div>
       );
     default:
@@ -44,7 +44,7 @@ export const StatusBadge = ({ status, circuitBreakerState }: StatusIndicatorsPro
   if (circuitBreakerState?.status === 'grace_period') {
     return (
       <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30 px-3 py-1">
-        GRACE PERIOD
+        RECOVERY
       </Badge>
     );
   }
@@ -52,7 +52,7 @@ export const StatusBadge = ({ status, circuitBreakerState }: StatusIndicatorsPro
   if (circuitBreakerState?.status === 'circuit_open') {
     return (
       <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30 px-3 py-1">
-        CIRCUIT OPEN
+        PROTECTED
       </Badge>
     );
   }
@@ -73,7 +73,7 @@ export const StatusBadge = ({ status, circuitBreakerState }: StatusIndicatorsPro
     case 'unhealthy':
       return (
         <Badge className="bg-red-500/20 text-red-300 border-red-500/30 px-3 py-1">
-          UNAVAILABLE
+          UNREACHABLE
         </Badge>
       );
     default:

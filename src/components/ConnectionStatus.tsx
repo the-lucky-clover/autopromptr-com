@@ -10,12 +10,12 @@ const connectionCircuitBreaker = {
   failures: 0,
   isOpen: false,
   lastFailure: 0,
-  maxFailures: 5,
-  timeout: 600000 // 10 minutes
+  maxFailures: 3, // Reduced from 5 to be more responsive
+  timeout: 300000 // 5 minutes instead of 10
 };
 
 export const ConnectionStatus = () => {
-  const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected' | 'offline'>('connected');
+  const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected' | 'protected'>('connected');
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
   const { user, isEmailVerified } = useAuth();
 
@@ -61,7 +61,7 @@ export const ConnectionStatus = () => {
       if (!user || !isEmailVerified || !window.location.pathname.includes('/dashboard')) {
         setStatus('connected'); // Assume healthy on public pages
       } else if (connectionCircuitBreaker.isOpen) {
-        setStatus('offline'); // Circuit breaker active
+        setStatus('protected'); // Circuit breaker active
       }
       setLastChecked(new Date());
       return;
@@ -74,8 +74,8 @@ export const ConnectionStatus = () => {
       setStatus('connected');
       recordConnectionSuccess();
     } catch (err) {
-      console.log('ConnectionStatus: Connection check failed (silenced)');
-      setStatus('connected'); // Be optimistic to reduce noise
+      console.log('ConnectionStatus: Connection validation failed');
+      setStatus('disconnected');
       recordConnectionFailure();
     }
     setLastChecked(new Date());
@@ -84,12 +84,12 @@ export const ConnectionStatus = () => {
   useEffect(() => {
     checkConnection();
     
-    // Only set up interval for dashboard users, and with longer intervals
+    // Only set up interval for dashboard users, with longer intervals
     if (!user || !isEmailVerified || !window.location.pathname.includes('/dashboard')) {
       return;
     }
 
-    // Much longer interval - every 5 minutes
+    // Check every 5 minutes instead of more frequently
     const interval = setInterval(checkConnection, 300000);
     return () => clearInterval(interval);
   }, [user, isEmailVerified]);
@@ -110,11 +110,11 @@ export const ConnectionStatus = () => {
             Ready
           </Badge>
         );
-      case 'offline':
+      case 'protected':
         return (
-          <Badge variant="outline" className="bg-orange-500/20 text-orange-700 border-orange-500/30">
+          <Badge variant="outline" className="bg-purple-500/20 text-purple-700 border-purple-500/30">
             <WifiOff className="h-3 w-3 mr-1" />
-            Protected Mode
+            Protected
           </Badge>
         );
       case 'disconnected':
