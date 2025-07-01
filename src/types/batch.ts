@@ -21,6 +21,10 @@ export interface Batch {
     automationDelay?: number;
     elementTimeout?: number;
     debugLevel?: 'minimal' | 'standard' | 'detailed' | 'verbose';
+    isLocalPath?: boolean;
+    localAIAssistant?: 'cursor' | 'windsurf' | 'github-copilot' | 'bolt-diy' | 'roocode';
+    promptEnhancement?: boolean;
+    targetUrlOverride?: string;
   };
 }
 

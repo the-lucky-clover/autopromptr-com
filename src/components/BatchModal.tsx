@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2, Globe, Folder } from "lucide-react";
 import { Batch, TextPrompt } from "@/types/batch";
 
 interface BatchModalProps {
@@ -17,14 +17,28 @@ interface BatchModalProps {
   onSave: (batch: Omit<Batch, 'id' | 'createdAt'>) => void;
 }
 
+const detectPathType = (input: string) => {
+  if (!input) return 'unknown';
+  
+  // Check for URLs (http/https)
+  if (input.match(/^https?:\/\//)) return 'remote';
+  
+  // Check for local paths
+  if (input.match(/^[A-Za-z]:\\/)) return 'local'; // Windows
+  if (input.match(/^\//) || input.match(/^~\//)) return 'local'; // Unix/Mac
+  if (input.match(/^\.\//)) return 'local'; // Relative path
+  
+  return 'unknown';
+};
+
 export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModalProps) {
   const [formData, setFormData] = useState({
     name: batch?.name || '',
-    targetUrl: batch?.targetUrl || '',
+    targetProjectUrl: batch?.targetUrl || '',
     description: batch?.description || '',
-    platform: batch?.platform || 'website',
     waitForIdle: batch?.settings?.waitForIdle ?? true,
     maxRetries: batch?.settings?.maxRetries || 3,
+    localAIAssistant: batch?.settings?.localAIAssistant || 'cursor',
   });
 
   const [prompts, setPrompts] = useState<TextPrompt[]>(
@@ -32,26 +46,29 @@ export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModa
   );
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
+  const pathType = detectPathType(formData.targetProjectUrl);
+  const isLocalPath = pathType === 'local';
+
   useEffect(() => {
     if (batch) {
       setFormData({
         name: batch.name,
-        targetUrl: batch.targetUrl,
+        targetProjectUrl: batch.targetUrl,
         description: batch.description || '',
-        platform: batch.platform || 'website',
         waitForIdle: batch.settings?.waitForIdle ?? true,
         maxRetries: batch.settings?.maxRetries || 3,
+        localAIAssistant: batch.settings?.localAIAssistant || 'cursor',
       });
       setPrompts(batch.prompts);
     } else {
       // Reset form data when creating a new batch
       setFormData({
         name: '',
-        targetUrl: '',
+        targetProjectUrl: '',
         description: '',
-        platform: 'website',
         waitForIdle: true,
         maxRetries: 3,
+        localAIAssistant: 'cursor',
       });
       setPrompts([{ id: '1', text: '', order: 0 }]);
       setErrors({});
@@ -61,15 +78,11 @@ export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModa
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData(prev => ({ ...prev, [name]: checked }));
-  };
-
-  const handleSelectChange = (value: string) => {
-    setFormData(prev => ({ ...prev, platform: value }));
+    
+    // Clear related errors
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const validateForm = () => {
@@ -79,8 +92,13 @@ export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModa
       newErrors.name = 'Batch name is required';
     }
 
-    if (!formData.targetUrl.trim()) {
-      newErrors.targetUrl = 'Target URL is required';
+    if (!formData.targetProjectUrl.trim()) {
+      newErrors.targetProjectUrl = 'Target Project URL or local path is required';
+    } else {
+      const pathType = detectPathType(formData.targetProjectUrl);
+      if (pathType === 'unknown') {
+        newErrors.targetProjectUrl = 'Please enter a valid URL (https://...) or local path (/path/to/project)';
+      }
     }
 
     // Validate prompts
@@ -148,20 +166,22 @@ export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModa
 
     const batchData = {
       name: formData.name,
-      targetUrl: formData.targetUrl,
+      targetUrl: formData.targetProjectUrl,
       description: formData.description,
       prompts: validPrompts.map((prompt, index) => ({
         ...prompt,
         order: index
       })),
       status: 'pending' as const,
-      platform: formData.platform,
+      platform: isLocalPath ? 'local' : 'web',
       settings: {
         waitForIdle: formData.waitForIdle,
         maxRetries: parseInt(String(formData.maxRetries), 10),
         automationDelay: 1000,
         elementTimeout: 30000,
         debugLevel: 'standard' as const,
+        isLocalPath,
+        localAIAssistant: isLocalPath ? formData.localAIAssistant : undefined,
       },
     };
 
@@ -172,21 +192,11 @@ export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModa
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/10 backdrop-blur-xl border-white/20 text-white">
-        <div className="flex items-center justify-between">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-white">
-              {batch ? 'Edit Batch' : 'Create New Batch'}
-            </DialogTitle>
-          </DialogHeader>
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20 rounded-full p-2"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold text-white">
+            {batch ? 'Edit Batch' : 'Create New Batch'}
+          </DialogTitle>
+        </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -208,22 +218,49 @@ export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModa
           </div>
 
           <div>
-            <Label htmlFor="targetUrl" className="text-base font-medium text-white">
-              Target URL
+            <Label htmlFor="targetProjectUrl" className="text-base font-medium text-white flex items-center gap-2">
+              {pathType === 'remote' && <Globe className="w-4 h-4" />}
+              {pathType === 'local' && <Folder className="w-4 h-4" />}
+              Target Project URL or Local Path
             </Label>
             <Input
-              type="url"
-              id="targetUrl"
-              name="targetUrl"
-              value={formData.targetUrl}
+              type="text"
+              id="targetProjectUrl"
+              name="targetProjectUrl"
+              value={formData.targetProjectUrl}
               onChange={handleInputChange}
-              placeholder="Enter target URL"
+              placeholder="https://example.com or /path/to/project"
               className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg"
             />
-            {errors.targetUrl && (
-              <p className="text-red-400 text-sm mt-1">{errors.targetUrl}</p>
+            {pathType !== 'unknown' && (
+              <p className="text-blue-300 text-xs mt-1">
+                Detected: {pathType === 'remote' ? 'Remote URL' : 'Local Path'}
+              </p>
+            )}
+            {errors.targetProjectUrl && (
+              <p className="text-red-400 text-sm mt-1">{errors.targetProjectUrl}</p>
             )}
           </div>
+
+          {isLocalPath && (
+            <div>
+              <Label htmlFor="localAIAssistant" className="text-base font-medium text-white">
+                Local AI Coding Assistant
+              </Label>
+              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, localAIAssistant: value }))} defaultValue={formData.localAIAssistant}>
+                <SelectTrigger className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg">
+                  <SelectValue placeholder="Select AI assistant" />
+                </SelectTrigger>
+                <SelectContent className="bg-black/70 backdrop-blur-md border-white/10 text-white">
+                  <SelectItem value="cursor">Cursor</SelectItem>
+                  <SelectItem value="windsurf">Windsurf</SelectItem>
+                  <SelectItem value="github-copilot">GitHub Copilot</SelectItem>
+                  <SelectItem value="bolt-diy">Bolt.DIY</SelectItem>
+                  <SelectItem value="roocode">Roocode</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div>
             <Label htmlFor="description" className="text-base font-medium text-white">
@@ -234,25 +271,9 @@ export default function BatchModal({ isOpen, onClose, batch, onSave }: BatchModa
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              placeholder="Enter batch description"
+              placeholder="Describe what this batch will do"
               className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg resize-none"
             />
-          </div>
-
-          <div>
-            <Label htmlFor="platform" className="text-base font-medium text-white">
-              Platform
-            </Label>
-            <Select onValueChange={handleSelectChange} defaultValue={formData.platform}>
-              <SelectTrigger className="bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-lg">
-                <SelectValue placeholder="Select a platform" />
-              </SelectTrigger>
-              <SelectContent className="bg-black/70 backdrop-blur-md border-white/10 text-white">
-                <SelectItem value="website">Website</SelectItem>
-                <SelectItem value="desktop-app">Desktop App</SelectItem>
-                <SelectItem value="mobile-app">Mobile App</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Text Prompts Section */}

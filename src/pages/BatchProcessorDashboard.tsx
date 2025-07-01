@@ -4,6 +4,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
 import DashboardBatchManager from "@/components/DashboardBatchManager";
+import BatchProcessorControlBar from "@/components/BatchProcessorControlBar";
 
 const BatchProcessorDashboard = () => {
   const [stats, setStats] = useState({
@@ -14,6 +15,7 @@ const BatchProcessorDashboard = () => {
   });
   
   const [batches, setBatches] = useState<any[]>([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleStatsUpdate = useCallback((newStats: typeof stats) => {
     setStats(newStats);
@@ -21,6 +23,15 @@ const BatchProcessorDashboard = () => {
 
   const handleBatchesUpdate = useCallback((newBatches: any[]) => {
     setBatches(newBatches);
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    setRefreshTrigger(prev => prev + 1);
+  }, []);
+
+  const handleNewBatch = useCallback(() => {
+    // This will be handled by the DashboardBatchManager
+    console.log('New batch requested from control bar');
   }, []);
 
   return (
@@ -36,12 +47,20 @@ const BatchProcessorDashboard = () => {
               </div>
             </div>
             
-            <div className="p-6">
+            <div className="p-6 space-y-6">
+              {/* Big Beautiful Control Bar */}
+              <BatchProcessorControlBar 
+                onRefresh={handleRefresh}
+                onNewBatch={handleNewBatch}
+              />
+              
+              {/* Batch Manager */}
               <div className="max-w-full">
                 <DashboardBatchManager 
                   onStatsUpdate={handleStatsUpdate} 
                   onBatchesUpdate={handleBatchesUpdate}
                   isCompact={false}
+                  key={refreshTrigger}
                 />
               </div>
             </div>

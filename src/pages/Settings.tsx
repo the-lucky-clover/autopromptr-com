@@ -16,6 +16,7 @@ import { SecureApiKeyManager } from "@/components/security/SecureApiKeyManager";
 import { LocalSimulationCard } from "@/components/settings/LocalSimulationCard";
 import { VideoBackgroundCard } from "@/components/settings/VideoBackgroundCard";
 import TimezoneSettingsCard from "@/components/settings/TimezoneSettingsCard";
+import PromptEnhancementCard from "@/components/settings/PromptEnhancementCard";
 import { SidebarInset } from "@/components/ui/sidebar";
 
 const Settings = () => {
@@ -34,6 +35,7 @@ const Settings = () => {
             
             <div className="space-y-6">
               <BackendConfigurationCard />
+              <PromptEnhancementCard />
               <OverviewLayoutCard />
               <TimezoneSettingsCard />
               <VideoBackgroundCard />
