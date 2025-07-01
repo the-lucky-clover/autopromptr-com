@@ -1,3 +1,4 @@
+
 import {
   Sidebar,
   SidebarContent,
@@ -17,7 +18,8 @@ import {
   User,
   LucideIcon,
   MessageCircle,
-  BookOpen
+  BookOpen,
+  PlayCircle
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -31,9 +33,14 @@ const items: Array<{
   icon: LucideIcon;
 }> = [
   {
-    title: "Dashboard",
+    title: "Overview",
     url: "/dashboard",
     icon: Home,
+  },
+  {
+    title: "Batch Processor",
+    url: "/dashboard/batch-processor",
+    icon: PlayCircle,
   },
   {
     title: "Batch Extractor",

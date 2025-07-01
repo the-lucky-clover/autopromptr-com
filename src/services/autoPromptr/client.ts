@@ -1,5 +1,5 @@
 
-import { Batch } from '@/types/batch';
+import { Batch, AutoPromtrBackendRequest, AutoPromtrBackendResponse } from '@/types/batch';
 import { AutoPromtrError } from './errors';
 import { API_BASE_URL } from './config';
 
@@ -7,45 +7,22 @@ export class AutoPromptr {
   private baseUrl: string;
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || API_BASE_URL;
+    this.baseUrl = baseUrl || 'https://autopromptr-backend.onrender.com';
   }
 
   async getPlatforms() {
     try {
-      const response = await fetch(`${this.baseUrl}/platforms`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new AutoPromtrError(
-          'Failed to fetch platforms',
-          'PLATFORMS_FETCH_FAILED',
-          response.status
-        );
-      }
-
-      const platforms = await response.json();
-      return Array.isArray(platforms) ? platforms : platforms.data || [];
+      // Fallback platforms since backend may not have this endpoint
+      return [
+        { id: 'lovable', name: 'Lovable', type: 'web' },
+        { id: 'chatgpt', name: 'ChatGPT', type: 'web' },
+        { id: 'claude', name: 'Claude', type: 'web' },
+        { id: 'v0', name: 'v0.dev', type: 'web' },
+        { id: 'bolt', name: 'Bolt.new', type: 'web' },
+        { id: 'generic-web', name: 'Generic Web Platform', type: 'web' }
+      ];
     } catch (error) {
       console.error('Error fetching platforms:', error);
-      
-      if (error instanceof AutoPromtrError) {
-        throw error;
-      }
-      
-      // Handle network errors
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new AutoPromtrError(
-          'Network error while fetching platforms',
-          'NETWORK_ERROR',
-          0
-        );
-      }
-      
-      // Return fallback platforms if the backend is not available
       return [
         { id: 'lovable', name: 'Lovable', type: 'web' },
         { id: 'chatgpt', name: 'ChatGPT', type: 'web' },
@@ -87,11 +64,48 @@ export class AutoPromptr {
   }
 
   async runBatch(batch: Batch, platform: string, options?: { waitForIdle?: boolean; maxRetries?: number }) {
-    console.log('🚀 Starting batch run:', batch.id);
+    console.log('🚀 Starting batch run with new backend:', batch.id);
     
     try {
-      // Try actual backend processing without fallback
-      return await this.processWithBackend(batch, platform, options);
+      // Process each prompt individually since backend expects single prompt
+      const results: AutoPromtrBackendResponse[] = [];
+      
+      for (let i = 0; i < batch.prompts.length; i++) {
+        const prompt = batch.prompts[i];
+        console.log(`Processing prompt ${i + 1}/${batch.prompts.length}:`, prompt.text);
+        
+        const request: AutoPromtrBackendRequest = {
+          batch: {
+            id: `${batch.id}-${i}`,
+            prompt: prompt.text,
+            targetUrl: batch.targetUrl
+          },
+          platform: 'lovable.dev',
+          wait_for_idle: options?.waitForIdle ?? true,
+          max_retries: options?.maxRetries ?? 3
+        };
+
+        const result = await this.processWithBackend(request);
+        results.push(result);
+        
+        // If any prompt fails, stop processing
+        if (result.status === 'failed') {
+          throw new AutoPromtrError(
+            `Batch failed at prompt ${i + 1}: ${result.error || 'Unknown error'}`,
+            'BATCH_PROCESSING_FAILED',
+            500
+          );
+        }
+      }
+      
+      console.log('✅ All prompts processed successfully:', results);
+      return {
+        batchId: batch.id,
+        status: 'completed',
+        results: results,
+        totalPrompts: batch.prompts.length,
+        completedPrompts: results.filter(r => r.status === 'completed').length
+      };
       
     } catch (error) {
       console.error('💥 Error in runBatch:', error);
@@ -117,52 +131,19 @@ export class AutoPromptr {
     }
   }
 
-  private async processWithBackend(batch: Batch, platform: string, options: any = {}): Promise<any> {
-    const batchData = {
-      id: batch.id,
-      name: batch.name,
-      targetUrl: batch.targetUrl,
-      platform: platform,
-      prompts: batch.prompts.map(prompt => ({
-        id: prompt.id,
-        text: prompt.text,
-        order: prompt.order
-      })),
-      settings: {
-        waitForIdle: options?.waitForIdle ?? true,
-        maxRetries: options?.maxRetries ?? 0,
-        ...batch.settings
-      }
-    };
+  private async processWithBackend(request: AutoPromtrBackendRequest): Promise<AutoPromtrBackendResponse> {
+    console.log('📤 Sending request to backend:', request);
 
-    console.log('📤 Sending batch to backend:', batchData);
+    try {
+      const response = await fetch(`${this.baseUrl}/api/run-batch`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
 
-    // Try common automation endpoints
-    const endpoints = ['/api/batch/run', '/api/batches', '/run-batch', '/batch'];
-    let lastError: Error | null = null;
-
-    for (const endpoint of endpoints) {
-      try {
-        console.log(`Trying endpoint: ${this.baseUrl}${endpoint}`);
-        const response = await fetch(`${this.baseUrl}${endpoint}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(batchData),
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          console.log('✅ Backend processing started successfully:', result);
-          return result;
-        }
-
-        if (response.status === 404) {
-          console.log(`Endpoint ${endpoint} returned 404, trying next...`);
-          continue;
-        }
-
+      if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ Backend error response:', response.status, errorText);
         
@@ -171,64 +152,44 @@ export class AutoPromptr {
           'BACKEND_ERROR',
           response.status
         );
-      } catch (fetchError) {
-        console.error(`Fetch error for ${endpoint}:`, fetchError);
-        lastError = fetchError instanceof Error ? fetchError : new Error('Unknown fetch error');
-        
-        // If it's not a 404, throw the error immediately
-        if (fetchError instanceof AutoPromtrError && fetchError.statusCode !== 404) {
-          throw fetchError;
-        }
-        
-        continue;
       }
-    }
 
-    // All endpoints failed
-    console.error('All automation endpoints returned 404. Backend may need configuration.');
-    throw new AutoPromtrError(
-      `The backend automation service is not configured with the expected endpoints. This could mean: 1) The backend needs to be updated to support batch automation, 2) The backend URL is incorrect, or 3) The automation service is not deployed. Please check your backend configuration in Settings.`,
-      'AUTOMATION_ENDPOINTS_NOT_CONFIGURED',
-      404
-    );
+      const result: AutoPromtrBackendResponse = await response.json();
+      console.log('✅ Backend processing completed:', result);
+      return result;
+
+    } catch (fetchError) {
+      console.error('Fetch error:', fetchError);
+      
+      if (fetchError instanceof AutoPromtrError) {
+        throw fetchError;
+      }
+      
+      throw new AutoPromtrError(
+        fetchError instanceof Error ? fetchError.message : 'Network error occurred',
+        'NETWORK_ERROR',
+        0
+      );
+    }
   }
 
   async stopBatch(batchId: string) {
     try {
-      const stopEndpoints = ['/api/batch/stop', '/stop-batch', '/api/stop'];
-      
-      for (const endpoint of stopEndpoints) {
-        try {
-          const response = await fetch(`${this.baseUrl}${endpoint}/${batchId}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
+      const response = await fetch(`${this.baseUrl}/api/stop/${batchId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-          if (response.ok) {
-            return await response.json();
-          }
-          
-          if (response.status !== 404) {
-            throw new AutoPromtrError(
-              'Failed to stop batch',
-              'STOP_BATCH_FAILED',
-              response.status
-            );
-          }
-        } catch (fetchError) {
-          if (fetchError instanceof AutoPromtrError) {
-            throw fetchError;
-          }
-          continue;
-        }
+      if (response.ok) {
+        return await response.json();
       }
       
       throw new AutoPromtrError(
-        'Backend stop endpoints not found or not responding',
-        'STOP_ENDPOINTS_NOT_CONFIGURED',
-        404
+        'Failed to stop batch',
+        'STOP_BATCH_FAILED',
+        response.status
       );
       
     } catch (error) {
@@ -246,40 +207,21 @@ export class AutoPromptr {
 
   async getBatchStatus(batchId: string) {
     try {
-      const statusEndpoints = ['/api/batch/status', '/batch-status', '/api/status'];
-      
-      for (const endpoint of statusEndpoints) {
-        try {
-          const response = await fetch(`${this.baseUrl}${endpoint}/${batchId}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
+      const response = await fetch(`${this.baseUrl}/api/status/${batchId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-          if (response.ok) {
-            return await response.json();
-          }
-          
-          if (response.status !== 404) {
-            throw new AutoPromtrError(
-              'Failed to get batch status',
-              'STATUS_CHECK_FAILED',
-              response.status
-            );
-          }
-        } catch (fetchError) {
-          if (fetchError instanceof AutoPromtrError) {
-            throw fetchError;
-          }
-          continue;
-        }
+      if (response.ok) {
+        return await response.json();
       }
       
       throw new AutoPromtrError(
-        'Backend status endpoints not found or not responding',
-        'STATUS_ENDPOINTS_NOT_CONFIGURED',
-        404
+        'Failed to get batch status',
+        'STATUS_CHECK_FAILED',
+        response.status
       );
       
     } catch (error) {

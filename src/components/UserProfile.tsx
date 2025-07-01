@@ -27,6 +27,10 @@ const UserProfile = () => {
 
   const hasSecureApiKeys = hasApiKey('openai_api_key');
 
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
   return (
     <div className="relative">
       <Button
@@ -60,11 +64,12 @@ const UserProfile = () => {
 
       {isOpen && (
         <>
+          {/* Dark glass background overlay */}
           <div 
-            className="fixed inset-0 z-40" 
-            onClick={() => setIsOpen(false)}
+            className="fixed inset-0 bg-black/50 backdrop-blur-md z-40 animate-fade-in" 
+            onClick={handleClose}
           />
-          <Card className="absolute bottom-full left-0 mb-2 w-80 bg-white/10 backdrop-blur-xl border-white/20 z-50 rounded-xl shadow-2xl">
+          <Card className="absolute bottom-full left-0 mb-2 w-80 bg-black/40 backdrop-blur-xl border-white/20 z-50 rounded-xl shadow-2xl shadow-black/50 animate-scale-in">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3 mb-4 p-3 bg-white/5 rounded-xl">
                 <Avatar className="h-12 w-12">

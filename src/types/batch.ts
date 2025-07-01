@@ -11,10 +11,10 @@ export interface Batch {
   targetUrl: string;
   description?: string;
   prompts: TextPrompt[];
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'stopped' | 'paused';
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'stopped' | 'paused' | 'draft';
   createdAt: Date;
   platform?: string;
-  errorMessage?: string; // Added error message support
+  errorMessage?: string;
   settings?: {
     waitForIdle: boolean;
     maxRetries: number;
@@ -55,4 +55,33 @@ export interface BatchFormData {
   platform: string;
   waitForIdle: boolean;
   maxRetries: number;
+}
+
+// New types for AutoPromptr Backend Integration
+export interface AutoPromtrBackendRequest {
+  batch: {
+    id: string;
+    prompt: string;
+    targetUrl?: string;
+  };
+  platform: string;
+  wait_for_idle?: boolean;
+  max_retries?: number;
+}
+
+export interface AutoPromtrBackendResponse {
+  batchId: string;
+  status: 'completed' | 'failed';
+  result: {
+    success: boolean;
+    action: string;
+    prompt: string;
+    method: string;
+    timestamp: string;
+    details: string;
+  };
+  screenshot: string; // Base64 encoded PNG image
+  processedAt: string;
+  platform: string;
+  error?: string;
 }
