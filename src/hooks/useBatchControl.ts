@@ -1,13 +1,14 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { Batch } from '@/types/batch';
+import { EnhancedAutoPromtrClient } from '@/services/autoPromptr/enhancedClient';
+import { AutoPromtrError } from '@/services/autoPromptr/errors';
 
 export const useBatchControl = () => {
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
+  const [automationLoading, setAutomationLoading] = useState(false);
+  const [lastError, setLastError] = useState<AutoPromtrError | null>(null);
   const { toast } = useToast();
-  const { loading: automationLoading, runBatch, stopBatch } = useBatchAutomation(selectedBatchId || undefined);
 
   const validateBatchForExecution = (batch: Batch): { isValid: boolean; error?: string } => {
     // Check if target URL is provided
@@ -91,8 +92,13 @@ export const useBatchControl = () => {
     }
 
     setSelectedBatchId(batch.id);
+    setAutomationLoading(true);
+    setLastError(null);
     
     try {
+      // Use enhanced client with better error handling
+      const enhancedClient = new EnhancedAutoPromtrClient();
+      
       // Create enhanced batch with overrides and settings
       const enhancedBatch = {
         ...batch,
@@ -103,11 +109,26 @@ export const useBatchControl = () => {
           isLocalPath,
           promptEnhancement: localStorage.getItem('promptEnhancement') === 'true',
           targetUrlOverride: targetUrlOverride || undefined,
+          // Enhanced Chrome configuration
+          chromeArgs: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process',
+            '--disable-gpu'
+          ]
         }
       };
       
-      // Pass the complete batch object to the automation service
-      await runBatch(enhancedBatch, platform, enhancedBatch.settings);
+      // Test connection first
+      await enhancedClient.testConnection();
+      console.log('✅ Backend connection verified');
+      
+      // Run batch with enhanced client
+      await enhancedClient.runBatch(enhancedBatch, platform, enhancedBatch.settings);
       
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'running', platform } : b
@@ -116,31 +137,44 @@ export const useBatchControl = () => {
       const overrideMessage = targetUrlOverride ? ` (using override: ${targetUrlOverride})` : '';
       toast({
         title: "Batch started successfully",
-        description: `Automation started for "${batch.name}"${overrideMessage}.`,
+        description: `Enhanced automation started for "${batch.name}"${overrideMessage}.`,
       });
+      
     } catch (err) {
-      let errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      console.error('💥 Enhanced batch run failed:', err);
       
-      // Enhanced error handling
-      if (errorMessage.includes('INVALID_URL')) {
-        errorMessage = 'Invalid target URL. Please check the URL format and try again.';
-      } else if (errorMessage.includes('LOCAL_PATH_NOT_FOUND')) {
-        errorMessage = 'Local path not found. Please verify the path exists and is accessible.';
-      } else if (errorMessage.includes('AI_ASSISTANT_NOT_CONFIGURED')) {
-        errorMessage = 'Local AI assistant not properly configured. Please check your settings.';
+      setBatches(prev => prev.map(b => 
+        b.id === batch.id ? { ...b, status: 'failed' } : b
+      ));
+      
+      if (err instanceof AutoPromtrError) {
+        setLastError(err);
+        
+        // Show user-friendly error message
+        toast({
+          title: "Batch execution failed",
+          description: err.userMessage,
+          variant: "destructive",
+        });
+      } else {
+        const genericError = AutoPromtrError.fromBackendError(err);
+        setLastError(genericError);
+        
+        toast({
+          title: "Unexpected error",
+          description: genericError.userMessage,
+          variant: "destructive",
+        });
       }
-      
-      toast({
-        title: "Failed to start batch",
-        description: errorMessage,
-        variant: "destructive",
-      });
+    } finally {
+      setAutomationLoading(false);
     }
   };
 
   const handleStopBatch = async (batch: Batch, setBatches: (updater: (prev: Batch[]) => Batch[]) => void) => {
     try {
-      await stopBatch();
+      const enhancedClient = new EnhancedAutoPromtrClient();
+      await enhancedClient.stopBatch(batch.id);
       
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'failed' } : b
@@ -186,10 +220,12 @@ export const useBatchControl = () => {
   return {
     selectedBatchId,
     automationLoading,
+    lastError,
     handleRunBatch,
     handleStopBatch,
     handlePauseBatch,
     handleRewindBatch,
-    validateBatchForExecution
+    validateBatchForExecution,
+    clearError: () => setLastError(null)
   };
 };

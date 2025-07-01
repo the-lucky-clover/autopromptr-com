@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
 import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
@@ -8,6 +7,7 @@ import DashboardBatchList from './DashboardBatchList';
 import DashboardEmptyState from './DashboardEmptyState';
 import { Button } from './ui/button';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import BatchErrorDisplay from './batch/BatchErrorDisplay';
 
 interface DashboardBatchManagerProps {
   onStatsUpdate?: (stats: {
@@ -35,6 +35,8 @@ const DashboardBatchManager = ({
     setEditingBatch,
     selectedBatchId,
     automationLoading,
+    lastError,
+    clearError,
     handleCreateBatch,
     handleUpdateBatch,
     handleDeleteBatch,
@@ -123,6 +125,22 @@ const DashboardBatchManager = ({
 
   return (
     <div className={`space-y-6 ${isCompact ? 'space-y-4' : ''}`}>
+      {/* Error Display */}
+      {lastError && (
+        <BatchErrorDisplay
+          error={lastError}
+          onRetry={() => {
+            if (selectedBatchId) {
+              const batch = batches.find(b => b.id === selectedBatchId);
+              if (batch) {
+                handleRunBatch(batch);
+              }
+            }
+          }}
+          onDismiss={clearError}
+        />
+      )}
+
       <div className={`space-y-6 ${isCompact ? 'space-y-4' : ''}`}>
         {batches.length === 0 ? (
           <DashboardEmptyState onNewBatch={handleNewBatch} />
