@@ -37,31 +37,29 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
   const circuitBreakerState = healthStatus.circuitBreakerState;
 
   return (
-    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-white flex items-center gap-3">
-            <Server className="w-5 h-5 text-blue-400" />
-            System Status
-          </CardTitle>
-          <div className="flex items-center space-x-3">
-            <ConnectionStatus />
-            <StatusBadge status={healthStatus.status} circuitBreakerState={circuitBreakerState} />
-            <Button
-              onClick={handleManualRefresh}
-              disabled={isLoading}
-              size="sm"
-              variant="outline"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-lg"
-            >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            </Button>
-          </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-white flex items-center gap-3">
+          <Server className="w-5 h-5 text-blue-400" />
+          System Status
+        </h3>
+        <div className="flex items-center space-x-3">
+          <ConnectionStatus />
+          <StatusBadge status={healthStatus.status} circuitBreakerState={circuitBreakerState} />
+          <Button
+            onClick={handleManualRefresh}
+            disabled={isLoading}
+            size="sm"
+            variant="outline"
+            className="bg-gray-800/50 border-white/20 text-white hover:bg-gray-700/50 rounded-lg"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </Button>
         </div>
-      </CardHeader>
+      </div>
       
-      <CardContent className="space-y-4">
-        <div className="bg-black/30 rounded-lg p-4 border border-white/10">
+      <div className="space-y-4">
+        <div className="bg-gray-800/50 rounded-lg p-4 border border-white/10">
           <StatusLight status={healthStatus.status} />
         </div>
 
@@ -104,8 +102,8 @@ const ServerStatusConsole = ({ isCompact = false }: { isCompact?: boolean }) => 
             Response time: {healthStatus.responseTime}ms • Status: {healthStatus.uptime}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

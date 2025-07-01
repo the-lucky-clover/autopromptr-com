@@ -21,34 +21,19 @@ interface DashboardWelcomeCardProps {
 }
 
 const DashboardWelcomeCard = ({ currentGreeting, stats, videoSettings }: DashboardWelcomeCardProps) => {
-  // Extract first name from greeting
-  const getFirstName = (greetingText: string) => {
-    const match = greetingText.match(/(?:Good \w+|¡Buen\w+|Bon\w+|Guten \w+|Buon\w+|おはよう\w*),?\s+([^,!]+)/);
-    return match ? match[1].trim() : 'there';
-  };
-
-  const firstName = currentGreeting ? getFirstName(currentGreeting.text) : 'there';
-  const restOfGreeting = currentGreeting 
-    ? currentGreeting.text.replace(new RegExp(`(?:Good \\w+|¡Buen\\w+|Bon\\w+|Guten \\w+|Buon\\w+|おはよう\\w*),?\\s+${firstName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`), '').trim()
-    : 'Ready to automate your way to success? 💰';
-
   return (
-    <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl border m-6 mb-4">
+    <Card className="bg-gray-900/50 backdrop-blur-sm border-white/20 rounded-xl border m-6 mb-4">
       <CardContent className="p-8 relative">
-        {/* Clock in upper-right corner */}
-        <div className="absolute top-6 right-6">
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
-            <RealTimeClock />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pr-32">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-8">
             <div className="space-y-4">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {currentGreeting && (
-                  <div className="space-y-1">
+                  <div className="space-y-3">
                     <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+                      <span className="text-white">
+                        {currentGreeting.greeting}{' '}
+                      </span>
                       <span 
                         className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent"
                         style={{
@@ -58,37 +43,36 @@ const DashboardWelcomeCard = ({ currentGreeting, stats, videoSettings }: Dashboa
                           WebkitTextFillColor: 'transparent'
                         }}
                       >
-                        {firstName}
-                      </span>
-                      <br />
-                      <span className="text-white">
-                        {restOfGreeting}
+                        {currentGreeting.firstName}
                       </span>
                     </h1>
+                    <p className="text-white/80 text-lg font-medium">
+                      {currentGreeting.encouragement}
+                    </p>
                   </div>
                 )}
-                <p className="text-white/60 text-lg">
+                <p className="text-white/60 text-base">
                   Your intelligent automation dashboard - streamline workflows, maximize efficiency, generate revenue
                 </p>
-                {currentGreeting && currentGreeting.language !== 'en' && (
-                  <p className="text-white/40 text-sm font-medium">
-                    🌍 {currentGreeting.languageName}
-                  </p>
-                )}
               </div>
             </div>
           </div>
           
-          <div className="lg:col-span-4 flex justify-end">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-16 border border-white/20 relative overflow-hidden">
-              {/* Enhanced glassmorphism effects */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-2xl"></div>
-              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 rounded-2xl"></div>
+          <div className="lg:col-span-4 flex flex-col items-end space-y-4">
+            {/* Clock */}
+            <div className="bg-gray-800/40 backdrop-blur-md rounded-xl p-4">
+              <RealTimeClock />
+            </div>
+
+            {/* Ready to Automate Badge - Smaller */}
+            <div className="bg-gray-800/40 backdrop-blur-md rounded-xl p-6 border border-white/20 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-xl"></div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-purple-500/10 rounded-xl"></div>
               
-              <div className="text-center space-y-8 relative z-10">
-                <div className="text-8xl">🚀</div>
-                <div className="text-white font-semibold text-2xl">Ready to Automate</div>
-                <div className="text-white/60 text-lg">
+              <div className="text-center space-y-3 relative z-10">
+                <div className="text-4xl">🚀</div>
+                <div className="text-white font-semibold text-lg">Ready to Automate</div>
+                <div className="text-white/60 text-sm">
                   {stats.totalBatches} batches • {stats.activeBatches} active
                 </div>
               </div>

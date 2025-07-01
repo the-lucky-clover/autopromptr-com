@@ -1,73 +1,41 @@
 
-import { useState, useEffect } from 'react';
-import { Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
-interface RealTimeClockProps {
-  use24Hour?: boolean;
-}
-
-const RealTimeClock = ({ use24Hour = true }: RealTimeClockProps) => {
+const RealTimeClock = () => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
-    const timeInterval = setInterval(() => {
+    const timer = setInterval(() => {
       setTime(new Date());
     }, 1000);
 
-    return () => {
-      clearInterval(timeInterval);
-    };
+    return () => clearInterval(timer);
   }, []);
 
   const formatTime = (date: Date) => {
-    if (use24Hour) {
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-      const seconds = date.getSeconds().toString().padStart(2, '0');
-      return `${hours}:${minutes}:${seconds}`;
-    } else {
-      return date.toLocaleTimeString('en-US', {
-        hour12: true,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
-    }
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
   };
 
-  const getTimezone = () => {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    
-    // Map common timezones to readable names
-    const timezoneMap: { [key: string]: string } = {
-      'America/New_York': 'Eastern',
-      'America/Chicago': 'Central', 
-      'America/Denver': 'Mountain',
-      'America/Los_Angeles': 'Pacific',
-      'America/Phoenix': 'Mountain',
-      'America/Anchorage': 'Alaska',
-      'Pacific/Honolulu': 'Hawaii',
-      'Europe/London': 'GMT',
-      'Europe/Paris': 'CET',
-      'Europe/Berlin': 'CET',
-      'Asia/Tokyo': 'JST',
-      'Asia/Shanghai': 'CST',
-      'Australia/Sydney': 'AEDT'
-    };
-    
-    return timezoneMap[timezone] || timezone.split('/')[1]?.replace('_', ' ') || 'Local';
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
   return (
-    <div className="flex items-center space-x-2 text-gray-700">
-      <Clock className="h-3 w-3" />
-      <div className="flex flex-col text-xs text-right">
-        <span className="font-mono font-medium">
-          {formatTime(time)}
-        </span>
-        <span className="text-[10px] text-gray-500">
-          {getTimezone()}
-        </span>
+    <div className="text-center">
+      <div className="text-white/90 text-lg font-light tracking-wide">
+        {formatTime(time)}
+      </div>
+      <div className="text-white/60 text-sm font-light">
+        {formatDate(time)}
       </div>
     </div>
   );

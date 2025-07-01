@@ -1,16 +1,43 @@
 
-import { useState } from 'react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useState, useRef } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { LogOut, CreditCard, User, Key, Shield } from 'lucide-react';
+import { LogOut, CreditCard, User, Key, Shield, Upload } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useSecureApiKeys } from '@/hooks/useSecureApiKeys';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const UserProfile = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, signOut } = useAuth();
   const { hasApiKey } = useSecureApiKeys();
+  const { toast } = useToast();
+
+  // Load user profile on mount
+  useState(() => {
+    if (user) {
+      loadProfile();
+    }
+  });
+
+  const loadProfile = async () => {
+    if (!user) return;
+    
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('avatar_url')
+      .eq('id', user.id)
+      .single();
+    
+    if (profile?.avatar_url) {
+      setAvatarUrl(profile.avatar_url);
+    }
+  };
 
   const getInitial = () => {
     if (!user?.email) return 'U';
@@ -22,6 +49,49 @@ const UserProfile = () => {
       await signOut();
     } catch (error) {
       console.error('Error signing out:', error);
+    }
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      setAvatarUrl(publicUrl);
+      toast({
+        title: "Avatar updated",
+        description: "Your profile picture has been updated successfully.",
+      });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to update your profile picture. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -41,6 +111,9 @@ const UserProfile = () => {
       >
         <div className="flex items-center space-x-3 p-2 rounded-xl hover:bg-white/10 transition-colors">
           <Avatar className="h-8 w-8">
+            {avatarUrl ? (
+              <AvatarImage src={avatarUrl} alt="Avatar" />
+            ) : null}
             <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium">
               {getInitial()}
             </AvatarFallback>
@@ -64,19 +137,39 @@ const UserProfile = () => {
 
       {isOpen && (
         <>
-          {/* Dark glass background overlay */}
           <div 
             className="fixed inset-0 bg-black/50 backdrop-blur-md z-40 animate-fade-in" 
             onClick={handleClose}
           />
-          <Card className="absolute bottom-full left-0 mb-2 w-80 bg-black/40 backdrop-blur-xl border-white/20 z-50 rounded-xl shadow-2xl shadow-black/50 animate-scale-in">
+          <Card className="absolute bottom-full left-0 mb-2 w-80 bg-gray-900/90 backdrop-blur-xl border-white/20 z-50 rounded-xl shadow-2xl shadow-black/50 animate-scale-in">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3 mb-4 p-3 bg-white/5 rounded-xl">
-                <Avatar className="h-12 w-12">
-                  <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-medium">
-                    {getInitial()}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="h-12 w-12">
+                    {avatarUrl ? (
+                      <AvatarImage src={avatarUrl} alt="Avatar" />
+                    ) : null}
+                    <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-medium">
+                      {getInitial()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="absolute -bottom-1 -right-1 h-6 w-6 p-0 bg-gray-800 border-white/20 hover:bg-gray-700"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                  >
+                    <Upload className="h-3 w-3" />
+                  </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarUpload}
+                  />
+                </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-white text-sm font-medium truncate">
                     {user?.email}

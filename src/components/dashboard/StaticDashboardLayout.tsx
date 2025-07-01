@@ -1,28 +1,38 @@
 
 import React from 'react';
-import StaticModuleWrapper from '@/components/StaticModuleWrapper';
-import { DashboardModule } from '@/hooks/useDashboardModules';
+
+interface Module {
+  id: string;
+  title: string;
+  component: string;
+  enabled: boolean;
+}
 
 interface StaticDashboardLayoutProps {
-  visibleModules: DashboardModule[];
+  visibleModules: Module[];
   renderModuleContent: (moduleId: string, componentName: string) => React.ReactNode;
 }
 
-const StaticDashboardLayout = ({
-  visibleModules,
-  renderModuleContent,
-}: StaticDashboardLayoutProps) => {
-  const sortedModules = visibleModules.sort((a, b) => a.order - b.order);
-
+const StaticDashboardLayout = ({ visibleModules, renderModuleContent }: StaticDashboardLayoutProps) => {
   return (
     <div className="space-y-6">
-      {sortedModules.map((module) => (
-        <StaticModuleWrapper
+      {visibleModules.map((module) => (
+        <div
           key={module.id}
-          title={module.title}
+          className="bg-gray-900/50 backdrop-blur-sm border-white/20 rounded-xl border"
         >
-          {renderModuleContent(module.id, module.component)}
-        </StaticModuleWrapper>
+          {/* Module Header - Consistent with Recent Activity */}
+          <div className="px-6 py-4">
+            <h3 className="text-lg font-semibold text-white">
+              {module.title}
+            </h3>
+          </div>
+          
+          {/* Module Content */}
+          <div className="px-6 pb-6">
+            {renderModuleContent(module.id, module.component)}
+          </div>
+        </div>
       ))}
     </div>
   );

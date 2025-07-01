@@ -15,7 +15,6 @@ import {
   Settings, 
   Camera, 
   Zap,
-  User,
   LucideIcon,
   MessageCircle,
   BookOpen,
@@ -27,7 +26,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import ZapBrandLogo from "@/components/ZapBrandLogo";
 import UserProfile from "@/components/UserProfile";
 
-// Navigation items with proper typing
+// Navigation items with proper typing - removed Profile
 const items: Array<{
   title: string;
   url: string;
@@ -52,11 +51,6 @@ const items: Array<{
     title: "Screenshots",
     url: "/screenshots", 
     icon: Camera,
-  },
-  {
-    title: "Profile",
-    url: "/dashboard/profile",
-    icon: User,
   },
   {
     title: "Settings",
@@ -98,7 +92,7 @@ export function AppSidebar() {
   const { isSysOp } = useUserRole();
 
   return (
-    <Sidebar className="bg-white/5 backdrop-blur-sm border-white/10 shadow-2xl">
+    <Sidebar className="bg-gray-900/60 backdrop-blur-sm border-white/10 shadow-2xl">
       <SidebarHeader className="p-4 border-b border-white/10">
         <div className="flex justify-center">
           <ZapBrandLogo size="small" variant="horizontal" />

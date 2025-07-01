@@ -181,6 +181,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           id: string
           name: string | null
@@ -193,6 +194,7 @@ export type Database = {
           video_background_opacity: number | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           id: string
           name?: string | null
@@ -205,6 +207,7 @@ export type Database = {
           video_background_opacity?: number | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           id?: string
           name?: string | null
