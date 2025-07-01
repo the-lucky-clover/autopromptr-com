@@ -2,19 +2,14 @@
 import { AutoPromptr, AutoPromtrError } from './autoPromptr';
 import { ConnectionDiagnostics } from './connectionDiagnostics';
 import { RedundantAutoPromptr } from './redundantAutoPromptr';
+import { GlobalCircuitBreaker } from './globalCircuitBreaker';
 import { Batch } from '@/types/batch';
 
 export class EnhancedAutoPromptr extends AutoPromptr {
   private configuredUrl: string;
   private connectionDiagnostics: ConnectionDiagnostics;
   private simplifiedSystem: RedundantAutoPromptr;
-  private validationCache: { isValid: boolean; timestamp: number } | null = null;
-  private readonly VALIDATION_CACHE_DURATION = 300000; // 5 minutes cache
-  private circuitBreakerOpen: boolean = false;
-  private validationFailureCount: number = 0;
-  private readonly MAX_VALIDATION_FAILURES = 2; // Reduced from 3
-  private lastValidationAttempt: number = 0;
-  private readonly MIN_VALIDATION_INTERVAL = 60000; // 1 minute minimum between attempts
+  private globalCircuitBreaker = GlobalCircuitBreaker.getInstance();
 
   constructor() {
     const savedUrl = 'https://autopromptr-backend.onrender.com';
@@ -23,110 +18,36 @@ export class EnhancedAutoPromptr extends AutoPromptr {
     this.connectionDiagnostics = new ConnectionDiagnostics(savedUrl);
     this.simplifiedSystem = new RedundantAutoPromptr();
     
-    console.log('🔧 Enhanced AutoPromptr initialized with improved circuit breaker');
+    console.log('🔧 Enhanced AutoPromptr initialized with global circuit breaker protection');
   }
 
   async validateConnection(): Promise<boolean> {
-    const now = Date.now();
-    
-    // Rate limiting - don't validate too frequently
-    if ((now - this.lastValidationAttempt) < this.MIN_VALIDATION_INTERVAL) {
-      console.log('Validation rate limited - using cached result');
-      return this.validationCache?.isValid ?? true;
-    }
-    
-    // Return cached validation if recent
-    if (this.validationCache && (now - this.validationCache.timestamp) < this.VALIDATION_CACHE_DURATION) {
-      console.log('Using cached validation result:', this.validationCache.isValid);
-      return this.validationCache.isValid;
-    }
-
-    // Skip validation entirely on public pages
-    if (!window.location.pathname.includes('/dashboard')) {
-      console.log('Skipping validation on public page');
-      this.validationCache = { isValid: true, timestamp: now };
-      return true;
-    }
-
-    // Enhanced circuit breaker pattern
-    if (this.circuitBreakerOpen) {
-      const timeSinceLastFailure = now - this.lastValidationAttempt;
-      const backoffTime = Math.min(300000, 30000 * Math.pow(2, this.validationFailureCount)); // Exponential backoff up to 5 minutes
-      
-      if (timeSinceLastFailure < backoffTime) {
-        console.log(`Validation circuit breaker is open - next attempt in ${Math.round((backoffTime - timeSinceLastFailure) / 1000)}s`);
-        this.validationCache = { isValid: false, timestamp: now };
-        return false;
-      } else {
-        console.log('Circuit breaker timeout expired - attempting validation');
-        this.circuitBreakerOpen = false;
-      }
-    }
-
-    this.lastValidationAttempt = now;
-
     try {
-      console.log('🔍 Performing optimized connection validation with enhanced circuit breaker...');
+      console.log('🔍 Performing connection validation with global circuit breaker...');
       
-      // Add timeout to validation
-      const validationPromise = this.simplifiedSystem.validateConnections();
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Validation timeout')), 10000)
-      );
-      
-      const connectionStatus = await Promise.race([validationPromise, timeoutPromise]) as any;
-      
-      // Consider connection valid if backend is working
-      const isValid = connectionStatus.primary || false;
-      
-      console.log('✅ Enhanced validation result:', {
-        primary: connectionStatus.primary,
-        overall: isValid,
-        recommendation: connectionStatus.recommendation
+      const result = await this.globalCircuitBreaker.makeRequest(async () => {
+        const connectionStatus = await this.simplifiedSystem.validateConnections();
+        return connectionStatus.primary || false;
       });
       
-      // Reset failure count on success
-      if (isValid) {
-        this.validationFailureCount = 0;
-        if (this.circuitBreakerOpen) {
-          this.circuitBreakerOpen = false;
-          console.log('Validation circuit breaker reset - connection restored');
-        }
-      } else {
-        this.handleValidationFailure();
-      }
-      
-      this.validationCache = { isValid, timestamp: now };
-      return isValid;
+      console.log('✅ Enhanced validation result:', result);
+      return result;
       
     } catch (err) {
-      console.log('Validation failed with error:', err instanceof Error ? err.message : 'Unknown error');
-      this.handleValidationFailure();
-      
-      // Return false for validation failures instead of being optimistic
-      this.validationCache = { isValid: false, timestamp: now };
+      console.log('❌ Validation blocked by circuit breaker:', err instanceof Error ? err.message : 'Unknown error');
       return false;
     }
   }
 
-  private handleValidationFailure() {
-    this.validationFailureCount++;
-    
-    if (this.validationFailureCount >= this.MAX_VALIDATION_FAILURES) {
-      this.circuitBreakerOpen = true;
-      console.log(`Enhanced circuit breaker opened after ${this.validationFailureCount} failures`);
-    }
-  }
-
   async runBatchWithValidation(batch: Batch, platform: string, options: any = {}) {
-    console.log('🚀 Starting enhanced batch run with improved error handling...');
+    console.log('🚀 Starting enhanced batch run with circuit breaker protection...');
     
-    // Enhanced validation with better error handling
-    const isValid = await this.validateConnection();
-    if (!isValid && this.circuitBreakerOpen) {
+    // Check if we can make requests
+    const canRequest = this.globalCircuitBreaker.canMakeRequest();
+    if (!canRequest.allowed) {
       throw new AutoPromtrError(
-        'Backend services are currently unavailable. Circuit breaker is active.',
-        'BACKEND_UNAVAILABLE',
+        `Backend services are temporarily unavailable: ${canRequest.reason}`,
+        'CIRCUIT_BREAKER_OPEN',
         503,
         true
       );
@@ -134,43 +55,30 @@ export class EnhancedAutoPromptr extends AutoPromptr {
     
     const enhancedOptions = {
       waitForIdle: options.waitForIdle ?? true,
-      maxRetries: Math.min(options.maxRetries ?? 1, 1), // Reduced retries to prevent long waits
-      timeout: 30000, // 30 second timeout
+      maxRetries: 1, // Reduced retries
+      timeout: 30000,
       ...options
     };
     
     try {
-      console.log('🎯 Starting batch with enhanced options:', enhancedOptions);
+      console.log('🎯 Starting batch with circuit breaker protection:', enhancedOptions);
       
-      const result = await this.simplifiedSystem.runBatchWithRedundancy(batch, platform, enhancedOptions);
+      const result = await this.globalCircuitBreaker.makeRequest(async () => {
+        return await this.simplifiedSystem.runBatchWithRedundancy(batch, platform, enhancedOptions);
+      });
+      
       console.log('✅ Enhanced batch completed successfully');
-      
-      // Reset circuit breaker on successful batch run
-      this.validationFailureCount = 0;
-      this.circuitBreakerOpen = false;
-      
       return result;
       
     } catch (err) {
       console.error('❌ Enhanced batch failed:', err);
       
-      // Clear validation cache on failure
-      this.validationCache = null;
-      
-      // Categorize errors better
       if (err instanceof Error) {
-        if (err.message.includes('fetch')) {
+        if (err.message.includes('Circuit breaker')) {
           throw new AutoPromtrError(
-            'Failed to connect to backend services. Please check your internet connection.',
-            'CONNECTION_FAILED',
-            0,
-            true
-          );
-        } else if (err.message.includes('timeout')) {
-          throw new AutoPromtrError(
-            'Backend request timed out. The service may be overloaded.',
-            'REQUEST_TIMEOUT',
-            408,
+            'Backend services are temporarily unavailable due to circuit breaker protection.',
+            'CIRCUIT_BREAKER_OPEN',
+            503,
             true
           );
         }
@@ -194,8 +102,10 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   }
 
   async getDiagnostics() {
-    // Return cached diagnostics to avoid unnecessary requests during circuit breaker
-    if (this.circuitBreakerOpen) {
+    const circuitBreakerState = this.globalCircuitBreaker.getState();
+    
+    // Return circuit breaker status without making requests if blocked
+    if (!this.globalCircuitBreaker.canMakeRequest().allowed) {
       return {
         overallSuccess: false,
         configuredUrl: this.configuredUrl,
@@ -206,14 +116,10 @@ export class EnhancedAutoPromptr extends AutoPromptr {
           networkType: 'unknown',
           isOnline: navigator.onLine
         },
-        circuitBreaker: {
-          isOpen: this.circuitBreakerOpen,
-          failureCount: this.validationFailureCount,
-          nextRetryIn: this.getNextRetryTime()
-        },
+        globalCircuitBreaker: circuitBreakerState,
         simplifiedMode: {
           primary: false,
-          recommendation: 'Service temporarily unavailable - enhanced circuit breaker active',
+          recommendation: 'Service temporarily unavailable - global circuit breaker active',
           configuration: this.simplifiedSystem.getBackendConfiguration()
         }
       };
@@ -226,11 +132,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
       
       return {
         ...standardDiagnostics,
-        circuitBreaker: {
-          isOpen: this.circuitBreakerOpen,
-          failureCount: this.validationFailureCount,
-          nextRetryIn: this.getNextRetryTime()
-        },
+        globalCircuitBreaker: circuitBreakerState,
         simplifiedMode: {
           primary: backendStatus.primary,
           recommendation: backendStatus.recommendation,
@@ -238,7 +140,6 @@ export class EnhancedAutoPromptr extends AutoPromptr {
         }
       };
     } catch (err) {
-      // Return enhanced diagnostics on error
       return {
         overallSuccess: false,
         configuredUrl: this.configuredUrl,
@@ -249,58 +150,31 @@ export class EnhancedAutoPromptr extends AutoPromptr {
           networkType: 'unknown',
           isOnline: navigator.onLine
         },
-        circuitBreaker: {
-          isOpen: this.circuitBreakerOpen,
-          failureCount: this.validationFailureCount,
-          nextRetryIn: this.getNextRetryTime()
-        },
+        globalCircuitBreaker: circuitBreakerState,
         simplifiedMode: {
           primary: false,
-          recommendation: 'Enhanced diagnostics failed - operating in degraded mode',
+          recommendation: 'Enhanced diagnostics failed - operating with global circuit breaker protection',
           configuration: this.simplifiedSystem.getBackendConfiguration()
         }
       };
     }
   }
 
-  private getNextRetryTime(): number {
-    if (!this.circuitBreakerOpen) return 0;
-    
-    const now = Date.now();
-    const timeSinceLastFailure = now - this.lastValidationAttempt;
-    const backoffTime = Math.min(300000, 30000 * Math.pow(2, this.validationFailureCount));
-    
-    return Math.max(0, backoffTime - timeSinceLastFailure);
-  }
-
   getSimplifiedStatus() {
     return {
       ...this.simplifiedSystem.getBackendConfiguration(),
-      circuitBreaker: {
-        isOpen: this.circuitBreakerOpen,
-        failureCount: this.validationFailureCount,
-        nextRetryIn: this.getNextRetryTime()
-      }
+      globalCircuitBreaker: this.globalCircuitBreaker.getState()
     };
   }
 
   // Method to reset circuit breakers
   resetCircuitBreakers() {
-    this.circuitBreakerOpen = false;
-    this.validationFailureCount = 0;
-    this.validationCache = null;
-    this.lastValidationAttempt = 0;
-    console.log('Enhanced circuit breaker manually reset');
+    this.globalCircuitBreaker.reset();
+    console.log('Enhanced AutoPromptr: Global circuit breaker manually reset');
   }
 
   // Get circuit breaker status
   getCircuitBreakerStatus() {
-    return {
-      isOpen: this.circuitBreakerOpen,
-      failureCount: this.validationFailureCount,
-      maxFailures: this.MAX_VALIDATION_FAILURES,
-      nextRetryIn: this.getNextRetryTime(),
-      lastAttempt: this.lastValidationAttempt
-    };
+    return this.globalCircuitBreaker.getState();
   }
 }
