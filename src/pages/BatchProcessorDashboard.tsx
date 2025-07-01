@@ -3,8 +3,8 @@ import { useState, useCallback } from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
-import DashboardBatchManager from "@/components/DashboardBatchManager";
 import BatchProcessorControlBar from "@/components/BatchProcessorControlBar";
+import YourBatchesModule from "@/components/YourBatchesModule";
 import AnimatedDropdownClock from "@/components/AnimatedDropdownClock";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -33,7 +33,6 @@ const BatchProcessorDashboard = () => {
   }, []);
 
   const handleNewBatch = useCallback(() => {
-    // Call the dashboard's new batch handler
     if (window.dashboardNewBatchHandler) {
       window.dashboardNewBatchHandler();
     }
@@ -46,38 +45,34 @@ const BatchProcessorDashboard = () => {
         <div className="min-h-screen flex w-full">
           <AppSidebar />
           <SidebarInset className="flex-1">
-            <div className="flex justify-between items-center p-6 border-b border-white/10">
+            <div className="flex justify-between items-center p-8 border-b border-white/10">
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Batch Processor</h1>
-                <p className="text-purple-200">Manage and execute your prompt batches</p>
+                <h1 className="text-4xl font-bold text-white mb-3">Automation</h1>
+                <p className="text-purple-200 text-lg">Batch Automation Dashboard - Manage and execute your prompt batches</p>
               </div>
               
-              {/* Single New Batch Button */}
               <Button
                 onClick={handleNewBatch}
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-2 font-medium shadow-lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl px-8 py-3 font-medium shadow-lg hover:shadow-purple-500/25 transition-all duration-300 animate-glow"
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-5 h-5 mr-2" />
                 New Batch
               </Button>
             </div>
             
-            <div className="p-6 space-y-6">
-              {/* Control Bar - removed onNewBatch prop since we handle it in header */}
+            <div className="p-8 space-y-8">
+              {/* Batch Controls Module */}
               <BatchProcessorControlBar 
                 onRefresh={handleRefresh}
               />
               
-              {/* Batch Manager */}
-              <div className="max-w-full">
-                <DashboardBatchManager 
-                  onStatsUpdate={handleStatsUpdate} 
-                  onBatchesUpdate={handleBatchesUpdate}
-                  isCompact={false}
-                  onNewBatchRequest={handleNewBatch}
-                  key={refreshTrigger}
-                />
-              </div>
+              {/* Your Batches Module */}
+              <YourBatchesModule 
+                onStatsUpdate={handleStatsUpdate} 
+                onBatchesUpdate={handleBatchesUpdate}
+                onNewBatchRequest={handleNewBatch}
+                refreshTrigger={refreshTrigger}
+              />
             </div>
           </SidebarInset>
         </div>

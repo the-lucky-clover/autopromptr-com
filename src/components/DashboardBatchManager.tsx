@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
 import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
@@ -52,12 +51,10 @@ const DashboardBatchManager = ({
   // Listen for new batch requests from control bar
   useEffect(() => {
     if (onNewBatchRequest) {
-      // This will be called when the control bar triggers a new batch
       const handleExternalNewBatch = () => {
         handleNewBatch();
       };
       
-      // Store the handler so parent can call it
       window.dashboardNewBatchHandler = handleExternalNewBatch;
     }
     
@@ -124,22 +121,23 @@ const DashboardBatchManager = ({
   }).length;
 
   return (
-    <div className={`space-y-5 ${isCompact ? 'space-y-3' : ''}`}>
-      <div className={`space-y-5 ${isCompact ? 'space-y-3' : ''}`}>
+    <div className={`space-y-6 ${isCompact ? 'space-y-4' : ''}`}>
+      <div className={`space-y-6 ${isCompact ? 'space-y-4' : ''}`}>
         {batches.length === 0 ? (
           <DashboardEmptyState onNewBatch={handleNewBatch} />
         ) : (
           <>
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <Button
                   onClick={handleRefresh}
                   size="sm"
                   variant="outline"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl btn-with-shadow"
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl btn-with-shadow px-4 py-2"
                   title="Refresh batch list"
                 >
-                  <RefreshCw className="w-4 h-4" />
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Refresh
                 </Button>
               </div>
               
@@ -148,7 +146,7 @@ const DashboardBatchManager = ({
                   onClick={detectAndFixFailedBatches}
                   variant="outline"
                   size="sm"
-                  className="bg-orange-500/20 border-orange-500/30 text-orange-300 hover:bg-orange-500/30 btn-with-shadow"
+                  className="bg-orange-500/20 border-orange-500/30 text-orange-300 hover:bg-orange-500/30 btn-with-shadow px-4 py-2"
                 >
                   <AlertTriangle className="w-4 h-4 mr-2" />
                   Fix {stuckBatchCount} Stuck Batch{stuckBatchCount > 1 ? 'es' : ''}

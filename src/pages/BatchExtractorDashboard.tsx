@@ -13,14 +13,14 @@ const BatchExtractorDashboard = () => {
         <div className="min-h-screen flex w-full">
           <AppSidebar />
           <SidebarInset className="flex-1">
-            <div className="flex justify-between items-center p-6 border-b border-white/10">
+            <div className="flex justify-between items-center p-8 border-b border-white/10">
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Batch Extractor</h1>
-                <p className="text-purple-200">Extract and process multiple prompts from large text blocks</p>
+                <h1 className="text-4xl font-bold text-white mb-3">Extractor</h1>
+                <p className="text-purple-200 text-lg">Extract and process multiple prompts from large text blocks</p>
               </div>
             </div>
             
-            <div className="p-6">
+            <div className="p-8">
               <div className="max-w-full">
                 <BatchExtractorModule isCompact={false} />
               </div>
