@@ -1,3 +1,4 @@
+
 import { AutoPromtrError } from './errors';
 import { Batch } from '@/types/batch';
 
@@ -161,7 +162,7 @@ export class EnhancedAutoPromtrClient {
 
   async testConnection(): Promise<boolean> {
     try {
-      const response = await this.makeRequest<{ status: string }>(`${this.baseUrl}/health`, {
+      const response = await this.makeRequest<{ status: string }>('/health', {
         method: 'GET',
       });
       
