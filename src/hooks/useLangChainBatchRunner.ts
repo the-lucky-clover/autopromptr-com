@@ -39,7 +39,6 @@ export const useLangChainBatchRunner = () => {
       return;
     }
 
-    // Check if any batch is already running
     const runningBatch = await new Promise<Batch[]>((resolve) => {
       setBatches(prev => {
         const running = prev.filter(b => b.status === 'running');
@@ -63,12 +62,10 @@ export const useLangChainBatchRunner = () => {
     setAutomationLoading(true);
     
     try {
-      // Update batch status to pending
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'pending', errorMessage: undefined } : b
       ));
 
-      // Enhanced settings for LangChain processing
       const enhancedSettings = {
         waitForIdle: batch.settings?.waitForIdle ?? true,
         maxRetries: Math.max(batch.settings?.maxRetries ?? 2, 2),
@@ -92,7 +89,6 @@ export const useLangChainBatchRunner = () => {
         throw new Error('Failed to save batch to database');
       }
       
-      // Update to running status
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { 
           ...b, 
@@ -103,30 +99,26 @@ export const useLangChainBatchRunner = () => {
         } : b
       ));
       
-      // Initialize LangChain client and processor
+      // Initialize LangChain client with proper parameters
       const langchainClient = new LangChainClient({
-        apiKey,
-        model: 'gpt-3.5-turbo',
         temperature: 0.7,
-        maxRetries: 3
+        maxTokens: 1000,
+        model: 'gpt-3.5-turbo'
       });
       
-      const batchProcessor = new LangChainBatchProcessor(langchainClient, {
-        waitBetweenPrompts: enhancedSettings.automationDelay,
-        maxWaitForTarget: enhancedSettings.elementTimeout,
-        retryFailedPrompts: true,
-        maxRetries: enhancedSettings.maxRetries
-      });
+      const batchProcessor = new LangChainBatchProcessor();
       
       console.log('🎯 Starting LangChain batch processing...');
-      const results = await batchProcessor.processBatch(batchToRun);
+      const results = await batchProcessor.processBatch(batchToRun, {
+        temperature: 0.7,
+        maxTokens: 1000,
+        model: 'gpt-3.5-turbo'
+      });
       
-      // Determine final status based on results
-      const successCount = results.filter(r => r.success).length;
-      const finalStatus: Batch['status'] = successCount === results.length ? 'completed' : 
+      const successCount = results.results.filter((r: any) => r.success).length;
+      const finalStatus: Batch['status'] = successCount === results.results.length ? 'completed' : 
                          successCount > 0 ? 'completed' : 'failed';
       
-      // Update batch status
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { 
           ...b, 
@@ -135,7 +127,6 @@ export const useLangChainBatchRunner = () => {
         } : b
       ));
       
-      // Save final status to database
       const finalBatch = { ...batchToRun, status: finalStatus };
       await saveBatchToDatabase(finalBatch);
       
@@ -143,7 +134,7 @@ export const useLangChainBatchRunner = () => {
       
       toast({
         title: "LangChain batch processing completed",
-        description: `Processed "${batch.name}" using ${platformName}. Success: ${successCount}/${results.length} prompts.`,
+        description: `Processed "${batch.name}" using ${platformName}. Success: ${successCount}/${results.results.length} prompts.`,
       });
       
     } catch (err) {
@@ -155,7 +146,6 @@ export const useLangChainBatchRunner = () => {
         errorMessage = err.message;
       }
       
-      // Update batch status to failed with error message
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { 
           ...b, 
@@ -164,7 +154,6 @@ export const useLangChainBatchRunner = () => {
         } : b
       ));
       
-      // Save failed status to database
       try {
         const failedBatch = {
           ...batch,
