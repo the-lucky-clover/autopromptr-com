@@ -86,25 +86,15 @@ const UnifiedDashboardWelcomeModule = ({
           <div className="col-span-12 lg:col-span-4 flex flex-col items-end space-y-4">
             {/* Digital Clock */}
             <div className="flex justify-end">
-              <DigitalClock 
-                clockColor={clockColor}
-                showReactorStatus={true}
-                showTimezone={true}
-                showDate={true}
-                size="lg"
-                className="text-right"
-              />
-            </div>
-            
-            {/* Additional timezone info */}
-            <div className="text-right space-y-2">
-              <div className="text-white/80 text-lg font-medium">
-                {dayName}, {monthDay} {year}
-              </div>
-              <div className="text-white/70 text-base">
-                {timezone}
-              </div>
-            </div>
+            <DigitalClock 
+              clockColor={clockColor}
+              showReactorStatus={true}
+              showTimezone={true}
+              showDate={true}
+              size="dashboard"
+              className="pr-4"
+            />
+          </div>
           </div>
         </div>
       </CardContent>
