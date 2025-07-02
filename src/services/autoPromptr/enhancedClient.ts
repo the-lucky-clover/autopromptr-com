@@ -1,3 +1,4 @@
+
 import { AutoPromptprError } from './errors';
 import { Batch } from '@/types/batch';
 
@@ -22,7 +23,7 @@ interface BackendBatchRequest {
   settings?: any;
 }
 
-export class EnhancedAutoPromptprClient {
+export class EnhancedAutoPromtprClient {
   private baseUrl: string;
   private retryConfig: RetryConfig;
 

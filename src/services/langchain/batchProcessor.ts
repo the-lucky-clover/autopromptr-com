@@ -1,7 +1,7 @@
 
 import { Batch } from '@/types/batch';
 import { LangChainClient } from './langchainClient';
-import { AutoPromtprError } from '../autoPromptr';
+import { AutoPromptprError } from '../autoPromptr';
 
 export class LangChainBatchProcessor {
   private client: LangChainClient;
@@ -19,7 +19,7 @@ export class LangChainBatchProcessor {
       console.log('🦜 Starting LangChain batch processing...');
       
       if (!batch.prompts || batch.prompts.length === 0) {
-        throw new AutoPromtprError(
+        throw new AutoPromptprError(
           'No prompts provided for LangChain processing',
           'INVALID_BATCH',
           400,
@@ -60,11 +60,11 @@ export class LangChainBatchProcessor {
     } catch (error) {
       console.error('💥 LangChain batch processing failed:', error);
       
-      if (error instanceof AutoPromtprError) {
+      if (error instanceof AutoPromptprError) {
         throw error;
       }
       
-      throw new AutoPromtprError(
+      throw new AutoPromptprError(
         'LangChain batch processing failed',
         'LANGCHAIN_BATCH_ERROR',
         500,

@@ -1,7 +1,7 @@
 
 import { ChatOpenAI } from '@langchain/openai';
 import { StringOutputParser } from '@langchain/core/output_parsers';
-import { AutoPromtprError } from '../autoPromptr';
+import { AutoPromptprError } from '../autoPromptr';
 
 export class LangChainClient {
   private model: ChatOpenAI;
@@ -19,7 +19,7 @@ export class LangChainClient {
         openAIApiKey: process.env.OPENAI_API_KEY
       });
     } catch (error) {
-      throw new AutoPromtprError(
+      throw new AutoPromptprError(
         'Failed to initialize LangChain client',
         'LANGCHAIN_INIT_ERROR',
         500,
@@ -52,7 +52,7 @@ export class LangChainClient {
     } catch (error) {
       console.error('💥 LangChain prompt processing failed:', error);
       
-      throw new AutoPromtprError(
+      throw new AutoPromptprError(
         'LangChain prompt processing failed',
         'LANGCHAIN_PROMPT_ERROR',
         500,

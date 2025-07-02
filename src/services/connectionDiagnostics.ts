@@ -1,5 +1,5 @@
 
-import { AutoPromptr, AutoPromtprError } from './autoPromptr';
+import { AutoPromptr, AutoPromptprError } from './autoPromptr';
 
 export class ConnectionDiagnostics {
   private baseUrl: string;
@@ -67,7 +67,7 @@ export class ConnectionDiagnostics {
         endpoint: '/health',
         success: false,
         latency: Date.now() - startTime,
-        error: error instanceof AutoPromtprError ? error.message : 'Unknown error'
+        error: error instanceof AutoPromptprError ? error.message : 'Unknown error'
       };
     }
   }

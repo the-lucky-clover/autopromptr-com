@@ -1,5 +1,6 @@
 
-import { Batch, AutoPromtprError } from './autoPromptr';
+import { Batch } from '@/types/batch';
+import { AutoPromptprError } from './autoPromptr';
 
 export class RedundantAutoPromptr {
   private primaryUrl: string;
@@ -40,7 +41,7 @@ export class RedundantAutoPromptr {
       }
       
       // All backends failed
-      throw new AutoPromtprError(
+      throw new AutoPromptprError(
         'All backend services are unavailable',
         'ALL_BACKENDS_FAILED',
         503,
