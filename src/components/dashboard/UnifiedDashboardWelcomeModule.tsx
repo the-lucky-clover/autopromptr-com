@@ -83,14 +83,16 @@ const UnifiedDashboardWelcomeModule = ({
           </div>
 
           {/* Clock and date area - right side */}
-          <div className="col-span-12 lg:col-span-4 flex flex-col items-end space-y-3">
-            <div className="flex justify-end mb-2">
+          <div className="col-span-12 lg:col-span-4 flex flex-col items-end space-y-4">
+            {/* Clock - embedded directly without container */}
+            <div className="flex justify-end">
               <AnalogueDropdownClock 
                 enableEasterEgg={true} 
                 clockColor={clockColor}
               />
             </div>
             
+            {/* Date and location info */}
             <div className="text-right space-y-2">
               <div className="text-white/80 text-lg font-medium">
                 {dayName}, {monthDay} {year}

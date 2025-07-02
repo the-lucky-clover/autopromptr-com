@@ -1,95 +1,102 @@
 
 import React, { useState, useEffect } from 'react';
-import AnalogueClockComponent from './clock/AnalogueClockComponent';
-import EnhancedMeltdownSystem from './clock/EnhancedMeltdownSystem';
 
 interface AnalogueDropdownClockProps {
   enableEasterEgg?: boolean;
   clockColor?: string;
 }
 
-const AnalogueDropdownClock: React.FC<AnalogueDropdownClockProps> = ({
-  enableEasterEgg = false,
-  clockColor = "#10B981"
+const AnalogueDropdownClock: React.FC<AnalogueDropdownClockProps> = ({ 
+  enableEasterEgg = false, 
+  clockColor = "#10B981" 
 }) => {
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [showMeltdown, setShowMeltdown] = useState(false);
-  const [isMeltdownAvailable, setIsMeltdownAvailable] = useState(true);
+  const [time, setTime] = useState(new Date());
 
   useEffect(() => {
-    // Show dropdown after component mounts
-    setTimeout(() => setIsDropdownVisible(true), 500);
-    
-    // Check cooldown status
-    checkMeltdownCooldown();
+    const timer = setInterval(() => {
+      setTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
-  const checkMeltdownCooldown = () => {
-    if (!enableEasterEgg) return;
-    
-    const lastMeltdown = localStorage.getItem('lastMeltdownTrigger');
-    if (lastMeltdown) {
-      const lastTriggerTime = new Date(lastMeltdown).getTime();
-      const currentTime = new Date().getTime();
-      const oneHourInMs = 60 * 60 * 1000;
-      
-      if (currentTime - lastTriggerTime < oneHourInMs) {
-        setIsMeltdownAvailable(false);
-        
-        // Set timer to re-enable after cooldown
-        const remainingTime = oneHourInMs - (currentTime - lastTriggerTime);
-        setTimeout(() => {
-          setIsMeltdownAvailable(true);
-        }, remainingTime);
-      }
-    }
-  };
+  const hours = time.getHours() % 12;
+  const minutes = time.getMinutes();
+  const seconds = time.getSeconds();
 
-  const handleMeltdownTrigger = () => {
-    if (!enableEasterEgg || !isMeltdownAvailable) return;
-    
-    console.log('🚨 SECTOR 7G REACTOR MELTDOWN INITIATED! 🚨');
-    setShowMeltdown(true);
-    setIsMeltdownAvailable(false);
-    
-    // Store trigger time for cooldown
-    localStorage.setItem('lastMeltdownTrigger', new Date().toISOString());
-  };
-
-  const handleMeltdownComplete = () => {
-    setShowMeltdown(false);
-    
-    // Set one-hour cooldown
-    setTimeout(() => {
-      setIsMeltdownAvailable(true);
-    }, 60 * 60 * 1000); // 1 hour
-  };
+  const hourAngle = (hours * 30) + (minutes * 0.5);
+  const minuteAngle = minutes * 6;
+  const secondAngle = seconds * 6;
 
   return (
-    <>
-      <EnhancedMeltdownSystem
-        isActive={showMeltdown}
-        onComplete={handleMeltdownComplete}
-      />
-
-      <div 
-        className={`fixed top-0 right-6 z-40 transition-all duration-700 ease-out ${
-          isDropdownVisible ? 'translate-y-6' : '-translate-y-full'
-        } ${showMeltdown ? 'pointer-events-none opacity-30' : ''}`}
-      >
-        <div className={`backdrop-blur-md rounded-b-xl p-6 border border-t-0 shadow-2xl transition-all duration-300 ${
-          showMeltdown 
-            ? 'bg-red-900/40 border-red-500/60' 
-            : 'bg-black/30 border-white/30'
-        }`}>
-          <AnalogueClockComponent
-            onMeltdownTrigger={handleMeltdownTrigger}
-            isMeltdownAvailable={isMeltdownAvailable && enableEasterEgg}
-            clockColor={clockColor}
+    <div className="relative">
+      <svg width="80" height="80" viewBox="0 0 100 100" className="transform -rotate-90">
+        {/* Clock face */}
+        <circle
+          cx="50"
+          cy="50"
+          r="48"
+          fill="transparent"
+          stroke={clockColor}
+          strokeWidth="2"
+          className="drop-shadow-lg"
+          style={{ filter: 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.4))' }}
+        />
+        
+        {/* Hour markers */}
+        {[...Array(12)].map((_, i) => (
+          <line
+            key={i}
+            x1="50"
+            y1="5"
+            x2="50"
+            y2="15"
+            stroke={clockColor}
+            strokeWidth="2"
+            transform={`rotate(${i * 30} 50 50)`}
           />
-        </div>
-      </div>
-    </>
+        ))}
+        
+        {/* Hour hand */}
+        <line
+          x1="50"
+          y1="50"
+          x2="50"
+          y2="25"
+          stroke={clockColor}
+          strokeWidth="3"
+          strokeLinecap="round"
+          transform={`rotate(${hourAngle} 50 50)`}
+        />
+        
+        {/* Minute hand */}
+        <line
+          x1="50"
+          y1="50"
+          x2="50"
+          y2="15"
+          stroke={clockColor}
+          strokeWidth="2"
+          strokeLinecap="round"
+          transform={`rotate(${minuteAngle} 50 50)`}
+        />
+        
+        {/* Second hand */}
+        <line
+          x1="50"
+          y1="50"
+          x2="50"
+          y2="10"
+          stroke="#ef4444"
+          strokeWidth="1"
+          strokeLinecap="round"
+          transform={`rotate(${secondAngle} 50 50)`}
+        />
+        
+        {/* Center dot */}
+        <circle cx="50" cy="50" r="3" fill={clockColor} />
+      </svg>
+    </div>
   );
 };
 

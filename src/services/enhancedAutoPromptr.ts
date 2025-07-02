@@ -1,3 +1,4 @@
+
 import { AutoPromptr } from './autoPromptr';
 import { AutoPromptrError } from './autoPromptr';
 import { Batch } from '@/types/batch';
@@ -46,6 +47,41 @@ export class EnhancedAutoPromptr extends AutoPromptr {
         500,
         true
       );
+    }
+  }
+
+  async validateConnection(): Promise<boolean> {
+    try {
+      await this.healthCheck();
+      return true;
+    } catch (error) {
+      console.error('Connection validation failed:', error);
+      return false;
+    }
+  }
+
+  async runBatchWithValidation(batch: Batch, platform: string, settings?: any): Promise<any> {
+    try {
+      console.log('🔄 Running batch with validation...');
+      
+      // Validate connection first
+      const isValid = await this.validateConnection();
+      if (!isValid) {
+        throw new AutoPromptrError(
+          'Backend connection validation failed',
+          'CONNECTION_VALIDATION_ERROR',
+          500,
+          true
+        );
+      }
+
+      // Run the batch
+      const result = await this.runBatch(batch, platform, settings);
+      console.log('✅ Batch with validation completed successfully');
+      return result;
+    } catch (error) {
+      console.error('💥 Batch with validation failed:', error);
+      throw AutoPromptrError.fromBackendError(error);
     }
   }
 }

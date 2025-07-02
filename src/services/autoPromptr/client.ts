@@ -3,7 +3,7 @@ import { Batch } from '@/types/batch';
 import { AutoPromptrError } from './errors';
 
 export class AutoPromptr {
-  private baseUrl: string;
+  public baseUrl: string; // Make baseUrl public
 
   constructor(baseUrl?: string) {
     this.baseUrl = baseUrl || 'https://autopromptr-backend.onrender.com';
@@ -66,6 +66,44 @@ export class AutoPromptr {
         throw new AutoPromptrError(
           `Failed to fetch platforms: HTTP ${response.status}`,
           'PLATFORMS_ERROR',
+          response.status,
+          true
+        );
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw AutoPromptrError.fromBackendError(error);
+    }
+  }
+
+  async healthCheck(): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/health`);
+      
+      if (!response.ok) {
+        throw new AutoPromptrError(
+          `Health check failed: HTTP ${response.status}`,
+          'HEALTH_CHECK_ERROR',
+          response.status,
+          true
+        );
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw AutoPromptrError.fromBackendError(error);
+    }
+  }
+
+  async getBatchStatus(batchId: string): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/batch/${batchId}/status`);
+      
+      if (!response.ok) {
+        throw new AutoPromptrError(
+          `Failed to get batch status: HTTP ${response.status}`,
+          'BATCH_STATUS_ERROR',
           response.status,
           true
         );

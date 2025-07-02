@@ -22,7 +22,7 @@ export class TestingService {
 
   constructor(baseUrl = 'https://autopromptr-backend.onrender.com') {
     this.baseUrl = baseUrl;
-    this.diagnostics = new ConnectionDiagnostics(baseUrl);
+    this.diagnostics = new ConnectionDiagnostics();
   }
 
   async runTestSuite(): Promise<TestSuite> {

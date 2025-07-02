@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Batch } from '@/types/batch';
@@ -26,34 +27,21 @@ export function useBatchRunner(batchId?: string): BatchRunnerHook {
 
     try {
       await runAutoPromptrBatch(batch, platform, {
-        onStart: () => {
-          toast({
-            title: "Batch started",
-            description: `Batch "${batch.name}" is now running.`,
-          });
-        },
-        onComplete: () => {
-          setCompleted(true);
-          toast({
-            title: "Batch completed",
-            description: `Batch "${batch.name}" completed successfully.`,
-          });
-        },
-        onError: (err: any) => {
-          setError(err.message || 'Batch failed');
-          toast({
-            title: "Batch failed",
-            description: `Batch "${batch.name}" failed with error: ${err.message || 'Unknown error'}`,
-            variant: "destructive",
-          });
-        },
+        delay: 1000,
+        maxRetries: 3
+      });
+      
+      setCompleted(true);
+      toast({
+        title: "Batch completed",
+        description: `Batch "${batch.name}" completed successfully.`,
       });
     } catch (err: any) {
       const errorMessage = err instanceof AutoPromptrError ? err.message : 'Unknown error';
       setError(errorMessage);
       toast({
-        title: "Error running batch",
-        description: `Failed to start batch: ${errorMessage}`,
+        title: "Batch failed",
+        description: `Batch "${batch.name}" failed with error: ${errorMessage}`,
         variant: "destructive",
       });
     } finally {

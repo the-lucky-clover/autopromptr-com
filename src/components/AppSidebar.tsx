@@ -1,9 +1,8 @@
 
-import { Home, Zap, FileText, BarChart3, Camera, Settings, Mail, LogOut, User } from "lucide-react"
+import { Home, Zap, FileText, BarChart3, Camera, Settings, Mail } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
-import { useAuth } from "@/hooks/useAuth"
-import { useToast } from "@/hooks/use-toast"
 import ZapBrandLogo from "@/components/ZapBrandLogo"
+import EnhancedUserProfile from "@/components/EnhancedUserProfile"
 
 import {
   Sidebar,
@@ -17,7 +16,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
 
 // Menu items
 const items = [
@@ -60,24 +58,6 @@ const items = [
 
 export function AppSidebar() {
   const location = useLocation()
-  const { user, signOut } = useAuth()
-  const { toast } = useToast()
-
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-      toast({
-        title: "Signed out successfully",
-        description: "You have been logged out of your account.",
-      })
-    } catch (error) {
-      toast({
-        title: "Error signing out",
-        description: "There was a problem signing you out.",
-        variant: "destructive",
-      })
-    }
-  }
 
   return (
     <Sidebar className="bg-gray-900 border-gray-800 w-80">
@@ -114,22 +94,9 @@ export function AppSidebar() {
       </SidebarContent>
       
       <SidebarFooter className="border-t border-gray-800 p-6">
-        {user && (
-          <div className="flex items-center justify-between p-4 rounded-lg bg-gray-800/50">
-            <div className="flex items-center gap-4 text-sm text-gray-400">
-              <User className="h-6 w-6" />
-              <span className="truncate font-medium text-base">{user.email}</span>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSignOut}
-              className="text-gray-400 hover:text-white hover:bg-gray-700 rounded-md p-3"
-            >
-              <LogOut className="h-5 w-5" />
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center justify-start">
+          <EnhancedUserProfile />
+        </div>
       </SidebarFooter>
     </Sidebar>
   )
