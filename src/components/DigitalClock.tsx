@@ -128,8 +128,9 @@ const DigitalClock: React.FC<DigitalClockProps> = ({
           className={`text-green-400 ${sizes.time} tabular-nums font-bold`} 
           style={{ 
             fontVariantNumeric: 'tabular-nums',
+            fontFeatureSettings: '"tnum"',
             textShadow: '0 0 16px rgba(34, 197, 94, 0.9), 0 0 32px rgba(34, 197, 94, 0.5), 0 0 48px rgba(34, 197, 94, 0.3)',
-            letterSpacing: '0.05em'
+            letterSpacing: '0.2em'
           }}
         >
           {currentTime}
