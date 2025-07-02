@@ -1,5 +1,5 @@
-
-import { AutoPromptr, AutoPromptprError } from './autoPromptr';
+import { AutoPromptr } from './autoPromptr';
+import { AutoPromptrError } from './autoPromptr';
 
 export interface ConnectionTestResult {
   endpoint: string;
@@ -11,12 +11,34 @@ export interface ConnectionTestResult {
 }
 
 export class ConnectionDiagnostics {
-  private baseUrl: string;
   private autoPromptr: AutoPromptr;
 
-  constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || localStorage.getItem('backendUrl') || 'https://autopromptr-backend.onrender.com';
-    this.autoPromptr = new AutoPromptr(this.baseUrl);
+  constructor() {
+    this.autoPromptr = new AutoPromptr();
+  }
+
+  async testConnection(): Promise<{
+    success: boolean;
+    latency?: number;
+    error?: string;
+  }> {
+    const startTime = Date.now();
+    
+    try {
+      // Test basic connectivity by trying to get platforms
+      await this.autoPromptr.getPlatforms();
+      const latency = Date.now() - startTime;
+      
+      return {
+        success: true,
+        latency
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof AutoPromptrError ? error.message : 'Connection failed'
+      };
+    }
   }
 
   async runComprehensiveTest() {
@@ -24,7 +46,7 @@ export class ConnectionDiagnostics {
     
     const results = {
       overallSuccess: false,
-      configuredUrl: this.baseUrl,
+      configuredUrl: this.autoPromptr.baseUrl,
       endpointResults: [] as ConnectionTestResult[],
       networkEnvironment: {
         hasAdBlocker: false,
@@ -88,7 +110,7 @@ export class ConnectionDiagnostics {
         success: false,
         latency: Date.now() - startTime,
         responseTime: Date.now() - startTime,
-        error: error instanceof AutoPromptprError ? error.message : 'Unknown error'
+        error: error instanceof AutoPromptrError ? error.message : 'Unknown error'
       };
     }
   }

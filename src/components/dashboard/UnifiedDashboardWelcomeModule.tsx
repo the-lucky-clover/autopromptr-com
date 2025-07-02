@@ -30,7 +30,8 @@ const UnifiedDashboardWelcomeModule = ({
     const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
     const monthDay = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
     const year = now.getFullYear();
-    return { dayName, monthDay, year };
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return { dayName, monthDay, year, timezone };
   };
 
   const getUserName = () => {
@@ -40,7 +41,7 @@ const UnifiedDashboardWelcomeModule = ({
            'there';
   };
 
-  const { dayName, monthDay, year } = getCurrentDateInfo();
+  const { dayName, monthDay, year, timezone } = getCurrentDateInfo();
   const userName = getUserName();
 
   return (
@@ -82,17 +83,20 @@ const UnifiedDashboardWelcomeModule = ({
           </div>
 
           {/* Clock and date area - right side */}
-          <div className="col-span-12 lg:col-span-4 flex flex-col items-end space-y-2">
-            <div className="flex justify-end">
+          <div className="col-span-12 lg:col-span-4 flex flex-col items-end space-y-3">
+            <div className="flex justify-end mb-2">
               <AnalogueDropdownClock 
                 enableEasterEgg={true} 
                 clockColor={clockColor}
               />
             </div>
             
-            <div className="text-right space-y-1">
-              <div className="text-white/80 text-base font-medium">
+            <div className="text-right space-y-2">
+              <div className="text-white/80 text-lg font-medium">
                 {dayName}, {monthDay} {year}
+              </div>
+              <div className="text-white/70 text-base">
+                {timezone}
               </div>
               <div className="flex items-center justify-end gap-2 text-white/70 text-sm">
                 <Radiation className="w-4 h-4 text-green-400" style={{ 
