@@ -6,7 +6,7 @@ import { useDashboardGreeting } from '@/hooks/useDashboardGreeting';
 import { useDashboardVideoSettings } from '@/hooks/useDashboardVideoSettings';
 import { useAuth } from '@/hooks/useAuth';
 import EnhancedWelcomeVideoBackground from './EnhancedWelcomeVideoBackground';
-import AnalogueClockComponent from '../clock/AnalogueClockComponent';
+import DigitalClock from '@/components/DigitalClock';
 
 const CleanDashboardWelcomeCard = () => {
   const currentGreeting = useDashboardGreeting();
@@ -49,10 +49,13 @@ const CleanDashboardWelcomeCard = () => {
         <div className="grid grid-cols-12 min-h-[200px]">
           {/* Clock positioned in upper-right - cols 10-12 */}
           <div className="col-span-3 flex items-start justify-end p-6 pt-8">
-            <AnalogueClockComponent 
-              clockColor="#10B981" 
-              isMeltdownAvailable={true}
-              hideDigitalDisplay={true}
+            <DigitalClock 
+              clockColor="#10B981"
+              showReactorStatus={true}
+              showTimezone={true}
+              showDate={true}
+              size="md"
+              className="text-right"
             />
           </div>
           

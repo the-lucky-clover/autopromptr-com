@@ -6,7 +6,7 @@ import { useDashboardVideoSettings } from '@/hooks/useDashboardVideoSettings';
 import { useDashboardGreeting } from '@/hooks/useDashboardGreeting';
 import { useAuth } from '@/hooks/useAuth';
 import EnhancedWelcomeVideoBackground from './EnhancedWelcomeVideoBackground';
-import AnalogueDropdownClock from '@/components/AnalogueDropdownClock';
+import DigitalClock from '@/components/DigitalClock';
 
 interface UnifiedDashboardWelcomeModuleProps {
   title: string;
@@ -84,32 +84,25 @@ const UnifiedDashboardWelcomeModule = ({
 
           {/* Clock and date area - right side */}
           <div className="col-span-12 lg:col-span-4 flex flex-col items-end space-y-4">
-            {/* Clock - embedded directly without container */}
+            {/* Digital Clock */}
             <div className="flex justify-end">
-              <AnalogueDropdownClock 
-                enableEasterEgg={true} 
+              <DigitalClock 
                 clockColor={clockColor}
+                showReactorStatus={true}
+                showTimezone={true}
+                showDate={true}
+                size="lg"
+                className="text-right"
               />
             </div>
             
-            {/* Date and location info */}
+            {/* Additional timezone info */}
             <div className="text-right space-y-2">
               <div className="text-white/80 text-lg font-medium">
                 {dayName}, {monthDay} {year}
               </div>
               <div className="text-white/70 text-base">
                 {timezone}
-              </div>
-              <div className="flex items-center justify-end gap-2 text-white/70 text-sm">
-                <Radiation className="w-4 h-4 text-green-400" style={{ 
-                  filter: 'drop-shadow(0 0 4px rgba(34, 197, 94, 0.6))',
-                  animation: 'pulse 2s infinite' 
-                }} />
-                <span className="text-green-400 font-medium" style={{ 
-                  textShadow: '0 0 8px rgba(34, 197, 94, 0.4)' 
-                }}>
-                  Sector 7-G • Reactor: Stable
-                </span>
               </div>
             </div>
           </div>

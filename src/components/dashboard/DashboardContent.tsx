@@ -3,7 +3,7 @@ import React from 'react';
 import { useDashboardModules } from '@/hooks/useDashboardModules';
 import CleanDashboardWelcomeCard from './CleanDashboardWelcomeCard';
 import StaticDashboardLayout from './StaticDashboardLayout';
-import AnalogueDropdownClock from '@/components/AnalogueDropdownClock';
+import DigitalClock from '@/components/DigitalClock';
 
 const DashboardContent = () => {
   const { visibleModules } = useDashboardModules();
@@ -15,7 +15,7 @@ const DashboardContent = () => {
 
   return (
     <>
-      <AnalogueDropdownClock enableEasterEgg={true} clockColor="#10B981" />
+      <DigitalClock clockColor="#10B981" showReactorStatus={true} size="md" />
       <div className="space-y-6">
         <CleanDashboardWelcomeCard />
         <StaticDashboardLayout 

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import UniversalSectorClock from "@/components/clock/UniversalSectorClock";
+import DigitalClock from "@/components/DigitalClock";
 
 interface DashboardWelcomeModuleProps {
   title: string;
@@ -30,7 +30,13 @@ const DashboardWelcomeModule: React.FC<DashboardWelcomeModuleProps> = ({
             
             <div className="flex-shrink-0 ml-8">
               <div className="relative">
-                <UniversalSectorClock clockColor={clockColor} />
+                <DigitalClock 
+                  clockColor={clockColor}
+                  showReactorStatus={true}
+                  showTimezone={true}
+                  showDate={true}
+                  size="lg"
+                />
               </div>
             </div>
           </div>

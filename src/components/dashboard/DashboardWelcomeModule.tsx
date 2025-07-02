@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Radiation } from 'lucide-react';
-import AnalogueClockComponent from "@/components/clock/AnalogueClockComponent";
+import DigitalClock from "@/components/DigitalClock";
 
 interface DashboardWelcomeModuleProps {
   title: string;
@@ -29,10 +29,12 @@ const DashboardWelcomeModule: React.FC<DashboardWelcomeModuleProps> = ({
           <div className="grid grid-cols-12 h-full min-h-[220px]">
             {/* Clock positioned in upper-right - cols 9-12 */}
             <div className="col-span-3 flex items-start justify-end p-6 pt-8">
-              <AnalogueClockComponent 
+              <DigitalClock 
                 clockColor={clockColor}
-                isMeltdownAvailable={true}
-                hideDigitalDisplay={true}
+                showReactorStatus={true}
+                showTimezone={true}
+                showDate={true}
+                size="md"
               />
             </div>
             
