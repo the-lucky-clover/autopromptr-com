@@ -1,5 +1,4 @@
-
-import { AutoPromtrError } from './errors';
+import { AutoPromptprError } from './errors';
 import { Batch } from '@/types/batch';
 
 interface RetryConfig {
@@ -23,7 +22,7 @@ interface BackendBatchRequest {
   settings?: any;
 }
 
-export class EnhancedAutoPromtrClient {
+export class EnhancedAutoPromptprClient {
   private baseUrl: string;
   private retryConfig: RetryConfig;
 
@@ -107,7 +106,7 @@ export class EnhancedAutoPromtrClient {
           errorData = { message: errorText };
         }
         
-        throw AutoPromtrError.fromBackendError({
+        throw AutoPromptprError.fromBackendError({
           message: errorData.message || `HTTP ${response.status}`,
           status: response.status,
           ...errorData
@@ -122,7 +121,7 @@ export class EnhancedAutoPromtrClient {
       clearTimeout(timeoutId);
       console.error(`❌ Request failed to ${url}:`, error);
       
-      if (error instanceof AutoPromtrError) {
+      if (error instanceof AutoPromptprError) {
         // If it's a non-retryable error or we've exhausted retries
         if (!error.retryable || retryCount >= this.retryConfig.maxRetries) {
           throw error;
@@ -138,7 +137,7 @@ export class EnhancedAutoPromtrClient {
       
       // Handle network errors
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        const networkError = new AutoPromtrError(
+        const networkError = new AutoPromptprError(
           'Network connection failed',
           'NETWORK_ERROR',
           0,
@@ -157,7 +156,7 @@ export class EnhancedAutoPromtrClient {
         throw networkError;
       }
       
-      throw AutoPromtrError.fromBackendError(error);
+      throw AutoPromptprError.fromBackendError(error);
     }
   }
 
@@ -223,7 +222,7 @@ export class EnhancedAutoPromtrClient {
       // Handle both uppercase and lowercase status responses
       const status = response.status?.toLowerCase();
       if (status !== 'ok') {
-        throw new AutoPromtrError(
+        throw new AutoPromptprError(
           'Backend health check failed',
           'HEALTH_CHECK_FAILED',
           0,
@@ -235,7 +234,7 @@ export class EnhancedAutoPromtrClient {
       return true;
     } catch (error) {
       console.error('❌ Backend connection test failed:', error);
-      throw new AutoPromtrError(
+      throw new AutoPromptprError(
         'Backend health check failed',
         'HEALTH_CHECK_FAILED',
         0,

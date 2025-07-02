@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, RefreshCw, ExternalLink, Info, Wrench, CheckCircle, Radiation } from 'lucide-react';
-import { AutoPromtrError } from '@/services/autoPromptr/errors';
+import { AutoPromptprError } from '@/services/autoPromptr/errors';
 
 interface BackendErrorHandlerProps {
-  error: AutoPromtrError;
+  error: AutoPromptprError;
   onRetry?: () => void;
   onDismiss?: () => void;
   showTechnicalDetails?: boolean;

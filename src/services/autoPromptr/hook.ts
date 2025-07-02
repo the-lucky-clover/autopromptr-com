@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { AutoPromptr } from './client';
-import { AutoPromtrError } from './errors';
+import { AutoPromptprError } from './errors';
 
 // Optimized React Hook with reduced polling
 export function useBatchAutomation(batchId?: string) {
@@ -11,7 +11,7 @@ export function useBatchAutomation(batchId?: string) {
   const [autoPromptr] = useState(new AutoPromptr());
 
   const runBatch = async (batch: any, platform: string, options?: { delay?: number; maxRetries?: number }) => {
-    if (!batch || !batch.id) throw new AutoPromtrError('No batch provided', 'NO_BATCH_PROVIDED');
+    if (!batch || !batch.id) throw new AutoPromptprError('No batch provided', 'NO_BATCH_PROVIDED');
     
     setLoading(true);
     setError(null);
@@ -23,7 +23,7 @@ export function useBatchAutomation(batchId?: string) {
       setStatus(result);
       return result;
     } catch (err) {
-      const errorMessage = err instanceof AutoPromtrError ? err.message : 'Unknown error';
+      const errorMessage = err instanceof AutoPromptprError ? err.message : 'Unknown error';
       console.error('Batch run error:', errorMessage);
       setError(errorMessage);
       throw err;
@@ -33,13 +33,13 @@ export function useBatchAutomation(batchId?: string) {
   };
 
   const stopBatch = async () => {
-    if (!batchId) throw new AutoPromtrError('No batch ID provided', 'NO_BATCH_ID');
+    if (!batchId) throw new AutoPromptprError('No batch ID provided', 'NO_BATCH_ID');
     
     try {
       await autoPromptr.stopBatch(batchId);
       setError(null);
     } catch (err) {
-      const errorMessage = err instanceof AutoPromtrError ? err.message : 'Unknown error';
+      const errorMessage = err instanceof AutoPromptprError ? err.message : 'Unknown error';
       setError(errorMessage);
       throw err;
     }

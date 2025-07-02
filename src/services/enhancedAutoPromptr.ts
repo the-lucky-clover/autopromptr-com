@@ -1,5 +1,5 @@
 
-import { AutoPromptr, AutoPromtrError } from './autoPromptr';
+import { AutoPromptr, AutoPromptprError } from './autoPromptr';
 import { ConnectionDiagnostics } from './connectionDiagnostics';
 import { RedundantAutoPromptr } from './redundantAutoPromptr';
 import { GlobalCircuitBreaker } from './globalCircuitBreaker';
@@ -45,7 +45,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
     // Check if we can make requests
     const canRequest = this.globalCircuitBreaker.canMakeRequest();
     if (!canRequest.allowed) {
-      throw new AutoPromtrError(
+      throw new AutoPromptprError(
         `Backend services are temporarily unavailable: ${canRequest.reason}`,
         'CIRCUIT_BREAKER_OPEN',
         503,
@@ -75,7 +75,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
       
       if (err instanceof Error) {
         if (err.message.includes('Circuit breaker')) {
-          throw new AutoPromtrError(
+          throw new AutoPromptprError(
             'Backend services are temporarily unavailable due to circuit breaker protection.',
             'CIRCUIT_BREAKER_OPEN',
             503,
@@ -84,11 +84,11 @@ export class EnhancedAutoPromptr extends AutoPromptr {
         }
       }
       
-      if (err instanceof AutoPromtrError) {
+      if (err instanceof AutoPromptprError) {
         throw err;
       }
       
-      throw new AutoPromtrError(
+      throw new AutoPromptprError(
         'Enhanced batch processing failed due to an unexpected error',
         'ENHANCED_BATCH_FAILED',
         500,

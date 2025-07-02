@@ -1,6 +1,5 @@
-
 import { Batch, AutoPromtrBackendRequest, AutoPromtrBackendResponse } from '@/types/batch';
-import { AutoPromtrError } from './errors';
+import { AutoPromptprError } from './errors';
 import { API_BASE_URL } from './config';
 
 export class AutoPromptr {
@@ -42,7 +41,7 @@ export class AutoPromptr {
       });
 
       if (!response.ok) {
-        throw new AutoPromtrError(
+        throw new AutoPromptprError(
           'Health check failed',
           'HEALTH_CHECK_FAILED',
           response.status
@@ -51,11 +50,11 @@ export class AutoPromptr {
 
       return await response.json();
     } catch (error) {
-      if (error instanceof AutoPromtrError) {
+      if (error instanceof AutoPromptprError) {
         throw error;
       }
       
-      throw new AutoPromtrError(
+      throw new AutoPromptprError(
         error instanceof Error ? error.message : 'Health check failed',
         'HEALTH_CHECK_ERROR',
         0
@@ -90,7 +89,7 @@ export class AutoPromptr {
         
         // If any prompt fails, stop processing
         if (result.status === 'failed') {
-          throw new AutoPromtrError(
+          throw new AutoPromptprError(
             `Batch failed at prompt ${i + 1}: ${result.error || 'Unknown error'}`,
             'BATCH_PROCESSING_FAILED',
             500
@@ -110,20 +109,20 @@ export class AutoPromptr {
     } catch (error) {
       console.error('💥 Error in runBatch:', error);
       
-      if (error instanceof AutoPromtrError) {
+      if (error instanceof AutoPromptprError) {
         throw error;
       }
       
       // Handle network errors
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new AutoPromtrError(
+        throw new AutoPromptprError(
           `Network connection failed when trying to connect to ${this.baseUrl}. Please verify the backend URL is correct and the service is running.`,
           'NETWORK_CONNECTION_FAILED',
           0
         );
       }
       
-      throw new AutoPromtrError(
+      throw new AutoPromptprError(
         error instanceof Error ? error.message : 'Unknown error occurred',
         'UNKNOWN_ERROR',
         0
@@ -147,7 +146,7 @@ export class AutoPromptr {
         const errorText = await response.text();
         console.error('❌ Backend error response:', response.status, errorText);
         
-        throw new AutoPromtrError(
+        throw new AutoPromptprError(
           `Backend returned ${response.status} error: ${errorText || response.statusText}`,
           'BACKEND_ERROR',
           response.status
@@ -161,11 +160,11 @@ export class AutoPromptr {
     } catch (fetchError) {
       console.error('Fetch error:', fetchError);
       
-      if (fetchError instanceof AutoPromtrError) {
+      if (fetchError instanceof AutoPromptprError) {
         throw fetchError;
       }
       
-      throw new AutoPromtrError(
+      throw new AutoPromptprError(
         fetchError instanceof Error ? fetchError.message : 'Network error occurred',
         'NETWORK_ERROR',
         0
@@ -186,18 +185,18 @@ export class AutoPromptr {
         return await response.json();
       }
       
-      throw new AutoPromtrError(
+      throw new AutoPromptprError(
         'Failed to stop batch',
         'STOP_BATCH_FAILED',
         response.status
       );
       
     } catch (error) {
-      if (error instanceof AutoPromtrError) {
+      if (error instanceof AutoPromptprError) {
         throw error;
       }
       
-      throw new AutoPromtrError(
+      throw new AutoPromptprError(
         error instanceof Error ? error.message : 'Failed to stop batch',
         'STOP_BATCH_ERROR',
         0
@@ -218,18 +217,18 @@ export class AutoPromptr {
         return await response.json();
       }
       
-      throw new AutoPromtrError(
+      throw new AutoPromptprError(
         'Failed to get batch status',
         'STATUS_CHECK_FAILED',
         response.status
       );
       
     } catch (error) {
-      if (error instanceof AutoPromtrError) {
+      if (error instanceof AutoPromptprError) {
         throw error;
       }
       
-      throw new AutoPromtrError(
+      throw new AutoPromptprError(
         error instanceof Error ? error.message : 'Failed to get batch status',
         'STATUS_CHECK_ERROR',
         0

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Batch } from '@/types/batch';
-import { EnhancedAutoPromtrClient } from '@/services/autoPromptr/enhancedClient';
-import { AutoPromtrError } from '@/services/autoPromptr/errors';
+import { EnhancedAutoPromptprClient } from '@/services/autoPromptr/enhancedClient';
+import { AutoPromptprError } from '@/services/autoPromptr/errors';
 
 export const useBatchControl = () => {
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const [automationLoading, setAutomationLoading] = useState(false);
-  const [lastError, setLastError] = useState<AutoPromtrError | null>(null);
+  const [lastError, setLastError] = useState<AutoPromptprError | null>(null);
   const { toast } = useToast();
 
   const validateBatchForExecution = (batch: Batch): { isValid: boolean; error?: string } => {
@@ -97,7 +97,7 @@ export const useBatchControl = () => {
     
     try {
       // Use enhanced client with better error handling
-      const enhancedClient = new EnhancedAutoPromtrClient();
+      const enhancedClient = new EnhancedAutoPromptprClient();
       
       // Create enhanced batch with overrides and settings
       const enhancedBatch = {
@@ -147,7 +147,7 @@ export const useBatchControl = () => {
         b.id === batch.id ? { ...b, status: 'failed' } : b
       ));
       
-      if (err instanceof AutoPromtrError) {
+      if (err instanceof AutoPromptprError) {
         setLastError(err);
         
         // Show user-friendly error message
@@ -157,7 +157,7 @@ export const useBatchControl = () => {
           variant: "destructive",
         });
       } else {
-        const genericError = AutoPromtrError.fromBackendError(err);
+        const genericError = AutoPromptprError.fromBackendError(err);
         setLastError(genericError);
         
         toast({
@@ -173,7 +173,7 @@ export const useBatchControl = () => {
 
   const handleStopBatch = async (batch: Batch, setBatches: (updater: (prev: Batch[]) => Batch[]) => void) => {
     try {
-      const enhancedClient = new EnhancedAutoPromtrClient();
+      const enhancedClient = new EnhancedAutoPromptprClient();
       await enhancedClient.stopBatch(batch.id);
       
       setBatches(prev => prev.map(b => 

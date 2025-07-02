@@ -1,6 +1,6 @@
 
 // Enhanced error handling with specific error types for Chrome/Puppeteer issues
-export class AutoPromtrError extends Error {
+export class AutoPromptprError extends Error {
   public readonly statusCode: number;
   public readonly code: string;
   public readonly retryable: boolean;
@@ -16,7 +16,7 @@ export class AutoPromtrError extends Error {
     technicalDetails?: string
   ) {
     super(message);
-    this.name = 'AutoPromtrError';
+    this.name = 'AutoPromptprError';
     this.statusCode = statusCode;
     this.code = code;
     this.retryable = retryable;
@@ -24,15 +24,15 @@ export class AutoPromtrError extends Error {
     this.technicalDetails = technicalDetails;
     
     // Ensure the error is properly recognized as an Error instance
-    Object.setPrototypeOf(this, AutoPromtrError.prototype);
+    Object.setPrototypeOf(this, AutoPromptprError.prototype);
   }
 
-  static fromBackendError(error: any): AutoPromtrError {
+  static fromBackendError(error: any): AutoPromptprError {
     const message = error.message || 'Unknown backend error';
     
     // Chrome/Puppeteer specific error handling
     if (message.includes('Could not find Chrome')) {
-      return new AutoPromtrError(
+      return new AutoPromptprError(
         'Chrome browser not available',
         'CHROME_NOT_FOUND',
         500,
@@ -43,7 +43,7 @@ export class AutoPromtrError extends Error {
     }
     
     if (message.includes('Browser not found') || message.includes('Puppeteer')) {
-      return new AutoPromtrError(
+      return new AutoPromptprError(
         'Browser automation service unavailable',
         'BROWSER_SERVICE_UNAVAILABLE',
         503,
@@ -54,7 +54,7 @@ export class AutoPromtrError extends Error {
     }
     
     if (message.includes('timeout') || message.includes('TIMEOUT')) {
-      return new AutoPromtrError(
+      return new AutoPromptprError(
         'Request timeout',
         'REQUEST_TIMEOUT',
         408,
@@ -65,7 +65,7 @@ export class AutoPromtrError extends Error {
     }
     
     if (message.includes('Connection refused') || message.includes('ECONNREFUSED')) {
-      return new AutoPromtrError(
+      return new AutoPromptprError(
         'Backend connection failed',
         'CONNECTION_REFUSED',
         503,
@@ -76,7 +76,7 @@ export class AutoPromtrError extends Error {
     }
     
     if (message.includes('rate limit') || message.includes('429')) {
-      return new AutoPromtrError(
+      return new AutoPromptprError(
         'Rate limit exceeded',
         'RATE_LIMIT_EXCEEDED',
         429,
@@ -87,7 +87,7 @@ export class AutoPromtrError extends Error {
     }
     
     // Generic error handling
-    return new AutoPromtrError(
+    return new AutoPromptprError(
       message,
       'BACKEND_ERROR',
       error.status || 500,
