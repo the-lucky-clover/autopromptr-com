@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Batch } from '@/types/batch';
-import { EnhancedAutoPromptprClient } from '@/services/autoPromptr/enhancedClient';
+import { EnhancedAutoPromptrClient } from '@/services/autoPromptr/enhancedClient';
 import { AutoPromptprError } from '@/services/autoPromptr/errors';
 
 export const useBatchControl = () => {
@@ -96,8 +96,8 @@ export const useBatchControl = () => {
     setLastError(null);
     
     try {
-      // Use enhanced client with better error handling
-      const enhancedClient = new EnhancedAutoPromptprClient();
+      // Use enhanced client with corrected class name
+      const enhancedClient = new EnhancedAutoPromptrClient();
       
       // Create enhanced batch with overrides and settings
       const enhancedBatch = {
@@ -173,7 +173,7 @@ export const useBatchControl = () => {
 
   const handleStopBatch = async (batch: Batch, setBatches: (updater: (prev: Batch[]) => Batch[]) => void) => {
     try {
-      const enhancedClient = new EnhancedAutoPromptprClient();
+      const enhancedClient = new EnhancedAutoPromptrClient();
       await enhancedClient.stopBatch(batch.id);
       
       setBatches(prev => prev.map(b => 
