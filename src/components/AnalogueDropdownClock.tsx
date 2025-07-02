@@ -13,6 +13,9 @@ const AnalogueDropdownClock: React.FC<AnalogueDropdownClockProps> = ({
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
+    // Set initial time immediately
+    setTime(new Date());
+    
     const timer = setInterval(() => {
       setTime(new Date());
     }, 100); // Update more frequently for smooth seconds hand
