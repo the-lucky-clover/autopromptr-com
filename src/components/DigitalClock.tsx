@@ -23,6 +23,17 @@ const DigitalClock: React.FC<DigitalClockProps> = ({
   const { getCurrentTime, getTimezoneAbbr, timezone } = useTimezone();
   const [currentTime, setCurrentTime] = useState(getCurrentTime());
 
+  // Get time without seconds for dashboard display
+  const getTimeWithoutSeconds = () => {
+    const now = new Date();
+    return now.toLocaleTimeString('en-US', {
+      timeZone: timezone,
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   useEffect(() => {
     const updateTime = () => {
       setCurrentTime(getCurrentTime());
@@ -41,7 +52,7 @@ const DigitalClock: React.FC<DigitalClockProps> = ({
       const month = now.toLocaleDateString('en-US', { month: 'long' });
       const date = now.getDate();
       const year = now.getFullYear();
-      return `${day}, ${month} ${date}, ${year}`;
+      return `${day} ${month} ${date}, ${year}`;
     } else {
       const day = now.toLocaleDateString('en-US', { weekday: 'short' });
       const date = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -97,46 +108,8 @@ const DigitalClock: React.FC<DigitalClockProps> = ({
 
   if (size === 'dashboard') {
     return (
-      <div className={`flex flex-col items-end space-y-4 text-right pr-2 ${className}`}>
-        {/* Reactor Status - Top */}
-        {showReactorStatus && (
-          <div className={`flex items-center gap-3 text-green-400 ${sizes.status}`}>
-            <span 
-              className="font-semibold tracking-wide"
-              style={{ 
-                textShadow: '0 0 12px rgba(34, 197, 94, 0.8), 0 0 24px rgba(34, 197, 94, 0.4)' 
-              }}
-            >
-              Sector 7-G
-            </span>
-            <Radiation 
-              className={`${sizes.icon} animate-[radioactive-pulse_3s_ease-in-out_infinite]`}
-            />
-            <span 
-              className="font-semibold tracking-wide" 
-              style={{ 
-                textShadow: '0 0 12px rgba(34, 197, 94, 0.8), 0 0 24px rgba(34, 197, 94, 0.4)' 
-              }}
-            >
-              Reactor: Stable
-            </span>
-          </div>
-        )}
-
-        {/* Large Time Display */}
-        <div 
-          className={`text-green-400 ${sizes.time} tabular-nums font-bold`} 
-          style={{ 
-            fontVariantNumeric: 'tabular-nums',
-            fontFeatureSettings: '"tnum"',
-            textShadow: '0 0 16px rgba(34, 197, 94, 0.9), 0 0 32px rgba(34, 197, 94, 0.5), 0 0 48px rgba(34, 197, 94, 0.3)',
-            letterSpacing: '0.2em'
-          }}
-        >
-          {currentTime}
-        </div>
-        
-        {/* Date Display */}
+      <div className={`flex flex-col items-end space-y-3 text-right ${className}`}>
+        {/* Date Display - Top */}
         {showDate && (
           <div 
             className={`text-green-400 font-semibold ${sizes.date} tracking-wide`}
@@ -147,6 +120,25 @@ const DigitalClock: React.FC<DigitalClockProps> = ({
             {formatDate()}
           </div>
         )}
+
+        {/* Time Display with Scan Lines */}
+        <div className="relative">
+          <div 
+            className={`text-green-400 ${sizes.time} tabular-nums font-bold relative z-10 scan-line-glow`} 
+            style={{ 
+              fontVariantNumeric: 'tabular-nums',
+              fontFeatureSettings: '"tnum"',
+              textShadow: '0 0 16px rgba(34, 197, 94, 0.9), 0 0 32px rgba(34, 197, 94, 0.5), 0 0 48px rgba(34, 197, 94, 0.3)',
+              letterSpacing: '0.2em'
+            }}
+          >
+            {getTimeWithoutSeconds()}
+          </div>
+          {/* Scan line effect */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="scan-line"></div>
+          </div>
+        </div>
 
         {/* Timezone Display */}
         {showTimezone && (

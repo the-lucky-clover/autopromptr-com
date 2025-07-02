@@ -54,11 +54,11 @@ const UnifiedDashboardWelcomeModule = ({
       />
       
       <CardContent className="p-0 relative z-10">
-        <div className="min-h-[200px] grid grid-cols-12 gap-4 items-center p-8">
-          {/* Main content area - left side */}
-          <div className="col-span-12 lg:col-span-8 space-y-4">
+        <div className="min-h-[280px] grid grid-cols-12 gap-8 p-8">
+          {/* Main content area - left side (lower positioning) */}
+          <div className="col-span-12 lg:col-span-7 flex flex-col justify-end pb-4">
             {showPersonalizedGreeting ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white drop-shadow-lg">
                   {currentGreeting.greeting},{' '}
                   <span className="bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">
@@ -66,35 +66,67 @@ const UnifiedDashboardWelcomeModule = ({
                   </span>
                   !
                 </h1>
-                <p className="text-white/90 text-lg font-medium leading-relaxed drop-shadow-md">
-                  {currentGreeting.encouragement}
-                </p>
+                <div className="pl-6">
+                  <p className="text-white/90 text-lg font-medium leading-relaxed drop-shadow-md">
+                    {currentGreeting.encouragement}
+                  </p>
+                </div>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white drop-shadow-lg">
                   {title}
                 </h1>
-                <p className="text-white/90 text-lg font-medium leading-relaxed drop-shadow-md">
-                  {subtitle}
-                </p>
+                <div className="pl-6">
+                  <p className="text-white/90 text-lg font-medium leading-relaxed drop-shadow-md">
+                    {subtitle}
+                  </p>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Clock and date area - right side */}
-          <div className="col-span-12 lg:col-span-4 flex flex-col items-end space-y-4">
-            {/* Digital Clock */}
+          {/* Right side with clock and status */}
+          <div className="col-span-12 lg:col-span-5 flex flex-col justify-between pr-8 py-4">
+            {/* Digital Clock - Upper Area */}
             <div className="flex justify-end">
-            <DigitalClock 
-              clockColor={clockColor}
-              showReactorStatus={true}
-              showTimezone={true}
-              showDate={true}
-              size="dashboard"
-              className="pr-4"
-            />
-          </div>
+              <DigitalClock 
+                clockColor={clockColor}
+                showReactorStatus={false}
+                showTimezone={true}
+                showDate={true}
+                size="dashboard"
+              />
+            </div>
+
+            {/* Reactor Status and Attribution - Lower Area */}
+            <div className="flex flex-col items-end space-y-4">
+              {/* Reactor Status */}
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-white/80 font-medium">Sector 7-G</span>
+                <span className="text-green-400 font-medium">//</span>
+                <span className="text-white/80 font-medium">Reactor:</span>
+                <span 
+                  className="text-green-400 font-semibold"
+                  style={{ 
+                    textShadow: '0 0 8px rgba(34, 197, 94, 0.6)' 
+                  }}
+                >
+                  Stable
+                </span>
+                <Radiation 
+                  className="w-4 h-4 text-yellow-400 animate-[radioactive-pulse_3s_ease-in-out_infinite]"
+                  style={{
+                    filter: 'drop-shadow(0 0 8px rgba(250, 204, 21, 0.8))'
+                  }}
+                />
+              </div>
+
+              {/* Attribution */}
+              <div className="text-white/60 text-base font-medium tracking-wide">
+                AutoPromptr Systems
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>

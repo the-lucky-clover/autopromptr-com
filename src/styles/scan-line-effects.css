@@ -1,0 +1,55 @@
+@layer base {
+  /* Scan Line Effects for Digital Clock */
+  .scan-line-glow {
+    position: relative;
+  }
+
+  .scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(34, 197, 94, 0.8) 50%, 
+      transparent 100%
+    );
+    animation: scanLineMove 2s linear infinite;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+  }
+
+  .scan-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.3) 50%, 
+      transparent 100%
+    );
+    animation: scanLineMove 2s linear infinite 0.5s;
+  }
+}
+
+@keyframes scanLineMove {
+  0% {
+    transform: translateY(0) scaleX(0.3);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(10px) scaleX(1);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(60px) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(70px) scaleX(0.3);
+  }
+}
