@@ -1,95 +1,73 @@
 
 import { ChatOpenAI } from '@langchain/openai';
-import { HumanMessage, SystemMessage } from '@langchain/core/messages';
-import { AutoPromtrError } from '../autoPromptr';
-
-export interface LangChainConfig {
-  apiKey?: string;
-  model?: string;
-  temperature?: number;
-  maxRetries?: number;
-}
+import { StringOutputParser } from '@langchain/core/output_parsers';
+import { AutoPromtprError } from '../autoPromptr';
 
 export class LangChainClient {
-  private chatModel: ChatOpenAI;
-  private config: Required<LangChainConfig>;
+  private model: ChatOpenAI;
 
-  constructor(config: LangChainConfig = {}) {
-    this.config = {
-      apiKey: config.apiKey || '',
-      model: config.model || 'gpt-3.5-turbo',
-      temperature: config.temperature || 0.7,
-      maxRetries: config.maxRetries || 3
-    };
-
-    this.chatModel = new ChatOpenAI({
-      openAIApiKey: this.config.apiKey,
-      modelName: this.config.model,
-      temperature: this.config.temperature,
-      maxRetries: this.config.maxRetries
-    });
+  constructor(options?: {
+    temperature?: number;
+    maxTokens?: number;
+    model?: string;
+  }) {
+    try {
+      this.model = new ChatOpenAI({
+        temperature: options?.temperature || 0.7,
+        maxTokens: options?.maxTokens || 1000,
+        modelName: options?.model || 'gpt-3.5-turbo',
+        openAIApiKey: process.env.OPENAI_API_KEY
+      });
+    } catch (error) {
+      throw new AutoPromtprError(
+        'Failed to initialize LangChain client',
+        'LANGCHAIN_INIT_ERROR',
+        500,
+        false
+      );
+    }
   }
 
-  async processPrompt(prompt: string, targetUrl: string): Promise<string> {
+  async processPrompt(prompt: string, options?: {
+    temperature?: number;
+    maxTokens?: number;
+  }): Promise<string> {
     try {
-      console.log(`🔗 LangChain processing prompt for: ${targetUrl}`);
+      console.log('🔄 Processing prompt with LangChain...');
       
-      const messages = [
-        new SystemMessage(`You are processing a prompt for the target URL: ${targetUrl}. Provide a structured response that acknowledges the prompt processing.`),
-        new HumanMessage(prompt)
-      ];
+      if (options) {
+        // Update model parameters if options provided
+        this.model.temperature = options.temperature || this.model.temperature;
+        this.model.maxTokens = options.maxTokens || this.model.maxTokens;
+      }
 
-      const response = await this.chatModel.invoke(messages);
+      const parser = new StringOutputParser();
+      const chain = this.model.pipe(parser);
+      
+      const result = await chain.invoke(prompt);
       
       console.log('✅ LangChain prompt processed successfully');
-      return response.content as string;
-      
+      return result;
+
     } catch (error) {
-      console.error('❌ LangChain processing failed:', error);
-      throw new AutoPromtrError(
-        `LangChain processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        'LANGCHAIN_PROCESSING_FAILED',
+      console.error('💥 LangChain prompt processing failed:', error);
+      
+      throw new AutoPromtprError(
+        'LangChain prompt processing failed',
+        'LANGCHAIN_PROMPT_ERROR',
         500,
         true
       );
     }
   }
 
-  async checkTargetAvailability(targetUrl: string): Promise<boolean> {
+  async testConnection(): Promise<boolean> {
     try {
-      console.log(`🔍 Checking target availability: ${targetUrl}`);
-      
-      const response = await fetch(targetUrl, { 
-        method: 'HEAD',
-        signal: AbortSignal.timeout(10000) // 10 second timeout
-      });
-      
-      const isAvailable = response.ok;
-      console.log(`${isAvailable ? '✅' : '❌'} Target ${targetUrl} availability: ${isAvailable}`);
-      
-      return isAvailable;
+      const testResult = await this.processPrompt('Test connection');
+      return testResult.length > 0;
     } catch (error) {
-      console.warn(`⚠️ Target availability check failed for ${targetUrl}:`, error);
+      console.error('LangChain connection test failed:', error);
       return false;
     }
-  }
-
-  async waitForTargetAvailability(targetUrl: string, maxWaitTime: number = 30000): Promise<boolean> {
-    const startTime = Date.now();
-    const checkInterval = 2000; // Check every 2 seconds
-    
-    while (Date.now() - startTime < maxWaitTime) {
-      const isAvailable = await this.checkTargetAvailability(targetUrl);
-      
-      if (isAvailable) {
-        return true;
-      }
-      
-      console.log(`⏳ Waiting for target availability... ${Math.round((Date.now() - startTime) / 1000)}s elapsed`);
-      await new Promise(resolve => setTimeout(resolve, checkInterval));
-    }
-    
-    console.warn(`⚠️ Target ${targetUrl} not available after ${maxWaitTime}ms`);
-    return false;
   }
 }

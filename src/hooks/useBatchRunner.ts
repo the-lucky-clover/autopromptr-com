@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { EnhancedAutoPromptr } from '@/services/enhancedAutoPromptr';
-import { AutoPromtrError } from '@/services/autoPromptr';
+import { AutoPromptprError } from '@/services/autoPromptr';
 import { Batch } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 import { useBatchDatabase } from './useBatchDatabase';
@@ -77,7 +77,7 @@ export const useBatchRunner = () => {
       // Enhanced database save with validation
       const saveResult = await saveBatchToDatabase(batchToRun);
       if (!saveResult) {
-        throw new AutoPromtrError(
+        throw new AutoPromptprError(
           'Failed to save batch to database',
           'DATABASE_SAVE_FAILED',
           500,
@@ -94,7 +94,7 @@ export const useBatchRunner = () => {
         console.warn('⚠️ Database verification failed, attempting final save...');
         const finalSaveResult = await saveBatchToDatabase(batchToRun);
         if (!finalSaveResult) {
-          throw new AutoPromtrError(
+          throw new AutoPromptprError(
             'Critical: Batch could not be verified in database',
             'DATABASE_VERIFICATION_FAILED',
             500,
@@ -136,7 +136,7 @@ export const useBatchRunner = () => {
       
       let errorMessage = 'Unknown error occurred';
       
-      if (err instanceof AutoPromtrError) {
+      if (err instanceof AutoPromptprError) {
         errorMessage = err.message;
         
         // Handle specific error cases with better guidance

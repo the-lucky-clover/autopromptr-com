@@ -1,74 +1,65 @@
 
-import { ElementDetector } from './elementDetection';
-import { SubmissionHandler } from './submissionMethods';
-import { PageReadinessChecker } from './pageReadiness';
-import { AutoPromtrError } from '../autoPromptr';
+import { Batch } from '@/types/batch';
+import { AutoPromptr } from '../autoPromptr';
+import { AutoPromtprError } from '../autoPromptr';
 
-// Text automation with enhanced reliability
-export class TextAutomation {
-  private static readonly DEFAULT_RETRY_ATTEMPTS = 5;
-  private static readonly DEFAULT_RETRY_DELAY = 2000;
+export class TextAutomationService {
+  private autoPromptr: AutoPromptr;
 
-  static async automateTextEntryWithRetries(
-    page: any, 
-    text: string, 
-    retryAttempts = this.DEFAULT_RETRY_ATTEMPTS,
-    retryDelay = this.DEFAULT_RETRY_DELAY
-  ): Promise<void> {
-    console.log(`🚀 Starting enhanced text automation for: "${text.substring(0, 50)}..."`);
-    
-    for (let attempt = 1; attempt <= retryAttempts; attempt++) {
-      try {
-        console.log(`📝 Text entry attempt ${attempt}/${retryAttempts}`);
-        
-        // Wait for page readiness
-        await PageReadinessChecker.waitForLovablePageReady(page);
-        
-        // Find chat input with enhanced strategies
-        const chatInput = await ElementDetector.findChatInput(page);
-        
-        // Focus and prepare input
-        await chatInput.focus();
-        await page.waitForTimeout(500);
-        
-        // Clear existing content
-        await chatInput.fill('');
-        await page.waitForTimeout(300);
-        
-        // Type the text with human-like timing
-        await chatInput.type(text, { delay: 75 });
-        console.log('✅ Text typed successfully');
-        
-        // Wait a moment for the text to register
-        await page.waitForTimeout(1000);
-        
-        // Try multiple submission strategies
-        const submitted = await SubmissionHandler.tryMultipleSubmissions(page);
-        
-        if (submitted) {
-          console.log('✅ Message submitted successfully');
-          return; // Success!
-        }
-        
-        throw new Error('Failed to submit message');
-        
-      } catch (err) {
-        console.error(`❌ Attempt ${attempt} failed:`, err.message);
-        
-        if (attempt === retryAttempts) {
-          throw new AutoPromtrError(
-            `Text automation failed after ${retryAttempts} attempts: ${err.message}`,
-            'TEXT_AUTOMATION_FAILED',
-            500,
-            true
-          );
-        }
-        
-        // Progressive backoff delay
-        const delay = retryDelay * Math.pow(1.5, attempt - 1);
-        console.log(`⏳ Waiting ${delay}ms before retry...`);
-        await page.waitForTimeout(delay);
+  constructor(baseUrl?: string) {
+    this.autoPromptr = new AutoPromptr(baseUrl);
+  }
+
+  async processTextBatch(batch: Batch, options?: {
+    maxRetries?: number;
+    timeout?: number;
+    concurrency?: number;
+  }): Promise<any> {
+    try {
+      console.log('🔤 Starting text automation processing...');
+      
+      // Validate batch for text processing
+      if (!batch.prompts || batch.prompts.length === 0) {
+        throw new AutoPromtprError(
+          'No prompts provided for text automation',
+          'INVALID_BATCH',
+          400,
+          false
+        );
       }
+
+      // Process with enhanced text handling
+      const result = await this.autoPromptr.runBatch(batch, 'text-automation', {
+        waitForIdle: false, // Text doesn't need DOM waiting
+        maxRetries: options?.maxRetries || 2,
+        timeout: options?.timeout || 15000,
+        ...options
+      });
+
+      console.log('✅ Text automation completed successfully');
+      return result;
+
+    } catch (error) {
+      console.error('💥 Text automation failed:', error);
+      
+      if (error instanceof AutoPromtprError) {
+        throw error;
+      }
+      
+      throw new AutoPromtprError(
+        'Text automation processing failed',
+        'TEXT_AUTOMATION_ERROR',
+        500,
+        true
+      );
     }
+  }
+
+  async optimizePromptText(text: string): Promise<string> {
+    // Simple text optimization logic
+    return text
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/\n{3,}/g, '\n\n');
   }
 }

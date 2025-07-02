@@ -1,111 +1,89 @@
 
-import { AutoPromptr, AutoPromtrError } from './autoPromptr';
-import { ConnectionDiagnostics } from './connectionDiagnostics';
-import { Batch } from '@/types/batch';
-
-interface BackendConfig {
-  name: string;
-  url: string;
-  maxRetries: number;
-  retryDelay: number;
-}
+import { Batch, AutoPromtprError } from './autoPromptr';
 
 export class RedundantAutoPromptr {
-  private primaryBackend: BackendConfig;
-  private connectionDiagnostics: ConnectionDiagnostics;
+  private primaryUrl: string;
+  private fallbackUrls: string[];
 
   constructor() {
-    this.primaryBackend = {
-      name: 'AutoPromptr Backend',
-      url: 'https://autopromptr-backend.onrender.com',
-      maxRetries: 3,
-      retryDelay: 60000 // 60 seconds
-    };
-
-    this.connectionDiagnostics = new ConnectionDiagnostics();
-    console.log('🔄 Simplified AutoPromptr initialized with autopromptr-backend only');
+    this.primaryUrl = 'https://autopromptr-backend.onrender.com';
+    this.fallbackUrls = [
+      'https://autopromptr-backup.onrender.com',
+      'https://autopromptr-fallback.herokuapp.com'
+    ];
   }
 
-  async runBatchWithRedundancy(batch: Batch, platform: string, options: any = {}): Promise<any> {
-    console.log('🚀 Starting batch run with autopromptr-backend...');
-    console.log(`📋 Batch: ${batch.name} (${batch.id})`);
-    console.log(`🎯 Platform: ${platform}`);
+  async runBatchWithRedundancy(batch: Batch, platform: string, options: any = {}) {
+    console.log('🔄 Starting redundant batch execution...');
     
-    for (let attempt = 1; attempt <= this.primaryBackend.maxRetries; attempt++) {
-      try {
-        console.log(`📡 AutoPromptr Backend - Attempt ${attempt}/${this.primaryBackend.maxRetries}`);
-        
-        const autoPromptr = new AutoPromptr(this.primaryBackend.url);
-        
-        const enhancedOptions = {
-          ...options,
-          targetUrl: batch.targetUrl || 'https://lovable.dev',
-          textPrompts: batch.prompts || [],
-          automationType: 'enhanced-lovable-automation',
-          elementSelector: 'textarea, input[type="text"], [contenteditable="true"]',
-          actionType: 'multi-strategy-submission',
-          enhancedFeatures: true
-        };
-        
-        console.log(`📝 Transmitting to ${this.primaryBackend.name}:`, {
-          targetUrl: enhancedOptions.targetUrl,
-          promptCount: enhancedOptions.textPrompts.length,
-          automationType: enhancedOptions.automationType,
-          enhanced: enhancedOptions.enhancedFeatures
-        });
-        
-        const result = await autoPromptr.runBatch(batch, platform, enhancedOptions);
-        
-        console.log(`✅ AutoPromptr Backend succeeded on attempt ${attempt}`);
-        return {
-          success: true,
-          result,
-          backend: this.primaryBackend.name,
-          attempt
-        };
-        
-      } catch (err) {
-        console.error(`❌ AutoPromptr Backend attempt ${attempt} failed:`, err);
-        
-        if (attempt < this.primaryBackend.maxRetries) {
-          console.log(`⏳ Waiting ${this.primaryBackend.retryDelay / 1000} seconds before retry...`);
-          await new Promise(resolve => setTimeout(resolve, this.primaryBackend.retryDelay));
-        } else {
-          console.error(`💥 AutoPromptr Backend failed all ${this.primaryBackend.maxRetries} attempts`);
-          throw new AutoPromtrError(
-            `AutoPromptr Backend failed after ${this.primaryBackend.maxRetries} attempts`,
-            'BACKEND_EXHAUSTED',
-            503,
-            false
-          );
+    // Try primary backend first
+    try {
+      const primaryClient = new (await import('./autoPromptr')).AutoPromptr(this.primaryUrl);
+      const result = await primaryClient.runBatch(batch, platform, options);
+      console.log('✅ Primary backend succeeded');
+      return result;
+    } catch (primaryError) {
+      console.warn('⚠️ Primary backend failed, trying fallbacks:', primaryError);
+      
+      // Try fallback backends
+      for (const fallbackUrl of this.fallbackUrls) {
+        try {
+          console.log(`🔄 Trying fallback: ${fallbackUrl}`);
+          const fallbackClient = new (await import('./autoPromptr')).AutoPromptr(fallbackUrl);
+          const result = await fallbackClient.runBatch(batch, platform, options);
+          console.log(`✅ Fallback backend succeeded: ${fallbackUrl}`);
+          return result;
+        } catch (fallbackError) {
+          console.warn(`⚠️ Fallback failed: ${fallbackUrl}`, fallbackError);
+          continue;
         }
       }
+      
+      // All backends failed
+      throw new AutoPromtprError(
+        'All backend services are unavailable',
+        'ALL_BACKENDS_FAILED',
+        503,
+        true,
+        'Primary and all fallback backend services are currently unavailable. Please try again later.'
+      );
     }
   }
 
-  async validateConnections(): Promise<{
-    primary: boolean;
-    fallback: boolean;
-    recommendation: string;
-  }> {
+  async validateConnections() {
     const results = {
       primary: false,
-      fallback: false,
+      fallbacks: [] as boolean[],
       recommendation: ''
     };
 
+    // Test primary
     try {
-      const primaryDiagnostics = new ConnectionDiagnostics(this.primaryBackend.url);
-      const primaryTest = await primaryDiagnostics.runComprehensiveTest();
-      results.primary = primaryTest.overallSuccess;
-    } catch (err) {
-      console.warn('Primary backend validation failed:', err);
+      const primaryClient = new (await import('./autoPromptr')).AutoPromptr(this.primaryUrl);
+      await primaryClient.healthCheck();
+      results.primary = true;
+    } catch (error) {
+      console.warn('Primary backend unavailable:', error);
     }
 
+    // Test fallbacks
+    for (const fallbackUrl of this.fallbackUrls) {
+      try {
+        const fallbackClient = new (await import('./autoPromptr')).AutoPromptr(fallbackUrl);
+        await fallbackClient.healthCheck();
+        results.fallbacks.push(true);
+      } catch (error) {
+        results.fallbacks.push(false);
+      }
+    }
+
+    // Generate recommendation
     if (results.primary) {
-      results.recommendation = 'AutoPromptr Backend operational';
+      results.recommendation = 'Primary backend is available - optimal performance';
+    } else if (results.fallbacks.some(f => f)) {
+      results.recommendation = 'Primary backend unavailable, but fallbacks are ready';
     } else {
-      results.recommendation = 'AutoPromptr Backend may be unavailable - check connectivity';
+      results.recommendation = 'All backend services are currently unavailable';
     }
 
     return results;
@@ -113,10 +91,9 @@ export class RedundantAutoPromptr {
 
   getBackendConfiguration() {
     return {
-      primary: this.primaryBackend,
-      fallback: null,
-      totalMaxAttempts: this.primaryBackend.maxRetries,
-      totalMaxDuration: this.primaryBackend.maxRetries * 60
+      primary: this.primaryUrl,
+      fallbacks: this.fallbackUrls,
+      strategy: 'redundant-failover'
     };
   }
 }
