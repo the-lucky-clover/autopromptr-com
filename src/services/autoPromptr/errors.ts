@@ -27,7 +27,7 @@ export class AutoPromptrError extends Error {
     Object.setPrototypeOf(this, AutoPromptrError.prototype);
   }
 
-  static fromBackendError(error: any): AutoPromptprError {
+  static fromBackendError(error: any): AutoPromptrError {
     const message = error.message || 'Unknown backend error';
     
     // Chrome/Puppeteer specific error handling

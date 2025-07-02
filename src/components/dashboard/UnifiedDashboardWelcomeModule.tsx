@@ -53,9 +53,9 @@ const UnifiedDashboardWelcomeModule = ({
       />
       
       <CardContent className="p-0 relative z-10">
-        <div className="min-h-[200px] grid grid-cols-12 gap-4 items-end p-8 pb-6">
+        <div className="min-h-[200px] grid grid-cols-12 gap-4 items-center p-8">
           {/* Main content area - left side */}
-          <div className="col-span-12 lg:col-span-9 space-y-4">
+          <div className="col-span-12 lg:col-span-8 space-y-4">
             {showPersonalizedGreeting ? (
               <div className="space-y-2">
                 <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white drop-shadow-lg">
@@ -82,16 +82,16 @@ const UnifiedDashboardWelcomeModule = ({
           </div>
 
           {/* Clock and date area - right side */}
-          <div className="col-span-12 lg:col-span-3 flex flex-col items-end space-y-3">
-            <div className="flex justify-end mb-2">
+          <div className="col-span-12 lg:col-span-4 flex flex-col items-end space-y-2">
+            <div className="flex justify-end">
               <AnalogueDropdownClock 
                 enableEasterEgg={true} 
                 clockColor={clockColor}
               />
             </div>
             
-            <div className="text-right space-y-1 mr-2">
-              <div className="text-white/70 text-sm font-medium">
+            <div className="text-right space-y-1">
+              <div className="text-white/80 text-base font-medium">
                 {dayName}, {monthDay} {year}
               </div>
               <div className="flex items-center justify-end gap-2 text-white/70 text-sm">

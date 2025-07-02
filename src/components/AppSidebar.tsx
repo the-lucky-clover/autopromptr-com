@@ -3,6 +3,7 @@ import { Home, Zap, FileText, BarChart3, Camera, Settings, Mail, LogOut, User } 
 import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { useToast } from "@/hooks/use-toast"
+import ZapBrandLogo from "@/components/ZapBrandLogo"
 
 import {
   Sidebar,
@@ -11,6 +12,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -79,23 +81,29 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="bg-gray-900 border-gray-800">
+      <SidebarHeader className="p-6 border-b border-gray-800">
+        <Link to="/" className="flex items-center justify-center">
+          <ZapBrandLogo size="medium" variant="horizontal" id="sidebar-logo" />
+        </Link>
+      </SidebarHeader>
+      
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-400 uppercase text-xs font-semibold tracking-wider">
-            AutoPromptr
+          <SidebarGroupLabel className="text-gray-400 uppercase text-xs font-semibold tracking-wider px-6 py-4">
+            Navigation
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="px-4 space-y-2">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     asChild
                     isActive={location.pathname === item.url}
-                    className="text-gray-300 hover:text-white hover:bg-gray-800 data-[active=true]:bg-gray-800 data-[active=true]:text-white"
+                    className="text-gray-300 hover:text-white hover:bg-gray-800 data-[active=true]:bg-gray-800 data-[active=true]:text-white h-12 text-base font-medium px-4 py-3 rounded-lg transition-all duration-200"
                   >
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.title}</span>
+                    <Link to={item.url} className="flex items-center gap-4">
+                      <item.icon className="h-6 w-6" strokeWidth={1.5} />
+                      <span className="text-base">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -104,18 +112,19 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="border-t border-gray-800">
+      
+      <SidebarFooter className="border-t border-gray-800 p-4">
         {user && (
-          <div className="flex items-center justify-between p-2">
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <User className="h-4 w-4" />
-              <span className="truncate">{user.email}</span>
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50">
+            <div className="flex items-center gap-3 text-sm text-gray-400">
+              <User className="h-5 w-5" />
+              <span className="truncate font-medium">{user.email}</span>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleSignOut}
-              className="text-gray-400 hover:text-white hover:bg-gray-800"
+              className="text-gray-400 hover:text-white hover:bg-gray-700 rounded-md p-2"
             >
               <LogOut className="h-4 w-4" />
             </Button>

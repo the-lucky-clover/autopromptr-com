@@ -138,7 +138,7 @@ export class EnhancedAutoPromptrClient {
       
       // Handle network errors
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        const networkError = new AutoPromptprError(
+        const networkError = new AutoPromptrError(
           'Network connection failed',
           'NETWORK_ERROR',
           0,

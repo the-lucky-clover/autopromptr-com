@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { AutoPromptprError } from '@/services/autoPromptr/errors';
+import { AutoPromptrError } from '@/services/autoPromptr/errors';
 import BackendErrorHandler from './BackendErrorHandler';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface BatchErrorDisplayProps {
-  error: AutoPromptprError | null;
+  error: AutoPromptrError | null;
   onRetry?: () => void;
   onDismiss?: () => void;
 }
