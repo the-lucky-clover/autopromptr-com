@@ -20,12 +20,11 @@ const AnalogueDropdownClock: React.FC<AnalogueDropdownClockProps> = ({
     return () => clearInterval(timer);
   }, []);
 
-  // Get current local time (which should be Pacific time based on user's system)
-  const now = new Date();
-  const hours = now.getHours() % 12;
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
-  const milliseconds = now.getMilliseconds();
+  // Use the time state variable for all calculations
+  const hours = time.getHours() % 12;
+  const minutes = time.getMinutes();
+  const seconds = time.getSeconds();
+  const milliseconds = time.getMilliseconds();
 
   // Calculate angles with smooth seconds hand
   const hourAngle = (hours * 30) + (minutes * 0.5);
