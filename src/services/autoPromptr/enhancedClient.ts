@@ -1,5 +1,5 @@
 
-import { AutoPromptprError } from './errors';
+import { AutoPromptrError } from './errors';
 import { Batch } from '@/types/batch';
 
 interface RetryConfig {
@@ -23,7 +23,7 @@ interface BackendBatchRequest {
   settings?: any;
 }
 
-export class EnhancedAutoPromtprClient {
+export class EnhancedAutoPromptrClient {
   private baseUrl: string;
   private retryConfig: RetryConfig;
 
@@ -107,7 +107,7 @@ export class EnhancedAutoPromtprClient {
           errorData = { message: errorText };
         }
         
-        throw AutoPromptprError.fromBackendError({
+        throw AutoPromptrError.fromBackendError({
           message: errorData.message || `HTTP ${response.status}`,
           status: response.status,
           ...errorData
@@ -122,7 +122,7 @@ export class EnhancedAutoPromtprClient {
       clearTimeout(timeoutId);
       console.error(`❌ Request failed to ${url}:`, error);
       
-      if (error instanceof AutoPromptprError) {
+      if (error instanceof AutoPromptrError) {
         // If it's a non-retryable error or we've exhausted retries
         if (!error.retryable || retryCount >= this.retryConfig.maxRetries) {
           throw error;
@@ -157,7 +157,7 @@ export class EnhancedAutoPromtprClient {
         throw networkError;
       }
       
-      throw AutoPromptprError.fromBackendError(error);
+      throw AutoPromptrError.fromBackendError(error);
     }
   }
 
@@ -223,7 +223,7 @@ export class EnhancedAutoPromtprClient {
       // Handle both uppercase and lowercase status responses
       const status = response.status?.toLowerCase();
       if (status !== 'ok') {
-        throw new AutoPromptprError(
+        throw new AutoPromptrError(
           'Backend health check failed',
           'HEALTH_CHECK_FAILED',
           0,
@@ -235,7 +235,7 @@ export class EnhancedAutoPromtprClient {
       return true;
     } catch (error) {
       console.error('❌ Backend connection test failed:', error);
-      throw new AutoPromptprError(
+      throw new AutoPromptrError(
         'Backend health check failed',
         'HEALTH_CHECK_FAILED',
         0,
