@@ -97,22 +97,25 @@ const DigitalClock: React.FC<DigitalClockProps> = ({
 
   if (size === 'dashboard') {
     return (
-      <div className={`flex flex-col items-end space-y-3 text-right ${className}`}>
+      <div className={`flex flex-col items-end space-y-4 text-right pr-2 ${className}`}>
         {/* Reactor Status - Top */}
         {showReactorStatus && (
-          <div className={`flex items-center gap-2 text-white/80 ${sizes.status}`}>
-            <span className="text-white font-medium">Sector Seven-G</span>
-            <Radiation 
-              className={`text-green-400 ${sizes.icon}`}
+          <div className={`flex items-center gap-3 text-green-400 ${sizes.status}`}>
+            <span 
+              className="font-semibold tracking-wide"
               style={{ 
-                filter: 'drop-shadow(0 0 4px rgba(34, 197, 94, 0.6))',
-                animation: 'pulse 2s infinite' 
-              }} 
+                textShadow: '0 0 12px rgba(34, 197, 94, 0.8), 0 0 24px rgba(34, 197, 94, 0.4)' 
+              }}
+            >
+              Sector 7-G
+            </span>
+            <Radiation 
+              className={`${sizes.icon} animate-[radioactive-pulse_3s_ease-in-out_infinite]`}
             />
             <span 
-              className="text-green-400 font-medium" 
+              className="font-semibold tracking-wide" 
               style={{ 
-                textShadow: '0 0 8px rgba(34, 197, 94, 0.4)' 
+                textShadow: '0 0 12px rgba(34, 197, 94, 0.8), 0 0 24px rgba(34, 197, 94, 0.4)' 
               }}
             >
               Reactor: Stable
@@ -121,20 +124,37 @@ const DigitalClock: React.FC<DigitalClockProps> = ({
         )}
 
         {/* Large Time Display */}
-        <div className={`text-white/95 ${sizes.time} tabular-nums`} style={{ fontVariantNumeric: 'tabular-nums' }}>
+        <div 
+          className={`text-green-400 ${sizes.time} tabular-nums font-bold`} 
+          style={{ 
+            fontVariantNumeric: 'tabular-nums',
+            textShadow: '0 0 16px rgba(34, 197, 94, 0.9), 0 0 32px rgba(34, 197, 94, 0.5), 0 0 48px rgba(34, 197, 94, 0.3)',
+            letterSpacing: '0.05em'
+          }}
+        >
           {currentTime}
         </div>
         
         {/* Date Display */}
         {showDate && (
-          <div className={`text-white/70 font-medium ${sizes.date}`}>
+          <div 
+            className={`text-green-400 font-semibold ${sizes.date} tracking-wide`}
+            style={{ 
+              textShadow: '0 0 10px rgba(34, 197, 94, 0.7), 0 0 20px rgba(34, 197, 94, 0.4)' 
+            }}
+          >
             {formatDate()}
           </div>
         )}
 
         {/* Timezone Display */}
         {showTimezone && (
-          <div className={`text-white/60 ${sizeClasses.dashboard.timezone}`}>
+          <div 
+            className={`text-green-400 font-medium ${sizeClasses.dashboard.timezone} tracking-wide`}
+            style={{ 
+              textShadow: '0 0 8px rgba(34, 197, 94, 0.6), 0 0 16px rgba(34, 197, 94, 0.3)' 
+            }}
+          >
             {getTimezoneDisplay()}
           </div>
         )}

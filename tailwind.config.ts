@@ -126,6 +126,24 @@ export default {
 					'50%': {
 						boxShadow: '0 0 40px rgba(139, 92, 246, 0.6)'
 					}
+				},
+				'radioactive-pulse': {
+					'0%': {
+						color: '#ffffff',
+						filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))'
+					},
+					'33%': {
+						color: '#fbbf24',
+						filter: 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.9))'
+					},
+					'66%': {
+						color: '#22c55e',
+						filter: 'drop-shadow(0 0 16px rgba(34, 197, 94, 1.0))'
+					},
+					'100%': {
+						color: '#ffffff',
+						filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))'
+					}
 				}
 			},
 			animation: {
@@ -133,7 +151,8 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.6s ease-out',
 				'slide-up': 'slide-up 0.6s ease-out',
-				'glow': 'glow 2s ease-in-out infinite alternate'
+				'glow': 'glow 2s ease-in-out infinite alternate',
+				'radioactive-pulse': 'radioactive-pulse 3s ease-in-out infinite'
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
