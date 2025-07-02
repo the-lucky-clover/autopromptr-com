@@ -3,8 +3,7 @@ import React from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import DashboardBatchManager from "@/components/DashboardBatchManager";
-import BatchProcessorWelcomeCard from "@/components/dashboard/BatchProcessorWelcomeCard";
-import AnalogueDropdownClock from "@/components/AnalogueDropdownClock";
+import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 
 const BatchProcessorDashboard = () => {
   return (
@@ -17,17 +16,13 @@ const BatchProcessorDashboard = () => {
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
           <AppSidebar />
-          <SidebarInset className="flex-1 relative">
-            {/* Clock positioned in upper right corner */}
-            <div className="fixed top-4 right-6 z-50">
-              <AnalogueDropdownClock 
-                enableEasterEgg={true} 
-                clockColor="#F59E0B" 
-              />
-            </div>
-            
-            {/* Welcome card with video background */}
-            <BatchProcessorWelcomeCard />
+          <SidebarInset className="flex-1 relative">            
+            <UnifiedDashboardWelcomeModule
+              title="Batch Processor"
+              subtitle="Create, manage, and execute automated prompt batches across multiple AI platforms."
+              clockColor="#F59E0B"
+              showPersonalizedGreeting={false}
+            />
             
             <div className="px-6">
               <DashboardBatchManager />

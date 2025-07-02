@@ -3,7 +3,7 @@ import React from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import BatchExtractorPageContent from "@/components/batch-extractor/BatchExtractorPageContent";
-import DashboardWelcomeModule from "@/components/dashboard/DashboardWelcomeModule";
+import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 
 const BatchExtractorDashboard = () => {
   return (
@@ -17,10 +17,11 @@ const BatchExtractorDashboard = () => {
         <div className="min-h-screen flex w-full">
           <AppSidebar />
           <SidebarInset className="flex-1 relative">
-            <DashboardWelcomeModule
+            <UnifiedDashboardWelcomeModule
               title="Batch Extractor"
               subtitle="Extract and convert large text content into organized prompt batches for automated processing."
-              clockColor="#06B6D4" // Cyan for extractor dashboard
+              clockColor="#06B6D4"
+              showPersonalizedGreeting={false}
             />
             
             <div className="px-6">
