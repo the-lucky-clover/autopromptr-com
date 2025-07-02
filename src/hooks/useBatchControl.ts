@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Batch } from '@/types/batch';
 import { EnhancedAutoPromptrClient } from '@/services/autoPromptr/enhancedClient';
-import { AutoPromptprError } from '@/services/autoPromptr/errors';
+import { AutoPromptrError } from '@/services/autoPromptr/errors';
 
 export const useBatchControl = () => {
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
