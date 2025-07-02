@@ -1,7 +1,7 @@
 
 import { Batch } from '@/types/batch';
 import { AutoPromptr } from '../autoPromptr';
-import { AutoPromptprError } from '../autoPromptr';
+import { AutoPromptrError } from '../autoPromptr';
 
 export class TextAutomationService {
   private autoPromptr: AutoPromptr;
@@ -20,7 +20,7 @@ export class TextAutomationService {
       
       // Validate batch for text processing
       if (!batch.prompts || batch.prompts.length === 0) {
-        throw new AutoPromptprError(
+        throw new AutoPromptrError(
           'No prompts provided for text automation',
           'INVALID_BATCH',
           400,
@@ -42,11 +42,11 @@ export class TextAutomationService {
     } catch (error) {
       console.error('💥 Text automation failed:', error);
       
-      if (error instanceof AutoPromptprError) {
+      if (error instanceof AutoPromptrError) {
         throw error;
       }
       
-      throw new AutoPromptprError(
+      throw new AutoPromptrError(
         'Text automation processing failed',
         'TEXT_AUTOMATION_ERROR',
         500,

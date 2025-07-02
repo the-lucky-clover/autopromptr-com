@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { AutoPromptr } from '@/services/autoPromptr';
-import { AutoPromptprError } from '@/services/autoPromptr/errors';
+import { AutoPromptrError } from '@/services/autoPromptr/errors';
 import { Platform } from '@/types/batch';
 
 export const usePlatforms = () => {
@@ -20,14 +20,14 @@ export const usePlatforms = () => {
       .catch((err) => {
         console.log('Platform loading error details:', {
           error: err,
-          isAutoPromptprError: err instanceof AutoPromptprError,
+          isAutoPromptrError: err instanceof AutoPromptrError,
           statusCode: err?.statusCode,
           code: err?.code,
           message: err?.message
         });
         
         // Check for 404 errors more reliably
-        const is404Error = (err instanceof AutoPromptprError && err.statusCode === 404) ||
+        const is404Error = (err instanceof AutoPromptrError && err.statusCode === 404) ||
                           (err?.status === 404) ||
                           (err?.message?.includes('404'));
         
@@ -49,7 +49,7 @@ export const usePlatforms = () => {
           
           // Only show toast for truly unexpected errors
           const isNetworkError = err?.message?.includes('fetch') || err?.message?.includes('network');
-          const isServerError = (err instanceof AutoPromptprError && err.statusCode >= 500);
+          const isServerError = (err instanceof AutoPromptrError && err.statusCode >= 500);
           
           if (isNetworkError || isServerError) {
             toast({

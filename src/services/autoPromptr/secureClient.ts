@@ -1,7 +1,7 @@
 
 import { Batch } from '@/types/batch';
 import { AutoPromptr } from './client';
-import { AutoPromptprError } from './errors';
+import { AutoPromptrError } from './errors';
 import { useSecureApiKeys } from '@/hooks/useSecureApiKeys';
 
 export class SecureAutoPromptr extends AutoPromptr {
@@ -16,7 +16,7 @@ export class SecureAutoPromptr extends AutoPromptr {
   // Override methods to include security headers
   async runBatch(batch: Batch, platform: string, options?: any) {
     if (!this.secureKeys) {
-      throw new AutoPromptprError(
+      throw new AutoPromptrError(
         'Secure keys not initialized',
         'SECURITY_ERROR',
         401,

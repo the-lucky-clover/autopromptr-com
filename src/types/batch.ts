@@ -62,7 +62,7 @@ export interface BatchFormData {
 }
 
 // New types for AutoPromptr Backend Integration
-export interface AutoPromtrBackendRequest {
+export interface AutoPromptrBackendRequest {
   batch: {
     id: string;
     prompt: string;
@@ -73,7 +73,7 @@ export interface AutoPromtrBackendRequest {
   max_retries?: number;
 }
 
-export interface AutoPromtrBackendResponse {
+export interface AutoPromptrBackendResponse {
   batchId: string;
   status: 'completed' | 'failed';
   result: {

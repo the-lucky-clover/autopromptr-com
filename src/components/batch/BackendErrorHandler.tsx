@@ -1,14 +1,13 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, RefreshCw, ExternalLink, Info, Wrench, CheckCircle, Radiation } from 'lucide-react';
-import { AutoPromptprError } from '@/services/autoPromptr/errors';
+import { AutoPromptrError } from '@/services/autoPromptr/errors';
 
 interface BackendErrorHandlerProps {
-  error: AutoPromptprError;
+  error: AutoPromptrError;
   onRetry?: () => void;
   onDismiss?: () => void;
   showTechnicalDetails?: boolean;
