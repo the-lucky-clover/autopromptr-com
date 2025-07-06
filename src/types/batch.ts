@@ -1,8 +1,7 @@
-
 export interface TextPrompt {
   id: string;
   text: string;
-  order: number;
+  order: number; // The order in which this prompt should be processed/displayed
 }
 
 export interface Batch {
@@ -18,13 +17,14 @@ export interface Batch {
   settings?: {
     waitForIdle: boolean;
     maxRetries: number;
-    automationDelay?: number;
-    elementTimeout?: number;
+    automationDelay?: number;   // Delay between automation steps (ms)
+    elementTimeout?: number;    // Timeout for DOM element operations (ms)
     debugLevel?: 'minimal' | 'standard' | 'detailed' | 'verbose';
-    isLocalPath?: boolean;
-    localAIAssistant?: 'cursor' | 'windsurf' | 'github-copilot' | 'bolt-diy' | 'roocode';
-    promptEnhancement?: boolean;
-    targetUrlOverride?: string;
+    isLocalPath?: boolean;      // Indicates if targetUrl is a local path
+    localAIAssistant?: 'cursor' | 'windsurf' | 'github-copilot' | 'bolt-diy' | 'roocode'; // AI assistant type for local paths
+    promptEnhancement?: boolean;    // Whether prompt enhancement is enabled
+    targetUrlOverride?: string;      // URL override for batch run
+    chromeArgs?: string[];           // Optional custom Chrome args for automation
   };
 }
 
@@ -46,8 +46,9 @@ export interface BatchStatus {
     pending: number;
   };
   recent_logs?: Array<{
-    level: string;
+    level: string;     // e.g., 'info', 'warning', 'error'
     message: string;
+    timestamp?: string;  // Optional timestamp for the log entry
   }>;
 }
 
@@ -62,6 +63,7 @@ export interface BatchFormData {
 }
 
 // New types for AutoPromptr Backend Integration
+
 export interface AutoPromptrBackendRequest {
   batch: {
     id: string;
