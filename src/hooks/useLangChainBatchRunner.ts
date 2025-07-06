@@ -1,191 +1,124 @@
-import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { LangChainClient } from '@/services/langchain/langchainClient';
-import { LangChainBatchProcessor } from '@/services/langchain/batchProcessor';
-import { Batch } from '@/types/batch';
-import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
-import { useBatchDatabase } from './useBatchDatabase';
+import { LangChainClient } from './langchainClient';
+import { Batch, PromptResult } from '@/types/batch';
 
-export const useLangChainBatchRunner = () => {
-  const { toast } = useToast();
-  const { saveBatchToDatabase } = useBatchDatabase();
-  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
-  const [automationLoading, setAutomationLoading] = useState(false);
+interface LangChainBatchProcessorOptions {
+  temperature?: number;
+  maxTokens?: number;
+  model?: string;
+  maxRetries?: number;          // retries per prompt
+  concurrency?: number;         // how many prompts processed in parallel
+  retryBackoffMs?: number;      // base delay for exponential backoff
+  onProgress?: (completed: number, total: number) => void; // progress callback
+}
 
-  const handleRunBatchWithLangChain = async (
-    batch: Batch, 
-    setBatches: (updater: (prev: Batch[]) => Batch[]) => void,
-    apiKey?: string
-  ) => {
-    const detectedPlatform = detectPlatformFromUrl(batch.targetUrl);
-    const platformName = getPlatformName(detectedPlatform);
+export class LangChainBatchProcessor {
+  private client: LangChainClient;
+  private maxRetries: number;
+  private concurrency: number;
+  private retryBackoffMs: number;
+  private onProgress?: (completed: number, total: number) => void;
 
-    if (!detectedPlatform) {
-      toast({
-        title: "Cannot detect platform",
-        description: "Unable to determine platform from the target URL. Please check the URL format.",
-        variant: "destructive",
-      });
-      return;
+  constructor() {
+    this.client = new LangChainClient();
+    this.maxRetries = 3;
+    this.concurrency = 3;
+    this.retryBackoffMs = 1000;
+  }
+
+  public async processBatch(
+    batch: Batch,
+    options: LangChainBatchProcessorOptions = {}
+  ): Promise<{ results: PromptResult[] }> {
+    this.maxRetries = options.maxRetries ?? 3;
+    this.concurrency = options.concurrency ?? 3;
+    this.retryBackoffMs = options.retryBackoffMs ?? 1000;
+    this.onProgress = options.onProgress;
+
+    if (!batch.prompts || batch.prompts.length === 0) {
+      throw new Error('Batch contains no prompts to process.');
     }
 
-    if (!apiKey) {
-      toast({
-        title: "API Key Required",
-        description: "OpenAI API key is required for LangChain processing. Please configure it in settings.",
-        variant: "destructive",
-      });
-      return;
-    }
+    const total = batch.prompts.length;
+    let completedCount = 0;
 
-    // Consider reading from batches state or pass current batches if available instead of Promise hack
-    const runningBatch = await new Promise<Batch[]>((resolve) => {
-      setBatches(prev => {
-        const running = prev.filter(b => b.status === 'running');
-        resolve(running);
-        return prev;
-      });
-    });
+    const results: PromptResult[] = [];
 
-    if (runningBatch.length > 0) {
-      toast({
-        title: "Batch already running",
-        description: `Cannot start "${batch.name}" because "${runningBatch[0].name}" is already processing.`,
-        variant: "destructive",
-      });
-      return;
-    }
+    // Process prompts with concurrency limit
+    const executing: Promise<void>[] = [];
 
-    console.log('🔗 Starting LangChain batch processing for:', batch.id);
+    // Helper to process a single prompt with retry
+    const processPromptWithRetry = async (promptText: string, promptId: string): Promise<PromptResult> => {
+      let attempt = 0;
+      while (attempt <= this.maxRetries) {
+        try {
+          const response = await this.client.callModel({
+            prompt: promptText,
+            temperature: options.temperature ?? 0.7,
+            maxTokens: options.maxTokens ?? 1000,
+            model: options.model ?? 'gpt-3.5-turbo',
+          });
 
-    setSelectedBatchId(batch.id);
-    setAutomationLoading(true);
-    
-    try {
-      setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { ...b, status: 'pending', errorMessage: undefined } : b
-      ));
-
-      const enhancedSettings = {
-        waitForIdle: batch.settings?.waitForIdle ?? true,
-        maxRetries: Math.min(Math.max(batch.settings?.maxRetries ?? 2, 2), 3), // Clamp between 2 and 3
-        automationDelay: batch.settings?.automationDelay ?? 3000,
-        elementTimeout: batch.settings?.elementTimeout ?? 30000,
-        debugLevel: batch.settings?.debugLevel ?? 'detailed'
+          return {
+            promptId,
+            promptText,
+            success: true,
+            responseText: response.text ?? '',
+            error: null,
+          };
+        } catch (error) {
+          attempt++;
+          if (attempt > this.maxRetries) {
+            return {
+              promptId,
+              promptText,
+              success: false,
+              responseText: '',
+              error: error instanceof Error ? error.message : 'Unknown error',
+            };
+          }
+          // Exponential backoff delay before retrying
+          const delay = this.retryBackoffMs * Math.pow(2, attempt - 1);
+          await new Promise(res => setTimeout(res, delay));
+        }
+      }
+      // Should never reach here but fallback fail-safe
+      return {
+        promptId,
+        promptText,
+        success: false,
+        responseText: '',
+        error: 'Failed after retries',
       };
+    };
 
-      const batchToRun = {
-        ...batch,
-        platform: detectedPlatform,
-        status: 'pending' as const,
-        settings: enhancedSettings,
-        createdAt: batch.createdAt instanceof Date ? batch.createdAt : new Date(batch.createdAt)
-      };
-      
-      console.log('💾 Saving batch to database...');
-      const saveResult = await saveBatchToDatabase(batchToRun);
-      
-      if (!saveResult) {
-        throw new Error('Failed to save batch to database');
-      }
-      
-      setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { 
-          ...b, 
-          status: 'running', 
-          platform: detectedPlatform, 
-          settings: enhancedSettings,
-          errorMessage: undefined
-        } : b
-      ));
-      
-      // Initialize LangChain client with proper parameters
-      const langchainClient = new LangChainClient({
-        temperature: 0.7,
-        maxTokens: 1000,
-        model: 'gpt-3.5-turbo'
-      });
-      
-      const batchProcessor = new LangChainBatchProcessor();
-      
-      console.log('🎯 Starting LangChain batch processing...');
-      const results = await batchProcessor.processBatch(batchToRun, {
-        temperature: 0.7,
-        maxTokens: 1000,
-        model: 'gpt-3.5-turbo'
-      });
-      
-      const successCount = results.results.filter((r: any) => r.success).length;
-      
-      // Decide final status based on success count
-      const finalStatus: Batch['status'] = successCount === results.results.length 
-        ? 'completed' 
-        : successCount > 0 
-          ? 'completed' // or 'partially_completed' if you want to distinguish partial success
-          : 'failed';
-      
-      setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { 
-          ...b, 
-          status: finalStatus,
-          errorMessage: finalStatus === 'failed' ? 'Some prompts failed processing' : undefined
-        } : b
-      ));
-      
-      const finalBatch = { ...batchToRun, status: finalStatus };
-      await saveBatchToDatabase(finalBatch);
-      
-      console.log('🎉 LangChain batch processing completed:', results);
-      
-      toast({
-        title: "LangChain batch processing completed",
-        description: `Processed "${batch.name}" using ${platformName}. Success: ${successCount}/${results.results.length} prompts.`,
-        variant: "success"
-      });
-      
-    } catch (err) {
-      console.error('💥 LangChain batch processing failed:', err);
-      
-      let errorMessage = 'Unknown error occurred';
-      
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-      
-      setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { 
-          ...b, 
-          status: 'failed',
-          errorMessage: errorMessage
-        } : b
-      ));
-      
-      try {
-        const failedBatch = {
-          ...batch,
-          status: 'failed' as const,
-          errorMessage: errorMessage,
-          platform: detectedPlatform
-        };
-        await saveBatchToDatabase(failedBatch);
-      } catch (saveError) {
-        console.error('Failed to save failed batch status to database:', saveError);
-      }
-      
-      toast({
-        title: "LangChain batch processing failed",
-        description: `Processing failed: ${errorMessage}`,
-        variant: "destructive",
-      });
-      
-    } finally {
-      setAutomationLoading(false);
-    }
-  };
+    // Runner that respects concurrency limit
+    const runQueue = async () => {
+      for (let i = 0; i < batch.prompts.length; i++) {
+        // Wait if concurrency limit reached
+        while (executing.length >= this.concurrency) {
+          await Promise.race(executing);
+        }
 
-  return {
-    selectedBatchId,
-    automationLoading,
-    handleRunBatchWithLangChain
-  };
-};
+        const prompt = batch.prompts[i];
+        const p = processPromptWithRetry(prompt.text ?? '', prompt.id).then(result => {
+          results.push(result);
+          completedCount++;
+          if (this.onProgress) {
+            this.onProgress(completedCount, total);
+          }
+          // Remove this promise from executing array when done
+          executing.splice(executing.indexOf(p), 1);
+        });
+
+        executing.push(p);
+      }
+
+      // Wait for all remaining to finish
+      await Promise.all(executing);
+    };
+
+    await runQueue();
+
+    return { results };
+  }
+}
