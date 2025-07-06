@@ -6,14 +6,26 @@ import { useBatchDatabase } from './useBatchDatabase';
 
 export const useBatchCrud = () => {
   const { toast } = useToast();
-  const { saveBatchToDatabase } = useBatchDatabase();
+  const { saveBatchToDatabase, deleteBatchFromDatabase } = useBatchDatabase();
+
   const [showModal, setShowModal] = useState(false);
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
 
+  // Loading states for CRUD operations
+  const [loadingCreate, setLoadingCreate] = useState(false);
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+
+  // Error state for any operation
+  const [error, setError] = useState<string | null>(null);
+
   const handleCreateBatch = async (
-    batchData: Omit<Batch, 'id' | 'createdAt'>, 
+    batchData: Omit<Batch, 'id' | 'createdAt'>,
     setBatches: (updater: (prev: Batch[]) => Batch[]) => void
   ) => {
+    setLoadingCreate(true);
+    setError(null);
+
     const detectedPlatform = detectPlatformFromUrl(batchData.targetUrl);
     const platformName = getPlatformName(detectedPlatform);
 
@@ -25,88 +37,111 @@ export const useBatchCrud = () => {
       status: 'pending',
       settings: {
         waitForIdle: batchData.settings?.waitForIdle ?? true,
-        maxRetries: batchData.settings?.maxRetries ?? 0
-      }
+        maxRetries: batchData.settings?.maxRetries ?? 0,
+      },
     };
 
-    console.log('Creating new batch with idle detection settings:', newBatch);
-
     try {
-      // Save to database with explicit error handling
       const saveResult = await saveBatchToDatabase(newBatch);
-      console.log('Database save result:', saveResult);
-      
-      if (!saveResult) {
-        throw new Error('Failed to save batch to database');
-      }
-      
-      // Add a small delay to ensure database consistency
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Only update local state after successful database save
-      setBatches(prev => [...prev, newBatch]);
+      if (!saveResult) throw new Error('Failed to save batch to database');
+
+      // Small delay to ensure DB consistency
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      setBatches((prev) => [...prev, newBatch]);
       setShowModal(false);
       setEditingBatch(null);
 
       toast({
-        title: "Batch created successfully",
+        title: 'Batch created successfully',
         description: `Batch "${newBatch.name}" created with platform: ${platformName} and idle detection enabled`,
       });
-
-      console.log('Batch creation completed successfully');
-    } catch (error) {
-      console.error('Failed to create batch:', error);
+    } catch (err) {
+      console.error('Failed to create batch:', err);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message);
       toast({
-        title: "Failed to create batch",
-        description: error instanceof Error ? error.message : 'Unknown error occurred',
-        variant: "destructive",
+        title: 'Failed to create batch',
+        description: message,
+        variant: 'destructive',
       });
-      throw error; // Re-throw to let the modal handle it
+      throw err;
+    } finally {
+      setLoadingCreate(false);
     }
   };
 
   const handleUpdateBatch = async (
-    updatedBatch: Batch, 
+    updatedBatch: Batch,
     setBatches: (updater: (prev: Batch[]) => Batch[]) => void
   ) => {
+    setLoadingUpdate(true);
+    setError(null);
+
     const detectedPlatform = detectPlatformFromUrl(updatedBatch.targetUrl);
     const batchWithPlatform = {
       ...updatedBatch,
-      platform: detectedPlatform
+      platform: detectedPlatform,
     };
 
     try {
-      // Save to database first
       const saveResult = await saveBatchToDatabase(batchWithPlatform);
-      
-      if (!saveResult) {
-        throw new Error('Failed to update batch in database');
-      }
-      
-      // Then update local state
-      setBatches(prev => prev.map(batch => 
-        batch.id === batchWithPlatform.id ? batchWithPlatform : batch
-      ));
+      if (!saveResult) throw new Error('Failed to update batch in database');
+
+      setBatches((prev) =>
+        prev.map((batch) => (batch.id === batchWithPlatform.id ? batchWithPlatform : batch))
+      );
+
       setShowModal(false);
       setEditingBatch(null);
 
       const platformName = getPlatformName(detectedPlatform);
       toast({
-        title: "Batch updated",
+        title: 'Batch updated',
         description: `Batch updated with platform: ${platformName}`,
       });
-    } catch (error) {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message);
       toast({
-        title: "Failed to update batch",
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: "destructive",
+        title: 'Failed to update batch',
+        description: message,
+        variant: 'destructive',
       });
-      throw error; // Re-throw to let the modal handle it
+      throw err;
+    } finally {
+      setLoadingUpdate(false);
     }
   };
 
-  const handleDeleteBatch = (batchId: string, setBatches: (updater: (prev: Batch[]) => Batch[]) => void) => {
-    setBatches(prev => prev.filter(batch => batch.id !== batchId));
+  const handleDeleteBatch = async (
+    batchId: string,
+    setBatches: (updater: (prev: Batch[]) => Batch[]) => void
+  ) => {
+    setLoadingDelete(true);
+    setError(null);
+
+    try {
+      const deleted = await deleteBatchFromDatabase(batchId);
+      if (!deleted) throw new Error('Failed to delete batch from database');
+
+      setBatches((prev) => prev.filter((batch) => batch.id !== batchId));
+
+      toast({
+        title: 'Batch deleted',
+        description: 'Batch has been removed successfully.',
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setError(message);
+      toast({
+        title: 'Failed to delete batch',
+        description: message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoadingDelete(false);
+    }
   };
 
   const handleEditBatch = (batch: Batch) => {
@@ -128,6 +163,10 @@ export const useBatchCrud = () => {
     handleUpdateBatch,
     handleDeleteBatch,
     handleEditBatch,
-    handleNewBatch
+    handleNewBatch,
+    loadingCreate,
+    loadingUpdate,
+    loadingDelete,
+    error,
   };
 };
