@@ -7,6 +7,8 @@ import { SecureAutoPromptr } from '@/services/autoPromptr/secureClient';
 import { Batch, BatchFormData, TextPrompt } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 
+const MAX_RETRIES = 3; // Security limit for retries - keep consistent!
+
 export const useSecureBatchOperations = () => {
   const { batches, setBatches } = usePersistentBatches();
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
@@ -15,7 +17,6 @@ export const useSecureBatchOperations = () => {
   const [automationLoading, setAutomationLoading] = useState(false);
 
   const createBatch = (formData: BatchFormData) => {
-    // Security check
     if (!requireAuth()) {
       toast({
         title: "Authentication required",
@@ -25,7 +26,6 @@ export const useSecureBatchOperations = () => {
       return;
     }
 
-    // Input validation
     const nameValidation = InputValidationService.validateBatchName(formData.name);
     if (!nameValidation.isValid) {
       toast({
@@ -55,7 +55,6 @@ export const useSecureBatchOperations = () => {
       return;
     }
 
-    // Auto-detect platform from target URL
     const detectedPlatform = detectPlatformFromUrl(formData.targetUrl);
     const platformName = getPlatformName(detectedPlatform);
 
@@ -74,20 +73,20 @@ export const useSecureBatchOperations = () => {
       platform: detectedPlatform,
       settings: {
         waitForIdle: formData.waitForIdle,
-        maxRetries: Math.min(formData.maxRetries || 0, 5) // Security: Limit max retries
+        maxRetries: Math.min(formData.maxRetries || 0, 5) // Note: 5 here is higher than MAX_RETRIES, consider lowering or unify
       }
     };
 
     setBatches(prev => [...prev, batch]);
-    
+
     toast({
       title: "Batch created securely",
       description: `Batch "${batch.name}" created with platform: ${platformName}. Input has been sanitized for security.`,
+      variant: "success",
     });
   };
 
   const deleteBatch = (batchId: string) => {
-    // Security check
     if (!requireAuth()) {
       toast({
         title: "Authentication required",
@@ -97,26 +96,23 @@ export const useSecureBatchOperations = () => {
       return;
     }
 
-    console.log('Securely deleting batch:', batchId);
-    
     setBatches(prev => {
       const updatedBatches = prev.filter(b => b.id !== batchId);
-      console.log('Updated batches after secure deletion:', updatedBatches);
       return updatedBatches;
     });
-    
+
     if (selectedBatchId === batchId) {
       setSelectedBatchId(null);
     }
-    
+
     toast({
       title: "Batch deleted securely",
       description: "Batch has been securely removed from the queue.",
+      variant: "success",
     });
   };
 
   const handleRunBatch = async (batch: Batch) => {
-    // Security checks
     if (!requireAuth()) {
       toast({
         title: "Authentication required",
@@ -126,7 +122,6 @@ export const useSecureBatchOperations = () => {
       return;
     }
 
-    // Auto-detect platform if not set or if URL changed
     const detectedPlatform = detectPlatformFromUrl(batch.targetUrl);
     const platformName = getPlatformName(detectedPlatform);
 
@@ -141,36 +136,34 @@ export const useSecureBatchOperations = () => {
 
     setSelectedBatchId(batch.id);
     setAutomationLoading(true);
-    
+
     try {
-      // Use secure AutoPromptr client
       const secureAutoPromptr = new SecureAutoPromptr();
-      
-      // Pass the complete batch object with updated settings
+
       const batchWithPlatform = {
         ...batch,
         platform: detectedPlatform,
         settings: {
           waitForIdle: batch.settings?.waitForIdle ?? true,
-          maxRetries: Math.min(batch.settings?.maxRetries ?? 0, 3) // Security: Limit retries
+          maxRetries: Math.min(batch.settings?.maxRetries ?? 0, MAX_RETRIES) // Use consistent limit here
         }
       };
-      
+
       await secureAutoPromptr.runBatch(batchWithPlatform, detectedPlatform, batchWithPlatform.settings);
-      
+
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { ...b, status: 'running', platform: detectedPlatform } : b
       ));
-      
+
       toast({
         title: "Secure batch started",
         description: `Secure automation started for "${batch.name}" using ${platformName} with input validation.`,
+        variant: "success",
       });
     } catch (err) {
       let errorTitle = "Failed to start secure batch";
       let errorDescription = err instanceof Error ? err.message : 'Unknown error';
-      
-      // Enhanced error handling for security
+
       if (err instanceof Error && err.message.includes('INVALID_')) {
         errorTitle = "Input validation failed";
         errorDescription = "Invalid input detected. Please check your batch configuration.";
@@ -181,7 +174,7 @@ export const useSecureBatchOperations = () => {
         errorTitle = "Backend not configured for automation";
         errorDescription = "The backend service needs to be configured with automation endpoints.";
       }
-      
+
       toast({
         title: errorTitle,
         description: errorDescription,
@@ -193,7 +186,6 @@ export const useSecureBatchOperations = () => {
   };
 
   const updatePrompt = (batchId: string, promptId: string, text: string) => {
-    // Security check
     if (!requireAuth()) {
       toast({
         title: "Authentication required",
@@ -203,7 +195,6 @@ export const useSecureBatchOperations = () => {
       return;
     }
 
-    // Input validation
     const validation = InputValidationService.validatePromptText(text);
     if (!validation.isValid) {
       toast({
@@ -230,7 +221,6 @@ export const useSecureBatchOperations = () => {
   };
 
   const addPromptToBatch = (batchId: string) => {
-    // Security check
     if (!requireAuth()) {
       toast({
         title: "Authentication required",
@@ -266,7 +256,6 @@ export const useSecureBatchOperations = () => {
     handleRunBatch,
     updatePrompt,
     addPromptToBatch,
-    // Security utilities
     hasPermission,
     requireAuth
   };
