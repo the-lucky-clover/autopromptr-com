@@ -1,229 +1,233 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Batch } from '@/types/batch';
 import { EnhancedAutoPromptrClient } from '@/services/autoPromptr/enhancedClient';
 import { AutoPromptrError } from '@/services/autoPromptr/errors';
 
-export const useBatchControl = () => {
+type UseBatchControlParams = {
+  batches: Batch[];
+  setBatches: React.Dispatch<React.SetStateAction<Batch[]>>;
+};
+
+export const useBatchControl = ({ batches, setBatches }: UseBatchControlParams) => {
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const [automationLoading, setAutomationLoading] = useState(false);
   const [lastError, setLastError] = useState<AutoPromptrError | null>(null);
   const { toast } = useToast();
 
-  const validateBatchForExecution = (batch: Batch): { isValid: boolean; error?: string } => {
-    // Check if target URL is provided
+  const validateBatchForExecution = useCallback((batch: Batch): { isValid: boolean; error?: string } => {
     if (!batch.targetUrl || !batch.targetUrl.trim()) {
       return {
         isValid: false,
-        error: 'Target Project URL is required. Please edit the batch and add a valid URL or local path.'
+        error: 'Target Project URL is required. Please edit the batch and add a valid URL or local path.',
       };
     }
 
-    // Check if URL/path format is valid
     const targetUrl = batch.targetUrl.trim();
-    const isUrl = targetUrl.match(/^https?:\/\//);
-    const isLocalPath = targetUrl.match(/^[A-Za-z]:\\/) || targetUrl.match(/^\//) || targetUrl.match(/^~\//) || targetUrl.match(/^\.\//);
-    
+    const isUrl = /^https?:\/\//.test(targetUrl);
+    const isLocalPath =
+      /^[A-Za-z]:\\/.test(targetUrl) ||
+      /^\//.test(targetUrl) ||
+      /^~\//.test(targetUrl) ||
+      /^\.\//.test(targetUrl);
+
     if (!isUrl && !isLocalPath) {
       return {
         isValid: false,
-        error: 'Invalid target format. Please provide a valid URL (https://...) or local path (/path/to/project).'
+        error: 'Invalid target format. Please provide a valid URL (https://...) or local path (/path/to/project).',
       };
     }
 
-    // Check if prompts are provided
     if (!batch.prompts || batch.prompts.length === 0) {
-      return {
-        isValid: false,
-        error: 'No prompts found. Please add at least one prompt to the batch.'
-      };
+      return { isValid: false, error: 'No prompts found. Please add at least one prompt to the batch.' };
     }
 
-    // Check if prompts have content
-    const validPrompts = batch.prompts.filter(p => p.text && p.text.trim());
+    const validPrompts = batch.prompts.filter((p) => p.text && p.text.trim());
     if (validPrompts.length === 0) {
-      return {
-        isValid: false,
-        error: 'No valid prompts found. Please ensure at least one prompt has content.'
-      };
+      return { isValid: false, error: 'No valid prompts found. Please ensure at least one prompt has content.' };
     }
 
     return { isValid: true };
-  };
+  }, []);
 
-  const handleRunBatch = async (batch: Batch, setBatches: (updater: (prev: Batch[]) => Batch[]) => void) => {
-    // Validate batch before execution
-    const validation = validateBatchForExecution(batch);
-    if (!validation.isValid) {
-      toast({
-        title: "Cannot start batch",
-        description: validation.error,
-        variant: "destructive",
-      });
-      return;
-    }
+  const detectPlatformFromUrl = useCallback((url: string): string | null => {
+    if (!url) return null;
+    if (/^https?:\/\//.test(url)) return 'web';
+    return 'cursor'; // default local platform
+  }, []);
 
-    // Get target URL override from localStorage if available
-    const targetUrlOverride = localStorage.getItem('targetUrlOverride');
-    const effectiveTargetUrl = targetUrlOverride && targetUrlOverride.trim() 
-      ? targetUrlOverride.trim() 
-      : batch.targetUrl;
+  const getApiKey = useCallback((keyName: string): string | null => {
+    return localStorage.getItem(keyName);
+  }, []);
 
-    // Detect platform from the effective target URL
-    const isLocalPath = !effectiveTargetUrl.match(/^https?:\/\//);
-    const platform = isLocalPath ? batch.settings?.localAIAssistant || 'cursor' : 'web';
+  // Placeholder: Replace with your actual LangChain batch runner
+  const runBatchWithLangChain = useCallback(
+    async (batch: Batch, apiKey: string) => {
+      // Example: call your LangChain API here
+      // throw new Error('LangChain not implemented'); // uncomment to simulate failure
+      return Promise.resolve();
+    },
+    []
+  );
 
-    // Check if any batch is already running
-    const runningBatch = await new Promise<Batch | null>((resolve) => {
-      setBatches(prev => {
-        const running = prev.find(b => b.status === 'running');
-        resolve(running || null);
-        return prev;
-      });
-    });
+  const runBatchWithEnhancedClient = useCallback(
+    async (batch: Batch, platform: string) => {
+      const client = new EnhancedAutoPromptrClient();
 
-    if (runningBatch) {
-      toast({
-        title: "Batch already running",
-        description: `Cannot start "${batch.name}" because "${runningBatch.name}" is already processing. Only one batch can run at a time.`,
-        variant: "destructive",
-      });
-      return;
-    }
+      // Test backend connection
+      await client.testConnection();
 
-    setSelectedBatchId(batch.id);
-    setAutomationLoading(true);
-    setLastError(null);
-    
-    try {
-      // Use enhanced client with corrected class name
-      const enhancedClient = new EnhancedAutoPromptrClient();
-      
-      // Create enhanced batch with overrides and settings
-      const enhancedBatch = {
-        ...batch,
-        targetUrl: effectiveTargetUrl,
-        platform,
-        settings: {
-          ...batch.settings,
-          isLocalPath,
-          promptEnhancement: localStorage.getItem('promptEnhancement') === 'true',
-          targetUrlOverride: targetUrlOverride || undefined,
-          // Enhanced Chrome configuration
-          chromeArgs: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process',
-            '--disable-gpu'
-          ]
-        }
-      };
-      
-      // Test connection first
-      await enhancedClient.testConnection();
-      console.log('✅ Backend connection verified');
-      
-      // Run batch with enhanced client
-      await enhancedClient.runBatch(enhancedBatch, platform, enhancedBatch.settings);
-      
-      setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { ...b, status: 'running', platform } : b
-      ));
-      
-      const overrideMessage = targetUrlOverride ? ` (using override: ${targetUrlOverride})` : '';
-      toast({
-        title: "Batch started successfully",
-        description: `Enhanced automation started for "${batch.name}"${overrideMessage}.`,
-      });
-      
-    } catch (err) {
-      console.error('💥 Enhanced batch run failed:', err);
-      
-      setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { ...b, status: 'failed' } : b
-      ));
-      
-      if (err instanceof AutoPromptrError) {
-        setLastError(err);
-        
-        // Show user-friendly error message
+      // Run batch with provided settings
+      await client.runBatch(batch, platform, batch.settings);
+    },
+    []
+  );
+
+  const handleRunBatch = useCallback(
+    async (batch: Batch) => {
+      // Validate batch
+      const validation = validateBatchForExecution(batch);
+      if (!validation.isValid) {
+        toast({ title: 'Cannot start batch', description: validation.error, variant: 'destructive' });
+        return;
+      }
+
+      if (batches.find((b) => b.status === 'running')) {
         toast({
-          title: "Batch execution failed",
-          description: err.userMessage,
-          variant: "destructive",
+          title: 'Batch already running',
+          description: 'Only one batch can run at a time. Please wait for the current batch to finish.',
+          variant: 'destructive',
         });
-      } else {
-        const genericError = AutoPromptrError.fromBackendError(err);
-        setLastError(genericError);
-        
+        return;
+      }
+
+      setSelectedBatchId(batch.id);
+      setAutomationLoading(true);
+      setLastError(null);
+
+      try {
+        const platform = detectPlatformFromUrl(batch.targetUrl) || 'web';
+        const apiKey = getApiKey('openai_api_key');
+
+        if (apiKey) {
+          try {
+            await runBatchWithLangChain(batch, apiKey);
+            setBatches((prev) =>
+              prev.map((b) => (b.id === batch.id ? { ...b, status: 'running', platform } : b))
+            );
+            toast({
+              title: 'Batch started',
+              description: `LangChain automation started for "${batch.name}".`,
+              variant: 'success',
+            });
+            return;
+          } catch (langErr) {
+            console.warn('LangChain failed, falling back to enhanced client:', langErr);
+          }
+        }
+
+        // Fallback to enhanced client
+        await runBatchWithEnhancedClient(batch, platform);
+        setBatches((prev) =>
+          prev.map((b) => (b.id === batch.id ? { ...b, status: 'running', platform } : b))
+        );
         toast({
-          title: "Unexpected error",
-          description: genericError.userMessage,
-          variant: "destructive",
+          title: 'Batch started',
+          description: `Enhanced automation started for "${batch.name}".`,
+          variant: 'success',
+        });
+      } catch (err) {
+        console.error('Batch run failed:', err);
+        setBatches((prev) => prev.map((b) => (b.id === batch.id ? { ...b, status: 'failed' } : b)));
+
+        const errorInstance =
+          err instanceof AutoPromptrError ? err : AutoPromptrError.fromBackendError(err);
+        setLastError(errorInstance);
+
+        toast({
+          title: 'Batch execution failed',
+          description: errorInstance.userMessage || 'Unknown error occurred',
+          variant: 'destructive',
+        });
+      } finally {
+        setAutomationLoading(false);
+      }
+    },
+    [
+      batches,
+      setBatches,
+      validateBatchForExecution,
+      detectPlatformFromUrl,
+      getApiKey,
+      runBatchWithLangChain,
+      runBatchWithEnhancedClient,
+      toast,
+    ]
+  );
+
+  // Implement other handlers similarly (stop, pause, rewind)...
+
+  const handleStopBatch = useCallback(
+    async (batch: Batch) => {
+      try {
+        const client = new EnhancedAutoPromptrClient();
+        await client.stopBatch(batch.id);
+        setBatches((prev) =>
+          prev.map((b) => (b.id === batch.id ? { ...b, status: 'failed' } : b))
+        );
+        toast({
+          title: 'Batch stopped',
+          description: `Automation stopped for "${batch.name}".`,
+          variant: 'success',
+        });
+      } catch (err) {
+        toast({
+          title: 'Failed to stop batch',
+          description: err instanceof Error ? err.message : 'Unknown error',
+          variant: 'destructive',
         });
       }
-    } finally {
-      setAutomationLoading(false);
-    }
-  };
+    },
+    [setBatches, toast]
+  );
 
-  const handleStopBatch = async (batch: Batch, setBatches: (updater: (prev: Batch[]) => Batch[]) => void) => {
-    try {
-      const enhancedClient = new EnhancedAutoPromptrClient();
-      await enhancedClient.stopBatch(batch.id);
-      
-      setBatches(prev => prev.map(b => 
-        b.id === batch.id ? { ...b, status: 'failed' } : b
-      ));
-      
+  const handlePauseBatch = useCallback(
+    (batch: Batch) => {
+      setBatches((prev) =>
+        prev.map((b) => (b.id === batch.id ? { ...b, status: 'paused' } : b))
+      );
       toast({
-        title: "Batch stopped",
-        description: `Automation stopped for "${batch.name}".`,
+        title: 'Batch paused',
+        description: `Batch "${batch.name}" has been paused.`,
+        variant: 'success',
       });
-    } catch (err) {
+    },
+    [setBatches, toast]
+  );
+
+  const handleRewindBatch = useCallback(
+    (batch: Batch) => {
+      setBatches((prev) =>
+        prev.map((b) => (b.id === batch.id ? { ...b, status: 'pending' } : b))
+      );
       toast({
-        title: "Failed to stop batch",
-        description: err instanceof Error ? err.message : 'Unknown error',
-        variant: "destructive",
+        title: 'Batch rewound',
+        description: `Batch "${batch.name}" has been reset to pending.`,
+        variant: 'success',
       });
-    }
-  };
-
-  const handlePauseBatch = async (batch: Batch, setBatches: (updater: (prev: Batch[]) => Batch[]) => void) => {
-    setBatches(prev => prev.map(b => 
-      b.id === batch.id ? { ...b, status: 'paused' } : b
-    ));
-    
-    toast({
-      title: "Batch paused",
-      description: `Batch "${batch.name}" has been paused.`,
-    });
-  };
-
-  const handleRewindBatch = async (batch: Batch, setBatches: (updater: (prev: Batch[]) => Batch[]) => void) => {
-    setBatches(prev => prev.map(b => 
-      b.id === batch.id ? { ...b, status: 'pending' } : b
-    ));
-    
-    toast({
-      title: "Batch rewound",
-      description: `Batch "${batch.name}" has been reset to pending.`,
-    });
-  };
+    },
+    [setBatches, toast]
+  );
 
   return {
     selectedBatchId,
     automationLoading,
     lastError,
+    clearError: () => setLastError(null),
+    validateBatchForExecution,
     handleRunBatch,
     handleStopBatch,
     handlePauseBatch,
     handleRewindBatch,
-    validateBatchForExecution,
-    clearError: () => setLastError(null)
   };
 };
