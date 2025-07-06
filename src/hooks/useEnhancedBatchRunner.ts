@@ -1,4 +1,7 @@
-const handleRunBatchEnhanced = async (batch: Batch, setBatches: (updater: (prev: Batch[]) => Batch[]) => void) => {
+const handleRunBatchEnhanced = async (
+  batch: Batch,
+  setBatches: (updater: (prev: Batch[]) => Batch[]) => void
+) => {
   const detectedPlatform = detectPlatformFromUrl(batch.targetUrl);
   const platformName = getPlatformName(detectedPlatform);
 
@@ -11,11 +14,10 @@ const handleRunBatchEnhanced = async (batch: Batch, setBatches: (updater: (prev:
     return;
   }
 
-  // NOTE: consider passing 'batches' state to avoid async Promise here
+  // Ensure only one batch runs at a time
   const runningBatch = await new Promise<Batch[]>((resolve) => {
     setBatches(prev => {
-      const running = prev.filter(b => b.status === 'running');
-      resolve(running);
+      resolve(prev.filter(b => b.status === 'running'));
       return prev;
     });
   });
@@ -23,157 +25,100 @@ const handleRunBatchEnhanced = async (batch: Batch, setBatches: (updater: (prev:
   if (runningBatch.length > 0) {
     toast({
       title: "Batch already running",
-      description: `Cannot start "${batch.name}" because "${runningBatch[0].name}" is already processing. Only one batch can run at a time.`,
+      description: `Cannot start "${batch.name}" because "${runningBatch[0].name}" is already processing.`,
       variant: "destructive",
     });
     return;
   }
 
-  console.log('🚀 Starting ENHANCED batch run with REDUNDANT failover for:', batch.id, 'with platform:', detectedPlatform);
+  console.group(`🚀 Starting Enhanced Batch: ${batch.id}`);
+  console.log('Detected Platform:', detectedPlatform);
+  console.log('Failover Strategy: Puppeteer → AutoPromptr (3 attempts each)');
 
   setSelectedBatchId(batch.id);
   setAutomationLoading(true);
-  
+
   try {
-    setBatches(prev => prev.map(b => 
-      b.id === batch.id ? { ...b, status: 'pending' as const, errorMessage: undefined } : b
+    setBatches(prev => prev.map(b =>
+      b.id === batch.id ? { ...b, status: 'pending', errorMessage: undefined } : b
     ));
 
-    const enhancedSettings = {
+    const enhancedSettings: NonNullable<Batch["settings"]> = {
       waitForIdle: batch.settings?.waitForIdle ?? true,
-      maxRetries: Math.min(Math.max(batch.settings?.maxRetries ?? 2, 2), 5), // min 2, max 5 retries
+      maxRetries: Math.min(Math.max(batch.settings?.maxRetries ?? 2, 2), 5),
       automationDelay: batch.settings?.automationDelay ?? 3000,
       elementTimeout: batch.settings?.elementTimeout ?? 15000,
-      debugLevel: batch.settings?.debugLevel ?? 'verbose'
+      debugLevel: batch.settings?.debugLevel ?? 'verbose',
     };
 
-    const batchToRun = {
+    const batchToRun: Batch = {
       ...batch,
       platform: detectedPlatform,
-      status: 'pending' as const,
+      status: 'pending',
       settings: enhancedSettings,
-      createdAt: batch.createdAt instanceof Date ? batch.createdAt : new Date(batch.createdAt)
+      createdAt: new Date(batch.createdAt ?? new Date()),
     };
-    
-    console.log('🔧 ENHANCED REDUNDANT batch configuration:', enhancedSettings);
-    
-    console.log('💾 Starting enhanced database save...');
-    const saveResult = await saveBatchToDatabase(batchToRun);
-    
-    if (!saveResult) {
+
+    console.log('Saving batch to database...');
+    if (!(await saveBatchToDatabase(batchToRun))) {
       throw new Error('Failed to save batch to database');
     }
-    
-    // Wait for eventual consistency in DB
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    console.log('🔍 Enhanced database verification...');
-    const verificationResult = await verifyBatchInDatabase(batch.id);
-    
-    if (!verificationResult) {
-      console.warn('⚠️ Database verification failed, attempting final save...');
-      const finalSaveResult = await saveBatchToDatabase(batchToRun);
-      if (!finalSaveResult) {
+
+    await new Promise(res => setTimeout(res, 1500));
+
+    if (!(await verifyBatchInDatabase(batch.id))) {
+      console.warn('Verification failed — retrying save...');
+      if (!(await saveBatchToDatabase(batchToRun))) {
         throw new Error('Critical: Batch could not be verified in database');
       }
     }
-    
-    console.log('✅ Enhanced database operations complete');
-    
-    setBatches(prev => prev.map(b => 
-      b.id === batch.id ? { 
-        ...b, 
-        status: 'running' as const, 
-        platform: detectedPlatform, 
-        settings: enhancedSettings,
-        errorMessage: undefined
-      } : b
+
+    setBatches(prev => prev.map(b =>
+      b.id === batch.id
+        ? { ...b, status: 'running', platform: detectedPlatform, settings: enhancedSettings }
+        : b
     ));
-    
+
     const enhancedAutoPromptr = new EnhancedAutoPromptr();
-    
-    console.log('🎯 Starting ENHANCED REDUNDANT automation...');
-    console.log('🔄 Failover strategy: Puppeteer Backend (3 attempts) → AutoPromptr Backend (3 attempts)');
-    console.log('⏱️ Total maximum duration: ~6 minutes with 60-second delays between attempts');
-    
-    const runResult = await enhancedAutoPromptr.runBatchWithValidation(
-      batchToRun, 
-      detectedPlatform, 
-      enhancedSettings
-    );
-    
-    console.log('🎉 ENHANCED REDUNDANT automation completed:', runResult);
-    
+    console.log('Initiating batch run with enhanced failover...');
+    await enhancedAutoPromptr.runBatchWithValidation(batchToRun, detectedPlatform, enhancedSettings);
+
     toast({
-      title: "Enhanced redundant batch started successfully",
-      description: `Advanced automation with failover started for "${batch.name}" using ${platformName}. Primary: Puppeteer Backend, Fallback: AutoPromptr Backend (3 attempts each with 60s delays).`,
-      variant: "success"
+      title: "Enhanced batch running",
+      description: `Automation with failover started for "${batch.name}" using ${platformName}.`,
+      variant: "success",
     });
-    
   } catch (err) {
-    console.error('💥 Enhanced redundant batch run failed:', err);
-    
-    let errorMessage = 'Unknown error occurred';
-    
-    if (err instanceof Error) {
-      errorMessage = err.message.toLowerCase();
-      
-      if (errorMessage.includes('redundancy_exhausted')) {
-        errorMessage = 'All backends exhausted - Both Puppeteer and AutoPromptr failed after 6 attempts';
-      } else if (errorMessage.includes('404')) {
-        errorMessage = 'Backend endpoint not found (404) - Please check backend configuration';
-      } else if (errorMessage.includes('database')) {
-        errorMessage = 'Database operation failed - Please try again';
-      }
+    const error = err instanceof Error ? err.message : 'Unknown error occurred';
+    let finalMessage = error.toLowerCase();
+
+    if (finalMessage.includes('redundancy_exhausted')) {
+      finalMessage = 'All backends exhausted — Puppeteer and AutoPromptr failed.';
+    } else if (finalMessage.includes('404')) {
+      finalMessage = 'Backend endpoint not found (404).';
+    } else if (finalMessage.includes('database')) {
+      finalMessage = 'Database operation failed.';
     }
-    
-    setBatches(prev => prev.map(b => 
-      b.id === batch.id ? { 
-        ...b, 
-        status: 'failed' as const,
-        errorMessage: errorMessage
-      } : b
+
+    console.error('❌ Batch run failed:', finalMessage);
+
+    setBatches(prev => prev.map(b =>
+      b.id === batch.id ? { ...b, status: 'failed', errorMessage: finalMessage } : b
     ));
-    
+
     try {
-      const failedBatch = {
-        ...batch,
-        status: 'failed' as const,
-        errorMessage: errorMessage,
-        platform: detectedPlatform
-      };
-      await saveBatchToDatabase(failedBatch);
-    } catch (saveError) {
-      console.error('Failed to save failed batch status to database:', saveError);
+      await saveBatchToDatabase({ ...batch, status: 'failed', errorMessage: finalMessage, platform: detectedPlatform });
+    } catch (dbErr) {
+      console.error('⚠️ Failed to persist failed status:', dbErr);
     }
-    
-    if (errorMessage.includes('redundancy_exhausted')) {
-      toast({
-        title: "All backends exhausted",
-        description: "Both Puppeteer and AutoPromptr backends failed after 6 total attempts. Both services may be down.",
-        variant: "destructive",
-      });
-    } else if (errorMessage.includes('404')) {
-      toast({
-        title: "Backend endpoint not found",
-        description: "The backend automation service is not available. Please check your backend configuration in Settings.",
-        variant: "destructive",
-      });
-    } else if (errorMessage.includes('database')) {
-      toast({
-        title: "Database operation failed",
-        description: "Enhanced database save failed. Please try again.",
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Enhanced redundant batch failed",
-        description: `Redundant automation failed: ${errorMessage}`,
-        variant: "destructive",
-      });
-    }
-    
+
+    toast({
+      title: "Enhanced batch failed",
+      description: finalMessage,
+      variant: "destructive",
+    });
   } finally {
     setAutomationLoading(false);
+    console.groupEnd();
   }
 };
