@@ -1,5 +1,3 @@
-
-// Enhanced error handling with specific error types for Chrome/Puppeteer issues
 export class AutoPromptrError extends Error {
   public readonly statusCode: number;
   public readonly code: string;
@@ -22,15 +20,18 @@ export class AutoPromptrError extends Error {
     this.retryable = retryable;
     this.userMessage = userMessage || message;
     this.technicalDetails = technicalDetails;
-    
-    // Ensure the error is properly recognized as an Error instance
+
     Object.setPrototypeOf(this, AutoPromptrError.prototype);
+  }
+
+  // ✅ Add alias so error.status works like error.statusCode
+  get status(): number {
+    return this.statusCode;
   }
 
   static fromBackendError(error: any): AutoPromptrError {
     const message = error.message || 'Unknown backend error';
-    
-    // Chrome/Puppeteer specific error handling
+
     if (message.includes('Could not find Chrome')) {
       return new AutoPromptrError(
         'Chrome browser not available',
@@ -41,7 +42,7 @@ export class AutoPromptrError extends Error {
         'Chrome needs to be installed in the backend environment. Check Dockerfile and build scripts.'
       );
     }
-    
+
     if (message.includes('Browser not found') || message.includes('Puppeteer')) {
       return new AutoPromptrError(
         'Browser automation service unavailable',
@@ -52,7 +53,7 @@ export class AutoPromptrError extends Error {
         'Backend browser service needs configuration or restart'
       );
     }
-    
+
     if (message.includes('timeout') || message.includes('TIMEOUT')) {
       return new AutoPromptrError(
         'Request timeout',
@@ -63,7 +64,7 @@ export class AutoPromptrError extends Error {
         'Consider increasing timeout limits or optimizing automation speed'
       );
     }
-    
+
     if (message.includes('Connection refused') || message.includes('ECONNREFUSED')) {
       return new AutoPromptrError(
         'Backend connection failed',
@@ -74,7 +75,7 @@ export class AutoPromptrError extends Error {
         'Backend service may be down or restarting'
       );
     }
-    
+
     if (message.includes('rate limit') || message.includes('429')) {
       return new AutoPromptrError(
         'Rate limit exceeded',
@@ -85,12 +86,11 @@ export class AutoPromptrError extends Error {
         'Backend rate limiting is active'
       );
     }
-    
-    // Generic error handling
+
     return new AutoPromptrError(
       message,
       'BACKEND_ERROR',
-      error.status || 500,
+      error.status || error.statusCode || 500,
       true,
       'An unexpected error occurred during automation. Please try again.',
       message
