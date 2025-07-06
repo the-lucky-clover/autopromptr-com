@@ -5,7 +5,7 @@ import { EnhancedAutoPromptr } from '@/services/autoPromptr/enhancedClient';
 import { saveBatchToDatabase, verifyBatchInDatabase } from '@/services/batchDatabase';
 import { useToast } from '@/hooks/use-toast';
 
-export const useEnhancedBatchFunction = () => {
+export const useEnhancedBatchRunner = () => {
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const [automationLoading, setAutomationLoading] = useState(false);
   const { toast } = useToast();
@@ -28,8 +28,10 @@ export const useEnhancedBatchFunction = () => {
 
     let runningBatch: Batch[] = [];
     await new Promise<void>((resolve) => {
-      setBatches(prev => {
-        runningBatch = prev.filter(b => b.status === 'running');
+      setBatches((prev: Batch[]) => {
+        runningBatch = Array.isArray(prev)
+          ? prev.filter(b => b.status === 'running')
+          : [];
         resolve();
         return prev;
       });
@@ -72,9 +74,10 @@ export const useEnhancedBatchFunction = () => {
         platform: detectedPlatform,
         status: 'pending',
         settings: enhancedSettings,
-        createdAt: batch.createdAt instanceof Date
-          ? batch.createdAt
-          : new Date(batch.createdAt ?? Date.now()),
+        createdAt:
+          batch.createdAt instanceof Date
+            ? batch.createdAt
+            : new Date(batch.createdAt ?? Date.now()),
       };
 
       console.log('💾 Saving batch to database...');
@@ -94,4 +97,71 @@ export const useEnhancedBatchFunction = () => {
       setBatches(prev =>
         prev.map(b =>
           b.id === batch.id
-            ? { ...b, statu
+            ? {
+                ...b,
+                status: 'running',
+                platform: detectedPlatform,
+                settings: enhancedSettings,
+              }
+            : b
+        )
+      );
+
+      const enhancedAutoPromptr = new EnhancedAutoPromptr();
+      console.log('📦 Initiating batch run with enhanced failover...');
+      await enhancedAutoPromptr.runBatchWithValidation(batchToRun, detectedPlatform, enhancedSettings);
+
+      toast({
+        title: 'Enhanced batch running',
+        description: `Automation with failover started for "${batch.name}" using ${platformName}.`,
+        variant: 'success',
+      });
+    } catch (err) {
+      const error = err instanceof Error ? err.message : 'Unknown error occurred';
+      let finalMessage = error.toLowerCase();
+
+      if (finalMessage.includes('redundancy_exhausted')) {
+        finalMessage = 'All backends exhausted — Puppeteer and AutoPromptr failed.';
+      } else if (finalMessage.includes('404')) {
+        finalMessage = 'Backend endpoint not found (404).';
+      } else if (finalMessage.includes('database')) {
+        finalMessage = 'Database operation failed.';
+      }
+
+      console.error('❌ Batch run failed:', finalMessage);
+
+      setBatches(prev =>
+        prev.map(b =>
+          b.id === batch.id ? { ...b, status: 'failed', errorMessage: finalMessage } : b
+        )
+      );
+
+      try {
+        await saveBatchToDatabase({
+          ...batch,
+          status: 'failed',
+          errorMessage: finalMessage,
+          platform: detectedPlatform,
+        });
+      } catch (dbErr) {
+        console.error('⚠️ Failed to persist failed status:', dbErr);
+      }
+
+      toast({
+        title: 'Enhanced batch failed',
+        description: finalMessage,
+        variant: 'destructive',
+      });
+    } finally {
+      setAutomationLoading(false);
+      console.groupEnd();
+    }
+  };
+
+  return {
+    selectedBatchId,
+    automationLoading,
+    handleRunBatchEnhanced,
+  };
+};
+
