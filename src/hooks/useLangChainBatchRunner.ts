@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { LangChainClient } from '@/services/langchain/langchainClient';
@@ -39,6 +38,7 @@ export const useLangChainBatchRunner = () => {
       return;
     }
 
+    // Consider reading from batches state or pass current batches if available instead of Promise hack
     const runningBatch = await new Promise<Batch[]>((resolve) => {
       setBatches(prev => {
         const running = prev.filter(b => b.status === 'running');
@@ -68,7 +68,7 @@ export const useLangChainBatchRunner = () => {
 
       const enhancedSettings = {
         waitForIdle: batch.settings?.waitForIdle ?? true,
-        maxRetries: Math.max(batch.settings?.maxRetries ?? 2, 2),
+        maxRetries: Math.min(Math.max(batch.settings?.maxRetries ?? 2, 2), 3), // Clamp between 2 and 3
         automationDelay: batch.settings?.automationDelay ?? 3000,
         elementTimeout: batch.settings?.elementTimeout ?? 30000,
         debugLevel: batch.settings?.debugLevel ?? 'detailed'
@@ -116,8 +116,13 @@ export const useLangChainBatchRunner = () => {
       });
       
       const successCount = results.results.filter((r: any) => r.success).length;
-      const finalStatus: Batch['status'] = successCount === results.results.length ? 'completed' : 
-                         successCount > 0 ? 'completed' : 'failed';
+      
+      // Decide final status based on success count
+      const finalStatus: Batch['status'] = successCount === results.results.length 
+        ? 'completed' 
+        : successCount > 0 
+          ? 'completed' // or 'partially_completed' if you want to distinguish partial success
+          : 'failed';
       
       setBatches(prev => prev.map(b => 
         b.id === batch.id ? { 
@@ -135,6 +140,7 @@ export const useLangChainBatchRunner = () => {
       toast({
         title: "LangChain batch processing completed",
         description: `Processed "${batch.name}" using ${platformName}. Success: ${successCount}/${results.results.length} prompts.`,
+        variant: "success"
       });
       
     } catch (err) {
