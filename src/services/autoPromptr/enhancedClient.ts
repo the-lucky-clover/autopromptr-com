@@ -79,13 +79,41 @@ export class EnhancedAutoPromptrClient {
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     
+    // 🚀 DIAGNOSTIC LOGGING - Log request details
+    console.log('🚀 [DIAGNOSTIC] Making request to backend:');
+    console.log('📍 URL:', url);
+    console.log('🔧 Method:', options.method || 'GET');
+    console.log('📋 Headers:', options.headers);
+    
+    // Log payload if it's a POST/PUT request
+    if (options.body && (options.method === 'POST' || options.method === 'PUT')) {
+      console.log('📦 Request Payload:');
+      try {
+        const parsedPayload = JSON.parse(options.body as string);
+        console.log('  - Parsed payload:', parsedPayload);
+        
+        // Additional payload validation logging
+        if (parsedPayload.batch) {
+          console.log('  - Batch ID:', parsedPayload.batch.id);
+          console.log('  - Batch Name:', parsedPayload.batch.name);
+          console.log('  - Target URL:', parsedPayload.batch.targetUrl);
+          console.log('  - Platform:', parsedPayload.platform);
+          console.log('  - Prompt Length:', parsedPayload.batch.prompt?.length || 0);
+          console.log('  - Settings:', parsedPayload.settings);
+        }
+      } catch (e) {
+        console.log('  - Raw payload:', options.body);
+        console.warn('  - Could not parse payload as JSON:', e);
+      }
+    }
+    
+    console.log(`🔄 Attempt ${retryCount + 1}/${this.retryConfig.maxRetries + 1}`);
+    
     // Create AbortController for timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
     
     try {
-      console.log(`🔄 Making request to ${url} (attempt ${retryCount + 1})`);
-      
       const response = await fetch(url, {
         ...options,
         headers: {
@@ -97,14 +125,32 @@ export class EnhancedAutoPromptrClient {
 
       clearTimeout(timeoutId);
 
+      // 📊 DIAGNOSTIC LOGGING - Log response details
+      console.log('📥 [DIAGNOSTIC] Response received:');
+      console.log('  - Status:', response.status, response.statusText);
+      console.log('  - Headers:', Object.fromEntries(response.headers.entries()));
+      console.log('  - URL:', response.url);
+      console.log('  - OK:', response.ok);
+
       if (!response.ok) {
-        const errorText = await response.text();
-        let errorData;
+        let errorText = '';
+        let errorData: any = {};
         
         try {
-          errorData = JSON.parse(errorText);
-        } catch {
-          errorData = { message: errorText };
+          errorText = await response.text();
+          console.log('❌ [DIAGNOSTIC] Error response body:', errorText);
+          
+          // Try to parse as JSON
+          try {
+            errorData = JSON.parse(errorText);
+            console.log('❌ [DIAGNOSTIC] Parsed error data:', errorData);
+          } catch {
+            errorData = { message: errorText };
+            console.log('❌ [DIAGNOSTIC] Error response is not JSON, using as message');
+          }
+        } catch (readError) {
+          console.error('❌ [DIAGNOSTIC] Could not read error response:', readError);
+          errorData = { message: `HTTP ${response.status}` };
         }
         
         throw AutoPromptrError.fromBackendError({
@@ -114,15 +160,40 @@ export class EnhancedAutoPromptrClient {
         });
       }
 
-      const data = await response.json();
+      let responseData;
+      try {
+        responseData = await response.json();
+        console.log('✅ [DIAGNOSTIC] Successful response data:', responseData);
+      } catch (parseError) {
+        console.warn('⚠️ [DIAGNOSTIC] Could not parse response as JSON:', parseError);
+        responseData = {};
+      }
+      
       console.log(`✅ Request successful to ${url}`);
-      return data;
+      return responseData;
 
     } catch (error) {
       clearTimeout(timeoutId);
-      console.error(`❌ Request failed to ${url}:`, error);
+      console.error(`❌ [DIAGNOSTIC] Request failed to ${url}:`, error);
+      
+      // Enhanced error logging
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.error('🌐 [DIAGNOSTIC] Network error details:');
+        console.error('  - Error type: Network/CORS failure');
+        console.error('  - Message:', error.message);
+        console.error('  - Likely causes: Backend down, CORS misconfiguration, network issues');
+      } else if (error instanceof Error && error.name === 'AbortError') {
+        console.error('⏰ [DIAGNOSTIC] Request timeout details:');
+        console.error('  - Request was aborted due to 30s timeout');
+        console.error('  - Backend may be slow or unresponsive');
+      }
       
       if (error instanceof AutoPromptrError) {
+        console.error('🔧 [DIAGNOSTIC] AutoPromptrError details:');
+        console.error('  - Code:', error.code);
+        console.error('  - Retryable:', error.retryable);
+        console.error('  - Status:', error.status);
+        
         // If it's a non-retryable error or we've exhausted retries
         if (!error.retryable || retryCount >= this.retryConfig.maxRetries) {
           throw error;
@@ -130,7 +201,7 @@ export class EnhancedAutoPromptrClient {
         
         // Retry with exponential backoff
         const delay = this.calculateRetryDelay(retryCount);
-        console.log(`⏳ Retrying in ${delay}ms...`);
+        console.log(`⏳ [DIAGNOSTIC] Retrying in ${delay}ms...`);
         await this.delay(delay);
         
         return this.makeRequest<T>(endpoint, options, retryCount + 1);
@@ -149,7 +220,7 @@ export class EnhancedAutoPromptrClient {
         
         if (retryCount < this.retryConfig.maxRetries) {
           const delay = this.calculateRetryDelay(retryCount);
-          console.log(`⏳ Network error, retrying in ${delay}ms...`);
+          console.log(`⏳ [DIAGNOSTIC] Network error, retrying in ${delay}ms...`);
           await this.delay(delay);
           return this.makeRequest<T>(endpoint, options, retryCount + 1);
         }
@@ -162,8 +233,8 @@ export class EnhancedAutoPromptrClient {
   }
 
   async runBatch(batch: Batch, platform: string, settings?: any): Promise<any> {
-    console.log('🚀 Enhanced batch execution starting...');
-    console.log('📋 Transforming batch data for backend compatibility...');
+    console.log('🚀 [DIAGNOSTIC] Enhanced batch execution starting...');
+    console.log('📋 [DIAGNOSTIC] Transforming batch data for backend compatibility...');
     
     try {
       // First, test backend connectivity
@@ -172,7 +243,7 @@ export class EnhancedAutoPromptrClient {
       // Transform the batch to match backend expectations
       const backendBatch = this.transformBatchForBackend(batch);
       
-      console.log('📝 Backend batch format:', {
+      console.log('📝 [DIAGNOSTIC] Backend batch format:', {
         id: backendBatch.id,
         name: backendBatch.name,
         targetUrl: backendBatch.targetUrl,
@@ -205,11 +276,11 @@ export class EnhancedAutoPromptrClient {
         body: JSON.stringify(requestPayload)
       });
       
-      console.log('✅ Enhanced batch execution completed successfully');
+      console.log('✅ [DIAGNOSTIC] Enhanced batch execution completed successfully');
       return response;
       
     } catch (error) {
-      console.error('💥 Enhanced batch execution failed:', error);
+      console.error('💥 [DIAGNOSTIC] Enhanced batch execution failed:', error);
       throw error;
     }
   }
@@ -234,7 +305,7 @@ export class EnhancedAutoPromptrClient {
       
       return true;
     } catch (error) {
-      console.error('❌ Backend connection test failed:', error);
+      console.error('❌ [DIAGNOSTIC] Backend connection test failed:', error);
       throw new AutoPromptrError(
         'Backend health check failed',
         'HEALTH_CHECK_FAILED',
