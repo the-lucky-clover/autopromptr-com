@@ -1,18 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
 import { useBatchCrud } from './useBatchCrud';
 import { useBatchControl } from './useBatchControl';
 
 /**
- * Hook for managing batch operations on the dashboard
+ * Centralized hook for managing all batch-related logic on the dashboard.
+ * - Manages persistent state
+ * - Integrates CRUD and control operations
+ * - Guards against premature execution before full initialization
  */
 export const useDashboardBatchManager = () => {
   const isInitializedRef = useRef(false);
 
-  // Persistent batch state
+  // Persistent batches from localStorage or DB
   const { batches, setBatches } = usePersistentBatches();
 
-  // Batch CRUD operations
+  // CRUD ops
   const {
     showModal,
     setShowModal,
@@ -25,7 +28,7 @@ export const useDashboardBatchManager = () => {
     handleNewBatch,
   } = useBatchCrud();
 
-  // Batch control operations (pass required state to new API)
+  // Control logic (requires batch state)
   const {
     selectedBatchId,
     automationLoading,
@@ -37,7 +40,7 @@ export const useDashboardBatchManager = () => {
     handleRewindBatch: rewindBatch,
   } = useBatchControl({ batches, setBatches });
 
-  // Initialization logic
+  // Initialization
   useEffect(() => {
     if (!isInitializedRef.current) {
       isInitializedRef.current = true;
@@ -45,16 +48,23 @@ export const useDashboardBatchManager = () => {
     }
   }, []);
 
-  // Wrap all mutating operations with initialization guard
-  const guard = <T extends (...args: any[]) => any>(fn: T) => {
-    return (...args: Parameters<T>): ReturnType<T> | undefined => {
-      if (!isInitializedRef.current) return;
-      return fn(...args);
-    };
-  };
+  /**
+   * Wraps a function and ensures it doesn't run until initialization is complete.
+   */
+  const guard = useCallback(
+    <T extends (...args: any[]) => any>(fn: T): T =>
+      ((...args: Parameters<T>) => {
+        if (!isInitializedRef.current) {
+          console.warn('[BatchManager] Operation skipped: not initialized yet');
+          return;
+        }
+        return fn(...args);
+      }) as T,
+    []
+  );
 
   return {
-    // State
+    // Batch state
     batches,
     showModal,
     setShowModal,
@@ -64,18 +74,19 @@ export const useDashboardBatchManager = () => {
     automationLoading,
     lastError,
 
-    // CRUD
+    // CRUD ops
     handleCreateBatch: guard((data) => createBatch(data, setBatches)),
     handleUpdateBatch: guard((data) => updateBatch(data, setBatches)),
     handleDeleteBatch: guard((id) => deleteBatch(id, setBatches)),
     handleEditBatch,
     handleNewBatch,
 
-    // Control
+    // Control ops
     handleRunBatch: guard((batch) => runBatch(batch)),
     handleStopBatch: guard((batch) => stopBatch(batch)),
     handlePauseBatch: guard((batch) => pauseBatch(batch)),
     handleRewindBatch: guard((batch) => rewindBatch(batch)),
+
     clearError,
   };
 };
