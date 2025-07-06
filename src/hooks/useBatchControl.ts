@@ -12,27 +12,23 @@ export const useBatchControl = () => {
 
   const validateBatchForExecution = (batch: Batch): { isValid: boolean; error?: string } => {
     const url = batch.targetUrl?.trim();
-    const isUrl = url?.match(/^https?:\/\//);
-    const isLocalPath = url?.match(/^[A-Za-z]:\\/) || url?.match(/^(\.\/|\/|~\/)/);
+    const isUrl = /^https?:\/\//.test(url || '');
+    const isLocalPath = /^[A-Za-z]:\\/.test(url || '') || /^(\.\/|\/|~\/)/.test(url || '');
 
-    if (!url) {
-      return { isValid: false, error: 'Target Project URL is required. Please add a valid URL or path.' };
-    }
+    if (!url) return { isValid: false, error: 'Target Project URL is required. Please add a valid URL or path.' };
+    if (!isUrl && !isLocalPath) return { isValid: false, error: 'Invalid target format. Must be a valid URL or local path.' };
 
-    if (!isUrl && !isLocalPath) {
-      return { isValid: false, error: 'Invalid target format. Must be a valid URL or local path.' };
-    }
-
-    const prompts = batch.prompts || [];
-    const validPrompts = prompts.filter(p => p.text?.trim());
-    if (validPrompts.length === 0) {
-      return { isValid: false, error: 'Please provide at least one valid prompt.' };
-    }
+    const validPrompts = (batch.prompts || []).filter(p => p.text?.trim());
+    if (!validPrompts.length) return { isValid: false, error: 'Please provide at least one valid prompt.' };
 
     return { isValid: true };
   };
 
-  const handleRunBatch = async (batch: Batch, setBatches: (fn: (prev: Batch[]) => Batch[]) => void) => {
+  const handleRunBatch = async (
+    batch: Batch,
+    setBatches: (fn: (prev: Batch[]) => Batch[]) => void,
+    onStatusChange?: (status: 'running' | 'failed') => void
+  ) => {
     const validation = validateBatchForExecution(batch);
     if (!validation.isValid) {
       toast({ title: 'Cannot start batch', description: validation.error, variant: 'destructive' });
@@ -41,27 +37,24 @@ export const useBatchControl = () => {
 
     const overrideUrl = localStorage.getItem('targetUrlOverride')?.trim();
     const targetUrl = overrideUrl || batch.targetUrl?.trim();
+    const isLocal = !/^https?:\/\//.test(targetUrl || '');
+    const platform = isLocal ? batch.settings?.localAIAssistant || 'cursor' : 'web';
 
     if (!targetUrl) {
       toast({ title: 'Missing Target URL', description: 'Batch targetUrl is undefined after override logic.', variant: 'destructive' });
       return;
     }
 
-    const isLocal = !targetUrl.match(/^https?:\/\//);
-    const platform = isLocal ? batch.settings?.localAIAssistant || 'cursor' : 'web';
-
-    const running = await new Promise<Batch | null>((resolve) => {
-      setBatches(prev => {
-        const found = prev.find(b => b.status === 'running');
-        resolve(found || null);
-        return prev;
-      });
+    let hasRunning = false;
+    setBatches(prev => {
+      hasRunning = prev.some(b => b.status === 'running');
+      return prev;
     });
 
-    if (running) {
+    if (hasRunning) {
       toast({
         title: 'Another batch is running',
-        description: `"${running.name}" is already running. Please wait for it to finish.`,
+        description: 'Please wait for the current batch to complete.',
         variant: 'destructive'
       });
       return;
@@ -110,6 +103,7 @@ export const useBatchControl = () => {
       await enhancedClient.runBatch(enhancedBatch, platform, enhancedBatch.settings);
 
       setBatches(prev => prev.map(b => b.id === batch.id ? { ...b, status: 'running', platform } : b));
+      onStatusChange?.('running');
 
       toast({
         title: 'Batch started',
@@ -120,6 +114,7 @@ export const useBatchControl = () => {
       console.error('💥 Batch execution failed:', err);
 
       setBatches(prev => prev.map(b => b.id === batch.id ? { ...b, status: 'failed' } : b));
+      onStatusChange?.('failed');
 
       const normalized = err instanceof AutoPromptrError
         ? err
@@ -129,15 +124,18 @@ export const useBatchControl = () => {
 
       toast({
         title: normalized.code === 'BACKEND_ERROR' ? 'Backend Error' : 'Batch failed',
-        description: normalized.userMessage || 'An unexpected error occurred.',
-        variant: 'destructive',
+        description: normalized.userMessage || (err instanceof Error ? err.message : 'An unexpected error occurred.'),
+        variant: 'destructive'
       });
     } finally {
       setAutomationLoading(false);
     }
   };
 
-  const handleStopBatch = async (batch: Batch, setBatches: (fn: (prev: Batch[]) => Batch[]) => void) => {
+  const handleStopBatch = async (
+    batch: Batch,
+    setBatches: (fn: (prev: Batch[]) => Batch[]) => void
+  ) => {
     try {
       const client = new EnhancedAutoPromptrClient();
       await client.stopBatch(batch.id);
@@ -148,12 +146,18 @@ export const useBatchControl = () => {
     }
   };
 
-  const handlePauseBatch = (batch: Batch, setBatches: (fn: (prev: Batch[]) => Batch[]) => void) => {
+  const handlePauseBatch = (
+    batch: Batch,
+    setBatches: (fn: (prev: Batch[]) => Batch[]) => void
+  ) => {
     setBatches(prev => prev.map(b => b.id === batch.id ? { ...b, status: 'paused' } : b));
     toast({ title: 'Batch paused', description: `"${batch.name}" has been paused.` });
   };
 
-  const handleRewindBatch = (batch: Batch, setBatches: (fn: (prev: Batch[]) => Batch[]) => void) => {
+  const handleRewindBatch = (
+    batch: Batch,
+    setBatches: (fn: (prev: Batch[]) => Batch[]) => void
+  ) => {
     setBatches(prev => prev.map(b => b.id === batch.id ? { ...b, status: 'pending' } : b));
     toast({ title: 'Batch reset', description: `"${batch.name}" has been rewound to pending.` });
   };
