@@ -4,7 +4,10 @@ import { Batch } from '@/types/batch';
 import { EnhancedAutoPromptrClient } from '@/services/autoPromptr/enhancedClient';
 import { AutoPromptrError } from '@/services/autoPromptr/errors';
 
-export const useBatchControl = () => {
+export const useBatchControl = (
+  batches: Batch[],
+  setBatches: React.Dispatch<React.SetStateAction<Batch[]>>
+) => {
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const [automationLoading, setAutomationLoading] = useState(false);
   const [lastError, setLastError] = useState<AutoPromptrError | null>(null);
@@ -26,7 +29,6 @@ export const useBatchControl = () => {
 
   const handleRunBatch = async (
     batch: Batch,
-    setBatches: (fn: (prev: Batch[]) => Batch[]) => void,
     onStatusChange?: (status: 'running' | 'failed') => void
   ) => {
     const validation = validateBatchForExecution(batch);
@@ -45,12 +47,8 @@ export const useBatchControl = () => {
       return;
     }
 
-    let hasRunning = false;
-    setBatches(prev => {
-      hasRunning = prev.some(b => b.status === 'running');
-      return prev;
-    });
-
+    // Synchronously check if any batch is running
+    const hasRunning = batches.some(b => b.status === 'running');
     if (hasRunning) {
       toast({
         title: 'Another batch is running',
@@ -133,8 +131,7 @@ export const useBatchControl = () => {
   };
 
   const handleStopBatch = async (
-    batch: Batch,
-    setBatches: (fn: (prev: Batch[]) => Batch[]) => void
+    batch: Batch
   ) => {
     try {
       const client = new EnhancedAutoPromptrClient();
@@ -147,16 +144,14 @@ export const useBatchControl = () => {
   };
 
   const handlePauseBatch = (
-    batch: Batch,
-    setBatches: (fn: (prev: Batch[]) => Batch[]) => void
+    batch: Batch
   ) => {
     setBatches(prev => prev.map(b => b.id === batch.id ? { ...b, status: 'paused' } : b));
     toast({ title: 'Batch paused', description: `"${batch.name}" has been paused.` });
   };
 
   const handleRewindBatch = (
-    batch: Batch,
-    setBatches: (fn: (prev: Batch[]) => Batch[]) => void
+    batch: Batch
   ) => {
     setBatches(prev => prev.map(b => b.id === batch.id ? { ...b, status: 'pending' } : b));
     toast({ title: 'Batch reset', description: `"${batch.name}" has been rewound to pending.` });
