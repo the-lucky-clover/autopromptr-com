@@ -39,7 +39,7 @@ export const useDashboardBatchManager = () => {
     handleStopBatch: stopBatch,
     handlePauseBatch: pauseBatch,
     handleRewindBatch: rewindBatch,
-  } = useBatchControl(batches, setBatches);
+  } = useBatchControl({ batches, setBatches });
 
   // Initialization
   useEffect(() => {
