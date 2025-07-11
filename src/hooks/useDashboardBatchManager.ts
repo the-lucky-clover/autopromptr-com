@@ -39,7 +39,7 @@ export const useDashboardBatchManager = () => {
     handleStopBatch: stopBatch,
     handlePauseBatch: pauseBatch,
     handleRewindBatch: rewindBatch,
-  } = useBatchControl({ batches, setBatches });
+  } = useBatchControl(batches, setBatches);
 
   // Initialization
   useEffect(() => {
@@ -75,18 +75,18 @@ export const useDashboardBatchManager = () => {
     automationLoading,
     lastError,
 
-    // CRUD ops
-    handleCreateBatch: guard((data) => createBatch(data, setBatches)),
-    handleUpdateBatch: guard((data) => updateBatch(data, setBatches)),
-    handleDeleteBatch: guard((id) => deleteBatch(id, setBatches)),
+    // CRUD ops - properly wrapped with setBatches
+    handleCreateBatch: guard((data: any) => createBatch(data, setBatches)),
+    handleUpdateBatch: guard((data: any) => updateBatch(data, setBatches)),
+    handleDeleteBatch: guard((id: string) => deleteBatch(id, setBatches)),
     handleEditBatch,
     handleNewBatch,
 
     // Control ops
-    handleRunBatch: guard((batch) => runBatch(batch)),
-    handleStopBatch: guard((batch) => stopBatch(batch)),
-    handlePauseBatch: guard((batch) => pauseBatch(batch)),
-    handleRewindBatch: guard((batch) => rewindBatch(batch)),
+    handleRunBatch: guard((batch: any) => runBatch(batch)),
+    handleStopBatch: guard((batch: any) => stopBatch(batch)),
+    handlePauseBatch: guard((batch: any) => pauseBatch(batch)),
+    handleRewindBatch: guard((batch: any) => rewindBatch(batch)),
 
     clearError,
   };
