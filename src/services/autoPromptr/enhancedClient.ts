@@ -1,3 +1,4 @@
+
 import { AutoPromptrError } from './errors';
 import { Batch } from '@/types/batch';
 
@@ -268,6 +269,27 @@ export class EnhancedAutoPromptrClient {
     }
   }
 
+  async runBatchWithValidation(batch: Batch, platform: string, settings?: any): Promise<any> {
+    console.log('🔄 Running batch with connection validation...');
+
+    try {
+      const isValid = await this.testConnection();
+      if (!isValid) {
+        throw new AutoPromptrError(
+          'Backend connection validation failed',
+          'CONNECTION_VALIDATION_ERROR',
+          500,
+          true
+        );
+      }
+
+      return await this.runBatch(batch, platform, settings);
+    } catch (error) {
+      console.error('💥 Batch with validation failed:', error);
+      throw AutoPromptrError.fromBackendError(error);
+    }
+  }
+
   async testConnection(): Promise<boolean> {
     try {
       const response = await this.makeRequest<{ status: string }>('/health', {
@@ -308,4 +330,3 @@ export class EnhancedAutoPromptrClient {
     });
   }
 }
-
