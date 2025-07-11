@@ -4,6 +4,15 @@ export interface TextPrompt {
   order: number; // The order in which this prompt should be processed/displayed
 }
 
+export interface PromptResult {
+  promptId: string;
+  success: boolean;
+  result: any;
+  error: string | null;
+  processedAt: Date;
+  processingTime: number;
+}
+
 export interface Batch {
   id: string;
   name: string;

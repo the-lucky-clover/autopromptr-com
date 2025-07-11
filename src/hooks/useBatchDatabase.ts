@@ -132,6 +132,47 @@ export const useBatchDatabase = () => {
     }
   };
 
+  const deleteBatchFromDatabase = async (batchId: string): Promise<boolean> => {
+    try {
+      console.log('Deleting batch from database:', batchId);
+      
+      // First delete associated prompts
+      const { error: promptsError } = await supabase
+        .from('prompts')
+        .delete()
+        .eq('batch_id', batchId);
+
+      if (promptsError) {
+        console.error('Error deleting prompts:', promptsError);
+        throw new Error(`Failed to delete prompts: ${promptsError.message}`);
+      }
+
+      // Then delete the batch
+      const { error: batchError } = await supabase
+        .from('batches')
+        .delete()
+        .eq('id', batchId);
+
+      if (batchError) {
+        console.error('Error deleting batch:', batchError);
+        throw new Error(`Failed to delete batch: ${batchError.message}`);
+      }
+
+      console.log('Batch deleted successfully from database:', batchId);
+      return true;
+    } catch (error) {
+      console.error('Failed to delete batch from database:', error);
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown database error';
+      toast({
+        title: "Failed to delete batch",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
   const verifyBatchInDatabase = async (batchId: string, retries = 3) => {
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
@@ -177,6 +218,7 @@ export const useBatchDatabase = () => {
 
   return {
     saveBatchToDatabase,
+    deleteBatchFromDatabase,
     verifyBatchInDatabase
   };
 };

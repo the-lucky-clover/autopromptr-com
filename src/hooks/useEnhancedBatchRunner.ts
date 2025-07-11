@@ -1,7 +1,8 @@
+
 import { useState } from 'react';
 import { Batch } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
-import { EnhancedAutoPromptr } from '@/services/autoPromptr/enhancedClient';
+import { EnhancedAutoPromptrClient } from '@/services/autoPromptr/enhancedClient';
 import { saveBatchToDatabase, verifyBatchInDatabase } from '@/services/batchDatabase';
 import { useToast } from '@/hooks/use-toast';
 
@@ -107,14 +108,13 @@ export const useEnhancedBatchRunner = () => {
         )
       );
 
-      const enhancedAutoPromptr = new EnhancedAutoPromptr();
+      const enhancedAutoPromptr = new EnhancedAutoPromptrClient();
       console.log('📦 Initiating batch run with enhanced failover...');
       await enhancedAutoPromptr.runBatchWithValidation(batchToRun, detectedPlatform, enhancedSettings);
 
       toast({
         title: 'Enhanced batch running',
         description: `Automation with failover started for "${batch.name}" using ${platformName}.`,
-        variant: 'success',
       });
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -164,4 +164,3 @@ export const useEnhancedBatchRunner = () => {
     handleRunBatchEnhanced,
   };
 };
-
