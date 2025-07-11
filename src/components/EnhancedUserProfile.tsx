@@ -10,10 +10,10 @@ import { useToast } from '@/hooks/use-toast';
 
 const EnhancedUserProfile = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showGreeting, setShowGreeting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, signOut } = useAuth();
   const { toast } = useToast();
@@ -115,20 +115,6 @@ const EnhancedUserProfile = () => {
     }
   };
 
-  const handleMouseEnter = () => {
-    setShowGreeting(true);
-  };
-
-  const handleMouseLeave = () => {
-    setShowGreeting(false);
-    setIsOpen(false);
-  };
-
-  const handleClose = () => {
-    setIsOpen(false);
-    setShowGreeting(false);
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center p-4">
@@ -138,117 +124,88 @@ const EnhancedUserProfile = () => {
   }
 
   return (
-    <div className="relative" onMouseLeave={handleMouseLeave}>
-      {/* Animated greeting */}
-      <div className={`absolute bottom-full left-0 mb-2 transition-all duration-500 ease-out ${
-        showGreeting 
-          ? 'opacity-100 translate-x-0 scale-100' 
-          : 'opacity-0 -translate-x-4 scale-95 pointer-events-none'
-      }`}>
-        <div className="bg-gradient-to-r from-blue-600/90 to-purple-600/90 backdrop-blur-sm text-white px-4 py-2 rounded-xl shadow-lg border border-white/20 whitespace-nowrap">
-          <span className="text-sm font-medium">Hi, {getUsername()}!</span>
+    <div 
+      className="relative w-full"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setIsOpen(false);
+      }}
+    >
+      {/* Main Profile Container */}
+      <div className="relative overflow-hidden rounded-xl bg-gray-800/50 backdrop-blur-sm border border-gray-700/50">
+        {/* Avatar Section */}
+        <div className="flex items-center p-3 cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+          <Avatar className="h-10 w-10 ring-2 ring-purple-400/30">
+            {avatarUrl ? (
+              <AvatarImage src={avatarUrl} alt="Avatar" />
+            ) : null}
+            <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium">
+              {getInitial()}
+            </AvatarFallback>
+          </Avatar>
+          
+          {/* User Info - slides out on hover */}
+          <div className={`ml-3 transition-all duration-300 overflow-hidden ${
+            isHovered ? 'w-32 opacity-100' : 'w-0 opacity-0'
+          }`}>
+            <p className="text-white text-sm font-medium truncate">
+              {getUsername()}
+            </p>
+            <p className="text-white/60 text-xs truncate">
+              {user?.email}
+            </p>
+          </div>
+          
+          {/* Upload indicator */}
+          {uploading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Circular Avatar button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setIsOpen(!isOpen)}
-        onMouseEnter={handleMouseEnter}
-        className={`p-2 h-auto hover:bg-white/10 rounded-full transition-all duration-300 ${
-          showGreeting ? 'scale-110 shadow-lg shadow-purple-500/25 -translate-x-2' : ''
-        }`}
-      >
-        <Avatar className={`transition-all duration-300 ${
-          showGreeting ? 'h-12 w-12 ring-2 ring-purple-400/50' : 'h-10 w-10'
-        }`}>
-          {avatarUrl ? (
-            <AvatarImage src={avatarUrl} alt="Avatar" />
-          ) : null}
-          <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium">
-            {getInitial()}
-          </AvatarFallback>
-        </Avatar>
-        
-        {/* Upload indicator */}
-        {uploading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        {/* Expanded Menu */}
+        {isOpen && (
+          <div className="border-t border-gray-700/50 p-2 space-y-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="w-full justify-start text-white hover:bg-white/10 rounded-lg text-sm py-2"
+            >
+              <Upload className="h-4 w-4 mr-3" />
+              Upload Avatar
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-white hover:bg-white/10 rounded-lg text-sm py-2"
+            >
+              <User className="h-4 w-4 mr-3" />
+              Edit Profile
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSignOut}
+              className="w-full justify-start text-white hover:bg-red-500/20 hover:text-red-300 rounded-lg text-sm py-2"
+            >
+              <LogOut className="h-4 w-4 mr-3" />
+              Sign out
+            </Button>
           </div>
         )}
-      </Button>
-
-      {/* Profile menu */}
-      {isOpen && (
-        <>
-          <div 
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 animate-fade-in" 
-            onClick={handleClose}
-          />
-          <Card className="absolute bottom-full left-0 mb-4 w-48 bg-gray-900/95 backdrop-blur-xl border-white/20 z-50 rounded-xl shadow-2xl shadow-black/50 animate-scale-in">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-center mb-3">
-                <div className="relative">
-                  <Avatar className="h-16 w-16 ring-2 ring-purple-400/30">
-                    {avatarUrl ? (
-                      <AvatarImage src={avatarUrl} alt="Avatar" />
-                    ) : null}
-                    <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xl font-medium">
-                      {getInitial()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="absolute -bottom-1 -right-1 h-6 w-6 p-0 bg-gray-800 border-white/20 hover:bg-gray-700 rounded-full"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                  >
-                    <Upload className="h-3 w-3" />
-                  </Button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarUpload}
-                  />
-                </div>
-              </div>
-              
-              <div className="text-center mb-4">
-                <p className="text-white text-sm font-medium truncate">
-                  {getUsername()}
-                </p>
-                <p className="text-white/60 text-xs truncate">
-                  {user?.email}
-                </p>
-              </div>
-              
-              <div className="space-y-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start text-white hover:bg-white/10 rounded-lg text-sm py-2"
-                >
-                  <User className="h-4 w-4 mr-3" />
-                  Edit Profile
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="w-full justify-start text-white hover:bg-red-500/20 hover:text-red-300 rounded-lg text-sm py-2"
-                >
-                  <LogOut className="h-4 w-4 mr-3" />
-                  Sign out
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </>
-      )}
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleAvatarUpload}
+        />
+      </div>
     </div>
   );
 };

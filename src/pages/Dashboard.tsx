@@ -16,6 +16,7 @@ import StaticDashboardLayout from "@/components/dashboard/StaticDashboardLayout"
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import MobileDashboardNavbar from "@/components/dashboard/MobileDashboardNavbar";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 
 const Dashboard = () => {
@@ -69,9 +70,16 @@ const Dashboard = () => {
         background: 'linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%)' 
       }}
     >
+      {/* Mobile Navigation */}
+      <MobileDashboardNavbar />
+      
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
-          <AppSidebar />
+          {/* Desktop Sidebar - hidden on mobile */}
+          <div className="hidden md:block">
+            <AppSidebar />
+          </div>
+          
           <SidebarInset className="flex-1 relative">
             <ErrorBoundary>
               <div className="animate-shimmer-delayed">
@@ -90,8 +98,8 @@ const Dashboard = () => {
               </div>
             </ErrorBoundary>
 
-            <div className="px-6 pb-6">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="px-4 md:px-6 pb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
                 <div className="lg:col-span-9 animate-shimmer-delayed">
                   <ErrorBoundary>
                     <StaticDashboardLayout

@@ -10,6 +10,7 @@ import SocialProof from "@/components/SocialProof";
 import TrustedBy from "@/components/TrustedBy";
 import BlogPosts from "@/components/BlogPosts";
 import Footer from "@/components/Footer";
+import CookieBanner from "@/components/CookieBanner";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useAuth } from "@/hooks/useAuth";
@@ -70,6 +71,7 @@ const Index = () => {
       <CTA />
       <Footer />
       <FloatingConsoleButton />
+      <CookieBanner />
     </div>
   );
 };
