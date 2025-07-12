@@ -29,7 +29,7 @@ export const useDashboardBatchManager = () => {
     handleNewBatch,
   } = useBatchCrud();
 
-  // Control logic (requires batch state)
+  // Control logic (requires batch state) - using object destructuring syntax
   const {
     selectedBatchId,
     automationLoading,
