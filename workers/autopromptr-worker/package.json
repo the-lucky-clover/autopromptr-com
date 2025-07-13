@@ -1,0 +1,17 @@
+
+{
+  "name": "autopromptr-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for AutoPromptr backend services",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:production": "wrangler deploy --env production"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240129.0",
+    "wrangler": "^3.28.2"
+  }
+}

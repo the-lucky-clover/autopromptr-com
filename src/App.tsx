@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +22,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
 import TermsOfService from "./pages/TermsOfService";
 import ProtectedRoute from "./components/ProtectedRoute";
+import MigrationDashboard from "./pages/MigrationDashboard";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +42,9 @@ const App = () => (
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/cookie-policy" element={<CookiePolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
+            
+            {/* Migration Dashboard - accessible without auth for testing */}
+            <Route path="/migration" element={<MigrationDashboard />} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={
