@@ -39,7 +39,7 @@ export const useDashboardBatchManager = () => {
     handleStopBatch: stopBatch,
     handlePauseBatch: pauseBatch,
     handleRewindBatch: rewindBatch,
-  } = useBatchControl({ batches, setBatches });
+  } = useBatchControl(batches, setBatches);
 
   // Initialization
   useEffect(() => {
@@ -82,11 +82,11 @@ export const useDashboardBatchManager = () => {
     handleEditBatch,
     handleNewBatch,
 
-    // Control ops
-    handleRunBatch: guard((batch: any) => runBatch(batch)),
-    handleStopBatch: guard((batch: any) => stopBatch(batch)),
-    handlePauseBatch: guard((batch: any) => pauseBatch(batch)),
-    handleRewindBatch: guard((batch: any) => rewindBatch(batch)),
+    // Control ops - these already receive batches and setBatches from useBatchControl
+    handleRunBatch: guard(runBatch),
+    handleStopBatch: guard(stopBatch),
+    handlePauseBatch: guard(pauseBatch),
+    handleRewindBatch: guard(rewindBatch),
 
     clearError,
   };
