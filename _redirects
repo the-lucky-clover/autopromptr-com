@@ -1,0 +1,7 @@
+
+# Handle client-side routing for React Router
+/* /index.html 200
+
+# API redirects if you're keeping Supabase
+/api/* https://raahpoyciwuyhwlcenpy.supabase.co/rest/v1/:splat 200
+/auth/* https://raahpoyciwuyhwlcenpy.supabase.co/auth/v1/:splat 200
