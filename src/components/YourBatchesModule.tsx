@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Database, Plus } from "lucide-react";
-import DashboardBatchManager from './DashboardBatchManager';
+import { DashboardBatchManager } from './DashboardBatchManager';
 
 interface YourBatchesModuleProps {
   onStatsUpdate?: (stats: {

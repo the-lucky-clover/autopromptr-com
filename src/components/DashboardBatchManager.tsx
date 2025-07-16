@@ -11,15 +11,15 @@ export const DashboardBatchManager = () => {
   const [showBatchForm, setShowBatchForm] = useState(false);
   const { 
     batches, 
-    runBatch, 
-    stopBatch, 
-    pauseBatch, 
-    rewindBatch, 
-    deleteBatch,
-    createBatch 
+    handleRunBatch, 
+    handleStopBatch, 
+    handlePauseBatch, 
+    handleRewindBatch, 
+    handleDeleteBatch,
+    handleCreateBatch 
   } = useDashboardBatchManager();
 
-  const handleCreateBatch = async (batchData: any) => {
+  const handleCreateBatchWithEnhancement = async (batchData: any) => {
     try {
       // Enhanced batch creation with project context
       const enhancedBatchData = {
@@ -31,7 +31,7 @@ export const DashboardBatchManager = () => {
         }
       };
 
-      await createBatch(enhancedBatchData);
+      await handleCreateBatch(enhancedBatchData);
       setShowBatchForm(false);
     } catch (error) {
       console.error('Failed to create batch:', error);
@@ -43,7 +43,7 @@ export const DashboardBatchManager = () => {
       case 'running': return 'text-green-400';
       case 'paused': return 'text-yellow-400';
       case 'completed': return 'text-blue-400';
-      case 'error': return 'text-red-400';
+      case 'failed': return 'text-red-400';
       default: return 'text-gray-400';
     }
   };
@@ -70,7 +70,7 @@ export const DashboardBatchManager = () => {
                 <DialogTitle className="text-white text-xl">Create New Automation Batch</DialogTitle>
               </DialogHeader>
               <EnhancedBatchForm
-                onSubmit={handleCreateBatch}
+                onSubmit={handleCreateBatchWithEnhancement}
                 onCancel={() => setShowBatchForm(false)}
               />
             </DialogContent>
@@ -105,7 +105,7 @@ export const DashboardBatchManager = () => {
                     <span className={`${getStatusColor(batch.status)} capitalize`}>
                       {batch.status}
                     </span>
-                    {batch.settings?.enhancedPrompting && (
+                    {batch.settings?.projectContext && (
                       <span className="bg-purple-600/20 text-purple-300 px-2 py-1 rounded-full">
                         Enhanced AI
                       </span>
@@ -114,10 +114,10 @@ export const DashboardBatchManager = () => {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  {batch.status === 'idle' && (
+                  {batch.status === 'pending' && (
                     <Button
                       size="sm"
-                      onClick={() => runBatch(batch.id)}
+                      onClick={() => handleRunBatch(batch)}
                       className="bg-green-600 hover:bg-green-700 text-white"
                     >
                       <Play className="w-4 h-4" />
@@ -128,14 +128,14 @@ export const DashboardBatchManager = () => {
                     <>
                       <Button
                         size="sm"
-                        onClick={() => pauseBatch(batch.id)}
+                        onClick={() => handlePauseBatch(batch)}
                         className="bg-yellow-600 hover:bg-yellow-700 text-white"
                       >
                         <Pause className="w-4 h-4" />
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => stopBatch(batch.id)}
+                        onClick={() => handleStopBatch(batch)}
                         className="bg-red-600 hover:bg-red-700 text-white"
                       >
                         <Square className="w-4 h-4" />
@@ -147,14 +147,14 @@ export const DashboardBatchManager = () => {
                     <>
                       <Button
                         size="sm"
-                        onClick={() => runBatch(batch.id)}
+                        onClick={() => handleRunBatch(batch)}
                         className="bg-green-600 hover:bg-green-700 text-white"
                       >
                         <Play className="w-4 h-4" />
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => rewindBatch(batch.id)}
+                        onClick={() => handleRewindBatch(batch)}
                         className="bg-blue-600 hover:bg-blue-700 text-white"
                       >
                         <RotateCcw className="w-4 h-4" />
@@ -165,7 +165,7 @@ export const DashboardBatchManager = () => {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => deleteBatch(batch.id)}
+                    onClick={() => handleDeleteBatch(batch.id)}
                     className="border-red-400/50 text-red-400 hover:bg-red-500/20"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -179,3 +179,5 @@ export const DashboardBatchManager = () => {
     </Card>
   );
 };
+
+export default DashboardBatchManager;
