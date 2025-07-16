@@ -1,92 +1,96 @@
 
-import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Linkedin, Twitter, Github } from 'lucide-react';
-import ZapBrandLogo from '@/components/ZapBrandLogo';
+import { Github, Twitter, Linkedin, Mail } from "lucide-react";
+import { useLegalModals } from "./LegalModals";
 
 const Footer = () => {
+  const { openPrivacyPolicy, openTermsOfService, openCookiePolicy, LegalModals } = useLegalModals();
+
   return (
-    <footer className="text-white relative" style={{ background: 'linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 100%)' }}>
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 blur-3xl"></div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="space-y-4">
-            <ZapBrandLogo size="medium" variant="horizontal" id="footer" />
-            <p className="text-gray-300 text-sm">
-              Revolutionizing AI workflows through intelligent prompt engineering and automation.
-            </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Github className="w-5 h-5" />
-              </a>
+    <>
+      <footer className="bg-gradient-to-r from-slate-900 via-blue-900 to-purple-600 text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold">AutoPromptr</h3>
+              <p className="text-gray-300 text-sm">
+                Streamline your AI workflow with intelligent batch processing and automation tools.
+              </p>
+              <div className="flex space-x-4">
+                <a href="#" className="hover:text-purple-300 transition-colors">
+                  <Github className="h-5 w-5" />
+                </a>
+                <a href="#" className="hover:text-purple-300 transition-colors">
+                  <Twitter className="h-5 w-5" />
+                </a>
+                <a href="#" className="hover:text-purple-300 transition-colors">
+                  <Linkedin className="h-5 w-5" />
+                </a>
+                <a href="#" className="hover:text-purple-300 transition-colors">
+                  <Mail className="h-5 w-5" />
+                </a>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold">Product</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="/screenshots" className="hover:text-white transition-colors">Screenshots</a></li>
+                <li><a href="/results" className="hover:text-white transition-colors">Results</a></li>
+              </ul>
+            </div>
+            
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold">Company</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li><a href="/blog" className="hover:text-white transition-colors">Blog</a></li>
+                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+              </ul>
+            </div>
+            
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold">Legal</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li>
+                  <button 
+                    onClick={openPrivacyPolicy}
+                    className="hover:text-white transition-colors text-left"
+                  >
+                    Privacy Policy
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={openTermsOfService}
+                    className="hover:text-white transition-colors text-left"
+                  >
+                    Terms of Service
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={openCookiePolicy}
+                    className="hover:text-white transition-colors text-left"
+                  >
+                    Cookie Policy
+                  </button>
+                </li>
+                <li><a href="#" className="hover:text-white transition-colors">MIT License</a></li>
+              </ul>
             </div>
           </div>
-
-          {/* Products */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Products</h3>
-            <ul className="space-y-2 text-sm text-gray-300">
-              <li><Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
-              <li><a href="#" className="hover:text-white transition-colors">Batch Processing</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Analytics</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">API Access</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Enterprise</a></li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Resources</h3>
-            <ul className="space-y-2 text-sm text-gray-300">
-              <li><Link to="/blog" className="hover:text-white transition-colors">Blog</Link></li>
-              <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">White Papers</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Case Studies</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Contact</h3>
-            <ul className="space-y-3 text-sm text-gray-300">
-              <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
-              <li className="flex items-center space-x-2">
-                <Mail className="w-4 h-4" />
-                <span>thepremiumbrand@gmail.com</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Phone className="w-4 h-4" />
-                <span>+1 (555) 123-4567</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <MapPin className="w-4 h-4 mt-1" />
-                <span>123 Innovation Drive<br />San Francisco, CA 94105</span>
-              </li>
-            </ul>
+          
+          <div className="border-t border-white/20 mt-12 pt-8 text-center text-gray-300">
+            <p>&copy; 2024 AutoPromptr. All rights reserved. Open source under MIT License.</p>
           </div>
         </div>
-
-        <div className="border-t border-purple-500/30 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-sm text-gray-400 mb-4 md:mb-0">
-              © 2025 AutoPromptr. All rights reserved.
-            </div>
-            <div className="flex space-x-6 text-sm text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
+      </footer>
+      
+      <LegalModals />
+    </>
   );
 };
 

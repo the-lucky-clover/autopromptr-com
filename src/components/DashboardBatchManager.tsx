@@ -1,268 +1,181 @@
-import { useEffect, useRef } from 'react';
+
+import { useState } from 'react';
+import { Plus, Play, Pause, Square, RotateCcw, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { EnhancedBatchForm } from './batch/EnhancedBatchForm';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
-import { useBatchStatusManager } from '@/hooks/useBatchStatusManager';
-import BatchModal from './BatchModal';
-import DashboardBatchList from './DashboardBatchList';
-import DashboardEmptyState from './DashboardEmptyState';
-import { Button } from './ui/button';
-import { AlertTriangle, RefreshCw, Plus, Database } from 'lucide-react';
-import BatchErrorDisplay from './batch/BatchErrorDisplay';
 
-interface DashboardBatchManagerProps {
-  onStatsUpdate?: (stats: {
-    totalBatches: number;
-    activeBatches: number;
-    completedBatches: number;
-    totalPrompts: number;
-  }) => void;
-  onBatchesUpdate?: (batches: any[]) => void;
-  isCompact?: boolean;
-  onNewBatchRequest?: () => void;
-}
-
-const DashboardBatchManager = ({ 
-  onStatsUpdate, 
-  onBatchesUpdate, 
-  isCompact = false,
-  onNewBatchRequest 
-}: DashboardBatchManagerProps) => {
-  const isInitializedRef = useRef(false);
-  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const {
-    batches,
-    showModal,
-    setShowModal,
-    editingBatch,
-    setEditingBatch,
-    selectedBatchId,
-    automationLoading,
-    lastError,
-    clearError,
-    handleCreateBatch,
-    handleUpdateBatch,
-    handleDeleteBatch,
-    handleEditBatch,
-    handleRunBatch,
-    handleStopBatch,
-    handlePauseBatch,
-    handleRewindBatch,
-    handleNewBatch
+export const DashboardBatchManager = () => {
+  const [showBatchForm, setShowBatchForm] = useState(false);
+  const { 
+    batches, 
+    runBatch, 
+    stopBatch, 
+    pauseBatch, 
+    rewindBatch, 
+    deleteBatch,
+    createBatch 
   } = useDashboardBatchManager();
 
-  const { detectAndFixFailedBatches } = useBatchStatusManager();
-
-  // Initialize component
-  useEffect(() => {
-    if (!isInitializedRef.current) {
-      isInitializedRef.current = true;
-      console.log('DashboardBatchManager initialized');
-    }
-  }, []);
-
-  // Listen for new batch requests from control bar
-  useEffect(() => {
-    if (onNewBatchRequest && isInitializedRef.current) {
-      const handleExternalNewBatch = () => {
-        handleNewBatch();
+  const handleCreateBatch = async (batchData: any) => {
+    try {
+      // Enhanced batch creation with project context
+      const enhancedBatchData = {
+        ...batchData,
+        settings: {
+          ...batchData.settings,
+          projectContext: batchData.isNewProject ? batchData.projectContext : null,
+          enhancedPrompting: batchData.isNewProject
+        }
       };
-      
-      window.dashboardNewBatchHandler = handleExternalNewBatch;
-    }
-    
-    return () => {
-      delete window.dashboardNewBatchHandler;
-    };
-  }, [handleNewBatch, onNewBatchRequest]);
 
-  // Manual refresh function
-  const handleRefresh = () => {
-    console.log('Manual refresh triggered');
-    // Force a simple state refresh without triggering sync loops
-    if (batches.length > 0) {
-      console.log(`Refreshed view of ${batches.length} batches`);
+      await createBatch(enhancedBatchData);
+      setShowBatchForm(false);
+    } catch (error) {
+      console.error('Failed to create batch:', error);
     }
   };
 
-  // Simple delete handler
-  const handleEnhancedDeleteBatch = (batchId: string) => {
-    console.log('Dashboard deleting batch:', batchId);
-    handleDeleteBatch(batchId);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'running': return 'text-green-400';
+      case 'paused': return 'text-yellow-400';
+      case 'completed': return 'text-blue-400';
+      case 'error': return 'text-red-400';
+      default: return 'text-gray-400';
+    }
   };
-
-  // Update stats whenever batches change - with debouncing
-  useEffect(() => {
-    if (!isInitializedRef.current || !onStatsUpdate) return;
-
-    if (updateTimeoutRef.current) {
-      clearTimeout(updateTimeoutRef.current);
-    }
-
-    updateTimeoutRef.current = setTimeout(() => {
-      const stats = {
-        totalBatches: batches.length,
-        activeBatches: batches.filter(b => b.status === 'running').length,
-        completedBatches: batches.filter(b => b.status === 'completed').length,
-        totalPrompts: batches.reduce((sum, batch) => sum + batch.prompts.length, 0)
-      };
-      onStatsUpdate(stats);
-    }, 300);
-
-    return () => {
-      if (updateTimeoutRef.current) {
-        clearTimeout(updateTimeoutRef.current);
-      }
-    };
-  }, [batches, onStatsUpdate]);
-
-  // Update batches for parent component - with debouncing
-  useEffect(() => {
-    if (!isInitializedRef.current || !onBatchesUpdate) return;
-
-    if (updateTimeoutRef.current) {
-      clearTimeout(updateTimeoutRef.current);
-    }
-
-    updateTimeoutRef.current = setTimeout(() => {
-      onBatchesUpdate(batches);
-    }, 300);
-
-    return () => {
-      if (updateTimeoutRef.current) {
-        clearTimeout(updateTimeoutRef.current);
-      }
-    };
-  }, [batches, onBatchesUpdate]);
-
-  // Check for stuck/failed batches on component mount
-  useEffect(() => {
-    if (!isInitializedRef.current) return;
-
-    const timer = setTimeout(() => {
-      const stuckBatches = batches.filter(batch => {
-        const now = new Date();
-        const timeDiff = now.getTime() - new Date(batch.createdAt).getTime();
-        const tenMinutes = 10 * 60 * 1000;
-        return (batch.status === 'pending' || batch.status === 'running') && timeDiff > tenMinutes;
-      });
-
-      if (stuckBatches.length > 0) {
-        console.log('Found stuck batches:', stuckBatches.map(b => b.name));
-      }
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [batches]);
-
-  const stuckBatchCount = batches.filter(batch => {
-    const now = new Date();
-    const timeDiff = now.getTime() - new Date(batch.createdAt).getTime();
-    const tenMinutes = 10 * 60 * 1000;
-    return (batch.status === 'pending' || batch.status === 'running') && timeDiff > tenMinutes;
-  }).length;
-
-  const activeBatches = batches.filter(b => b.status === 'running').length;
-  const completedBatches = batches.filter(b => b.status === 'completed').length;
 
   return (
-    <div className={`space-y-6 ${isCompact ? 'space-y-4' : ''}`}>
-      {/* Error Display */}
-      {lastError && (
-        <BatchErrorDisplay
-          error={lastError}
-          onRetry={() => {
-            if (selectedBatchId) {
-              const batch = batches.find(b => b.id === selectedBatchId);
-              if (batch) {
-                handleRunBatch(batch);
-              }
-            }
-          }}
-          onDismiss={clearError}
-        />
-      )}
-
-      <div className={`space-y-6 ${isCompact ? 'space-y-4' : ''}`}>
+    <Card className="bg-white/5 backdrop-blur-sm border-white/20 rounded-xl">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-white">Batch Manager</CardTitle>
+            <CardDescription className="text-purple-200">
+              Create and manage your automation batches
+            </CardDescription>
+          </div>
+          <Dialog open={showBatchForm} onOpenChange={setShowBatchForm}>
+            <DialogTrigger asChild>
+              <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                <Plus className="w-4 h-4 mr-2" />
+                New Batch
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 border border-white/20">
+              <DialogHeader>
+                <DialogTitle className="text-white text-xl">Create New Automation Batch</DialogTitle>
+              </DialogHeader>
+              <EnhancedBatchForm
+                onSubmit={handleCreateBatch}
+                onCancel={() => setShowBatchForm(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </CardHeader>
+      <CardContent>
         {batches.length === 0 ? (
-          <DashboardEmptyState onNewBatch={handleNewBatch} />
+          <div className="text-center py-8">
+            <p className="text-gray-400 mb-4">No batches created yet</p>
+            <Button 
+              onClick={() => setShowBatchForm(true)}
+              variant="outline"
+              className="border-purple-400/50 text-purple-200 hover:bg-purple-500/20"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Your First Batch
+            </Button>
+          </div>
         ) : (
-          <>
-            {/* Professional Batch List Header */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <Database className="h-6 w-6 text-blue-400" />
-                    <div>
-                      <h3 className="text-xl font-bold text-white">Your Batches</h3>
-                      <p className="text-white/60 text-sm">
-                        {batches.length} total • {activeBatches} active • {completedBatches} completed
-                      </p>
-                    </div>
+          <div className="space-y-4">
+            {batches.map((batch) => (
+              <div 
+                key={batch.id} 
+                className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10"
+              >
+                <div className="flex-1">
+                  <h3 className="text-white font-medium">{batch.name}</h3>
+                  <p className="text-gray-400 text-sm">{batch.description}</p>
+                  <div className="flex items-center gap-4 mt-2 text-xs">
+                    <span className="text-gray-500">Platform: {batch.platform}</span>
+                    <span className={`${getStatusColor(batch.status)} capitalize`}>
+                      {batch.status}
+                    </span>
+                    {batch.settings?.enhancedPrompting && (
+                      <span className="bg-purple-600/20 text-purple-300 px-2 py-1 rounded-full">
+                        Enhanced AI
+                      </span>
+                    )}
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <Button
-                    onClick={handleRefresh}
-                    size="sm"
-                    variant="outline"
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl px-4 py-2 font-medium transition-all duration-300"
-                    title="Refresh batch list"
-                  >
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Refresh
-                  </Button>
-                  
-                  {stuckBatchCount > 0 && (
+                <div className="flex items-center gap-2">
+                  {batch.status === 'idle' && (
                     <Button
-                      onClick={detectAndFixFailedBatches}
-                      variant="outline"
                       size="sm"
-                      className="bg-orange-500/20 border-orange-500/30 text-orange-300 hover:bg-orange-500/30 px-4 py-2 font-medium transition-all duration-300"
+                      onClick={() => runBatch(batch.id)}
+                      className="bg-green-600 hover:bg-green-700 text-white"
                     >
-                      <AlertTriangle className="w-4 h-4 mr-2" />
-                      Fix {stuckBatchCount} Stuck
+                      <Play className="w-4 h-4" />
                     </Button>
                   )}
                   
+                  {batch.status === 'running' && (
+                    <>
+                      <Button
+                        size="sm"
+                        onClick={() => pauseBatch(batch.id)}
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                      >
+                        <Pause className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => stopBatch(batch.id)}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        <Square className="w-4 h-4" />
+                      </Button>
+                    </>
+                  )}
+                  
+                  {batch.status === 'paused' && (
+                    <>
+                      <Button
+                        size="sm"
+                        onClick={() => runBatch(batch.id)}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <Play className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => rewindBatch(batch.id)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                      </Button>
+                    </>
+                  )}
+                  
                   <Button
-                    onClick={handleNewBatch}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl px-6 py-2 font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => deleteBatch(batch.id)}
+                    className="border-red-400/50 text-red-400 hover:bg-red-500/20"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
-                    New Batch
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
-            </div>
-            
-            <DashboardBatchList 
-              batches={batches}
-              onEdit={handleEditBatch}
-              onDelete={handleEnhancedDeleteBatch}
-              onRun={handleRunBatch}
-              onStop={handleStopBatch}
-              onPause={handlePauseBatch}
-              onRewind={handleRewindBatch}
-              selectedBatchId={selectedBatchId}
-              automationLoading={automationLoading}
-            />
-          </>
+            ))}
+          </div>
         )}
-
-        <BatchModal
-          isOpen={showModal}
-          onClose={() => {
-            setShowModal(false);
-            setEditingBatch(null);
-          }}
-          onSave={editingBatch ? handleUpdateBatch : handleCreateBatch}
-          batch={editingBatch}
-        />
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
-
-export default DashboardBatchManager;

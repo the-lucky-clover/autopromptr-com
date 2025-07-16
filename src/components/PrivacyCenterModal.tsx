@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { X, Shield, BarChart3, Target, User, Info } from 'lucide-react';
+import { X, Shield, BarChart3, Target, User, ChevronDown, ChevronRight } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface CookieConsent {
   essential: boolean;
@@ -32,6 +33,13 @@ export const PrivacyCenterModal = ({ isOpen, onClose, onSave }: PrivacyCenterMod
     marketing: false,
     personalization: false,
     timestamp: Date.now()
+  });
+
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    essential: true,
+    analytics: false,
+    marketing: false,
+    personalization: false
   });
 
   useEffect(() => {
@@ -77,41 +85,46 @@ export const PrivacyCenterModal = ({ isOpen, onClose, onSave }: PrivacyCenterMod
     onSave(allRejected);
   };
 
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
   const cookieCategories = [
     {
       id: 'essential',
-      title: 'Essential Cookies',
+      title: 'Strictly Necessary Cookies',
       icon: Shield,
-      description: 'These cookies are necessary for the website to function and cannot be switched off. They are usually only set in response to actions made by you which amount to a request for services.',
-      examples: ['Authentication tokens', 'Security settings', 'Session management'],
+      description: 'These cookies are essential for the website to function properly and cannot be disabled. They enable core functionality such as security, network management, and accessibility. Without these cookies, services you have asked for cannot be provided.',
+      examples: ['Authentication tokens', 'Security settings', 'Session management', 'Load balancing'],
       vendors: ['AutoPromptr Core'],
-      required: true
+      required: true,
+      note: 'This preference is always active'
     },
     {
       id: 'analytics',
-      title: 'Analytics & Performance',
+      title: 'Performance & Analytics Cookies',
       icon: BarChart3,
-      description: 'These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously.',
-      examples: ['Page views', 'Click tracking', 'Performance metrics'],
+      description: 'These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously. They allow us to count visits and traffic sources so we can measure and improve the performance of our site.',
+      examples: ['Page views and user journeys', 'Site performance metrics', 'Error reporting', 'Usage statistics'],
       vendors: ['Google Analytics', 'Supabase Analytics'],
       required: false
     },
     {
       id: 'marketing',
-      title: 'Marketing & Advertising',
+      title: 'Targeting & Advertising Cookies',
       icon: Target,
-      description: 'These cookies track your online activity to help advertisers deliver more relevant advertising or to limit how many times you see an ad.',
-      examples: ['Ad targeting', 'Conversion tracking', 'Social media integration'],
-      vendors: ['Facebook Pixel', 'Google Ads'],
+      description: 'These cookies track your online activity to help advertisers deliver more relevant advertising or to limit how many times you see an ad. They may be used by advertising partners to build a profile of your interests.',
+      examples: ['Ad targeting and personalization', 'Conversion tracking', 'Social media integration', 'Retargeting campaigns'],
+      vendors: ['Meta Pixel', 'Google Ads', 'LinkedIn Insight'],
       required: false
     },
     {
       id: 'personalization',
-      title: 'Personalization',
+      title: 'Functional & Personalization Cookies',
       icon: User,
-      description: 'These cookies enable enhanced functionality and personalization, such as remembering your preferences and settings.',
-      examples: ['User preferences', 'Theme settings', 'Language selection'],
-      vendors: ['AutoPromptr Personalization'],
+      description: 'These cookies enable enhanced functionality and personalization. They may be set by us or by third party providers whose services we have added to our pages to remember your preferences and choices.',
+      examples: ['User preferences and settings', 'Theme and language selection', 'Dashboard customizations', 'Saved configurations'],
+      vendors: ['AutoPromptr Personalization Engine'],
       required: false
     }
   ];
@@ -123,74 +136,72 @@ export const PrivacyCenterModal = ({ isOpen, onClose, onSave }: PrivacyCenterMod
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
               <Shield className="w-6 h-6 text-purple-400" />
-              Privacy Center
+              Privacy Preference Center
             </DialogTitle>
-            <Button
-              onClick={onClose}
-              variant="ghost"
-              size="sm"
-              className="text-gray-400 hover:text-white hover:bg-white/10"
-            >
-              <X className="w-4 h-4" />
-            </Button>
           </div>
         </DialogHeader>
 
-        <Tabs defaultValue="cookies" className="flex-1 overflow-hidden">
-          <TabsList className="grid w-full grid-cols-2 bg-white/10">
-            <TabsTrigger value="cookies" className="text-white data-[state=active]:bg-purple-600">
-              Cookie Settings
-            </TabsTrigger>
-            <TabsTrigger value="rights" className="text-white data-[state=active]:bg-purple-600">
-              Your Rights
-            </TabsTrigger>
-          </TabsList>
+        <div className="text-gray-300 text-sm mb-6 leading-relaxed">
+          When you visit our website, we may collect information about you, your preferences, or your device. 
+          This information is primarily used to make the site work as you expect it to. We respect your privacy 
+          and give you control over your data preferences below.
+        </div>
 
-          <TabsContent value="cookies" className="mt-6 space-y-6 overflow-y-auto max-h-[60vh] pr-2">
-            <div className="space-y-4">
-              <p className="text-gray-300 text-sm leading-relaxed">
-                Manage your cookie preferences below. You can enable or disable different types of cookies. 
-                Note that disabling some types of cookies may impact your experience of the site and the services we are able to offer.
-              </p>
-
-              {cookieCategories.map((category) => {
-                const IconComponent = category.icon;
-                const isEnabled = consent[category.id as keyof Omit<CookieConsent, 'timestamp'>];
-                
-                return (
-                  <div key={category.id} className="bg-white/5 rounded-lg p-6 border border-white/10">
-                    <div className="flex items-start justify-between mb-4">
+        <div className="space-y-4 overflow-y-auto max-h-[50vh] pr-2">
+          {cookieCategories.map((category) => {
+            const IconComponent = category.icon;
+            const isEnabled = consent[category.id as keyof Omit<CookieConsent, 'timestamp'>];
+            const isOpen = openSections[category.id];
+            
+            return (
+              <div key={category.id} className="bg-white/5 rounded-lg border border-white/10">
+                <Collapsible open={isOpen} onOpenChange={() => toggleSection(category.id)}>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
                         <IconComponent className="w-5 h-5 text-purple-400" />
                         <h3 className="text-lg font-semibold text-white">{category.title}</h3>
                         {category.required && (
                           <span className="text-xs bg-purple-600 text-white px-2 py-1 rounded-full">
-                            Required
+                            Always Active
                           </span>
                         )}
                       </div>
-                      <Switch
-                        checked={isEnabled}
-                        onCheckedChange={(checked) => {
-                          if (!category.required) {
-                            setConsent(prev => ({
-                              ...prev,
-                              [category.id]: checked
-                            }));
-                          }
-                        }}
-                        disabled={category.required}
-                        className="data-[state=checked]:bg-purple-600"
-                      />
+                      <div className="flex items-center gap-3">
+                        <Switch
+                          checked={isEnabled}
+                          onCheckedChange={(checked) => {
+                            if (!category.required) {
+                              setConsent(prev => ({
+                                ...prev,
+                                [category.id]: checked
+                              }));
+                            }
+                          }}
+                          disabled={category.required}
+                          className="data-[state=checked]:bg-purple-600"
+                        />
+                        <CollapsibleTrigger asChild>
+                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                            {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                          </Button>
+                        </CollapsibleTrigger>
+                      </div>
                     </div>
                     
-                    <p className="text-gray-300 text-sm mb-4 leading-relaxed">
+                    {category.note && (
+                      <p className="text-xs text-purple-300 mb-2">{category.note}</p>
+                    )}
+                    
+                    <p className="text-gray-300 text-sm leading-relaxed">
                       {category.description}
                     </p>
-                    
-                    <div className="grid md:grid-cols-2 gap-4 text-xs">
+                  </div>
+
+                  <CollapsibleContent className="px-4 pb-4">
+                    <div className="grid md:grid-cols-2 gap-4 text-xs border-t border-white/10 pt-4">
                       <div>
-                        <h4 className="text-gray-200 font-medium mb-2">Examples:</h4>
+                        <h4 className="text-gray-200 font-medium mb-2">What we collect:</h4>
                         <ul className="text-gray-400 space-y-1">
                           {category.examples.map((example, idx) => (
                             <li key={idx}>• {example}</li>
@@ -198,7 +209,7 @@ export const PrivacyCenterModal = ({ isOpen, onClose, onSave }: PrivacyCenterMod
                         </ul>
                       </div>
                       <div>
-                        <h4 className="text-gray-200 font-medium mb-2">Vendors:</h4>
+                        <h4 className="text-gray-200 font-medium mb-2">Service providers:</h4>
                         <ul className="text-gray-400 space-y-1">
                           {category.vendors.map((vendor, idx) => (
                             <li key={idx}>• {vendor}</li>
@@ -206,67 +217,23 @@ export const PrivacyCenterModal = ({ isOpen, onClose, onSave }: PrivacyCenterMod
                         </ul>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="rights" className="mt-6 space-y-6 overflow-y-auto max-h-[60vh] pr-2">
-            <div className="space-y-6">
-              <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                <div className="flex items-center gap-3 mb-4">
-                  <Info className="w-5 h-5 text-blue-400" />
-                  <h3 className="text-lg font-semibold text-white">Your Privacy Rights</h3>
-                </div>
-                
-                <div className="space-y-4 text-sm text-gray-300">
-                  <div>
-                    <h4 className="text-white font-medium mb-2">Right to Access</h4>
-                    <p>You have the right to request copies of your personal data.</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-white font-medium mb-2">Right to Rectification</h4>
-                    <p>You have the right to request that we correct any information you believe is inaccurate.</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-white font-medium mb-2">Right to Erasure</h4>
-                    <p>You have the right to request that we erase your personal data, under certain conditions.</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-white font-medium mb-2">Right to Data Portability</h4>
-                    <p>You have the right to request that we transfer the data that we have collected to another organization.</p>
-                  </div>
-                </div>
+                  </CollapsibleContent>
+                </Collapsible>
               </div>
-
-              <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                <h3 className="text-lg font-semibold text-white mb-4">Contact Us</h3>
-                <p className="text-gray-300 text-sm mb-4">
-                  If you have any questions about your privacy rights or this Privacy Center, please contact us:
-                </p>
-                <div className="text-sm text-gray-400">
-                  <p>Email: privacy@autopromptr.com</p>
-                  <p>Address: Privacy Officer, AutoPromptr, MIT Licensed Open Source Project</p>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+            );
+          })}
+        </div>
 
         {/* Footer buttons */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/10">
           <Button onClick={handleAcceptAll} className="bg-purple-600 hover:bg-purple-700 text-white flex-1">
-            Accept All
+            Accept All Cookies
           </Button>
           <Button onClick={handleRejectAll} variant="outline" className="border-white/30 text-white hover:bg-white/10 flex-1">
-            Reject All
+            Reject Non-Essential
           </Button>
           <Button onClick={handleSave} variant="secondary" className="bg-white/10 text-white hover:bg-white/20 flex-1">
-            Save Preferences
+            Save My Preferences
           </Button>
         </div>
       </DialogContent>

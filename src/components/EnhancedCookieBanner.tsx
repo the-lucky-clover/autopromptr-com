@@ -119,7 +119,7 @@ const EnhancedCookieBanner = () => {
                 </div>
               </div>
               
-              {/* Buttons section - Three button layout */}
+              {/* Buttons section - Swapped order: Reject All, Privacy Center, Accept All */}
               <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:flex-shrink-0 lg:ml-8 lg:min-w-[200px]">
                 <Button 
                   onClick={acceptAllCookies}
@@ -145,7 +145,7 @@ const EnhancedCookieBanner = () => {
                   size="sm"
                   className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 px-6 py-3 font-medium"
                 >
-                  Reject All
+                  Reject Non-Essential
                 </Button>
               </div>
             </div>
