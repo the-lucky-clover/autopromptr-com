@@ -47,8 +47,8 @@ export const useBatchControl = (
       return;
     }
 
-    // Synchronously check if any batch is running
-    const hasRunning = batches.some(b => b.status === 'running');
+    // Synchronously check if any batch is running - ensure batches is an array
+    const hasRunning = Array.isArray(batches) ? batches.some(b => b.status === 'running') : false;
     if (hasRunning) {
       toast({
         title: 'Another batch is running',
