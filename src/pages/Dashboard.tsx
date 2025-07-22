@@ -99,8 +99,8 @@ const Dashboard = () => {
             </ErrorBoundary>
 
             <div className="px-4 md:px-6 pb-6">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
-                <div className="lg:col-span-9 animate-shimmer-delayed">
+              <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 md:gap-6">
+                <div className="lg:col-span-7 animate-shimmer-delayed">
                   <ErrorBoundary>
                     <StaticDashboardLayout
                       visibleModules={overviewModules}
