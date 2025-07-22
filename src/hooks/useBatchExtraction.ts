@@ -11,6 +11,7 @@ export const useBatchExtraction = () => {
   const [targetUrl, setTargetUrl] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isGeminiProcessing, setIsGeminiProcessing] = useState(false);
   const { setBatches } = usePersistentBatches();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -105,6 +106,32 @@ export const useBatchExtraction = () => {
     }
 
     return prompts.slice(0, 100); // Limit to 100 prompts
+  };
+
+  const extractPromptsWithGemini = async (text: string): Promise<string[]> => {
+    try {
+      const response = await fetch('/functions/v1/gemini-extract-prompts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success && Array.isArray(data.prompts)) {
+        return data.prompts;
+      } else {
+        console.error('Gemini extraction failed:', data.error);
+        // Fallback to local extraction
+        return extractPrompts(text);
+      }
+    } catch (error) {
+      console.error('Error calling Gemini extraction:', error);
+      // Fallback to local extraction
+      return extractPrompts(text);
+    }
   };
 
   const handleExtract = async () => {
@@ -212,6 +239,54 @@ export const useBatchExtraction = () => {
     }
   };
 
+  const handleGeminiExtract = async () => {
+    if (!prompts.trim()) {
+      toast({
+        title: "No content to extract",
+        description: "Please enter some content to extract prompts from.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeminiProcessing(true);
+
+    try {
+      const extractedPrompts = await extractPromptsWithGemini(prompts);
+      
+      if (extractedPrompts.length === 0) {
+        toast({
+          title: "No prompts found",
+          description: "Gemini was unable to extract any prompts from the provided content.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update the prompts text area with the extracted prompts
+      const formattedPrompts = extractedPrompts
+        .map((prompt, index) => `Prompt ${index + 1}: ${prompt}`)
+        .join('\n\n');
+      
+      setPrompts(formattedPrompts);
+
+      toast({
+        title: "Prompts extracted with Gemini!",
+        description: `Successfully extracted ${extractedPrompts.length} prompts using AI intelligence.`,
+      });
+
+    } catch (error) {
+      console.error('Error during Gemini extraction:', error);
+      toast({
+        title: "Gemini extraction failed",
+        description: "An error occurred while processing with Gemini. Try the regular extraction instead.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeminiProcessing(false);
+    }
+  };
+
   return {
     prompts,
     setPrompts,
@@ -222,10 +297,12 @@ export const useBatchExtraction = () => {
     selectedPlatform,
     setSelectedPlatform,
     isProcessing,
+    isGeminiProcessing,
     CHARACTER_LIMIT,
     characterCount,
     isOverLimit,
     handleExtract,
+    handleGeminiExtract,
     getCharacterCountColor,
     getEffectiveTargetUrl,
     getEffectiveTargetDisplay

@@ -24,10 +24,12 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
     selectedPlatform,
     setSelectedPlatform,
     isProcessing,
+    isGeminiProcessing,
     CHARACTER_LIMIT,
     characterCount,
     isOverLimit,
     handleExtract,
+    handleGeminiExtract,
     getCharacterCountColor,
     getEffectiveTargetDisplay
   } = useBatchExtraction();
@@ -111,9 +113,11 @@ const BatchExtractorModule = ({ isCompact = false }: BatchExtractorModuleProps) 
 
         <ExtractionControls
           isProcessing={isProcessing}
+          isGeminiProcessing={isGeminiProcessing}
           prompts={prompts}
           isOverLimit={isOverLimit}
           onExtract={handleExtract}
+          onGeminiExtract={handleGeminiExtract}
           onFileContent={handleFileContent}
           characterLimit={CHARACTER_LIMIT}
           isCompact={isCompact}
