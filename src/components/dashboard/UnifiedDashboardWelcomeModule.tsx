@@ -58,10 +58,10 @@ const UnifiedDashboardWelcomeModule = ({
           {/* Main content area - left side (lower positioning) */}
           <div className="col-span-12 lg:col-span-7 flex flex-col justify-end pb-4">
             {showPersonalizedGreeting ? (
-              <div className="space-y-3">
-                <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white drop-shadow-lg">
+              <div className="space-y-3 max-w-full">
+                <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white drop-shadow-lg break-words">
                   {currentGreeting.greeting},{' '}
-                  <span className="bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent whitespace-nowrap">
                     {userName}
                   </span>
                   !
