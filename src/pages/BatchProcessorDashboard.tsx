@@ -18,7 +18,7 @@ const BatchProcessorDashboard = () => {
       
       <ResizableDashboardLayout>
         <UnifiedDashboardWelcomeModule
-          title="Batch Processor"
+          title="Automation"
           subtitle="Create, manage, and execute automated prompt batches across multiple AI platforms."
           clockColor="#F59E0B"
           showPersonalizedGreeting={false}

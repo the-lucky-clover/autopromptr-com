@@ -70,7 +70,7 @@ export const DashboardBatchManager = ({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-white">Batch Manager</CardTitle>
+            <CardTitle className="text-white">Batch Processor</CardTitle>
             <CardDescription className="text-purple-200">
               Create and manage your automation batches
             </CardDescription>
