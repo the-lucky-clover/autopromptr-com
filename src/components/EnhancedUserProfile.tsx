@@ -117,8 +117,8 @@ const EnhancedUserProfile = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-4">
-        <div className="h-12 w-12 bg-gray-600 rounded-full animate-pulse"></div>
+      <div className="flex items-center justify-center p-2">
+        <div className="h-8 w-8 bg-gray-600 rounded-full animate-pulse"></div>
       </div>
     );
   }
@@ -133,23 +133,23 @@ const EnhancedUserProfile = () => {
       }}
     >
       {/* Main Profile Container */}
-      <div className="relative overflow-hidden rounded-xl bg-gray-800/50 backdrop-blur-sm border border-gray-700/50">
+      <div className="relative overflow-hidden rounded-lg bg-gray-800/50 backdrop-blur-sm border border-gray-700/50">
         {/* Avatar Section */}
-        <div className="flex items-center p-3 cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
-          <Avatar className="h-10 w-10 ring-2 ring-purple-400/30">
+        <div className="flex items-center p-2 cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+          <Avatar className="h-8 w-8 ring-1 ring-purple-400/30">
             {avatarUrl ? (
               <AvatarImage src={avatarUrl} alt="Avatar" />
             ) : null}
-            <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium">
+            <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-medium">
               {getInitial()}
             </AvatarFallback>
           </Avatar>
           
           {/* User Info - slides out on hover */}
-          <div className={`ml-3 transition-all duration-300 overflow-hidden ${
-            isHovered ? 'w-32 opacity-100' : 'w-0 opacity-0'
+          <div className={`ml-2 transition-all duration-300 overflow-hidden ${
+            isHovered ? 'w-28 opacity-100' : 'w-0 opacity-0'
           }`}>
-            <p className="text-white text-sm font-medium truncate">
+            <p className="text-white text-xs font-medium truncate">
               {getUsername()}
             </p>
             <p className="text-white/60 text-xs truncate">
@@ -159,8 +159,8 @@ const EnhancedUserProfile = () => {
           
           {/* Upload indicator */}
           {uploading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
+              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
         </div>
