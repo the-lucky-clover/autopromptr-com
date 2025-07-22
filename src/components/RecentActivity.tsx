@@ -96,37 +96,41 @@ const RecentActivity = () => {
           Recent Activity
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-1.5 md:space-y-2">
         {activities.length === 0 ? (
-          <div className="text-center py-8">
-            <Activity className="w-12 h-12 text-white/30 mx-auto mb-3" />
+          <div className="text-center py-6">
+            <Activity className="w-10 h-10 text-white/30 mx-auto mb-2" />
             <p className="text-white/60 text-sm">No recent activity</p>
             <p className="text-white/40 text-xs mt-1">Start creating batches to see activity here</p>
           </div>
         ) : (
-          activities.map((activity) => (
-            <div
-              key={activity.id}
-              className={`flex items-start gap-3 p-3 bg-white/5 rounded-lg border-l-2 ${getActivityColor(activity.type)} hover:bg-white/10 transition-colors`}
-            >
-              <div className="flex-shrink-0 mt-0.5">
-                {getActivityIcon(activity.type)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-medium truncate">
-                  {activity.message}
-                </p>
-                <p className="text-white/60 text-xs mt-1">
-                  {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
-                </p>
-                {activity.batchName && (
-                  <p className="text-purple-300 text-xs mt-1 font-medium">
-                    🔄 {activity.batchName}
+          <div className="grid gap-1.5 md:gap-2">
+            {activities.map((activity) => (
+              <div
+                key={activity.id}
+                className={`grid grid-cols-[auto_1fr] gap-2.5 p-2.5 md:p-3 bg-white/5 rounded-lg border-l-2 ${getActivityColor(activity.type)} hover:bg-white/10 transition-colors`}
+              >
+                <div className="flex-shrink-0 mt-0.5">
+                  {getActivityIcon(activity.type)}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-white text-sm font-medium truncate">
+                    {activity.message}
                   </p>
-                )}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 mt-1">
+                    <p className="text-white/60 text-xs">
+                      {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
+                    </p>
+                    {activity.batchName && (
+                      <p className="text-purple-300 text-xs font-medium">
+                        🔄 {activity.batchName}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </CardContent>
     </Card>

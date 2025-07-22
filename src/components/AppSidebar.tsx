@@ -69,21 +69,21 @@ export function AppSidebar() {
       
       <SidebarContent className="flex-1 overflow-y-auto">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-400 uppercase text-xs font-semibold tracking-wider px-6 py-4">
+          <SidebarGroupLabel className="text-gray-400 uppercase text-xs font-semibold tracking-wider px-4 py-2">
             Navigation
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="px-4 space-y-1">
+            <SidebarMenu className="px-3 space-y-0.5">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     asChild
                     isActive={location.pathname === item.url}
-                    className="text-gray-300 hover:text-white hover:bg-gray-800 data-[active=true]:bg-gray-800 data-[active=true]:text-white h-12 text-base font-medium px-4 py-3 rounded-lg transition-all duration-200"
+                    className="text-gray-300 hover:text-white hover:bg-gray-800 data-[active=true]:bg-gray-800 data-[active=true]:text-white h-10 text-sm font-medium px-3 py-2 rounded-md transition-all duration-200"
                   >
-                    <Link to={item.url} className="flex items-center gap-4">
-                      <item.icon className="h-6 w-6" strokeWidth={1.5} />
-                      <span className="text-base font-medium">{item.title}</span>
+                    <Link to={item.url} className="flex items-center gap-3">
+                      <item.icon className="h-5 w-5" strokeWidth={1.5} />
+                      <span className="text-sm font-medium">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

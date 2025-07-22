@@ -11,6 +11,12 @@ export class AutoPromptr {
 
   async runBatch(batch: Batch, platform: string, options?: any): Promise<any> {
     try {
+      console.log('🚀 [AutoPromptr] Sending batch to backend:', {
+        batchId: batch.id,
+        platform,
+        url: `${this.baseUrl}/api/run-batch`
+      });
+
       const response = await fetch(`${this.baseUrl}/api/run-batch`, {
         method: 'POST',
         headers: {
@@ -23,17 +29,24 @@ export class AutoPromptr {
         })
       });
 
+      console.log('📥 [AutoPromptr] Response status:', response.status);
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ [AutoPromptr] HTTP error:', response.status, errorText);
         throw new AutoPromptrError(
-          `HTTP ${response.status}`,
+          `HTTP ${response.status}: ${errorText}`,
           'HTTP_ERROR',
           response.status,
           true
         );
       }
 
-      return await response.json();
+      const result = await response.json();
+      console.log('✅ [AutoPromptr] Success response:', result);
+      return result;
     } catch (error) {
+      console.error('❌ [AutoPromptr] Error running batch:', error);
       throw AutoPromptrError.fromBackendError(error);
     }
   }
