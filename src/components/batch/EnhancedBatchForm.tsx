@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Lightbulb, Settings, Sparkles } from 'lucide-react';
+import { Lightbulb, Settings, Sparkles, Globe, Monitor } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface EnhancedBatchFormProps {
@@ -20,8 +20,10 @@ export const EnhancedBatchForm = ({ onSubmit, onCancel }: EnhancedBatchFormProps
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    platform: '',
+    targetType: 'remote', // 'local' or 'remote'
+    targetPath: '',
     isNewProject: false,
+    promptImprovement: false,
     projectContext: {
       role: '',
       history: '',
@@ -80,20 +82,55 @@ export const EnhancedBatchForm = ({ onSubmit, onCancel }: EnhancedBatchFormProps
           </div>
 
           <div>
-            <Label htmlFor="platform" className="text-white">Target Platform</Label>
-            <Select onValueChange={(value) => setFormData(prev => ({ ...prev, platform: value }))}>
-              <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                <SelectValue placeholder="Select target platform" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700">
-                <SelectItem value="lovable">Lovable.dev</SelectItem>
-                <SelectItem value="v0">V0.dev</SelectItem>
-                <SelectItem value="cursor">Cursor</SelectItem>
-                <SelectItem value="windsurf">Windsurf</SelectItem>
-                <SelectItem value="claude">Claude</SelectItem>
-                <SelectItem value="chatgpt">ChatGPT</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label className="text-white">Target Type</Label>
+            <div className="flex items-center gap-4 mt-2">
+              <div className="flex items-center gap-2">
+                <Monitor className="w-4 h-4 text-gray-400" />
+                <Label htmlFor="local" className="text-white">Local</Label>
+                <Switch
+                  id="local"
+                  checked={formData.targetType === 'local'}
+                  onCheckedChange={(checked) => setFormData(prev => ({ 
+                    ...prev, 
+                    targetType: checked ? 'local' : 'remote',
+                    targetPath: '' // Reset path when switching
+                  }))}
+                  className="data-[state=checked]:bg-blue-600"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-gray-400" />
+                <Label htmlFor="remote" className="text-white">Remote</Label>
+                <Switch
+                  id="remote"
+                  checked={formData.targetType === 'remote'}
+                  onCheckedChange={(checked) => setFormData(prev => ({ 
+                    ...prev, 
+                    targetType: checked ? 'remote' : 'local',
+                    targetPath: '' // Reset path when switching
+                  }))}
+                  className="data-[state=checked]:bg-purple-600"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="targetPath" className="text-white">
+              {formData.targetType === 'local' ? 'Local Path' : 'Target URL'}
+            </Label>
+            <Input
+              id="targetPath"
+              value={formData.targetPath}
+              onChange={(e) => setFormData(prev => ({ ...prev, targetPath: e.target.value }))}
+              placeholder={
+                formData.targetType === 'local' 
+                  ? 'Enter pathname (e.g., /windsurf, /cursor)' 
+                  : 'Enter URL (e.g., https://lovable.dev, https://v0.dev)'
+              }
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+              required
+            />
           </div>
         </CardContent>
       </Card>
@@ -120,6 +157,25 @@ export const EnhancedBatchForm = ({ onSubmit, onCancel }: EnhancedBatchFormProps
               checked={formData.isNewProject}
               onCheckedChange={handleNewProjectToggle}
               className="data-[state=checked]:bg-purple-600"
+            />
+          </div>
+
+          <Separator className="bg-white/20" />
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-white flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                Prompt Improvement
+              </Label>
+              <p className="text-sm text-gray-400">
+                Use Google Gemini Flash 2.5 to enhance prompts automatically
+              </p>
+            </div>
+            <Switch
+              checked={formData.promptImprovement}
+              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, promptImprovement: checked }))}
+              className="data-[state=checked]:bg-green-600"
             />
           </div>
 
