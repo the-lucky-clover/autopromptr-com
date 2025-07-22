@@ -76,12 +76,19 @@ const adminItems = [
   },
 ]
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  width?: number;
+}
+
+export function AppSidebar({ width = 256 }: AppSidebarProps) {
   const location = useLocation()
   const { role, isSysOp } = useUserRole()
 
   return (
-    <Sidebar className="bg-gray-900 border-gray-800 w-64">{/* Reduced from w-80 to w-64 */}
+    <Sidebar 
+      className="bg-gray-900 border-gray-800" 
+      style={{ width: `${width}px` }}
+    >{/* Dynamic width */}
       <SidebarHeader className="p-4 border-b border-gray-800">
         <Link to="/" className="flex items-center justify-center">
           <ZapBrandLogo size="small" variant="horizontal" id="sidebar-logo" />

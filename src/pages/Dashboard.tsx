@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
+import { ResizableDashboardLayout } from "@/components/dashboard/ResizableDashboardLayout";
 import { useDashboardModules } from "@/hooks/useDashboardModules";
 import { useAuth } from "@/hooks/useAuth";
 import SystemLogsPanel from "@/components/SystemLogsPanel";
@@ -73,52 +72,43 @@ const Dashboard = () => {
       {/* Mobile Navigation */}
       <MobileDashboardNavbar />
       
-      <SidebarProvider>
-        <div className="min-h-screen flex w-full">
-          {/* Desktop Sidebar - hidden on mobile */}
-          <div className="hidden md:block">
-            <AppSidebar />
+      <ResizableDashboardLayout>
+        <ErrorBoundary>
+          <div className="animate-shimmer-delayed">
+            <DashboardHeader />
           </div>
-          
-          <SidebarInset className="flex-1 relative">
-            <ErrorBoundary>
-              <div className="animate-shimmer-delayed">
-                <DashboardHeader />
-              </div>
-            </ErrorBoundary>
-            
-            <ErrorBoundary>
-              <div className="animate-shimmer">
-                <UnifiedDashboardWelcomeModule
-                  title="AutoPromptr Dashboard"
-                  subtitle="Welcome to your automation command center. Monitor, manage, and optimize your AI-powered workflows."
-                  clockColor="#10B981"
-                  showPersonalizedGreeting={true}
+        </ErrorBoundary>
+        
+        <ErrorBoundary>
+          <div className="animate-shimmer">
+            <UnifiedDashboardWelcomeModule
+              title="AutoPromptr Dashboard"
+              subtitle="Welcome to your automation command center. Monitor, manage, and optimize your AI-powered workflows."
+              clockColor="#10B981"
+              showPersonalizedGreeting={true}
+            />
+          </div>
+        </ErrorBoundary>
+
+        <div className="px-4 md:px-6 pb-6">
+          <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 md:gap-6">
+            <div className="xl:col-span-3 animate-shimmer-delayed">
+              <ErrorBoundary>
+                <StaticDashboardLayout
+                  visibleModules={overviewModules}
+                  renderModuleContent={renderModuleContent}
                 />
-              </div>
-            </ErrorBoundary>
-
-            <div className="px-4 md:px-6 pb-6">
-              <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 md:gap-6">
-                <div className="xl:col-span-3 animate-shimmer-delayed">
-                  <ErrorBoundary>
-                    <StaticDashboardLayout
-                      visibleModules={overviewModules}
-                      renderModuleContent={renderModuleContent}
-                    />
-                  </ErrorBoundary>
-                </div>
-
-                <div className="xl:col-span-2 animate-shimmer">
-                  <ErrorBoundary>
-                    <RecentActivity />
-                  </ErrorBoundary>
-                </div>
-              </div>
+              </ErrorBoundary>
             </div>
-          </SidebarInset>
+
+            <div className="xl:col-span-2 animate-shimmer">
+              <ErrorBoundary>
+                <RecentActivity />
+              </ErrorBoundary>
+            </div>
+          </div>
         </div>
-      </SidebarProvider>
+      </ResizableDashboardLayout>
     </div>
   );
 };
