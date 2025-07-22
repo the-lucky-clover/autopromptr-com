@@ -27,7 +27,7 @@ const items = [
   },
   {
     title: "Automation",
-    url: "/dashboard/automation",
+    url: "/batch-processor",
     icon: Zap,
   },
   {
