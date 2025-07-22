@@ -67,6 +67,11 @@ const App = () => (
                 <BatchProcessorDashboard />
               </ProtectedRoute>
             } />
+            <Route path="/dashboard/extractor" element={
+              <ProtectedRoute>
+                <BatchExtractorDashboard />
+              </ProtectedRoute>
+            } />
             <Route path="/batch-extractor-dashboard" element={
               <ProtectedRoute>
                 <BatchExtractorDashboard />
