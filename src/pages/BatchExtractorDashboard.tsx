@@ -2,8 +2,8 @@
 import React from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import BatchExtractorPageContent from "@/components/batch-extractor/BatchExtractorPageContent";
 import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
+import LargeTextInputModule from "@/components/batch-extractor/LargeTextInputModule";
 
 const BatchExtractorDashboard = () => {
   return (
@@ -24,10 +24,8 @@ const BatchExtractorDashboard = () => {
               showPersonalizedGreeting={false}
             />
             
-            <div className="px-6">
-              <div className="text-center py-8">
-                <p className="text-gray-400">Batch Extractor functionality coming soon...</p>
-              </div>
+            <div className="px-6 pb-6">
+              <LargeTextInputModule />
             </div>
           </SidebarInset>
         </div>
