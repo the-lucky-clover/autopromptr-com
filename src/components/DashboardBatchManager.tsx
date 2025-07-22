@@ -1,13 +1,25 @@
 
 import { useState } from 'react';
-import { Plus, Play, Pause, Square, RotateCcw, Trash2 } from 'lucide-react';
+import { Plus, Play, Pause, Square, RotateCcw, Trash2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { EnhancedBatchForm } from './batch/EnhancedBatchForm';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
 
-export const DashboardBatchManager = () => {
+interface DashboardBatchManagerProps {
+  onStatsUpdate?: (stats: any) => void;
+  onBatchesUpdate?: (batches: any[]) => void;
+  isCompact?: boolean;
+  onNewBatchRequest?: () => void;
+}
+
+export const DashboardBatchManager = ({ 
+  onStatsUpdate, 
+  onBatchesUpdate, 
+  isCompact = false, 
+  onNewBatchRequest 
+}: DashboardBatchManagerProps = {}) => {
   const [showBatchForm, setShowBatchForm] = useState(false);
   const { 
     batches, 
@@ -18,6 +30,11 @@ export const DashboardBatchManager = () => {
     handleDeleteBatch,
     handleCreateBatch 
   } = useDashboardBatchManager();
+
+  const handleMarkAsFailed = (batch: any) => {
+    // Mark batch as failed functionality
+    console.log('Marking batch as failed:', batch.id);
+  };
 
   const handleCreateBatchWithEnhancement = async (batchData: any) => {
     try {
@@ -105,7 +122,7 @@ export const DashboardBatchManager = () => {
                     <span className={`${getStatusColor(batch.status)} capitalize`}>
                       {batch.status}
                     </span>
-                    {batch.settings?.projectContext && (
+                    {batch.settings?.promptEnhancement && (
                       <span className="bg-purple-600/20 text-purple-300 px-2 py-1 rounded-full">
                         Enhanced AI
                       </span>
@@ -113,63 +130,86 @@ export const DashboardBatchManager = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  {batch.status === 'pending' && (
-                    <Button
-                      size="sm"
-                      onClick={() => handleRunBatch(batch)}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      <Play className="w-4 h-4" />
-                    </Button>
-                  )}
-                  
-                  {batch.status === 'running' && (
-                    <>
-                      <Button
-                        size="sm"
-                        onClick={() => handlePauseBatch(batch)}
-                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
-                      >
-                        <Pause className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleStopBatch(batch)}
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        <Square className="w-4 h-4" />
-                      </Button>
-                    </>
-                  )}
-                  
-                  {batch.status === 'paused' && (
-                    <>
+                {/* Grid-aligned control buttons */}
+                <div className="grid grid-cols-5 gap-2 w-48">
+                  {/* Play/Pause Button - Column 1 */}
+                  <div className="flex justify-center">
+                    {(batch.status === 'pending' || batch.status === 'paused') && (
                       <Button
                         size="sm"
                         onClick={() => handleRunBatch(batch)}
-                        className="bg-green-600 hover:bg-green-700 text-white"
+                        className="bg-green-600 hover:bg-green-700 text-white w-8 h-8 p-0"
+                        title="Run Batch"
                       >
                         <Play className="w-4 h-4" />
                       </Button>
+                    )}
+                    {batch.status === 'running' && (
+                      <Button
+                        size="sm"
+                        onClick={() => handlePauseBatch(batch)}
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white w-8 h-8 p-0"
+                        title="Pause Batch"
+                      >
+                        <Pause className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Stop Button - Column 2 */}
+                  <div className="flex justify-center">
+                    {batch.status === 'running' && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleStopBatch(batch)}
+                        className="bg-red-600 hover:bg-red-700 text-white w-8 h-8 p-0"
+                        title="Stop Batch"
+                      >
+                        <Square className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Rewind Button - Column 3 */}
+                  <div className="flex justify-center">
+                    {batch.status === 'paused' && (
                       <Button
                         size="sm"
                         onClick={() => handleRewindBatch(batch)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        className="bg-blue-600 hover:bg-blue-700 text-white w-8 h-8 p-0"
+                        title="Rewind Batch"
                       >
                         <RotateCcw className="w-4 h-4" />
                       </Button>
-                    </>
-                  )}
-                  
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDeleteBatch(batch.id)}
-                    className="border-red-400/50 text-red-400 hover:bg-red-500/20"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                    )}
+                  </div>
+
+                  {/* Mark as Failed Button - Column 4 */}
+                  <div className="flex justify-center">
+                    {(batch.status === 'running' || batch.status === 'paused') && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleMarkAsFailed(batch)}
+                        className="bg-orange-600 hover:bg-orange-700 text-white w-8 h-8 p-0"
+                        title="Mark as Failed"
+                      >
+                        <AlertTriangle className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Delete Button - Column 5 */}
+                  <div className="flex justify-center">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDeleteBatch(batch.id)}
+                      className="border-red-400/50 text-red-400 hover:bg-red-500/20 w-8 h-8 p-0"
+                      title="Delete Batch"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}
