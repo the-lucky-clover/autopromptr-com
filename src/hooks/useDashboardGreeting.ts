@@ -19,8 +19,12 @@ export const useDashboardGreeting = () => {
     firstName: 'there',
     encouragement: 'Ready to automate your workflow!'
   });
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    // Only load greeting once per page load session
+    if (isInitialized) return;
+
     const loadUserProfile = async () => {
       if (user) {
         const { data: profile } = await supabase
@@ -47,10 +51,12 @@ export const useDashboardGreeting = () => {
           encouragement: 'Welcome to AutoPromptr!'
         });
       }
+      
+      setIsInitialized(true);
     };
 
     loadUserProfile();
-  }, [user]);
+  }, [user, isInitialized]);
 
   return currentGreeting;
 };
