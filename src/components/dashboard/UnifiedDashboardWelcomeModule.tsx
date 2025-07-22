@@ -89,7 +89,7 @@ const UnifiedDashboardWelcomeModule = ({
           {/* Right side with clock and status */}
           <div className="col-span-12 lg:col-span-5 flex flex-col justify-between pr-8 py-4">
             {/* Digital Clock - Upper Area */}
-            <div className="flex justify-end">
+            <div className="flex justify-end" style={{ marginRight: '40px' }}>
               <DigitalClock 
                 clockColor={clockColor}
                 showReactorStatus={false}
