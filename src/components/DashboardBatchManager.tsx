@@ -144,103 +144,113 @@ export const DashboardBatchManager = ({
             {batches.map((batch) => (
               <div 
                 key={batch.id} 
-                className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10"
+                className="relative overflow-hidden p-4 bg-white/5 rounded-lg border border-white/10"
               >
-                <div className="flex-1">
-                  <h3 className="text-white font-medium">{batch.name}</h3>
-                  <p className="text-gray-400 text-sm">{batch.description}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs">
-                    <span className="text-gray-500">Platform: {batch.platform}</span>
-                    <span className={`${getStatusColor(batch.status)} capitalize`}>
-                      {batch.status}
-                    </span>
-                    {batch.settings?.promptEnhancement && (
-                      <span className="bg-purple-600/20 text-purple-300 px-2 py-1 rounded-full">
-                        Enhanced AI
-                      </span>
-                    )}
+                {/* Animated Progress Bar */}
+                {batch.status === 'running' && (
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-blue-500 to-green-500 animate-pulse">
+                    <div className="h-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[slide-in-right_2s_ease-in-out_infinite]"></div>
                   </div>
-                </div>
+                )}
                 
-                {/* Grid-aligned control buttons */}
-                <div className="grid grid-cols-5 gap-2 w-48">
-                  {/* Play/Pause Button - Column 1 */}
-                  <div className="flex justify-center">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium">{batch.name}</h3>
+                    <p className="text-gray-400 text-sm">{batch.description}</p>
+                    <div className="flex items-center gap-4 mt-2 text-xs">
+                      <span className="text-gray-500">Platform: {batch.platform}</span>
+                      <span className={`${getStatusColor(batch.status)} capitalize font-medium`}>
+                        {batch.status}
+                        {batch.status === 'running' && (
+                          <span className="ml-2 inline-flex items-center">
+                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                            <span className="ml-1 text-green-400">Processing...</span>
+                          </span>
+                        )}
+                      </span>
+                      {batch.settings?.promptEnhancement && (
+                        <span className="bg-purple-600/20 text-purple-300 px-2 py-1 rounded-full">
+                          Enhanced AI
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Glossy Skeuomorphic Control Buttons */}
+                  <div className="flex items-center gap-3">
+                    {/* Play/Pause Button */}
                     {(batch.status === 'pending' || batch.status === 'paused') && (
-                      <Button
-                        size="sm"
+                      <button
                         onClick={() => handleRunBatch(batch)}
-                        className="bg-green-600 hover:bg-green-700 text-white w-8 h-8 p-0"
+                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-green-400 to-green-600 shadow-lg border border-green-300/30 hover:from-green-300 hover:to-green-500 active:scale-95 transition-all duration-200 group"
                         title="Run Batch"
                       >
-                        <Play className="w-4 h-4" />
-                      </Button>
+                        <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
+                        <div className="absolute inset-0 rounded-full shadow-inner shadow-black/20"></div>
+                        <Play className="w-5 h-5 text-white relative z-10 ml-0.5 group-hover:scale-110 transition-transform" />
+                      </button>
                     )}
                     {batch.status === 'running' && (
-                      <Button
-                        size="sm"
+                      <button
                         onClick={() => handlePauseBatch(batch)}
-                        className="bg-yellow-600 hover:bg-yellow-700 text-white w-8 h-8 p-0"
+                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 shadow-lg border border-yellow-300/30 hover:from-yellow-300 hover:to-yellow-500 active:scale-95 transition-all duration-200 group"
                         title="Pause Batch"
                       >
-                        <Pause className="w-4 h-4" />
-                      </Button>
+                        <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
+                        <div className="absolute inset-0 rounded-full shadow-inner shadow-black/20"></div>
+                        <Pause className="w-5 h-5 text-white relative z-10 group-hover:scale-110 transition-transform" />
+                      </button>
                     )}
-                  </div>
 
-                  {/* Stop Button - Column 2 */}
-                  <div className="flex justify-center">
+                    {/* Stop Button */}
                     {batch.status === 'running' && (
-                      <Button
-                        size="sm"
+                      <button
                         onClick={() => handleStopBatch(batch)}
-                        className="bg-red-600 hover:bg-red-700 text-white w-8 h-8 p-0"
+                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-red-400 to-red-600 shadow-lg border border-red-300/30 hover:from-red-300 hover:to-red-500 active:scale-95 transition-all duration-200 group"
                         title="Stop Batch"
                       >
-                        <Square className="w-4 h-4" />
-                      </Button>
+                        <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
+                        <div className="absolute inset-0 rounded-full shadow-inner shadow-black/20"></div>
+                        <Square className="w-4 h-4 text-white relative z-10 group-hover:scale-110 transition-transform" />
+                      </button>
                     )}
-                  </div>
 
-                  {/* Rewind Button - Column 3 */}
-                  <div className="flex justify-center">
-                    {batch.status === 'paused' && (
-                      <Button
-                        size="sm"
+                    {/* Rewind Button */}
+                    {(batch.status === 'paused' || batch.status === 'completed' || batch.status === 'failed') && (
+                      <button
                         onClick={() => handleRewindBatch(batch)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white w-8 h-8 p-0"
+                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-blue-400 to-blue-600 shadow-lg border border-blue-300/30 hover:from-blue-300 hover:to-blue-500 active:scale-95 transition-all duration-200 group"
                         title="Rewind Batch"
                       >
-                        <RotateCcw className="w-4 h-4" />
-                      </Button>
+                        <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
+                        <div className="absolute inset-0 rounded-full shadow-inner shadow-black/20"></div>
+                        <RotateCcw className="w-4 h-4 text-white relative z-10 group-hover:scale-110 transition-transform" />
+                      </button>
                     )}
-                  </div>
 
-                  {/* Mark as Failed Button - Column 4 */}
-                  <div className="flex justify-center">
+                    {/* Mark as Failed Button */}
                     {(batch.status === 'running' || batch.status === 'paused') && (
-                      <Button
-                        size="sm"
+                      <button
                         onClick={() => handleMarkAsFailed(batch)}
-                        className="bg-orange-600 hover:bg-orange-700 text-white w-8 h-8 p-0"
+                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-orange-400 to-orange-600 shadow-lg border border-orange-300/30 hover:from-orange-300 hover:to-orange-500 active:scale-95 transition-all duration-200 group"
                         title="Mark as Failed"
                       >
-                        <AlertTriangle className="w-4 h-4" />
-                      </Button>
+                        <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
+                        <div className="absolute inset-0 rounded-full shadow-inner shadow-black/20"></div>
+                        <AlertTriangle className="w-4 h-4 text-white relative z-10 group-hover:scale-110 transition-transform" />
+                      </button>
                     )}
-                  </div>
 
-                  {/* Delete Button - Column 5 */}
-                  <div className="flex justify-center">
-                    <Button
-                      size="sm"
-                      variant="outline"
+                    {/* Delete Button */}
+                    <button
                       onClick={() => handleDeleteBatch(batch.id)}
-                      className="border-red-400/50 text-red-400 hover:bg-red-500/20 w-8 h-8 p-0"
+                      className="relative w-10 h-10 rounded-full bg-gradient-to-b from-gray-400 to-gray-600 shadow-lg border border-gray-300/30 hover:from-red-400 hover:to-red-600 hover:border-red-300/30 active:scale-95 transition-all duration-200 group"
                       title="Delete Batch"
                     >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                      <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
+                      <div className="absolute inset-0 rounded-full shadow-inner shadow-black/20"></div>
+                      <Trash2 className="w-4 h-4 text-white relative z-10 group-hover:scale-110 transition-transform" />
+                    </button>
                   </div>
                 </div>
               </div>
