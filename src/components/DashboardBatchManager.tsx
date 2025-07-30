@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { EnhancedBatchForm } from './batch/EnhancedBatchForm';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
+import BatchConnectionTester from './BatchConnectionTester';
 
 interface DashboardBatchManagerProps {
   onStatsUpdate?: (stats: any) => void;
@@ -21,6 +22,7 @@ export const DashboardBatchManager = ({
   onNewBatchRequest 
 }: DashboardBatchManagerProps = {}) => {
   const [showBatchForm, setShowBatchForm] = useState(false);
+  const [showConnectionTester, setShowConnectionTester] = useState(false);
   const { 
     batches, 
     handleRunBatch, 
@@ -28,7 +30,8 @@ export const DashboardBatchManager = ({
     handlePauseBatch, 
     handleRewindBatch, 
     handleDeleteBatch,
-    handleCreateBatch 
+    handleCreateBatch,
+    lastError
   } = useDashboardBatchManager();
 
   const handleMarkAsFailed = (batch: any) => {
@@ -95,6 +98,35 @@ export const DashboardBatchManager = ({
         </div>
       </CardHeader>
       <CardContent>
+        {lastError && (
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+            <div className="text-red-400 text-sm font-medium">Last Error:</div>
+            <div className="text-red-300 text-sm">{lastError.message}</div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowConnectionTester(true)}
+              className="mt-2 border-red-400/50 text-red-400 hover:bg-red-500/20"
+            >
+              Test Connection
+            </Button>
+          </div>
+        )}
+
+        {showConnectionTester && (
+          <div className="mb-4">
+            <BatchConnectionTester />
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setShowConnectionTester(false)}
+              className="mt-2 text-gray-400"
+            >
+              Hide Connection Tester
+            </Button>
+          </div>
+        )}
+
         {batches.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-400 mb-4">No batches created yet</p>

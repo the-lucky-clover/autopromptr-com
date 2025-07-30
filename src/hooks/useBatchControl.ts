@@ -31,18 +31,31 @@ export const useBatchControl = (
     batch: Batch,
     onStatusChange?: (status: 'running' | 'failed') => void
   ) => {
+    console.log('🎯 Play button clicked for batch:', batch.name);
+    
     const validation = validateBatchForExecution(batch);
     if (!validation.isValid) {
+      console.error('❌ Batch validation failed:', validation.error);
       toast({ title: 'Cannot start batch', description: validation.error, variant: 'destructive' });
       return;
     }
+    console.log('✅ Batch validation passed');
 
     const overrideUrl = localStorage.getItem('targetUrlOverride')?.trim();
     const targetUrl = overrideUrl || batch.targetUrl?.trim();
     const isLocal = !/^https?:\/\//.test(targetUrl || '');
     const platform = isLocal ? batch.settings?.localAIAssistant || 'cursor' : 'web';
 
+    console.log('🔧 Batch configuration:', {
+      targetUrl,
+      platform,
+      isLocal,
+      overrideUrl,
+      promptCount: batch.prompts?.length
+    });
+
     if (!targetUrl) {
+      console.error('❌ Missing target URL');
       toast({ title: 'Missing Target URL', description: 'Batch targetUrl is undefined after override logic.', variant: 'destructive' });
       return;
     }
@@ -50,6 +63,7 @@ export const useBatchControl = (
     // Synchronously check if any batch is running - ensure batches is an array
     const hasRunning = Array.isArray(batches) ? batches.some(b => b.status === 'running') : false;
     if (hasRunning) {
+      console.warn('⚠️ Another batch is already running');
       toast({
         title: 'Another batch is running',
         description: 'Please wait for the current batch to complete.',
@@ -87,10 +101,14 @@ export const useBatchControl = (
     };
 
     try {
-      await enhancedClient.testConnection();
-      console.log('✅ Verified backend connection');
+      console.log('🔌 Testing backend connection...');
+      const connectionTest = await enhancedClient.testConnection();
+      if (!connectionTest) {
+        throw new AutoPromptrError('Backend connection test failed', 'CONNECTION_FAILED', 503, true, 'Cannot reach the automation backend. Please check your connection and try again.');
+      }
+      console.log('✅ Backend connection verified');
 
-      console.log('📦 Submitting batch:', {
+      console.log('📦 Submitting batch to backend:', {
         batchId: enhancedBatch.id,
         targetUrl: enhancedBatch.targetUrl,
         platform: enhancedBatch.platform,
@@ -98,14 +116,15 @@ export const useBatchControl = (
         settings: enhancedBatch.settings,
       });
 
-      await enhancedClient.runBatch(enhancedBatch, platform, enhancedBatch.settings);
+      const result = await enhancedClient.runBatch(enhancedBatch, platform, enhancedBatch.settings);
+      console.log('🚀 Batch submitted successfully:', result);
 
       setBatches(prev => prev.map(b => b.id === batch.id ? { ...b, status: 'running', platform } : b));
       onStatusChange?.('running');
 
       toast({
-        title: 'Batch started',
-        description: `"${batch.name}" is now running.${overrideUrl ? ` (override used)` : ''}`,
+        title: 'Batch started successfully!',
+        description: `"${batch.name}" is now running automation.${overrideUrl ? ` (using override URL)` : ''}`,
         variant: 'default'
       });
     } catch (err) {
@@ -120,10 +139,25 @@ export const useBatchControl = (
 
       setLastError(normalized);
 
+      // Provide specific error guidance
+      let errorDescription = normalized.userMessage || (err instanceof Error ? err.message : 'An unexpected error occurred.');
+      
+      if (normalized.code === 'CONNECTION_FAILED') {
+        errorDescription += ' Try checking your backend URL in Settings > Backend Configuration.';
+      }
+
       toast({
-        title: normalized.code === 'BACKEND_ERROR' ? 'Backend Error' : 'Batch failed',
-        description: normalized.userMessage || (err instanceof Error ? err.message : 'An unexpected error occurred.'),
+        title: 'Automation failed to start',
+        description: errorDescription,
         variant: 'destructive'
+      });
+
+      // Log detailed error for debugging
+      console.error('Detailed error info:', {
+        code: normalized.code,
+        statusCode: normalized.statusCode,
+        retryable: normalized.retryable,
+        technicalDetails: normalized.technicalDetails
       });
     } finally {
       setAutomationLoading(false);

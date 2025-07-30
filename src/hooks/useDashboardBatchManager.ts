@@ -3,6 +3,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { usePersistentBatches } from '@/hooks/usePersistentBatches';
 import { useBatchCrud } from './useBatchCrud';
 import { useBatchControl } from './useBatchControl';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Centralized hook for managing all batch-related logic on the dashboard.
@@ -12,6 +13,7 @@ import { useBatchControl } from './useBatchControl';
  */
 export const useDashboardBatchManager = () => {
   const isInitializedRef = useRef(false);
+  const { toast } = useToast();
 
   // Persistent batches from localStorage or DB
   const { batches, setBatches } = usePersistentBatches();
@@ -57,8 +59,14 @@ export const useDashboardBatchManager = () => {
       ((...args: Parameters<T>) => {
         if (!isInitializedRef.current) {
           console.warn('[BatchManager] Operation skipped: not initialized yet');
+          toast({
+            title: 'System Initializing',
+            description: 'Dashboard is still initializing. Please wait a moment and try again.',
+            variant: 'default'
+          });
           return;
         }
+        console.log('[BatchManager] ✅ Operation proceeding - system initialized');
         return fn(...args);
       }) as T,
     []
