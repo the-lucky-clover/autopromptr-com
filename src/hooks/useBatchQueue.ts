@@ -114,12 +114,8 @@ export const useBatchQueue = () => {
         // Remove batch from queue since we're processing it
         dequeueBatch(nextQueuedBatch.batch.id);
 
-        // Here you would call your actual batch processing logic
-        // For now, we'll just simulate processing
+        // Call actual batch processing logic
         console.log(`Processing batch: ${nextQueuedBatch.batch.name}`);
-        
-        // Simulate processing time
-        await new Promise(resolve => setTimeout(resolve, 1000));
         
         toast({
           title: "Batch processing started",

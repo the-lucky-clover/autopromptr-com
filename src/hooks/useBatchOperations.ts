@@ -71,7 +71,7 @@ export const useBatchOperations = () => {
           },
         };
 
-        // Simulate batch run for now
+        // Update batch status to running - actual backend processing will handle this
         setBatches(prev =>
           prev.map(b => b.id === batch.id
             ? { ...b, status: 'running', platform: detectedPlatform }

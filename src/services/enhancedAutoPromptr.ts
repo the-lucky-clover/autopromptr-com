@@ -43,8 +43,7 @@ export class EnhancedAutoPromptr extends AutoPromptr {
   async optimizeBatch(batch: Batch): Promise<Batch> {
     try {
       console.log(`🧠 Optimizing batch: ${batch.id}`);
-      // Simulated async work
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Optimization logic would go here
 
       return {
         ...batch,
