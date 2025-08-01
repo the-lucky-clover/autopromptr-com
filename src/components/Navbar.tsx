@@ -76,7 +76,7 @@ const Navbar = () => {
             : 'transform -translate-y-20 opacity-0'
         } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg rounded-b-2xl`} />
         
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8">
+        <div className="relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
               <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16">
@@ -113,7 +113,7 @@ const Navbar = () => {
         } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-2xl rounded-b-2xl`} />
         
         {/* Navbar content - always visible with responsive padding */}
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Enhanced Logo with Zap Icon */}
             <Link to="/" className="flex items-center group flex-shrink-0">

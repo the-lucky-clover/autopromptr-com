@@ -96,7 +96,7 @@ const EnhancedCookieBanner = () => {
             <X className="w-4 h-4" />
           </Button>
 
-          <div className="max-w-7xl mx-auto">
+          <div className="w-full mx-auto">
             {/* Main content layout */}
             <div className="flex flex-col lg:flex-row lg:items-start gap-6 pr-12">
               {/* Content section */}
@@ -130,6 +130,15 @@ const EnhancedCookieBanner = () => {
                 </Button>
                 
                 <Button 
+                  onClick={rejectAllCookies}
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 px-6 py-3 font-medium"
+                >
+                  Reject Non-Essential
+                </Button>
+                
+                <Button 
                   onClick={() => setShowPrivacyCenter(true)}
                   variant="outline"
                   size="sm"
@@ -137,15 +146,6 @@ const EnhancedCookieBanner = () => {
                 >
                   <Settings className="w-4 h-4" />
                   Privacy Center
-                </Button>
-                
-                <Button 
-                  onClick={rejectAllCookies}
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 px-6 py-3 font-medium"
-                >
-                  Reject Non-Essential
                 </Button>
               </div>
             </div>
