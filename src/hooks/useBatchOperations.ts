@@ -4,8 +4,7 @@ import { Batch } from '@/types/batch';
 import { detectPlatformFromUrl, getPlatformName } from '@/utils/platformDetection';
 import { useToast } from '@/hooks/use-toast';
 import { useBatchDatabase } from '@/hooks/useBatchDatabase';
-import { useLangChainBatchRunner } from '@/hooks/useLangChainBatchRunner';
-import { useSecureApiKeys } from '@/hooks/useSecureApiKeys';
+import { useRealBatchAutomation } from '@/hooks/useRealBatchAutomation';
 
 export const useBatchOperations = () => {
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
@@ -16,18 +15,24 @@ export const useBatchOperations = () => {
 
   const { toast } = useToast();
   const { saveBatchToDatabase } = useBatchDatabase();
-  const { handleRunBatchWithLangChain } = useLangChainBatchRunner();
-  const { getApiKey } = useSecureApiKeys();
+  const { runBatch: runRealBatchAutomation, loading: realAutomationLoading, error: realAutomationError } = useRealBatchAutomation();
 
   const handleRunBatch = useCallback(async (batch: Batch) => {
     const targetUrl = batch.targetUrl?.trim();
-    const detectedPlatform = detectPlatformFromUrl(targetUrl);
-    const platformName = getPlatformName(detectedPlatform);
-
-    if (!targetUrl || !detectedPlatform) {
+    
+    if (!targetUrl) {
       toast({
-        title: 'Cannot detect platform',
-        description: 'Unable to determine automation platform from the target URL. Please check the URL format.',
+        title: 'Missing Target URL',
+        description: 'Please provide a target URL for automation.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!batch.prompts || batch.prompts.length === 0) {
+      toast({
+        title: 'No Prompts to Process',
+        description: 'Please add at least one prompt to the batch.',
         variant: 'destructive',
       });
       return;
@@ -35,75 +40,55 @@ export const useBatchOperations = () => {
 
     setSelectedBatchId(batch.id);
     setAutomationLoading(true);
-
-    const apiKey = getApiKey('openai_api_key');
-    if (!apiKey) {
-      toast({
-        title: 'API Key Required',
-        description: 'OpenAI API key required for LangChain processing. Please configure it in the secure API key manager.',
-        variant: 'destructive',
-      });
-      setAutomationLoading(false);
-      return;
-    }
+    setAutomationError(null);
 
     try {
-      console.log('🔗 Attempting LangChain processing...');
-      await handleRunBatchWithLangChain(batch, setBatches, apiKey);
+      console.log('🚀 Starting real browser automation for batch:', batch.name);
+      
+      // Update batch status to running
+      setBatches(prev =>
+        prev.map(b => b.id === batch.id
+          ? { ...b, status: 'running' }
+          : b)
+      );
+
+      // Run the actual automation
+      await runRealBatchAutomation(batch);
+
+      // Update batch status to completed
+      setBatches(prev =>
+        prev.map(b => b.id === batch.id
+          ? { ...b, status: 'completed' }
+          : b)
+      );
 
       toast({
-        title: 'LangChain Batch Started',
-        description: `"${batch.name}" has started via LangChain.`,
+        title: 'Batch Completed Successfully',
+        description: `"${batch.name}" has finished processing all prompts.`,
       });
-    } catch (langChainErr) {
-      console.warn('⚠️ LangChain failed, falling back:', langChainErr);
 
-      try {
-        const { waitForIdle, maxRetries } = batch.settings || {};
+    } catch (error) {
+      console.error('❌ Batch automation failed:', error);
+      
+      // Update batch status to failed
+      setBatches(prev =>
+        prev.map(b => b.id === batch.id
+          ? { ...b, status: 'failed' }
+          : b)
+      );
 
-        const fallbackBatch: Batch = {
-          ...batch,
-          platform: detectedPlatform,
-          settings: {
-            ...batch.settings,
-            waitForIdle: waitForIdle ?? true,
-            maxRetries: Math.min(maxRetries ?? 3, 3),
-          },
-        };
+      const errorMessage = error instanceof Error ? error.message : 'Unknown automation error';
+      setAutomationError(errorMessage);
 
-        // Update batch status to running - actual backend processing will handle this
-        setBatches(prev =>
-          prev.map(b => b.id === batch.id
-            ? { ...b, status: 'running', platform: detectedPlatform }
-            : b)
-        );
-
-        toast({
-          title: 'Fallback Batch Started',
-          description: `"${batch.name}" started using fallback automation with ${platformName}.`,
-        });
-      } catch (fallbackErr) {
-        let errorTitle = 'All batch processing methods failed';
-        let errorDescription = fallbackErr instanceof Error
-          ? fallbackErr.message
-          : 'Unknown error during fallback.';
-
-        if (fallbackErr instanceof Error && fallbackErr.message.toLowerCase().includes('automation_endpoints_not_configured')) {
-          errorTitle = 'Automation Endpoints Not Configured';
-          errorDescription = 'Neither LangChain nor backend automation endpoints are properly set.';
-        }
-
-        toast({
-          title: errorTitle,
-          description: errorDescription,
-          variant: 'destructive',
-        });
-        setAutomationError(errorDescription);
-      }
+      toast({
+        title: 'Batch Failed',
+        description: errorMessage,
+        variant: 'destructive',
+      });
     } finally {
       setAutomationLoading(false);
     }
-  }, [toast, getApiKey, handleRunBatchWithLangChain]);
+  }, [toast, runRealBatchAutomation, setBatches]);
 
   const handleStopBatch = useCallback((batch: Batch) => {
     setBatches(prev =>

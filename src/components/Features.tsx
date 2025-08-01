@@ -61,7 +61,7 @@ const Features = () => {
             return (
               <Card 
                 key={index} 
-                className={`glass-effect border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 hover-scale animate-slide-up ${feature.delay} rounded-2xl bg-black/30 backdrop-blur-sm hover:bg-black/40 group`}
+                className={`border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl animate-slide-up ${feature.delay} rounded-2xl group`}
               >
                 <CardHeader className="rounded-t-2xl pb-6">
                   <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6 flex-shrink-0 group-hover:from-purple-400 group-hover:to-blue-400 transition-colors duration-300">
