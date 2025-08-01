@@ -1,9 +1,14 @@
 
-// Cloudflare Worker for backend API parallel to existing services
+import { AutoSubmissionService } from './autoSubmissionService';
+import { BatchHandler } from './batch-handler';
+import { initializeD1Database, healthCheckD1 } from './d1-setup';
+
 export interface Env {
   SUPABASE_URL: string;
   SUPABASE_ANON_KEY: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
+  AUTOPROMPTR_DB?: D1Database;
+  AUTOPROMPTR_STORAGE?: R2Bucket;
 }
 
 export default {

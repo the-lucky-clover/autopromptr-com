@@ -3,11 +3,40 @@ name = "autopromptr-worker"
 main = "src/index.ts"
 compatibility_date = "2024-01-15"
 
+# D1 Database binding
+[[d1_databases]]
+binding = "AUTOPROMPTR_DB"
+database_name = "autopromptr-production"
+database_id = "your-d1-database-id"
+
+# R2 Storage binding
+[[r2_buckets]]
+binding = "AUTOPROMPTR_STORAGE"
+bucket_name = "autopromptr-files"
+
 [env.production]
 name = "autopromptr-worker-production"
 
+[[env.production.d1_databases]]
+binding = "AUTOPROMPTR_DB"
+database_name = "autopromptr-production"
+database_id = "your-d1-database-id"
+
+[[env.production.r2_buckets]]
+binding = "AUTOPROMPTR_STORAGE"
+bucket_name = "autopromptr-files-production"
+
 [env.staging]
 name = "autopromptr-worker-staging"
+
+[[env.staging.d1_databases]]
+binding = "AUTOPROMPTR_DB"
+database_name = "autopromptr-staging"
+database_id = "your-staging-d1-database-id"
+
+[[env.staging.r2_buckets]]
+binding = "AUTOPROMPTR_STORAGE"
+bucket_name = "autopromptr-files-staging"
 
 # Environment variables (configure in Cloudflare dashboard)
 # SUPABASE_URL

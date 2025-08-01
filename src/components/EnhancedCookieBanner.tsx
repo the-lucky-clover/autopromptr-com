@@ -131,9 +131,9 @@ const EnhancedCookieBanner = () => {
                 
                 <Button 
                   onClick={rejectAllCookies}
-                  variant="ghost"
+                  variant="secondary"
                   size="sm"
-                  className="text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 px-6 py-3 font-medium"
+                  className="transition-all duration-300 px-6 py-3 font-medium"
                 >
                   Reject Non-Essential
                 </Button>
