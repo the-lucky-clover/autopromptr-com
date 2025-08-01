@@ -1,9 +1,10 @@
 
 import { useState } from 'react';
-import { Plus, Play, Pause, Square, RotateCcw, Trash2, AlertTriangle } from 'lucide-react';
+import { Plus, Play, Pause, Square, RotateCcw, Trash2, AlertTriangle, Edit2, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { EnhancedBatchForm } from './batch/EnhancedBatchForm';
 import { useDashboardBatchManager } from '@/hooks/useDashboardBatchManager';
 import BatchConnectionTester from './BatchConnectionTester';
@@ -31,12 +32,50 @@ export const DashboardBatchManager = ({
     handleRewindBatch, 
     handleDeleteBatch,
     handleCreateBatch,
+    handleUpdateBatch,
+    handleEditBatch,
+    editingBatch,
+    showModal,
+    setShowModal,
     lastError
   } = useDashboardBatchManager();
 
   const handleMarkAsFailed = (batch: any) => {
     // Mark batch as failed functionality
     console.log('Marking batch as failed:', batch.id);
+  };
+
+  const handleDuplicateBatch = (batch: any) => {
+    const duplicatedBatch = {
+      ...batch,
+      name: `${batch.name} (Copy)`,
+      status: 'pending',
+      id: undefined, // Will be generated
+      createdAt: undefined // Will be generated
+    };
+    handleCreateBatch(duplicatedBatch);
+  };
+
+  const handleEditBatchWithModal = (batch: any) => {
+    handleEditBatch(batch);
+  };
+
+  const handleUpdateBatchWithEnhancement = async (batchData: any) => {
+    try {
+      const enhancedBatchData = {
+        ...batchData,
+        settings: {
+          ...batchData.settings,
+          projectContext: batchData.isNewProject ? batchData.projectContext : null,
+          enhancedPrompting: batchData.isNewProject
+        }
+      };
+
+      await handleUpdateBatch(enhancedBatchData);
+      setShowModal(false);
+    } catch (error) {
+      console.error('Failed to update batch:', error);
+    }
   };
 
   const handleCreateBatchWithEnhancement = async (batchData: any) => {
@@ -92,6 +131,22 @@ export const DashboardBatchManager = ({
               <EnhancedBatchForm
                 onSubmit={handleCreateBatchWithEnhancement}
                 onCancel={() => setShowBatchForm(false)}
+              />
+            </DialogContent>
+          </Dialog>
+
+          {/* Edit Batch Modal */}
+          <Dialog open={showModal} onOpenChange={setShowModal}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 border border-white/20 rounded-xl">
+              <DialogHeader>
+                <DialogTitle className="text-white text-xl">
+                  {editingBatch ? 'Edit Automation Batch' : 'Create New Automation Batch'}
+                </DialogTitle>
+              </DialogHeader>
+              <EnhancedBatchForm
+                onSubmit={editingBatch ? handleUpdateBatchWithEnhancement : handleCreateBatchWithEnhancement}
+                onCancel={() => setShowModal(false)}
+                initialData={editingBatch}
               />
             </DialogContent>
           </Dialog>
@@ -177,28 +232,28 @@ export const DashboardBatchManager = ({
                   </div>
                   
                   {/* Glossy Skeuomorphic Control Buttons */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     {/* Play/Pause Button */}
                     {(batch.status === 'pending' || batch.status === 'paused') && (
                       <button
                         onClick={() => handleRunBatch(batch)}
-                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-green-400 to-green-600 shadow-lg border border-green-300/30 hover:from-green-300 hover:to-green-500 active:scale-95 transition-all duration-200 group"
+                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-green-400 to-green-600 shadow-lg border border-green-300/30 hover:from-green-300 hover:to-green-500 active:scale-95 transition-all duration-200 group flex items-center justify-center"
                         title="Run Batch"
                       >
                         <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
                         <div className="absolute inset-0 rounded-full shadow-inner shadow-black/20"></div>
-                        <Play className="w-5 h-5 text-white relative z-10 ml-0.5 group-hover:scale-110 transition-transform" />
+                        <Play className="w-4 h-4 text-white relative z-10 group-hover:scale-110 transition-transform" />
                       </button>
                     )}
                     {batch.status === 'running' && (
                       <button
                         onClick={() => handlePauseBatch(batch)}
-                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 shadow-lg border border-yellow-300/30 hover:from-yellow-300 hover:to-yellow-500 active:scale-95 transition-all duration-200 group"
+                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 shadow-lg border border-yellow-300/30 hover:from-yellow-300 hover:to-yellow-500 active:scale-95 transition-all duration-200 group flex items-center justify-center"
                         title="Pause Batch"
                       >
                         <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
                         <div className="absolute inset-0 rounded-full shadow-inner shadow-black/20"></div>
-                        <Pause className="w-5 h-5 text-white relative z-10 group-hover:scale-110 transition-transform" />
+                        <Pause className="w-4 h-4 text-white relative z-10 group-hover:scale-110 transition-transform" />
                       </button>
                     )}
 
@@ -206,7 +261,7 @@ export const DashboardBatchManager = ({
                     {batch.status === 'running' && (
                       <button
                         onClick={() => handleStopBatch(batch)}
-                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-red-400 to-red-600 shadow-lg border border-red-300/30 hover:from-red-300 hover:to-red-500 active:scale-95 transition-all duration-200 group"
+                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-red-400 to-red-600 shadow-lg border border-red-300/30 hover:from-red-300 hover:to-red-500 active:scale-95 transition-all duration-200 group flex items-center justify-center"
                         title="Stop Batch"
                       >
                         <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
@@ -215,11 +270,33 @@ export const DashboardBatchManager = ({
                       </button>
                     )}
 
+                    {/* Edit Button */}
+                    <button
+                      onClick={() => handleEditBatchWithModal(batch)}
+                      className="relative w-10 h-10 rounded-full bg-gradient-to-b from-purple-400 to-purple-600 shadow-lg border border-purple-300/30 hover:from-purple-300 hover:to-purple-500 active:scale-95 transition-all duration-200 group flex items-center justify-center"
+                      title="Edit Batch"
+                    >
+                      <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
+                      <div className="absolute inset-0 rounded-full shadow-inner shadow-black/20"></div>
+                      <Edit2 className="w-4 h-4 text-white relative z-10 group-hover:scale-110 transition-transform" />
+                    </button>
+
+                    {/* Duplicate Button */}
+                    <button
+                      onClick={() => handleDuplicateBatch(batch)}
+                      className="relative w-10 h-10 rounded-full bg-gradient-to-b from-cyan-400 to-cyan-600 shadow-lg border border-cyan-300/30 hover:from-cyan-300 hover:to-cyan-500 active:scale-95 transition-all duration-200 group flex items-center justify-center"
+                      title="Duplicate Batch"
+                    >
+                      <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
+                      <div className="absolute inset-0 rounded-full shadow-inner shadow-black/20"></div>
+                      <Copy className="w-4 h-4 text-white relative z-10 group-hover:scale-110 transition-transform" />
+                    </button>
+
                     {/* Rewind Button */}
                     {(batch.status === 'paused' || batch.status === 'completed' || batch.status === 'failed') && (
                       <button
                         onClick={() => handleRewindBatch(batch)}
-                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-blue-400 to-blue-600 shadow-lg border border-blue-300/30 hover:from-blue-300 hover:to-blue-500 active:scale-95 transition-all duration-200 group"
+                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-blue-400 to-blue-600 shadow-lg border border-blue-300/30 hover:from-blue-300 hover:to-blue-500 active:scale-95 transition-all duration-200 group flex items-center justify-center"
                         title="Rewind Batch"
                       >
                         <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
@@ -232,7 +309,7 @@ export const DashboardBatchManager = ({
                     {(batch.status === 'running' || batch.status === 'paused') && (
                       <button
                         onClick={() => handleMarkAsFailed(batch)}
-                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-orange-400 to-orange-600 shadow-lg border border-orange-300/30 hover:from-orange-300 hover:to-orange-500 active:scale-95 transition-all duration-200 group"
+                        className="relative w-10 h-10 rounded-full bg-gradient-to-b from-orange-400 to-orange-600 shadow-lg border border-orange-300/30 hover:from-orange-300 hover:to-orange-500 active:scale-95 transition-all duration-200 group flex items-center justify-center"
                         title="Mark as Failed"
                       >
                         <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>
@@ -244,7 +321,7 @@ export const DashboardBatchManager = ({
                     {/* Delete Button */}
                     <button
                       onClick={() => handleDeleteBatch(batch.id)}
-                      className="relative w-10 h-10 rounded-full bg-gradient-to-b from-gray-400 to-gray-600 shadow-lg border border-gray-300/30 hover:from-red-400 hover:to-red-600 hover:border-red-300/30 active:scale-95 transition-all duration-200 group"
+                      className="relative w-10 h-10 rounded-full bg-gradient-to-b from-gray-400 to-gray-600 shadow-lg border border-gray-300/30 hover:from-red-400 hover:to-red-600 hover:border-red-300/30 active:scale-95 transition-all duration-200 group flex items-center justify-center"
                       title="Delete Batch"
                     >
                       <div className="absolute inset-0.5 rounded-full bg-gradient-to-b from-white/20 to-transparent"></div>

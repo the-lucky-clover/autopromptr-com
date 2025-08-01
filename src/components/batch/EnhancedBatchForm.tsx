@@ -14,17 +14,18 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 interface EnhancedBatchFormProps {
   onSubmit: (batchData: any) => void;
   onCancel: () => void;
+  initialData?: any;
 }
 
-export const EnhancedBatchForm = ({ onSubmit, onCancel }: EnhancedBatchFormProps) => {
+export const EnhancedBatchForm = ({ onSubmit, onCancel, initialData }: EnhancedBatchFormProps) => {
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    targetType: 'remote', // 'local' or 'remote'
-    targetPath: '',
-    isNewProject: false,
-    promptImprovement: false,
-    projectContext: {
+    name: initialData?.name || '',
+    description: initialData?.description || '',
+    targetType: initialData?.targetUrl?.startsWith('http') ? 'remote' : 'local',
+    targetPath: initialData?.targetUrl || '',
+    isNewProject: initialData?.settings?.enhancedPrompting || false,
+    promptImprovement: initialData?.settings?.promptEnhancement || false,
+    projectContext: initialData?.settings?.projectContext || {
       role: '',
       history: '',
       objectives: '',
@@ -32,11 +33,22 @@ export const EnhancedBatchForm = ({ onSubmit, onCancel }: EnhancedBatchFormProps
     }
   });
 
-  const [showProjectContext, setShowProjectContext] = useState(false);
+  const [showProjectContext, setShowProjectContext] = useState(initialData?.settings?.enhancedPrompting || false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    const submitData = {
+      ...formData,
+      ...(initialData ? { id: initialData.id } : {}),
+      targetUrl: formData.targetPath,
+      settings: {
+        ...formData,
+        promptEnhancement: formData.promptImprovement,
+        enhancedPrompting: formData.isNewProject,
+        projectContext: formData.projectContext
+      }
+    };
+    onSubmit(submitData);
   };
 
   const handleNewProjectToggle = (checked: boolean) => {
@@ -279,7 +291,7 @@ export const EnhancedBatchForm = ({ onSubmit, onCancel }: EnhancedBatchFormProps
           type="submit"
           className="bg-purple-600 hover:bg-purple-700 text-white"
         >
-          Create Batch
+          {initialData ? 'Update Batch' : 'Create Batch'}
         </Button>
       </div>
     </form>
