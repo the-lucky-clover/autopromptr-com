@@ -172,10 +172,13 @@ export const useBatchOperations = () => {
   }, []);
 
   const addPromptToBatch = useCallback((batchId: string) => {
+    const batch = batches.find(b => b.id === batchId);
+    const nextOrder = batch ? Math.max(...batch.prompts.map(p => p.order), -1) + 1 : 0;
+    
     const newPrompt = {
       id: crypto.randomUUID(),
       text: '',
-      order: Date.now()
+      order: nextOrder
     };
 
     setBatches(prev =>
@@ -185,7 +188,7 @@ export const useBatchOperations = () => {
           : batch
       )
     );
-  }, []);
+  }, [batches]);
 
   return {
     batches,

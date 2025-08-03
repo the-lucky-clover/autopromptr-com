@@ -2,8 +2,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { GripVertical, Play, Square, Trash2 } from 'lucide-react';
 import { Batch, Platform, BatchStatus } from '@/types/batch';
-import PromptEditor from './PromptEditor';
 import ProgressDisplay from './ProgressDisplay';
+import PromptQueueManagerComponent from './queue/PromptQueueManager';
+import { usePromptQueueManager } from '@/hooks/usePromptQueueManager';
 
 interface BatchCardProps {
   batch: Batch;
@@ -101,13 +102,28 @@ const BatchCard = ({
           <ProgressDisplay status={batchStatus} />
         )}
 
-        <PromptEditor
-          prompts={batch.prompts}
-          onUpdatePrompt={(promptId, text) => onUpdatePrompt(batch.id, promptId, text)}
-          onDeletePrompt={(promptId) => onDeletePrompt(batch.id, promptId)}
-          onAddPrompt={() => onAddPrompt(batch.id)}
-          disabled={batch.status === 'running'}
-        />
+        {(() => {
+          const queueManager = usePromptQueueManager(
+            batch.prompts,
+            (updatedPrompts) => {
+              // Sync queue changes back to batch operations
+              updatedPrompts.forEach((updatedPrompt) => {
+                const existingPrompt = batch.prompts.find(p => p.id === updatedPrompt.id);
+                if (existingPrompt && existingPrompt.text !== updatedPrompt.text) {
+                  onUpdatePrompt(batch.id, updatedPrompt.id, updatedPrompt.text);
+                }
+              });
+            }
+          );
+
+          return (
+            <PromptQueueManagerComponent
+              queueManager={queueManager}
+              disabled={batch.status === 'running'}
+              targetPlatform={batch.platform}
+            />
+          );
+        })()}
       </CardContent>
     </Card>
   );
