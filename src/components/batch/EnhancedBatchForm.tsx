@@ -8,8 +8,11 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Lightbulb, Settings, Sparkles, Globe, Monitor } from 'lucide-react';
+import { Lightbulb, Settings, Sparkles, Globe, Monitor, Target } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { usePromptQueueManager } from '@/hooks/usePromptQueueManager';
+import PromptQueueManagerComponent from '@/components/queue/PromptQueueManager';
+import { TextPrompt } from '@/types/batch';
 
 interface EnhancedBatchFormProps {
   onSubmit: (batchData: any) => void;
@@ -35,12 +38,19 @@ export const EnhancedBatchForm = ({ onSubmit, onCancel, initialData }: EnhancedB
 
   const [showProjectContext, setShowProjectContext] = useState(initialData?.settings?.enhancedPrompting || false);
 
+  // Initialize prompt queue with existing prompts or default
+  const initialPrompts: TextPrompt[] = initialData?.prompts || [
+    { id: crypto.randomUUID(), text: '', order: 0 }
+  ];
+  const queueManager = usePromptQueueManager(initialPrompts);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const submitData = {
       ...formData,
       ...(initialData ? { id: initialData.id } : {}),
       targetUrl: formData.targetPath,
+      prompts: queueManager.prompts,
       settings: {
         ...formData,
         promptEnhancement: formData.promptImprovement,
@@ -275,6 +285,24 @@ export const EnhancedBatchForm = ({ onSubmit, onCancel, initialData }: EnhancedB
               </div>
             </CollapsibleContent>
           </Collapsible>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-white/5 border-white/20">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Target className="w-5 h-5" />
+            Prompt Queue Management
+          </CardTitle>
+          <CardDescription className="text-gray-300">
+            Create, edit, reorder, and manage the sequence of prompts for this batch
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <PromptQueueManagerComponent
+            queueManager={queueManager}
+            targetPlatform={formData.targetType}
+          />
         </CardContent>
       </Card>
 

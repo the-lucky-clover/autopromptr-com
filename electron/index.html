@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoPromptr Companion</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>AutoPromptr Companion</h1>
+                <div class="status-indicator" id="status">
+                    <span class="status-dot"></span>
+                    <span id="status-text">Initializing...</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <div class="card">
+                <h2>Local Server Status</h2>
+                <div class="server-info">
+                    <p>Local API: <code>http://localhost:3001</code></p>
+                    <p>Platform: <span id="platform">Loading...</span></p>
+                    <p>Version: <span id="version">Loading...</span></p>
+                </div>
+                <button id="test-connection" class="btn btn-primary">Test Connection</button>
+            </div>
+
+            <div class="card">
+                <h2>Prompt Enhancement</h2>
+                <div class="enhancement-section">
+                    <textarea id="prompt-input" placeholder="Enter your prompt here..." rows="4"></textarea>
+                    <textarea id="context-input" placeholder="Enter context (optional)..." rows="2"></textarea>
+                    <button id="enhance-prompt" class="btn btn-secondary">Enhance Prompt</button>
+                    <div id="enhanced-output" class="output-area" style="display: none;">
+                        <h4>Enhanced Prompt:</h4>
+                        <div id="enhanced-text"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Local Automation</h2>
+                <div class="automation-section">
+                    <select id="target-app">
+                        <option value="/cursor">Cursor IDE</option>
+                        <option value="/windsurf">Windsurf IDE</option>
+                        <option value="/vscode">VS Code</option>
+                        <option value="/custom">Custom Path</option>
+                    </select>
+                    <input type="text" id="custom-path" placeholder="Enter custom path..." style="display: none;">
+                    <button id="send-automation" class="btn btn-accent">Send to Local App</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Connection to SaaS</h2>
+                <div class="saas-section">
+                    <p>Connect to AutoPromptr SaaS for cloud processing:</p>
+                    <input type="url" id="saas-url" placeholder="https://your-autopromptr-instance.com" value="https://1fec766e-41d8-4e0e-9e5c-277ce2efbe11.lovableproject.com">
+                    <button id="connect-saas" class="btn btn-primary">Connect to SaaS</button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 2024 AutoPromptr Companion - Local text prompt enrichment and deployment</p>
+        </footer>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
