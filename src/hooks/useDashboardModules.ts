@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 
@@ -89,16 +88,33 @@ export const useDashboardModules = () => {
   }, []);
 
   const reorderModules = useCallback((activeId: string, overId: string) => {
+    // Add safety checks for undefined values
+    if (!activeId || !overId) {
+      console.warn('reorderModules: activeId or overId is undefined');
+      return;
+    }
+
     setModules(prev => {
-      const oldIndex = prev.findIndex(module => module.id === activeId);
-      const newIndex = prev.findIndex(module => module.id === overId);
+      // Ensure prev is an array
+      if (!Array.isArray(prev)) {
+        console.warn('reorderModules: modules array is not valid');
+        return DEFAULT_MODULES;
+      }
+
+      const oldIndex = prev.findIndex(module => module?.id === activeId);
+      const newIndex = prev.findIndex(module => module?.id === overId);
       
       if (oldIndex !== -1 && newIndex !== -1) {
-        const reordered = arrayMove(prev, oldIndex, newIndex);
-        return reordered.map((module, index) => ({
-          ...module,
-          order: index
-        }));
+        try {
+          const reordered = arrayMove(prev, oldIndex, newIndex);
+          return reordered.map((module, index) => ({
+            ...module,
+            order: index
+          }));
+        } catch (error) {
+          console.error('Error in arrayMove:', error);
+          return prev;
+        }
       }
       
       return prev;
@@ -106,7 +122,7 @@ export const useDashboardModules = () => {
   }, []);
 
   const resetToDefaults = useCallback(() => {
-    setModules(DEFAULT_MODULES);
+    setModules([...DEFAULT_MODULES]); // Create a new array reference
   }, []);
 
   const restoreModule = useCallback((moduleId: string) => {
