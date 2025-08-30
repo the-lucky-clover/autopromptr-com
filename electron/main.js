@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, session } = require('electron');
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
@@ -10,6 +10,30 @@ let localServer;
 const LOCAL_PORT = 3001;
 
 function createWindow() {
+  // Configure security headers and CSP
+  session.defaultSession.webSecurity = true;
+  
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self'; " +
+          "script-src 'self' 'unsafe-inline'; " +
+          "style-src 'self' 'unsafe-inline'; " +
+          "img-src 'self' data: https:; " +
+          "font-src 'self' data:; " +
+          "connect-src 'self' http://localhost:* https://api.openai.com https://api.anthropic.com; " +
+          "frame-src 'none'; " +
+          "object-src 'none'"
+        ],
+        'X-Frame-Options': ['DENY'],
+        'X-Content-Type-Options': ['nosniff'],
+        'Referrer-Policy': ['strict-origin-when-cross-origin']
+      }
+    });
+  });
+
   // Create the browser window
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -17,6 +41,10 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      enableRemoteModule: false,
+      webSecurity: true,
+      allowRunningInsecureContent: false,
+      experimentalFeatures: false,
       preload: path.join(__dirname, 'preload.js')
     },
     icon: path.join(__dirname, 'build/icon.png'),
