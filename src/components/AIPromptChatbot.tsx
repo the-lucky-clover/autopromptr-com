@@ -2,28 +2,39 @@ import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Brain, Send, Sparkles, Zap, Cpu, MessageSquare } from "lucide-react";
+import { Brain, Send, Sparkles, Zap, Cpu, MessageSquare, Code, Search, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ChatMessage {
   id: string;
   message: string;
   isUser: boolean;
   timestamp: Date;
+  taskType?: string;
 }
 
 const AIPromptChatbot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      message: "Welcome, mad scientist! 🧪 I'm here to help you summon demons from the abyss with the perfect prompts. Ask me about prompt engineering, AI orchestration, or how to craft prompts that bend reality to your will...",
+      message: "🚀 Autonomous AI Agent Online! I can research, write code, review & refactor, and orchestrate complex tasks. Choose a task type or just ask me anything - I'm powered by Google Gemini Flash 2.5 for lightning-fast intelligence!",
       isUser: false,
       timestamp: new Date()
     }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<string>('general');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const taskTypes = [
+    { id: 'general', label: 'General', icon: Brain },
+    { id: 'research', label: 'Research', icon: Search },
+    { id: 'write_code', label: 'Write Code', icon: Code },
+    { id: 'code_review', label: 'Review Code', icon: Zap },
+    { id: 'refactor', label: 'Refactor', icon: RefreshCw }
+  ];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -40,40 +51,59 @@ const AIPromptChatbot = () => {
       id: Date.now().toString(),
       message: input.trim(),
       isUser: true,
-      timestamp: new Date()
+      timestamp: new Date(),
+      taskType: selectedTask
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input.trim();
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response with psychological hooks
-    setTimeout(() => {
-      const responses = [
-        "🔮 Ah, seeking the forbidden knowledge! To summon the perfect AI response, try framing your prompt with context, constraints, and desired output format. What specific demon are you trying to conjure?",
-        "⚡ Your prompt lacks the dark energy needed! Add emotional triggers: 'Urgently need', 'Critical for success', 'Transform my workflow'. The AI feeds on urgency and purpose.",
-        "🌟 Excellent question, my apprentice! For maximum prompt power, use the C.L.E.A.R framework: Context, Length specification, Examples, Action words, and Refined iterations. What's your target platform?",
-        "🧠 The neural networks whisper secrets... Try persona prompting: 'You are a senior developer with 10 years experience...' This awakens specialized knowledge patterns.",
-        "💀 Impressive ambition! For batch automation, craft prompts that include: platform detection, error handling, retry logic, and progress feedback. The machines love structure.",
-        "🎭 Your prompting game needs enhancement! Use progressive disclosure: start broad, then narrow focus with follow-ups. Each message should build on the last for maximum impact."
-      ];
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-agent-orchestrator', {
+        body: {
+          message: currentInput,
+          task_type: selectedTask,
+          context: messages.slice(-3).map(m => `${m.isUser ? 'User' : 'AI'}: ${m.message}`).join('\n')
+        }
+      });
+
+      if (error) throw error;
 
       const aiResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        message: responses[Math.floor(Math.random() * responses.length)],
+        message: data.response || 'No response received',
+        isUser: false,
+        timestamp: new Date(),
+        taskType: selectedTask
+      };
+
+      setMessages(prev => [...prev, aiResponse]);
+      
+      toast.success("AI Response Generated! 🤖", {
+        description: `Task: ${selectedTask} completed successfully`,
+        duration: 2000
+      });
+    } catch (error) {
+      console.error('AI Agent error:', error);
+      
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        message: `⚠️ Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}. Please check your Gemini API key configuration.`,
         isUser: false,
         timestamp: new Date()
       };
 
-      setMessages(prev => [...prev, aiResponse]);
-      setIsTyping(false);
+      setMessages(prev => [...prev, errorMessage]);
       
-      // Psychological reward
-      toast.success("AI wisdom acquired! 🧙‍♂️", {
-        description: "Your prompt engineering skills grow stronger...",
-        duration: 2000
+      toast.error("AI Agent Error", {
+        description: "Failed to process request. Check API configuration.",
+        duration: 3000
       });
-    }, 1500 + Math.random() * 1000); // Random delay for realism
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -91,11 +121,34 @@ const AIPromptChatbot = () => {
             <Brain className="w-6 h-6 text-purple-400 animate-glow" />
             <Sparkles className="w-3 h-3 text-yellow-400 absolute -top-1 -right-1 animate-pulse" />
           </div>
-          AI Prompt Oracle
+          Autonomous AI Agent
         </CardTitle>
         <p className="text-purple-300/80 text-xs font-medium">
-          Summon coding demons with perfect prompts ⚡
+          Powered by Gemini Flash 2.5 ⚡ Research | Code | Review | Refactor
         </p>
+        
+        {/* Task Type Selector */}
+        <div className="flex flex-wrap gap-1 mt-2">
+          {taskTypes.map((task) => {
+            const IconComponent = task.icon;
+            return (
+              <Button
+                key={task.id}
+                size="sm"
+                variant={selectedTask === task.id ? "default" : "ghost"}
+                onClick={() => setSelectedTask(task.id)}
+                className={`h-6 px-2 text-xs transition-all duration-200 ${
+                  selectedTask === task.id
+                    ? 'bg-purple-600 text-white hover:bg-purple-700'
+                    : 'text-purple-300 hover:text-white hover:bg-purple-600/50'
+                }`}
+              >
+                <IconComponent className="w-3 h-3 mr-1" />
+                {task.label}
+              </Button>
+            );
+          })}
+        </div>
       </CardHeader>
 
       <CardContent className="flex flex-col h-full p-0">
@@ -112,12 +165,19 @@ const AIPromptChatbot = () => {
                     : 'bg-black/40 text-gray-100 border border-purple-500/30 shadow-md'
                 } hover:scale-[1.02] transition-transform duration-200`}
               >
-                <p className="font-medium leading-relaxed">{msg.message}</p>
-                <div className="flex items-center gap-1 mt-2 opacity-70">
-                  {!msg.isUser && <Cpu className="w-3 h-3" />}
-                  <span className="text-xs">
-                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
+                <p className="font-medium leading-relaxed whitespace-pre-wrap">{msg.message}</p>
+                <div className="flex items-center justify-between mt-2 opacity-70">
+                  <div className="flex items-center gap-1">
+                    {!msg.isUser && <Cpu className="w-3 h-3" />}
+                    <span className="text-xs">
+                      {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  {msg.taskType && msg.taskType !== 'general' && (
+                    <span className="text-xs bg-purple-600/30 px-2 py-1 rounded text-purple-200">
+                      {msg.taskType}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -132,7 +192,7 @@ const AIPromptChatbot = () => {
                     <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                     <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
-                  <span className="text-xs font-medium">AI Oracle is thinking...</span>
+                  <span className="text-xs font-medium">Gemini AI processing...</span>
                 </div>
               </div>
             </div>
@@ -146,7 +206,11 @@ const AIPromptChatbot = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask about prompt engineering, AI orchestration, demon summoning..."
+              placeholder={`${selectedTask === 'general' ? 'Ask me anything...' : 
+                selectedTask === 'research' ? 'What should I research?' :
+                selectedTask === 'write_code' ? 'What code should I write?' :
+                selectedTask === 'code_review' ? 'Paste code to review...' :
+                'Paste code to refactor...'}`}
               className="flex-1 bg-black/40 border-purple-500/40 text-white placeholder:text-gray-400 focus:border-purple-400 focus:ring-purple-400/50 transition-all duration-200"
               disabled={isTyping}
             />
@@ -159,14 +223,19 @@ const AIPromptChatbot = () => {
             </Button>
           </div>
           
-          <div className="flex items-center justify-center gap-4 mt-3">
-            <div className="flex items-center gap-1 text-xs text-purple-300/60">
-              <MessageSquare className="w-3 h-3" />
-              <span>{messages.length} messages</span>
+          <div className="flex items-center justify-between gap-4 mt-3">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 text-xs text-purple-300/60">
+                <MessageSquare className="w-3 h-3" />
+                <span>{messages.length} messages</span>
+              </div>
+              <div className="flex items-center gap-1 text-xs text-green-300/60">
+                <Zap className="w-3 h-3" />
+                <span>Gemini 2.5</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1 text-xs text-blue-300/60">
-              <Zap className="w-3 h-3" />
-              <span>AI Enhanced</span>
+            <div className="text-xs text-blue-300/60">
+              Mode: {taskTypes.find(t => t.id === selectedTask)?.label}
             </div>
           </div>
         </div>

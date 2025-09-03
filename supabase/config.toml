@@ -36,3 +36,6 @@ enable_signup = true
 
 [functions.syslog-receiver]
 verify_jwt = false
+
+[functions.ai-agent-orchestrator]
+verify_jwt = false
