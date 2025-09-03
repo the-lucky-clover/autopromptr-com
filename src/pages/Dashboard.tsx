@@ -92,26 +92,30 @@ const Dashboard = () => {
         </ErrorBoundary>
 
         <div className="px-4 md:px-6 pb-6">
-          <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 md:gap-6">
+          {/* Recent Activity aligned with System Status */}
+          <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 md:gap-6 mb-6">
             <div className="xl:col-span-3 animate-shimmer-delayed">
               <ErrorBoundary>
-                <StaticDashboardLayout
-                  visibleModules={overviewModules}
-                  renderModuleContent={renderModuleContent}
-                />
+                <CompactRecentActivity />
               </ErrorBoundary>
             </div>
-
-            <div className="xl:col-span-2 space-y-4 animate-shimmer">
+            <div className="xl:col-span-2 animate-shimmer">
               <ErrorBoundary>
                 <div className="h-[450px]">
                   <AIPromptChatbot />
                 </div>
               </ErrorBoundary>
-              <ErrorBoundary>
-                <CompactRecentActivity />
-              </ErrorBoundary>
             </div>
+          </div>
+
+          {/* Main Dashboard Modules */}
+          <div className="animate-shimmer-delayed">
+            <ErrorBoundary>
+              <StaticDashboardLayout
+                visibleModules={overviewModules}
+                renderModuleContent={renderModuleContent}
+              />
+            </ErrorBoundary>
           </div>
         </div>
       </ResizableDashboardLayout>
