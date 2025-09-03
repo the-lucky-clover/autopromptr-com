@@ -72,16 +72,18 @@ const Hero = () => {
           )}
           
           <div className="mt-16">
-            <div className="relative mx-auto max-w-4xl">
+            <div className="relative mx-auto max-w-4xl group">
+              <div className="absolute -inset-2 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-3xl blur-xl opacity-30 group-hover:opacity-60 transition-all duration-500 animate-glow"></div>
               <img 
-                src="https://images.unsplash.com/photo-1677696795198-5ac0e21060ed" 
-                alt="AI-powered coding and automation workspace" 
-                className="mx-auto rounded-2xl shadow-2xl max-w-full h-auto"
+                src="/src/assets/dashboard-hero.png" 
+                alt="AI-powered prompt automation dashboard interface" 
+                className="relative mx-auto rounded-3xl shadow-2xl max-w-full h-auto transform group-hover:scale-[1.02] transition-all duration-500 border-2 border-white/20 backdrop-blur-sm"
                 onError={(e) => {
                   console.warn('Hero image failed to load, using fallback');
-                  e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgdmlld0JveD0iMCAwIDgwMCA0NTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDUwIiBmaWxsPSIjMUUyOTNDIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjI1IiBmaWxsPSIjNjM2NjZBIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiPkFJIFdvcmtmbG93IERhc2hib2FyZDwvdGV4dD4KPHN2Zz4=';
+                  e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgdmlld0JveD0iMCAwIDgwMCA0NTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDUwIiBmaWxsPSIjMUUyOTNDIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjI1IiBmaWxsPSIjNjM2NjZBIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiPkFJIEF1dG9tYXRpb24gRGFzaGJvYXJkPC90ZXh0Pgo8L3N2Zz4=';
                 }}
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent rounded-3xl pointer-events-none"></div>
             </div>
           </div>
         </div>

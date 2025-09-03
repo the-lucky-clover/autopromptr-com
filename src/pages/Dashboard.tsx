@@ -10,12 +10,13 @@ import DashboardStatsModule from "@/components/DashboardStatsModule";
 import AnalyticsModule from "@/components/AnalyticsModule";
 import ConsoleMonitorModule from "@/components/ConsoleMonitorModule";
 import QuickActionsModule from "@/components/dashboard/QuickActionsModule";
-import RecentActivity from "@/components/RecentActivity";
+import AIPromptChatbot from "@/components/AIPromptChatbot";
+import CompactRecentActivity from "@/components/CompactRecentActivity";
 import StaticDashboardLayout from "@/components/dashboard/StaticDashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import MobileDashboardNavbar from "@/components/dashboard/MobileDashboardNavbar";
+import EnhancedMobileNavbar from "@/components/dashboard/EnhancedMobileNavbar";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 
 const Dashboard = () => {
@@ -69,8 +70,8 @@ const Dashboard = () => {
         background: 'linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%)' 
       }}
     >
-      {/* Mobile Navigation */}
-      <MobileDashboardNavbar />
+      {/* Enhanced Mobile Navigation */}
+      <EnhancedMobileNavbar />
       
       <ResizableDashboardLayout>
         <ErrorBoundary>
@@ -101,9 +102,14 @@ const Dashboard = () => {
               </ErrorBoundary>
             </div>
 
-            <div className="xl:col-span-2 animate-shimmer">
+            <div className="xl:col-span-2 space-y-4 animate-shimmer">
               <ErrorBoundary>
-                <RecentActivity />
+                <div className="h-[450px]">
+                  <AIPromptChatbot />
+                </div>
+              </ErrorBoundary>
+              <ErrorBoundary>
+                <CompactRecentActivity />
               </ErrorBoundary>
             </div>
           </div>

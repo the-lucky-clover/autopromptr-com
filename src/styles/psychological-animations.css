@@ -1,0 +1,273 @@
+/* Psychological Animation Library - Designed to create addictive micro-interactions */
+
+/* Dopamine-triggering hover effects */
+.hover-lift {
+  @apply transition-all duration-300 ease-out;
+}
+
+.hover-lift:hover {
+  @apply -translate-y-1 shadow-lg scale-105;
+}
+
+/* Satisfying button presses */
+.press-effect {
+  @apply transition-all duration-150 active:scale-95 active:brightness-90;
+}
+
+/* Magnetic attraction effect */
+.magnetic-hover {
+  @apply relative transition-all duration-300;
+}
+
+.magnetic-hover:hover {
+  @apply scale-110;
+}
+
+.magnetic-hover::before {
+  content: '';
+  @apply absolute -inset-2 bg-gradient-to-r from-purple-500/0 via-purple-500/20 to-purple-500/0 rounded-xl opacity-0 transition-opacity duration-300 -z-10;
+}
+
+.magnetic-hover:hover::before {
+  @apply opacity-100;
+}
+
+/* Pulse breathing effect for important elements */
+.breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+/* Subtle glow on focus/hover */
+.glow-on-hover {
+  @apply transition-all duration-300;
+}
+
+.glow-on-hover:hover, .glow-on-hover:focus {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.2);
+  @apply border-purple-400/50;
+}
+
+/* Shimmer loading effect */
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Typewriter effect */
+.typewriter {
+  overflow: hidden;
+  border-right: 2px solid rgba(139, 92, 246, 0.7);
+  white-space: nowrap;
+  animation: typing 2s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: rgba(139, 92, 246, 0.7); }
+}
+
+/* Floating animation for cards */
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Success celebration effect */
+.success-celebration {
+  animation: success-pulse 0.6s ease-out;
+}
+
+@keyframes success-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); filter: brightness(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Loading spinner with gradient */
+.gradient-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid #8b5cf6;
+  border-right: 2px solid #a78bfa;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Staggered fade-in for lists */
+.stagger-fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fade-up 0.6s ease-out forwards;
+}
+
+.stagger-fade-in:nth-child(1) { animation-delay: 0.1s; }
+.stagger-fade-in:nth-child(2) { animation-delay: 0.2s; }
+.stagger-fade-in:nth-child(3) { animation-delay: 0.3s; }
+.stagger-fade-in:nth-child(4) { animation-delay: 0.4s; }
+.stagger-fade-in:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fade-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Morphing gradient backgrounds */
+.morphing-gradient {
+  background: linear-gradient(-45deg, #1e3a8a, #7c3aed, #be185d, #0369a1);
+  background-size: 400% 400%;
+  animation: morphing 8s ease-in-out infinite;
+}
+
+@keyframes morphing {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Attention-seeking pulse */
+.attention-pulse {
+  animation: attention-pulse 2s infinite;
+}
+
+@keyframes attention-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+}
+
+/* Satisfying click feedback */
+.click-feedback {
+  @apply relative overflow-hidden;
+}
+
+.click-feedback::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease-out;
+}
+
+.click-feedback:active::after {
+  width: 200px;
+  height: 200px;
+  opacity: 1;
+}
+
+/* Seductive text reveal */
+.text-reveal {
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.8), transparent);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-reveal 3s ease-in-out infinite;
+}
+
+@keyframes text-reveal {
+  0%, 100% { background-position: -200% 0; }
+  50% { background-position: 200% 0; }
+}
+
+/* Addictive progress animation */
+.progress-fill {
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa, #c4b5fd);
+  background-size: 200% 100%;
+  animation: progress-shimmer 2s ease-in-out infinite;
+}
+
+@keyframes progress-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Micro-interaction for icons */
+.icon-bounce:hover {
+  animation: icon-bounce 0.6s ease-in-out;
+}
+
+@keyframes icon-bounce {
+  0%, 20%, 60%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-8px); }
+  80% { transform: translateY(-4px); }
+}
+
+/* Satisfying checkbox animation */
+.checkbox-success {
+  animation: checkbox-success 0.5s ease-out;
+}
+
+@keyframes checkbox-success {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); filter: brightness(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* Gamification level-up effect */
+.level-up {
+  animation: level-up 1s ease-out;
+}
+
+@keyframes level-up {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(5deg); }
+  50% { transform: scale(1.2) rotate(-5deg); filter: brightness(1.4); }
+  75% { transform: scale(1.1) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Smooth page transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 0.4s ease-out;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.4s ease-out;
+}

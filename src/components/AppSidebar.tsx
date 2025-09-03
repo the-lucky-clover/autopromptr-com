@@ -86,9 +86,9 @@ export function AppSidebar({ width = 256 }: AppSidebarProps) {
 
   return (
     <Sidebar 
-      className="bg-gray-900 border-gray-800" 
+      className="bg-gradient-to-b from-gray-900 via-purple-900/20 to-gray-900 border-gray-700/50 backdrop-blur-xl" 
       style={{ width: `${width}px` }}
-    >{/* Dynamic width */}
+    >{/* Dynamic width with enhanced gradient */}
       <SidebarHeader className="p-4 border-b border-gray-800">
         <Link to="/" className="flex items-center justify-center">
           <ZapBrandLogo size="small" variant="horizontal" id="sidebar-logo" />
@@ -104,11 +104,11 @@ export function AppSidebar({ width = 256 }: AppSidebarProps) {
                   <SidebarMenuButton 
                     asChild
                     isActive={location.pathname === item.url}
-                    className="text-gray-300 hover:text-white hover:bg-gray-800 data-[active=true]:bg-gray-800 data-[active=true]:text-white h-8 text-xs font-medium px-2 py-1 rounded-md transition-all duration-200"
+                    className="text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-purple-600/20 hover:to-blue-600/20 hover:backdrop-blur-sm data-[active=true]:bg-gradient-to-r data-[active=true]:from-purple-600/30 data-[active=true]:to-blue-600/30 data-[active=true]:text-white h-10 text-sm font-semibold px-3 py-2 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg group"
                   >
-                    <Link to={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-3.5 w-3.5" strokeWidth={1.5} />
-                      <span className="text-xs font-medium">{item.title}</span>
+                    <Link to={item.url} className="flex items-center gap-3">
+                      <item.icon className="h-5 w-5 group-hover:animate-pulse" strokeWidth={2} />
+                      <span className="text-sm font-semibold">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
