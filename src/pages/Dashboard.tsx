@@ -92,14 +92,14 @@ const Dashboard = () => {
         </ErrorBoundary>
 
         <div className="px-4 md:px-6 pb-6">
-          {/* Recent Activity aligned with System Status */}
-          <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 md:gap-6 mb-6">
-            <div className="xl:col-span-3 animate-shimmer-delayed">
+          {/* Recent Activity aligned with AI Chatbot - Clean 2-column layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="animate-shimmer-delayed">
               <ErrorBoundary>
                 <CompactRecentActivity />
               </ErrorBoundary>
             </div>
-            <div className="xl:col-span-2 animate-shimmer">
+            <div className="animate-shimmer">
               <ErrorBoundary>
                 <div className="h-[450px]">
                   <AIPromptChatbot />
