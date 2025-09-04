@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # Frontend Development Server
+  autopromptr-web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../src:/app/src
+      - ../public:/app/public
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8787
+      - VITE_WEBSOCKET_URL=ws://localhost:8080
+    depends_on:
+      - autopromptr-api
+      - autopromptr-websocket
+
+  # Automation Service
+  autopromptr-automation:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.automation
+    ports:
+      - "3000:3000"
+    volumes:
+      - automation_profiles:/app/data/profiles
+      - automation_screenshots:/app/data/screenshots
+      - automation_recordings:/app/data/recordings
+      - ../logs:/app/data/logs
+    environment:
+      - NODE_ENV=development
+      - BROWSER_WS_ENDPOINT=ws://localhost:3000
+      - D1_DATABASE_URL=http://localhost:8787/d1
+    restart: unless-stopped
+
+  # SMTP Service
+  autopromptr-smtp:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.smtp
+    ports:
+      - "2525:2525"
+    volumes:
+      - smtp_queue:/app/data/queue
+      - ../logs:/app/data/logs
+    environment:
+      - NODE_ENV=development
+      - SMTP_HOST=localhost
+      - SMTP_PORT=2525
+      - D1_DATABASE_URL=http://localhost:8787/d1
+    restart: unless-stopped
+
+  # Autonomous Agents Orchestrator
+  autopromptr-agents:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.agents
+    ports:
+      - "3001:3001"
+    volumes:
+      - agent_data:/app/data
+      - ../logs:/app/data/logs
+    environment:
+      - NODE_ENV=development
+      - AUTOMATION_URL=http://autopromptr-automation:3000
+      - SMTP_URL=http://autopromptr-smtp:2525
+      - WEBSOCKET_URL=http://autopromptr-websocket:8080
+      - D1_DATABASE_URL=http://localhost:8787/d1
+    depends_on:
+      - autopromptr-automation
+      - autopromptr-smtp
+    restart: unless-stopped
+
+  # WebSocket Service
+  autopromptr-websocket:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.websocket
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - CORS_ORIGIN=http://localhost:5173
+    restart: unless-stopped
+
+  # API Gateway (Cloudflare Workers Local)
+  autopromptr-api:
+    build:
+      context: ../workers/autopromptr-worker
+      dockerfile: ../../docker/Dockerfile.workers
+    ports:
+      - "8787:8787"
+    volumes:
+      - ../workers/autopromptr-worker:/app
+      - worker_data:/app/data
+    environment:
+      - NODE_ENV=development
+      - D1_DATABASE_PATH=/app/data/database.db
+    restart: unless-stopped
+
+volumes:
+  automation_profiles:
+  automation_screenshots:
+  automation_recordings:
+  smtp_queue:
+  agent_data:
+  worker_data:
+
+networks:
+  default:
+    driver: bridge

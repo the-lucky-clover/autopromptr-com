@@ -1,0 +1,143 @@
+version: '3.8'
+
+services:
+  # Production Automation Service
+  autopromptr-automation:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.automation
+    restart: always
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    volumes:
+      - automation_profiles:/app/data/profiles
+      - automation_screenshots:/app/data/screenshots
+      - automation_recordings:/app/data/recordings
+      - /var/log/autopromptr:/app/data/logs
+    environment:
+      - NODE_ENV=production
+      - BROWSER_WS_ENDPOINT=ws://localhost:3000
+      - D1_DATABASE_URL=${D1_DATABASE_URL}
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  # Production SMTP Service
+  autopromptr-smtp:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.smtp
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    volumes:
+      - smtp_queue:/app/data/queue
+      - /var/log/autopromptr:/app/data/logs
+    environment:
+      - NODE_ENV=production
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - D1_DATABASE_URL=${D1_DATABASE_URL}
+
+  # Production Agents Orchestrator
+  autopromptr-agents:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.agents
+    restart: always
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2G
+        reservations:
+          cpus: '0.75'
+          memory: 1G
+    volumes:
+      - agent_data:/app/data
+      - /var/log/autopromptr:/app/data/logs
+    environment:
+      - NODE_ENV=production
+      - AUTOMATION_URL=http://autopromptr-automation:3000
+      - SMTP_URL=http://autopromptr-smtp:2525
+      - WEBSOCKET_URL=http://autopromptr-websocket:8080
+      - D1_DATABASE_URL=${D1_DATABASE_URL}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+    depends_on:
+      - autopromptr-automation
+      - autopromptr-smtp
+
+  # Production WebSocket Service
+  autopromptr-websocket:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.websocket
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    environment:
+      - NODE_ENV=production
+      - CORS_ORIGIN=${CORS_ORIGIN}
+      - JWT_SECRET=${JWT_SECRET}
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - /etc/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - autopromptr-automation
+      - autopromptr-smtp
+      - autopromptr-agents
+      - autopromptr-websocket
+
+  # Watchtower for auto-updates
+  watchtower:
+    image: containrrr/watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300
+
+volumes:
+  automation_profiles:
+    driver: local
+  automation_screenshots:
+    driver: local
+  automation_recordings:
+    driver: local
+  smtp_queue:
+    driver: local
+  agent_data:
+    driver: local
+
+networks:
+  default:
+    driver: bridge

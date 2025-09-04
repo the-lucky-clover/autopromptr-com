@@ -1,0 +1,24 @@
+{
+  "name": "autopromptr-docker-services",
+  "version": "1.0.0",
+  "description": "Docker services for AutoPromptr automation platform",
+  "scripts": {
+    "start:automation": "node automation-server.js",
+    "start:smtp": "node smtp-service.js",
+    "start:websocket": "node websocket-service.js",
+    "start:agents": "node agents-service.js",
+    "dev": "npm run start:automation"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "playwright": "^1.40.0",
+    "nodemailer": "^6.9.7",
+    "ws": "^8.14.2",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite3": "^5.1.6",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
