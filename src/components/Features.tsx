@@ -6,38 +6,38 @@ const Features = () => {
   const features = [
     {
       icon: Brain,
-      title: "Intelligent Prompt Engineering",
-      description: "Advanced AI algorithms optimize your prompts for maximum effectiveness and accuracy across all models and platforms.",
+      title: "Autonomous Browser Agent",
+      description: "AI agents that control real browsers independently, navigating websites, filling forms, and executing complex workflows with human-like intelligence.",
       delay: "delay-100"
     },
     {
       icon: Workflow,
-      title: "Seamless Integration", 
-      description: "Connect with your existing tools and workflows through our comprehensive API and native integrations with popular platforms.",
+      title: "Agent Orchestration Engine", 
+      description: "Master AI orchestrator that coordinates multiple specialized agents, manages task delegation, and ensures seamless collaboration between agents.",
       delay: "delay-200"
     },
     {
       icon: BarChart3,
-      title: "Real-time Analytics",
-      description: "Track performance metrics and gain deep insights into your AI prompt effectiveness, success rates, and ROI analytics.",
+      title: "Real-time Agent Analytics",
+      description: "Live monitoring of agent performance, decision-making processes, success rates, and autonomous workflow optimization with detailed insights.",
       delay: "delay-300"
     },
     {
       icon: Shield,
-      title: "Enterprise Security",
-      description: "Bank-grade encryption, SOC 2 compliance, and data privacy standards to protect your information and maintain trust.",
+      title: "Secure Agent Operations",
+      description: "Enterprise-grade security for agent activities with encrypted communications, access controls, and comprehensive audit trails for all autonomous actions.",
       delay: "delay-400"
     },
     {
       icon: Clock,
-      title: "Automated Batch Processing",
-      description: "Set up recurring prompts and automated workflows to save time, eliminate manual processes, and scale your operations.",
+      title: "Autonomous Task Execution",
+      description: "Agents that work 24/7 without human intervention, executing complex multi-step processes, learning from outcomes, and adapting to new scenarios.",
       delay: "delay-500"
     },
     {
       icon: Rocket,
-      title: "Rapid Deployment",
-      description: "Deploy your AI automation solutions in minutes, not weeks, with our streamlined cloud infrastructure and simple setup.",
+      title: "Multi-Platform Agent Deployment",
+      description: "Deploy agents across any platform - web, desktop, mobile - with intelligent adaptation to different interfaces and seamless cross-platform coordination.",
       delay: "delay-600"
     }
   ];
@@ -61,10 +61,11 @@ const Features = () => {
             return (
               <Card 
                 key={index} 
-                className={`border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl animate-slide-up ${feature.delay} rounded-2xl group`}
+                className={`border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl opacity-0 animate-slide-up ${feature.delay} rounded-2xl group bg-slate-800/50 backdrop-blur-sm`}
+                style={{ animationFillMode: 'forwards' }}
               >
                 <CardHeader className="rounded-t-2xl pb-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6 flex-shrink-0 group-hover:from-purple-400 group-hover:to-blue-400 transition-colors duration-300">
+                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6 flex-shrink-0 group-hover:from-purple-400 group-hover:to-blue-400 transition-colors duration-300 shadow-lg">
                     <IconComponent className="w-8 h-8 text-white" />
                   </div>
                   <CardTitle className="text-xl sm:text-2xl text-white leading-tight font-semibold group-hover:text-purple-200 transition-colors duration-300">
