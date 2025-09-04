@@ -75,7 +75,7 @@ const Hero = () => {
             <div className="relative mx-auto max-w-4xl group">
               <div className="absolute -inset-2 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-3xl blur-xl opacity-30 group-hover:opacity-60 transition-all duration-500 animate-glow"></div>
               <img 
-                src="/lovable-uploads/dashboard-screenshot.png" 
+                src="/lovable-uploads/97e39d75-1742-44ad-854e-cb0a1edd06ba.png" 
                 alt="AutoPromptr dashboard showing batch automation and AI prompt processing interface"
                 className="relative mx-auto rounded-3xl shadow-2xl max-w-full h-auto transform group-hover:scale-[1.02] transition-all duration-500 border-2 border-white/20 backdrop-blur-sm"
                 onError={(e) => {
