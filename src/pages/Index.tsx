@@ -12,7 +12,7 @@ import BlogPosts from "@/components/BlogPosts";
 import Footer from "@/components/Footer";
 import CompactCookieBanner from "@/components/CompactCookieBanner";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+// Removed useScrollAnimation import - using pure CSS animations
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +23,7 @@ const Index = () => {
   const { user, isEmailVerified, isInitialized } = useAuth();
   const navigate = useNavigate();
   
-  useScrollAnimation();
+  // Removed scroll animation hook - using pure CSS animations instead
 
   // Auto-redirect authenticated users to dashboard with a short delay
   useEffect(() => {

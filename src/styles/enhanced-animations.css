@@ -14,18 +14,7 @@
     }
   }
 
-  /* Enhanced scroll animations */
-  .animate-fade-in {
-    opacity: 0;
-    transform: translateY(30px);
-    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  .animate-slide-up {
-    opacity: 0;
-    transform: translateY(40px);
-    animation: slideUpSmooth 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
+  /* Removed duplicate animations - using scroll-animations.css instead */
 
   /* Staggered delays */
   .delay-100 { animation-delay: 0.1s; }

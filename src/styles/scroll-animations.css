@@ -1,33 +1,13 @@
 
 @layer base {
-  /* Smooth animations for content with enhanced easing */
-  .animate-on-scroll {
-    opacity: 0;
-    transform: translateY(50px);
-    transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .animate-on-scroll.animate {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .stagger-animation {
-    animation-delay: var(--animation-delay, 0s);
-  }
-
-  /* Enhanced fade-in animation */
+  /* Simple, reliable animations that work immediately */
   .animate-fade-in {
-    opacity: 0;
-    transform: translateY(40px) scale(0.95);
-    animation: fadeInUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   /* Slide up animation for cards and features */
   .animate-slide-up {
-    opacity: 0;
-    transform: translateY(60px);
-    animation: slideUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   /* Floating animation for hero elements */
@@ -56,7 +36,7 @@
 @keyframes fadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(40px) scale(0.95);
+    transform: translateY(30px) scale(0.98);
   }
   100% {
     opacity: 1;
@@ -67,7 +47,7 @@
 @keyframes slideUp {
   0% {
     opacity: 0;
-    transform: translateY(60px);
+    transform: translateY(40px);
   }
   100% {
     opacity: 1;
