@@ -11,6 +11,7 @@ import TrustedBy from "@/components/TrustedBy";
 import BlogPosts from "@/components/BlogPosts";
 import Footer from "@/components/Footer";
 import CompactCookieBanner from "@/components/CompactCookieBanner";
+import SpeedometerSection from "@/components/SpeedometerSection";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
 // Removed useScrollAnimation import - using pure CSS animations
 import { useAuth } from "@/hooks/useAuth";
@@ -53,27 +54,30 @@ const Index = () => {
       <Navbar />
       <Hero />
         <div className="animate-slide-up delay-100">
-          <ProvenResults />
+          <SpeedometerSection />
         </div>
         <div className="animate-slide-up delay-200">
-          <Features />
+          <ProvenResults />
         </div>
         <div className="animate-slide-up delay-300">
-          <UseCases />
+          <Features />
         </div>
         <div className="animate-slide-up delay-400">
-          <SocialProof />
+          <UseCases />
         </div>
         <div className="animate-slide-up delay-500">
-          <TrustedBy />
+          <SocialProof />
         </div>
         <div className="animate-slide-up delay-600">
-          <BlogPosts />
+          <TrustedBy />
         </div>
         <div className="animate-slide-up delay-700">
-          <NewsletterSignup />
+          <BlogPosts />
         </div>
         <div className="animate-slide-up delay-800">
+          <NewsletterSignup />
+        </div>
+        <div className="animate-slide-up delay-900">
           <CTA />
         </div>
       <Footer />
