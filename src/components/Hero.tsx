@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
+import HolographicFloor from "./HolographicFloor";
 
 const Hero = () => {
   const { user, isEmailVerified, isInitialized } = useAuth();
@@ -80,37 +81,26 @@ const Hero = () => {
             </div>
           )}
           
-          <div className="mt-16">
-            {/* Image container with reflection */}
-            <div className="relative mx-auto max-w-2xl group perspective-1000">
-              {/* Holographic glow effect */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-primary via-accent to-primary rounded-3xl blur-2xl opacity-40 group-hover:opacity-70 transition-all duration-700 animate-pulse"></div>
+          <div className="mt-16 relative">
+            {/* 3D Holographic Floor */}
+            <div className="absolute inset-0 -top-20 -bottom-20 -left-20 -right-20">
+              <HolographicFloor />
+            </div>
+            
+            {/* Floating image container - macOS dock style */}
+            <div className="relative mx-auto max-w-2xl z-10">
+              {/* Ambient glow underneath */}
+              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-3/4 h-4 bg-gradient-to-r from-transparent via-primary/30 to-transparent blur-lg"></div>
               
-              {/* Main image */}
-              <div className="relative">
+              {/* Main floating image */}
+              <div className="dock-float anime-glassmorphism intermittent-shimmer holographic-gleam">
                 <img 
                   src="/lovable-uploads/a7664099-7c32-4d61-9848-0bab8389a73d.png" 
                   alt="AutoPromptr dashboard interface with system status, batch automation, and real-time activity monitoring"
-                  className="relative mx-auto rounded-3xl shadow-2xl max-w-full h-auto transform group-hover:scale-105 transition-all duration-500 border-2 border-primary/30 backdrop-blur-sm"
+                  className="relative mx-auto rounded-3xl shadow-2xl max-w-full h-auto border border-primary/20"
                   onError={(e) => {
                     console.warn('Hero image failed to load, using fallback');
                     e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgdmlld0JveD0iMCAwIDgwMCA0NTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDUwIiBmaWxsPSIjMUUyOTNDIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjI1IiBmaWxsPSIjNjM2NjZBIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiPkFJIEF1dG9tYXRpb24gRGFzaGJvYXJkPC90ZXh0Pgo8L3N2Zz4=';
-                  }}
-                />
-                
-                {/* Iridescent overlay on image */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 rounded-3xl pointer-events-none mix-blend-overlay"></div>
-              </div>
-              
-              {/* Reflection effect */}
-              <div className="relative mt-2 overflow-hidden rounded-3xl">
-                <img 
-                  src="/lovable-uploads/a7664099-7c32-4d61-9848-0bab8389a73d.png" 
-                  alt=""
-                  className="w-full transform scale-y-[-1] opacity-30 blur-sm"
-                  style={{
-                    maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)',
-                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)'
                   }}
                 />
               </div>

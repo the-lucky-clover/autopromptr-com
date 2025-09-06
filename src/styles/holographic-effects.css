@@ -1,0 +1,100 @@
+@layer components {
+  .intermittent-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .intermittent-shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--primary) / 0.3),
+      hsl(var(--accent) / 0.4),
+      hsl(var(--primary) / 0.3),
+      transparent
+    );
+    animation: intermittentShimmer 4s ease-in-out infinite;
+  }
+
+  .anime-glassmorphism {
+    backdrop-filter: blur(20px);
+    background: linear-gradient(
+      135deg,
+      hsl(var(--card) / 0.1),
+      hsl(var(--primary) / 0.05),
+      hsl(var(--accent) / 0.1)
+    );
+    border: 1px solid hsl(var(--border) / 0.2);
+    box-shadow: 
+      0 8px 32px hsl(var(--primary) / 0.1),
+      inset 0 1px 0 hsl(var(--foreground) / 0.1);
+  }
+
+  .holographic-gleam {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .holographic-gleam::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+      from 0deg,
+      transparent,
+      hsl(var(--primary) / 0.2),
+      hsl(var(--accent) / 0.3),
+      hsl(var(--primary) / 0.2),
+      transparent
+    );
+    animation: holographicSpin 6s linear infinite;
+    pointer-events: none;
+  }
+
+  .dock-float {
+    transform-style: preserve-3d;
+    animation: dockFloat 3s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes intermittentShimmer {
+  0%, 70% {
+    left: -100%;
+    opacity: 0;
+  }
+  15%, 25% {
+    left: 100%;
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes holographicSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dockFloat {
+  0% {
+    transform: translateY(0px) rotateX(0deg);
+  }
+  100% {
+    transform: translateY(-10px) rotateX(-2deg);
+  }
+}
