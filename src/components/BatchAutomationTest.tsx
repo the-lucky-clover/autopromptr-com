@@ -16,13 +16,13 @@ export const BatchAutomationTest = () => {
     // Create a simple test batch
     const testBatchData: Batch = {
       id: 'test-' + Date.now(),
-      name: 'Test Batch',
-      targetUrl: 'https://lovable.dev',
-      description: 'Testing AI automation system',
+      name: 'Gradient Animation Test',
+      targetUrl: window.location.origin,
+      description: 'Testing animated gradient for hero word "supercharge"',
       prompts: [
         {
           id: 'prompt-1',
-          text: 'Hello, this is a test prompt for the AI automation system.',
+          text: 'Implement animated gradient fill in hero headline word "supercharge" only - add a dynamic rainbow gradient that shifts colors smoothly while keeping other text static',
           order: 1
         }
       ],
