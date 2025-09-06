@@ -195,7 +195,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
   }
 
   return (
-    <div className={`bg-gray-900/95 backdrop-blur-xl border border-gray-700 rounded-xl ${isMobile ? 'p-4' : 'p-6'}`}>
+    <div className={`bg-gray-900/95 backdrop-blur-xl border border-gray-700 rounded-xl modal-content ${isMobile ? 'p-4' : 'p-6'}`}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center">

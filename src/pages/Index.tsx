@@ -61,14 +61,30 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <Hero />
-      <ProvenResults />
-      <Features />
-      <UseCases />
-      <SocialProof />
-      <TrustedBy />
-      <BlogPosts />
-      <NewsletterSignup />
-      <CTA />
+      <div className="animate-on-scroll">
+        <ProvenResults />
+      </div>
+      <div className="animate-on-scroll">
+        <Features />
+      </div>
+      <div className="animate-on-scroll">
+        <UseCases />
+      </div>
+      <div className="animate-on-scroll">
+        <SocialProof />
+      </div>
+      <div className="animate-on-scroll">
+        <TrustedBy />
+      </div>
+      <div className="animate-on-scroll">
+        <BlogPosts />
+      </div>
+      <div className="animate-on-scroll">
+        <NewsletterSignup />
+      </div>
+      <div className="animate-on-scroll">
+        <CTA />
+      </div>
       <Footer />
       <FloatingConsoleButton />
       <EnhancedCookieBanner />
