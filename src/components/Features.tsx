@@ -61,7 +61,7 @@ const Features = () => {
             return (
               <Card 
                 key={index} 
-                className={`border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl opacity-0 animate-slide-up ${feature.delay} rounded-2xl group bg-slate-800/50 backdrop-blur-sm`}
+                className={`border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl animate-slide-up ${feature.delay} rounded-2xl group bg-slate-800/50 backdrop-blur-sm skeuomorphic-card`}
                 style={{ animationFillMode: 'forwards' }}
               >
                 <CardHeader className="rounded-t-2xl pb-6">

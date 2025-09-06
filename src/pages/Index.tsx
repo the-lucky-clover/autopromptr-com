@@ -10,7 +10,7 @@ import SocialProof from "@/components/SocialProof";
 import TrustedBy from "@/components/TrustedBy";
 import BlogPosts from "@/components/BlogPosts";
 import Footer from "@/components/Footer";
-import EnhancedCookieBanner from "@/components/EnhancedCookieBanner";
+import CompactCookieBanner from "@/components/CompactCookieBanner";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,11 +25,14 @@ const Index = () => {
   
   useScrollAnimation();
 
-  // Auto-redirect authenticated users to dashboard immediately
+  // Auto-redirect authenticated users to dashboard with a short delay
   useEffect(() => {
     if (isInitialized && user && isEmailVerified) {
       console.log("Authenticated user detected, redirecting to dashboard...");
-      navigate('/dashboard', { replace: true });
+      // Small delay to prevent jarring flash
+      setTimeout(() => {
+        navigate('/dashboard', { replace: true });
+      }, 1000);
     }
   }, [isInitialized, user, isEmailVerified, navigate]);
 
@@ -45,49 +48,37 @@ const Index = () => {
     );
   }
 
-  // Don't render landing page content for authenticated users
-  if (user && isEmailVerified) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-slate-900 via-blue-900 to-purple-600">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-400 mx-auto mb-4"></div>
-          <p className="text-white text-lg">Redirecting to dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen">
       <Navbar />
       <Hero />
-      <div className="animate-on-scroll">
-        <ProvenResults />
-      </div>
-      <div className="animate-on-scroll">
-        <Features />
-      </div>
-      <div className="animate-on-scroll">
-        <UseCases />
-      </div>
-      <div className="animate-on-scroll">
-        <SocialProof />
-      </div>
-      <div className="animate-on-scroll">
-        <TrustedBy />
-      </div>
-      <div className="animate-on-scroll">
-        <BlogPosts />
-      </div>
-      <div className="animate-on-scroll">
-        <NewsletterSignup />
-      </div>
-      <div className="animate-on-scroll">
-        <CTA />
-      </div>
+        <div className="animate-slide-up delay-100">
+          <ProvenResults />
+        </div>
+        <div className="animate-slide-up delay-200">
+          <Features />
+        </div>
+        <div className="animate-slide-up delay-300">
+          <UseCases />
+        </div>
+        <div className="animate-slide-up delay-400">
+          <SocialProof />
+        </div>
+        <div className="animate-slide-up delay-500">
+          <TrustedBy />
+        </div>
+        <div className="animate-slide-up delay-600">
+          <BlogPosts />
+        </div>
+        <div className="animate-slide-up delay-700">
+          <NewsletterSignup />
+        </div>
+        <div className="animate-slide-up delay-800">
+          <CTA />
+        </div>
       <Footer />
       <FloatingConsoleButton />
-      <EnhancedCookieBanner />
+      <CompactCookieBanner />
     </div>
   );
 };

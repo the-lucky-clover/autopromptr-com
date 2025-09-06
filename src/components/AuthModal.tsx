@@ -195,15 +195,15 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
   }
 
   return (
-    <div className={`bg-gray-900/95 backdrop-blur-xl border border-gray-700 rounded-xl modal-content ${isMobile ? 'p-4' : 'p-6'}`}>
+    <div className={`skeuomorphic-card elevation-4 animate-scale-in ${isMobile ? 'p-4' : 'p-6'}`}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center">
+          <div className="w-8 h-8 skeuomorphic-button rounded-xl flex items-center justify-center">
             <Zap className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">AutoPromptr</h3>
-            <p className="text-sm text-gray-300">
+            <h3 className="text-lg font-semibold text-foreground skeuomorphic-heading">AutoPromptr</h3>
+            <p className="text-sm text-muted-foreground skeuomorphic-text">
               {mode === 'signin' ? 'Welcome back' : 'Create your account'}
             </p>
           </div>
