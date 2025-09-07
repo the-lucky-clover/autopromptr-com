@@ -13,7 +13,9 @@ import logging
 from datetime import datetime
 
 from services.gemini_service import GeminiService, GeminiConfig
-from services.orchestrator_service import AIOrchestrator
+from services.enhanced_orchestrator_service import EnhancedAIOrchestrator
+from services.human_approval_service import human_approval_service
+from websocket_service import websocket_service
 
 # Configure logging
 logging.basicConfig(
@@ -43,7 +45,13 @@ def get_orchestrator():
     if orchestrator is None:
         if not gemini_config.api_key:
             raise ValueError("GEMINI_API_KEY environment variable is required")
-        orchestrator = AIOrchestrator(gemini_config)
+    orchestrator = EnhancedAIOrchestrator(gemini_config)
+    
+    # Register WebSocket callback for real-time updates
+    async def websocket_callback(message):
+        await websocket_service.broadcast_to_channel('orchestrator', message)
+    
+    orchestrator.register_websocket_callback(websocket_callback)
     return orchestrator
 
 @app.route('/health', methods=['GET'])
@@ -182,11 +190,19 @@ def run_batch_combined():
         
         orch = get_orchestrator()
         
-        # Create the batch
-        batch_job = orch.create_batch_job(name, description, prompts)
+        # Enhanced batch creation with human oversight options
+        options = data.get('options', {})
+        batch_job = await orch.create_batch_job(
+            name=name,
+            description=description,
+            prompts=prompts,
+            human_oversight_enabled=options.get('human_oversight_enabled', True),
+            step_by_step_mode=options.get('step_by_step_mode', False),
+            auto_approval_threshold=options.get('auto_approval_threshold', 0.8)
+        )
         
         # Run the batch immediately
-        result = asyncio.run(orch.run_batch_job(batch_job.job_id))
+        result = await orch.run_batch_job(batch_job.id)
         
         return jsonify({
             'job_id': batch_job.job_id,
