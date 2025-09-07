@@ -15,6 +15,7 @@ from datetime import datetime
 from services.gemini_service import GeminiService, GeminiConfig
 from services.enhanced_orchestrator_service import EnhancedAIOrchestrator
 from services.human_approval_service import human_approval_service
+from services.universal_batch_service import UniversalBatchService, BatchRequest
 from websocket_service import websocket_service
 
 # Configure logging
@@ -36,8 +37,9 @@ gemini_config = GeminiConfig(
     max_tokens=1000
 )
 
-# Global orchestrator instance
+# Global orchestrator and batch service instances
 orchestrator = None
+universal_batch_service = None
 
 def get_orchestrator():
     """Get or create the global orchestrator instance"""
@@ -45,14 +47,22 @@ def get_orchestrator():
     if orchestrator is None:
         if not gemini_config.api_key:
             raise ValueError("GEMINI_API_KEY environment variable is required")
-    orchestrator = EnhancedAIOrchestrator(gemini_config)
-    
-    # Register WebSocket callback for real-time updates
-    async def websocket_callback(message):
-        await websocket_service.broadcast_to_channel('orchestrator', message)
-    
-    orchestrator.register_websocket_callback(websocket_callback)
+        orchestrator = EnhancedAIOrchestrator(gemini_config)
+        
+        # Register WebSocket callback for real-time updates
+        async def websocket_callback(message):
+            await websocket_service.broadcast_to_channel('orchestrator', message)
+        
+        orchestrator.register_websocket_callback(websocket_callback)
     return orchestrator
+
+def get_universal_batch_service():
+    """Get or create the global universal batch service instance"""
+    global universal_batch_service
+    if universal_batch_service is None:
+        universal_batch_service = UniversalBatchService()
+        asyncio.run(universal_batch_service.initialize())
+    return universal_batch_service
 
 @app.route('/health', methods=['GET'])
 def health_check():
@@ -192,23 +202,28 @@ def run_batch_combined():
         
         # Enhanced batch creation with human oversight options
         options = data.get('options', {})
-        batch_job = await orch.create_batch_job(
-            name=name,
-            description=description,
+        
+        # Create batch request for universal service
+        batch_request = BatchRequest(
+            batch_id=f'batch-{datetime.now().strftime("%Y%m%d-%H%M%S")}-{hash(name) % 10000}',
+            batch_name=name,
+            target_url=batch_data.get('targetUrl', 'https://chat.openai.com'),
             prompts=prompts,
-            human_oversight_enabled=options.get('human_oversight_enabled', True),
-            step_by_step_mode=options.get('step_by_step_mode', False),
-            auto_approval_threshold=options.get('auto_approval_threshold', 0.8)
+            platform_type=platform,
+            automation_mode=options.get('automation_mode', 'hybrid'),
+            confidence_threshold=options.get('auto_approval_threshold', 0.8),
+            options=options
         )
         
-        # Run the batch immediately
-        result = await orch.run_batch_job(batch_job.id)
+        # Use universal batch service
+        universal_service = get_universal_batch_service()
+        result = await universal_service.start_batch(batch_request)
         
         return jsonify({
-            'job_id': batch_job.job_id,
-            'status': result.get('status', 'running'),
-            'message': f'Batch job "{name}" created and started successfully',
-            'batch_id': batch_job.job_id
+            'job_id': batch_request.batch_id,
+            'status': 'started' if result.get('success') else 'failed',
+            'message': result.get('message', 'Batch processing started'),
+            'batch_id': batch_request.batch_id
         })
         
     except Exception as e:
@@ -283,6 +298,115 @@ def get_job_tasks(job_id: str):
         
     except Exception as e:
         logger.error(f"Error getting tasks for job {job_id}: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# Universal Batch Service Endpoints
+
+@app.route('/api/universal/detect-platform', methods=['POST'])
+def detect_platform():
+    """Detect platform type and capabilities"""
+    try:
+        data = request.get_json()
+        url = data.get('url')
+        
+        if not url:
+            return jsonify({'error': 'URL is required'}), 400
+        
+        universal_service = get_universal_batch_service()
+        result = asyncio.run(universal_service.detect_platform(url))
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"Platform detection failed: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/universal/batch/<batch_id>/pause', methods=['POST'])
+def pause_universal_batch(batch_id: str):
+    """Pause an active universal batch"""
+    try:
+        universal_service = get_universal_batch_service()
+        result = asyncio.run(universal_service.pause_batch(batch_id))
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"Failed to pause batch {batch_id}: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/universal/batch/<batch_id>/resume', methods=['POST'])
+def resume_universal_batch(batch_id: str):
+    """Resume a paused universal batch"""
+    try:
+        universal_service = get_universal_batch_service()
+        result = asyncio.run(universal_service.resume_batch(batch_id))
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"Failed to resume batch {batch_id}: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/universal/batch/<batch_id>/cancel', methods=['POST'])
+def cancel_universal_batch(batch_id: str):
+    """Cancel an active universal batch"""
+    try:
+        universal_service = get_universal_batch_service()
+        result = asyncio.run(universal_service.cancel_batch(batch_id))
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"Failed to cancel batch {batch_id}: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/universal/batch/<batch_id>/status', methods=['GET'])
+def get_universal_batch_status(batch_id: str):
+    """Get status of a universal batch"""
+    try:
+        universal_service = get_universal_batch_service()
+        status = universal_service.get_batch_status(batch_id)
+        
+        if not status:
+            return jsonify({'error': 'Batch not found'}), 404
+        
+        return jsonify({
+            'batch_id': status.batch_id,
+            'status': status.status,
+            'current_prompt': status.current_prompt,
+            'total_prompts': status.total_prompts,
+            'completed_prompts': status.completed_prompts,
+            'failed_prompts': status.failed_prompts,
+            'progress_percentage': status.progress_percentage,
+            'current_action': status.current_action,
+            'last_updated': status.last_updated
+        })
+        
+    except Exception as e:
+        logger.error(f"Failed to get batch status {batch_id}: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/universal/batches', methods=['GET'])
+def list_universal_batches():
+    """List all universal batches"""
+    try:
+        universal_service = get_universal_batch_service()
+        batches = universal_service.get_all_batches()
+        
+        batch_list = []
+        for batch_id, status in batches.items():
+            batch_list.append({
+                'batch_id': status.batch_id,
+                'status': status.status,
+                'progress_percentage': status.progress_percentage,
+                'current_action': status.current_action,
+                'last_updated': status.last_updated
+            })
+        
+        return jsonify({'batches': batch_list})
+        
+    except Exception as e:
+        logger.error(f"Failed to list universal batches: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.errorhandler(404)

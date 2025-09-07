@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
-import AnimatedPatternBackground from "./AnimatedPatternBackground";
+// import AnimatedPatternBackground from "./AnimatedPatternBackground"; // Temporarily disabled
 import { BatchAutomationTest } from "./BatchAutomationTest";
+import SimpleErrorBoundary from "./SimpleErrorBoundary";
 
 const Hero = () => {
   const { user, isEmailVerified, isInitialized } = useAuth();
@@ -31,8 +32,8 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 md:pt-20 animate-fade-in">
-      {/* 3D Animated Pattern Background */}
-      <AnimatedPatternBackground />
+      {/* Simple gradient background instead of 3D animation for stability */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10"></div>
       
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-background/80 via-transparent to-background/60"></div>
@@ -42,10 +43,14 @@ const Hero = () => {
           
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight animate-slide-up">
             <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient-x">
-              Supercharge Your AI
+              <span className="block sm:inline">Supercharge</span>
+              <span className="block sm:inline"> Your AI</span>
             </span>
             <br />
-            <span className="text-foreground skeuomorphic-heading">Prompt Workflow</span>
+            <span className="text-foreground skeuomorphic-heading">
+              <span className="block sm:inline">Prompt</span>
+              <span className="block sm:inline"> Workflow</span>
+            </span>
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-4xl mx-auto font-light animate-slide-up delay-200 skeuomorphic-text">
@@ -77,9 +82,11 @@ const Hero = () => {
           
           <div className="mt-16 relative animate-slide-up delay-600">
             {/* Test Component - Temporary for validation */}
-            <div className="mb-8">
-              <BatchAutomationTest />
-            </div>
+            <SimpleErrorBoundary>
+              <div className="mb-8">
+                <BatchAutomationTest />
+              </div>
+            </SimpleErrorBoundary>
             
             {/* Floating image container - macOS dock style */}
             <div className="relative mx-auto max-w-xl z-10">

@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Batch } from '@/types/batch';
-import { useBatchAutomation } from '@/services/autoPromptr';
+import { useBatchAutomation } from '@/hooks/useBatchAutomation';
 import { AutoPromptrError } from '@/services/autoPromptr';
 
 interface BatchRunnerHook {
@@ -27,7 +27,6 @@ export function useBatchRunner(batchId?: string): BatchRunnerHook {
 
     try {
       await runAutoPromptrBatch(batch, platform, {
-        delay: 1000,
         maxRetries: 3
       });
       
