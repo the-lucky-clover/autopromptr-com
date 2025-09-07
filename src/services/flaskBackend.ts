@@ -161,5 +161,5 @@ export class FlaskBackendClient {
 
 // Default client instance
 export const flaskBackend = new FlaskBackendClient({
-  baseUrl: process.env.FLASK_BACKEND_URL || 'http://localhost:5000'
+  baseUrl: 'http://localhost:5000' // Direct URL since env variables are not supported
 });
