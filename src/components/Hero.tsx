@@ -46,16 +46,19 @@ const Hero = () => {
         <div className="text-center max-w-5xl mx-auto">
           
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight animate-slide-up">
-            <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient-x">
-              <span className="block">Supercharge</span>
+            {/* Desktop: "Supercharge Your AI" / "Prompt Workflow" */}
+            {/* Mobile Portrait: "Supercharge" / "Your AI" / "Prompt" / "Workflow" */}
+            <span className="block md:inline">
+              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient-x">
+                Supercharge
+              </span>
+              <span className="text-foreground skeuomorphic-heading block md:inline md:ml-4">
+                <span className="block md:inline">Your AI</span>
+              </span>
             </span>
-            <span className="text-foreground skeuomorphic-heading">
-              <span className="block">Your AI</span>
-            </span>
-            <br />
-            <span className="text-foreground skeuomorphic-heading">
-              <span className="block sm:inline">Prompt</span>
-              <span className="block sm:inline"> Workflow</span>
+            <span className="text-foreground skeuomorphic-heading block">
+              <span className="block md:inline">Prompt</span>
+              <span className="block md:inline md:ml-2">Workflow</span>
             </span>
           </h1>
           
@@ -93,7 +96,7 @@ const Hero = () => {
               <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-2/3 h-3 bg-gradient-to-r from-transparent via-primary/40 to-transparent blur-md"></div>
               
               {/* Main floating image */}
-              <div className="skeuomorphic-card elevation-3 hover-elevate">
+              <div className="skeuomorphic-card elevation-3">
                 <img 
                   src="/lovable-uploads/a7664099-7c32-4d61-9848-0bab8389a73d.png" 
                   alt="AutoPromptr dashboard interface with system status, batch automation, and real-time activity monitoring"
