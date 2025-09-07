@@ -32,8 +32,12 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 md:pt-20 animate-fade-in">
-      {/* Simple gradient background instead of 3D animation for stability */}
+      {/* Light grid background pattern */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10"></div>
+      <div className="absolute inset-0 opacity-20" style={{
+        backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+        backgroundSize: '40px 40px'
+      }}></div>
       
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-background/80 via-transparent to-background/60"></div>
@@ -43,8 +47,10 @@ const Hero = () => {
           
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight animate-slide-up">
             <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient-x">
-              <span className="block sm:inline">Supercharge</span>
-              <span className="block sm:inline"> Your AI</span>
+              <span className="block">Supercharge</span>
+            </span>
+            <span className="text-foreground skeuomorphic-heading">
+              <span className="block">Your AI</span>
             </span>
             <br />
             <span className="text-foreground skeuomorphic-heading">
@@ -81,15 +87,8 @@ const Hero = () => {
           )}
           
           <div className="mt-16 relative animate-slide-up delay-600">
-            {/* Test Component - Temporary for validation */}
-            <SimpleErrorBoundary>
-              <div className="mb-8">
-                <BatchAutomationTest />
-              </div>
-            </SimpleErrorBoundary>
-            
-            {/* Floating image container - macOS dock style */}
-            <div className="relative mx-auto max-w-xl z-10">
+            {/* Floating image container - macOS dock style - 50% bigger */}
+            <div className="relative mx-auto max-w-3xl z-10">
               {/* Ambient glow underneath */}
               <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-2/3 h-3 bg-gradient-to-r from-transparent via-primary/40 to-transparent blur-md"></div>
               

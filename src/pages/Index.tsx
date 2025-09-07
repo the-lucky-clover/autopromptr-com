@@ -13,7 +13,7 @@ import Footer from "@/components/Footer";
 import CompactCookieBanner from "@/components/CompactCookieBanner";
 import SpeedometerSection from "@/components/SpeedometerSection";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
-import { BackendTestButton } from "@/components/BackendTestButton";
+import { TestingSection } from "@/components/TestingSection";
 // Removed useScrollAnimation import - using pure CSS animations
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
@@ -81,9 +81,11 @@ const Index = () => {
         <div className="animate-slide-up delay-900">
           <CTA />
         </div>
+        <div className="animate-slide-up delay-1000">
+          <TestingSection />
+        </div>
       <Footer />
       <FloatingConsoleButton />
-      <BackendTestButton />
       <CompactCookieBanner />
     </div>
   );

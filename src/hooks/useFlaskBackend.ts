@@ -9,7 +9,7 @@ interface UseFlaskBackendConfig {
 
 export function useFlaskBackend(config: UseFlaskBackendConfig = {}) {
   const [client] = useState(() => new FlaskBackendClient({
-    baseUrl: config.baseUrl || process.env.FLASK_BACKEND_URL || 'http://localhost:5000'
+    baseUrl: config.baseUrl || 'http://localhost:5000' // Direct URL since env variables are not supported
   }));
   
   const [loading, setLoading] = useState(false);
