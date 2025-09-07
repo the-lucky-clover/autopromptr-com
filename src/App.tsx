@@ -23,6 +23,7 @@ import CookiePolicy from "./pages/CookiePolicy";
 import TermsOfService from "./pages/TermsOfService";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MigrationDashboard from "./pages/MigrationDashboard";
+import BackendTest from "./pages/BackendTest";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,9 @@ const App = () => (
             
             {/* Migration Dashboard - accessible without auth for testing */}
             <Route path="/migration" element={<MigrationDashboard />} />
+            
+            {/* Backend Testing - accessible without auth for testing */}
+            <Route path="/backend-test" element={<BackendTest />} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={

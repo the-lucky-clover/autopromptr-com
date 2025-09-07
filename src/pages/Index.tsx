@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import CompactCookieBanner from "@/components/CompactCookieBanner";
 import SpeedometerSection from "@/components/SpeedometerSection";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
+import { BackendTestButton } from "@/components/BackendTestButton";
 // Removed useScrollAnimation import - using pure CSS animations
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
@@ -82,6 +83,7 @@ const Index = () => {
         </div>
       <Footer />
       <FloatingConsoleButton />
+      <BackendTestButton />
       <CompactCookieBanner />
     </div>
   );
