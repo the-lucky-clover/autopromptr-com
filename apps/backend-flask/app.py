@@ -172,7 +172,7 @@ def stop_batch(job_id: str):
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/run-batch', methods=['POST'])
-def run_batch_combined():
+async def run_batch_combined():
     """Create and run a batch job in one call (for frontend compatibility)"""
     try:
         data = request.get_json()
