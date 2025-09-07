@@ -96,7 +96,7 @@ const Hero = () => {
               <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-2/3 h-3 bg-gradient-to-r from-transparent via-primary/40 to-transparent blur-md"></div>
               
               {/* Main floating image */}
-              <div className="skeuomorphic-card elevation-3">
+              <div className="skeuomorphic-card elevation-3 rounded-2xl overflow-hidden">
                 <img 
                   src="/lovable-uploads/a7664099-7c32-4d61-9848-0bab8389a73d.png" 
                   alt="AutoPromptr dashboard interface with system status, batch automation, and real-time activity monitoring"

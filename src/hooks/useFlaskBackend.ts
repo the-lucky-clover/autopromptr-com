@@ -22,7 +22,17 @@ export function useFlaskBackend(config: UseFlaskBackendConfig = {}) {
   }, []);
 
   const handleError = useCallback((error: any, operation: string) => {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    let errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
+    // Provide better error messages for common connection issues
+    if (errorMessage.includes('Failed to fetch') || errorMessage.includes('fetch')) {
+      errorMessage = 'Flask backend is not running. Please start the backend service on localhost:5000';
+    } else if (errorMessage.includes('Network request failed')) {
+      errorMessage = 'Network error - check if the Flask backend is accessible';
+    } else if (errorMessage.includes('Request timeout')) {
+      errorMessage = 'Backend request timed out - the service may be overloaded';
+    }
+    
     setError(errorMessage);
     
     toast({
