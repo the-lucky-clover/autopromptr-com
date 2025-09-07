@@ -6,7 +6,7 @@ export class AutoPromptr {
   public baseUrl: string; // Make baseUrl public
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || 'https://autopromptr-backend.onrender.com';
+    this.baseUrl = baseUrl || 'http://localhost:5000';
   }
 
   async runBatch(batch: Batch, platform: string, options?: any): Promise<any> {
@@ -52,7 +52,7 @@ export class AutoPromptr {
   }
 
   async stopBatch(batchId: string): Promise<any> {
-    const response = await fetch(`${this.baseUrl}/api/batch/${batchId}/stop`, {
+    const response = await fetch(`${this.baseUrl}/api/batches/${batchId}/stop`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export class AutoPromptr {
 
   async getBatchStatus(batchId: string): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/batch/${batchId}/status`);
+      const response = await fetch(`${this.baseUrl}/api/batches/${batchId}/status`);
       
       if (!response.ok) {
         throw new AutoPromptrError(

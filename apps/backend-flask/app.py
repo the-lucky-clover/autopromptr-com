@@ -153,6 +153,52 @@ def stop_batch(job_id: str):
         logger.error(f"Error stopping batch {job_id}: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/run-batch', methods=['POST'])
+def run_batch_combined():
+    """Create and run a batch job in one call (for frontend compatibility)"""
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+        
+        batch_data = data.get('batch', {})
+        platform = data.get('platform', 'web')
+        
+        # Extract batch information
+        name = batch_data.get('name', f'Batch-{datetime.now().strftime("%Y%m%d-%H%M%S")}')
+        description = batch_data.get('description', '')
+        
+        # Convert frontend prompts format to backend format
+        prompts = []
+        for prompt_data in batch_data.get('prompts', []):
+            prompts.append({
+                'text': prompt_data.get('text', ''),
+                'platform': platform
+            })
+        
+        if not prompts:
+            return jsonify({'error': 'At least one prompt is required'}), 400
+        
+        orch = get_orchestrator()
+        
+        # Create the batch
+        batch_job = orch.create_batch_job(name, description, prompts)
+        
+        # Run the batch immediately
+        result = asyncio.run(orch.run_batch_job(batch_job.job_id))
+        
+        return jsonify({
+            'job_id': batch_job.job_id,
+            'status': result.get('status', 'running'),
+            'message': f'Batch job "{name}" created and started successfully',
+            'batch_id': batch_job.job_id
+        })
+        
+    except Exception as e:
+        logger.error(f"Error creating and running batch: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/batches', methods=['GET'])
 def list_batches():
     """List all batch jobs"""
