@@ -1,7 +1,6 @@
 flask==3.0.0
 flask-cors==4.0.0
 playwright==1.41.0
-puppeteer==0.18.0
 google-generativeai==0.3.2
 asyncio-mqtt==0.16.2
 websockets==12.0
