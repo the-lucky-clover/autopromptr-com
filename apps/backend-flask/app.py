@@ -172,7 +172,7 @@ def stop_batch(job_id: str):
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/run-batch', methods=['POST'])
-async def run_batch_combined():
+def run_batch_combined():
     """Create and run a batch job in one call (for frontend compatibility)"""
     try:
         data = request.get_json()
@@ -217,7 +217,7 @@ async def run_batch_combined():
         
         # Use universal batch service
         universal_service = get_universal_batch_service()
-        result = await universal_service.start_batch(batch_request)
+        result = asyncio.run(universal_service.start_batch(batch_request))
         
         return jsonify({
             'job_id': batch_request.batch_id,
