@@ -31,38 +31,83 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 md:pt-20 animate-fade-in">
-      {/* Light grid background pattern */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10"></div>
+    <section className="
+      relative 
+      min-h-screen 
+      flex items-center justify-center 
+      overflow-hidden 
+      pt-24 md:pt-20 
+      animate-fade-in
+      container-mobile-safe
+    ">
+      {/* Psychedelic Background */}
+      <div className="absolute inset-0 bg-gradient-psychedelic animate-psychedelic-flow"></div>
+      <div className="absolute inset-0 bg-gradient-glow animate-glow-pulse opacity-30"></div>
       <div className="absolute inset-0 opacity-20" style={{
-        backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+        backgroundImage: `radial-gradient(circle at 2px 2px, hsl(var(--pastel-pink) / 0.3) 1px, transparent 0)`,
         backgroundSize: '40px 40px'
       }}></div>
       
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background/80 via-transparent to-background/60"></div>
+      {/* Subtle gradient overlay for readability */}
+      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-5xl mx-auto">
           
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight animate-slide-up">
+            <h1 className="
+              text-5xl md:text-7xl lg:text-8xl 
+              font-bold mb-8 
+              leading-tight 
+              animate-slide-up 
+              font-orbitron
+            ">
             {/* Desktop: "Supercharge Your AI" / "Prompt Workflow" */}
             {/* Mobile Portrait: "Supercharge" / "Your AI" / "Prompt" / "Workflow" */}
             <span className="block md:inline">
-              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient-x">
+              <span className="
+                bg-gradient-rainbow-flow 
+                bg-clip-text 
+                text-transparent 
+                animate-rainbow-shift
+                glow-effect
+              " style={{ backgroundSize: '400% 400%' }}>
                 Supercharge
               </span>
-              <span className="text-foreground skeuomorphic-heading block md:inline md:ml-4">
+              <span className="
+                text-foreground 
+                block md:inline md:ml-4
+                animate-glow-pulse
+              ">
                 <span className="block md:inline">Your AI</span>
               </span>
             </span>
-            <span className="text-foreground skeuomorphic-heading block">
+            <span className="
+              text-foreground 
+              block
+              animate-glow-pulse
+            ">
               <span className="block md:inline">Prompt</span>
-              <span className="block md:inline md:ml-2">Workflow</span>
+              <span className="
+                block md:inline md:ml-2
+                bg-gradient-glow
+                bg-clip-text
+                text-transparent
+              ">Workflow</span>
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-4xl mx-auto font-light animate-slide-up delay-200 skeuomorphic-text">
+          <p className="
+            text-xl md:text-2xl 
+            text-muted-foreground 
+            mb-12 
+            leading-relaxed 
+            max-w-4xl 
+            mx-auto 
+            font-light 
+            animate-slide-up 
+            delay-200
+            glow-effect
+          ">
             Intelligently batch process, enhance, and deploy prompts across all major AI coding 
             platforms, remote or local. Transform your development workflow with AutoPromptr's powerful automation 
             tools.
@@ -73,15 +118,42 @@ const Hero = () => {
               <Button 
                 size="lg" 
                 onClick={handleGetStarted}
-                className="text-primary-foreground text-lg px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-2 skeuomorphic-button hover-elevate"
+                className="
+                  bg-gradient-psychedelic 
+                  text-primary-foreground 
+                  text-lg px-8 py-4 
+                  font-semibold 
+                  smooth-transition 
+                  flex items-center justify-center gap-2 
+                  shadow-glow-md
+                  hover:shadow-glow-lg
+                  animate-subtle-breathe
+                  hover:scale-105
+                  rounded-2xl
+                  border-0
+                "
               >
-                <span>⭐︎</span>
+                <span className="animate-glow-pulse">⭐︎</span>
                 Get Started
               </Button>
               <Button 
                 size="lg" 
                 onClick={handleSignIn}
-                className="text-lg px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-2 skeuomorphic-button-outline hover-elevate"
+                variant="outline"
+                className="
+                  text-lg px-8 py-4 
+                  font-semibold 
+                  smooth-transition 
+                  flex items-center justify-center gap-2 
+                  border-border/50
+                  bg-card/30
+                  backdrop-blur-sm
+                  hover:bg-card/50
+                  hover:shadow-glow-sm
+                  rounded-2xl
+                  text-foreground
+                  hover:text-primary
+                "
               >
                 Sign In
                 <ArrowRight className="w-5 h-5" />

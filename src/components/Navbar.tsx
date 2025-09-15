@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
 import AuthModal from "@/components/AuthModal";
-import ZapBrandLogo from "@/components/ZapBrandLogo";
+import PsychedelicBrandLogo from "@/components/PsychedelicBrandLogo";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -79,8 +79,8 @@ const Navbar = () => {
         <div className="relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center group">
-              <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16">
-                <ZapBrandLogo size="small" variant="horizontal" id="navbar-loading" />
+              <div className="relative flex items-center justify-center">
+                <PsychedelicBrandLogo size="small" variant="horizontal" id="navbar-loading" />
               </div>
             </Link>
             
@@ -104,58 +104,88 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-40">
+      <nav className="fixed top-0 w-full z-40 container-mobile-safe">
         {/* Glassmorphism background that slides down */}
         <div className={`absolute top-0 left-0 right-0 h-20 transition-all duration-700 ease-out ${
           isScrolled 
             ? 'transform translate-y-0 opacity-100' 
             : 'transform -translate-y-20 opacity-0'
-        } bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-2xl rounded-b-2xl`} />
+        } bg-card/80 backdrop-blur-xl border-b border-border shadow-glow-lg rounded-b-2xl`} />
         
         {/* Navbar content - always visible with responsive padding */}
         <div className="relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            {/* Enhanced Logo with Zap Icon */}
+            {/* Enhanced Logo with Psychedelic Effects */}
             <Link to="/" className="flex items-center group flex-shrink-0">
-              <div className="relative flex items-center justify-center h-12 sm:h-14 lg:h-16">
-                <ZapBrandLogo size="small" variant="horizontal" id="navbar" />
+              <div className="relative flex items-center justify-center">
+                <PsychedelicBrandLogo size="small" variant="horizontal" id="navbar-logo" />
               </div>
             </Link>
             
-            {/* Desktop buttons - only show for non-authenticated users */}
+            {/* Desktop buttons - enhanced with new design system */}
             <div className="hidden md:flex items-center space-x-3 flex-shrink-0">
               <Button 
                 onClick={handleSignInClick}
                 variant="ghost"
                 size="sm"
-                className="text-white hover:text-purple-300 px-4 py-2 rounded-2xl font-medium transition-all duration-200"
+                className="text-foreground hover:text-primary px-4 py-2 rounded-2xl font-medium smooth-transition hover:shadow-glow-sm"
               >
                 Sign In
               </Button>
               <Button 
                 onClick={handleGetStartedClick}
                 size="sm"
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-5 py-2 rounded-2xl font-medium transition-all duration-200 flex items-center gap-2 shadow-lg"
+                className="
+                  bg-gradient-psychedelic 
+                  hover:shadow-glow-md 
+                  text-primary-foreground 
+                  px-5 py-2 
+                  rounded-2xl 
+                  font-medium 
+                  smooth-transition 
+                  flex items-center gap-2 
+                  shadow-glow-sm
+                  animate-subtle-breathe
+                  hover:scale-105
+                  border-0
+                "
               >
-                <span>⭐︎</span>
+                <span className="animate-glow-pulse">⭐︎</span>
                 Get Started
               </Button>
             </div>
 
-            {/* Mobile hamburger menu - properly aligned */}
+            {/* Mobile hamburger menu - enhanced with new design */}
             <div className="md:hidden flex-shrink-0 ml-2">
               <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-white hover:text-purple-300 rounded-2xl p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    className="
+                      text-foreground 
+                      hover:text-primary 
+                      rounded-2xl p-2 
+                      min-w-[44px] min-h-[44px] 
+                      flex items-center justify-center
+                      hover:shadow-glow-sm
+                      smooth-transition
+                    "
                   >
                     {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent 
-                  className="w-72 bg-gray-900/95 backdrop-blur-xl border-gray-700 rounded-2xl mr-4 shadow-2xl"
+                  className="
+                    w-72 
+                    bg-card/95 
+                    backdrop-blur-xl 
+                    border-border 
+                    rounded-2xl 
+                    mr-4 
+                    shadow-glow-lg
+                    z-50
+                  "
                   align="end"
                   sideOffset={8}
                 >
@@ -163,15 +193,32 @@ const Navbar = () => {
                     <Button 
                       onClick={() => { handleSignInClick(); setIsOpen(false); }}
                       variant="ghost"
-                      className="w-full text-white hover:text-purple-300 rounded-2xl"
+                      className="
+                        w-full 
+                        text-foreground 
+                        hover:text-primary 
+                        rounded-2xl
+                        hover:shadow-glow-sm
+                        smooth-transition
+                      "
                     >
                       Sign In
                     </Button>
                     <Button 
                       onClick={() => { handleGetStartedClick(); setIsOpen(false); }}
-                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl flex items-center justify-center gap-2 shadow-lg"
+                      className="
+                        w-full 
+                        bg-gradient-psychedelic 
+                        hover:shadow-glow-md 
+                        text-primary-foreground 
+                        rounded-2xl 
+                        flex items-center justify-center gap-2 
+                        shadow-glow-sm
+                        animate-subtle-breathe
+                        smooth-transition
+                      "
                     >
-                      <span>⭐︎</span>
+                      <span className="animate-glow-pulse">⭐︎</span>
                       Get Started
                     </Button>
                   </div>

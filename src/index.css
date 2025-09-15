@@ -11,3 +11,243 @@
 @import "./styles/holographic-effects.css";
 @import "./styles/enhanced-animations.css";
 @import "./styles/skeuomorphic-design.css";
+@import "./styles/psychedelic-animations.css";
+
+/* Mobile Optimization - Prevent Horizontal Scrolling */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Reinvigorated Pastel Psychedelic Design System */
+:root {
+  /* Base Colors - Pastel Palette */
+  --background: 225 12% 8%;
+  --foreground: 330 30% 96%;
+  
+  /* Pastel Gradient System */
+  --pastel-pink: 330 60% 85%;
+  --pastel-purple: 270 60% 85%;
+  --pastel-blue: 220 60% 85%;
+  --pastel-cyan: 180 60% 85%;
+  --pastel-mint: 150 60% 85%;
+  --pastel-peach: 30 60% 85%;
+  --pastel-lavender: 260 50% 88%;
+  --pastel-rose: 340 50% 88%;
+  
+  /* Glowing Variants */
+  --glow-pink: 330 80% 70%;
+  --glow-purple: 270 80% 70%;
+  --glow-blue: 220 80% 70%;
+  --glow-cyan: 180 80% 70%;
+  --glow-mint: 150 80% 70%;
+  
+  /* Semantic Colors with Pastel Integration */
+  --primary: 270 60% 85%;
+  --primary-foreground: 225 12% 8%;
+  --secondary: 330 60% 85%;
+  --secondary-foreground: 225 12% 8%;
+  --accent: 220 60% 85%;
+  --accent-foreground: 225 12% 8%;
+  
+  --muted: 225 12% 15%;
+  --muted-foreground: 330 30% 75%;
+  --card: 225 12% 12%;
+  --card-foreground: 330 30% 96%;
+  --popover: 225 12% 10%;
+  --popover-foreground: 330 30% 96%;
+  --border: 225 12% 20%;
+  --input: 225 12% 18%;
+  --ring: 270 60% 85%;
+  
+  /* Sidebar Colors */
+  --sidebar-background: 225 12% 10%;
+  --sidebar-foreground: 330 30% 90%;
+  --sidebar-primary: 270 60% 85%;
+  --sidebar-primary-foreground: 225 12% 8%;
+  --sidebar-accent: 330 60% 85%;
+  --sidebar-accent-foreground: 225 12% 8%;
+  --sidebar-border: 225 12% 20%;
+  --sidebar-ring: 270 60% 85%;
+  
+  /* Psychedelic Gradient Variables */
+  --gradient-psychedelic: linear-gradient(135deg, 
+    hsl(var(--pastel-pink)) 0%, 
+    hsl(var(--pastel-purple)) 25%, 
+    hsl(var(--pastel-blue)) 50%, 
+    hsl(var(--pastel-cyan)) 75%, 
+    hsl(var(--pastel-mint)) 100%);
+    
+  --gradient-glow: linear-gradient(135deg,
+    hsl(var(--glow-pink)) 0%,
+    hsl(var(--glow-purple)) 33%,
+    hsl(var(--glow-blue)) 66%,
+    hsl(var(--glow-cyan)) 100%);
+    
+  --gradient-rainbow-flow: linear-gradient(270deg,
+    hsl(var(--pastel-rose)) 0%,
+    hsl(var(--pastel-peach)) 14%,
+    hsl(var(--pastel-mint)) 28%,
+    hsl(var(--pastel-cyan)) 42%,
+    hsl(var(--pastel-blue)) 57%,
+    hsl(var(--pastel-purple)) 71%,
+    hsl(var(--pastel-lavender)) 85%,
+    hsl(var(--pastel-pink)) 100%);
+  
+  /* Shadow System with Glowing Effects */
+  --shadow-glow-sm: 0 2px 8px -2px hsl(var(--glow-purple) / 0.3);
+  --shadow-glow-md: 0 4px 16px -4px hsl(var(--glow-purple) / 0.4);
+  --shadow-glow-lg: 0 8px 32px -8px hsl(var(--glow-purple) / 0.5);
+  --shadow-glow-xl: 0 16px 64px -16px hsl(var(--glow-purple) / 0.6);
+  
+  --shadow-pastel-glow: 0 0 40px hsl(var(--pastel-purple) / 0.8),
+                        0 0 80px hsl(var(--pastel-blue) / 0.6),
+                        0 0 120px hsl(var(--pastel-cyan) / 0.4);
+  
+  /* Border Radius */
+  --radius: 1rem;
+  
+  /* Animation Timings */
+  --transition-smooth: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  --transition-glow: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Dark Mode Overrides for Enhanced Contrast */
+.dark {
+  --background: 225 15% 6%;
+  --foreground: 330 30% 98%;
+  --card: 225 15% 8%;
+  --card-foreground: 330 30% 98%;
+  --popover: 225 15% 7%;
+  --popover-foreground: 330 30% 98%;
+  --muted: 225 15% 12%;
+  --muted-foreground: 330 20% 70%;
+  --border: 225 15% 18%;
+  --input: 225 15% 15%;
+}
+
+/* Psychedelic Animation Keyframes */
+@keyframes psychedelic-flow {
+  0%, 100% { 
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) brightness(1) saturate(1);
+  }
+  25% { 
+    background-position: 100% 50%;
+    filter: hue-rotate(45deg) brightness(1.1) saturate(1.2);
+  }
+  50% { 
+    background-position: 100% 100%;
+    filter: hue-rotate(90deg) brightness(1.2) saturate(1.4);
+  }
+  75% { 
+    background-position: 0% 100%;
+    filter: hue-rotate(135deg) brightness(1.1) saturate(1.2);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px hsl(var(--glow-purple) / 0.6))
+            drop-shadow(0 0 40px hsl(var(--glow-blue) / 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 30px hsl(var(--glow-pink) / 0.8))
+            drop-shadow(0 0 60px hsl(var(--glow-cyan) / 0.6));
+  }
+}
+
+@keyframes rainbow-shift {
+  0% { 
+    background-position: 0% 0%;
+    transform: translateX(0);
+  }
+  25% {
+    background-position: 25% 25%;
+    transform: translateX(2px);
+  }
+  50% {
+    background-position: 50% 50%;
+    transform: translateX(0);
+  }
+  75% {
+    background-position: 75% 75%;
+    transform: translateX(-2px);
+  }
+  100% {
+    background-position: 100% 100%;
+    transform: translateX(0);
+  }
+}
+
+@keyframes subtle-breathe {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.02) rotate(0.5deg);
+    opacity: 1;
+  }
+}
+
+/* Utility Classes for Enhanced UX */
+.psychedelic-gradient {
+  background: var(--gradient-psychedelic);
+  background-size: 400% 400%;
+  animation: psychedelic-flow 8s ease-in-out infinite;
+}
+
+.glow-effect {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.rainbow-flow {
+  background: var(--gradient-rainbow-flow);
+  background-size: 800% 800%;
+  animation: rainbow-shift 12s linear infinite;
+}
+
+.subtle-breathe {
+  animation: subtle-breathe 4s ease-in-out infinite;
+}
+
+.pastel-glow {
+  box-shadow: var(--shadow-pastel-glow);
+}
+
+.smooth-transition {
+  transition: var(--transition-smooth);
+}
+
+.glow-transition {
+  transition: var(--transition-glow);
+}
+
+/* Mobile-First Responsive Containers */
+.container-mobile-safe {
+  width: 100%;
+  max-width: 100vw;
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-mobile-safe {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-mobile-safe {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    max-width: 1200px;
+  }
+}
