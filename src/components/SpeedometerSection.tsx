@@ -14,7 +14,7 @@ const SpeedometerSection = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          <div className="skeuomorphic-card p-6 text-center">
+          <div className="skeuomorphic-card p-6 text-center rounded-xl">
             <AnimatedSpeedometer
               value={85}
               maxValue={100}
@@ -25,7 +25,7 @@ const SpeedometerSection = () => {
             />
           </div>
           
-          <div className="skeuomorphic-card p-6 text-center">
+          <div className="skeuomorphic-card p-6 text-center rounded-xl">
             <AnimatedSpeedometer
               value={92}
               maxValue={100}
@@ -36,7 +36,7 @@ const SpeedometerSection = () => {
             />
           </div>
           
-          <div className="skeuomorphic-card p-6 text-center">
+          <div className="skeuomorphic-card p-6 text-center rounded-xl">
             <AnimatedSpeedometer
               value={78}
               maxValue={100}

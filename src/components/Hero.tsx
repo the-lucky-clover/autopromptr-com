@@ -45,24 +45,21 @@ const Hero = () => {
       animate-fade-in
       w-full
     ">
-      {/* Aurora Video Background - 100% opacity */}
+      {/* Aurora Video Background - 100% opacity, positioned higher */}
       <div className="absolute inset-0 overflow-hidden">
         <video
           autoPlay
           muted
           loop
           playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-100 transition-opacity duration-[2000ms] ease-in-out"
+          className="absolute -top-20 left-0 w-full h-[calc(100%+80px)] object-cover opacity-100 transition-opacity duration-[2000ms] ease-in-out"
         >
           <source src="https://videos.pexels.com/video-files/852435/852435-hd_1920_1080_30fps.mp4" type="video/mp4" />
         </video>
       </div>
       
-      {/* Gradient overlay with multiply blend mode at 50% opacity */}
-      <div 
-        className="absolute inset-0 bg-gradient-to-b from-purple-900/30 via-transparent to-black/40"
-        style={{ mixBlendMode: 'multiply', opacity: 0.5 }}
-      />
+      {/* Vertical gradient overlay - 100% to 0% opacity top to bottom */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/100 via-black/50 to-transparent" />
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="text-center max-w-5xl mx-auto">
@@ -148,13 +145,13 @@ const Hero = () => {
         </div>
       </div>
       
-      {/* Video Attribution - Fixed in lower right above fold */}
-      <div className="absolute bottom-16 right-6 z-20 animate-fade-in delay-1000">
+      {/* Video Attribution - Anchored within hero in lower right with proper spacing */}
+      <div className="absolute bottom-8 right-6 z-20 animate-fade-in delay-1000 p-2">
         <a 
           href="https://www.pexels.com/video/aurora-852435/" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-[10px] text-white/40 hover:text-white/60 bg-black/20 px-2 py-1 rounded backdrop-blur-sm transition-colors duration-300"
+          className="text-[10px] text-white/40 hover:text-white/60 bg-black/20 px-3 py-2 rounded-md backdrop-blur-sm transition-colors duration-300"
         >
           Aurora by Pexels
         </a>

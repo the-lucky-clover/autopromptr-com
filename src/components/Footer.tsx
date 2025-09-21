@@ -15,7 +15,7 @@ const Footer = () => {
         py-16 
         relative 
         overflow-hidden
-        container-mobile-safe
+        w-full
       ">
         {/* Glowing overlay */}
         <div className="absolute inset-0 bg-card/60 backdrop-blur-sm"></div>
