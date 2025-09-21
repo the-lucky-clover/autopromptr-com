@@ -52,7 +52,7 @@ const Hero = () => {
           muted
           loop
           playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-100"
+          className="absolute inset-0 w-full h-full object-cover opacity-100 transition-opacity duration-[2000ms] ease-in-out"
         >
           <source src="https://videos.pexels.com/video-files/852435/852435-hd_1920_1080_30fps.mp4" type="video/mp4" />
         </video>
@@ -148,13 +148,13 @@ const Hero = () => {
         </div>
       </div>
       
-      {/* Video Attribution - Above fold in lower right, smaller */}
-      <div className="absolute bottom-8 right-4 z-20 animate-fade-in delay-1000">
+      {/* Video Attribution - Fixed in lower right above fold */}
+      <div className="absolute bottom-16 right-6 z-20 animate-fade-in delay-1000">
         <a 
           href="https://www.pexels.com/video/aurora-852435/" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-xs text-white/50 hover:text-white/70 bg-black/30 px-2 py-1 rounded backdrop-blur-sm transition-colors"
+          className="text-[10px] text-white/40 hover:text-white/60 bg-black/20 px-2 py-1 rounded backdrop-blur-sm transition-colors duration-300"
         >
           Aurora by Pexels
         </a>
