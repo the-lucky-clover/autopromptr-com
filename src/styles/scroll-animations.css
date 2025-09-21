@@ -29,7 +29,6 @@
   .delay-600 { animation-delay: 0.6s; }
   .delay-700 { animation-delay: 0.7s; }
   .delay-800 { animation-delay: 0.8s; }
-}
 
 /* Keyframes */
 @keyframes fadeInUp {
