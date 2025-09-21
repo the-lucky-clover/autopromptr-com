@@ -83,13 +83,39 @@
     background: linear-gradient(135deg, #0a0f1c 0%, #1a1b3a 100%);
   }
 
-  .hover-scale {
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
+/* Hover Effects */
+.hover-scale {
+  transition: transform 0.3s ease;
+}
+.hover-scale:hover {
+  transform: scale(1.05);
+}
 
-  .hover-scale:hover {
-    transform: scale(1.05);
-  }
+/* 3D Skeumorphic Text */
+.skeumorphic-text {
+  text-shadow: 
+    0 1px 0 hsl(var(--background)),
+    0 2px 1px hsl(var(--primary) / 0.2),
+    0 3px 3px hsl(var(--primary) / 0.1),
+    0 4px 8px hsl(var(--primary) / 0.05);
+}
+
+/* Skeumorphic Surface */
+.skeumorphic-surface {
+  box-shadow: 
+    0 1px 3px hsl(var(--primary) / 0.12),
+    0 1px 2px hsl(var(--primary) / 0.24),
+    inset 0 1px 0 hsl(var(--foreground) / 0.1);
+  border: 1px solid hsl(var(--border) / 0.3);
+}
+
+/* Glass Capsule */
+.glass-capsule {
+  background: hsl(var(--background) / 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 0.2);
+  border-radius: 999px;
+}
 
   .animate-gradient-subtle {
     background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #a855f7 100%);

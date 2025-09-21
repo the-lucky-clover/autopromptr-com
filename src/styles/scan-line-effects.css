@@ -32,7 +32,6 @@
     );
     animation: scanLineMove 2s linear infinite 0.5s;
   }
-}
 
 @keyframes scanLineMove {
   0% {

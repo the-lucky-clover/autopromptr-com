@@ -1,185 +1,131 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Cookie, Settings } from 'lucide-react';
-import { PrivacyCenterModal } from './PrivacyCenterModal';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
-interface CookieConsent {
-  essential: boolean;
-  analytics: boolean;
-  marketing: boolean;
-  personalization: boolean;
-  timestamp: number;
-}
-
-const EnhancedCookieBanner = () => {
+export default function EnhancedCookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
-  const [showPrivacyCenter, setShowPrivacyCenter] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    // Check if user has already made a choice
-    const cookieConsent = localStorage.getItem('enhanced-cookie-consent');
-    if (!cookieConsent) {
-      setIsVisible(true);
+    const consent = localStorage.getItem('cookie-consent');
+    if (!consent) {
+      // Delay to allow page to fully load before showing banner
+      setTimeout(() => {
+        setIsVisible(true);
+        setIsAnimating(true);
+      }, 1500);
     }
   }, []);
 
-  // Keyboard event handling
-  useEffect(() => {
-    if (!isVisible) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsVisible(false);
-      } else if (event.key === 'Enter') {
-        acceptAllCookies();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isVisible]);
-
-  const acceptAllCookies = () => {
-    const consent: CookieConsent = {
-      essential: true,
-      analytics: true,
-      marketing: true,
-      personalization: true,
-      timestamp: Date.now()
-    };
-    localStorage.setItem('enhanced-cookie-consent', JSON.stringify(consent));
-    setIsVisible(false);
+  const handleAccept = () => {
+    localStorage.setItem('cookie-consent', 'accepted');
+    setIsAnimating(false);
+    setTimeout(() => setIsVisible(false), 300);
   };
 
-  const rejectAllCookies = () => {
-    const consent: CookieConsent = {
-      essential: true, // Essential cookies cannot be rejected
-      analytics: false,
-      marketing: false,
-      personalization: false,
-      timestamp: Date.now()
-    };
-    localStorage.setItem('enhanced-cookie-consent', JSON.stringify(consent));
-    setIsVisible(false);
+  const handleReject = () => {
+    localStorage.setItem('cookie-consent', 'rejected');
+    setIsAnimating(false);
+    setTimeout(() => setIsVisible(false), 300);
   };
 
-  const handlePrivacyCenterSave = (consent: CookieConsent) => {
-    localStorage.setItem('enhanced-cookie-consent', JSON.stringify(consent));
-    setIsVisible(false);
-    setShowPrivacyCenter(false);
+  const handleDismiss = () => {
+    setIsAnimating(false);
+    setTimeout(() => setIsVisible(false), 300);
   };
 
   if (!isVisible) return null;
 
   return (
-    <>
-      <div className="fixed bottom-0 left-0 right-0 z-50 w-full">
-        <div 
-          className="glass-cookie-banner text-white relative w-full px-6 py-6"
-          style={{
-            backgroundColor: '#0a0e17',
-            background: 'linear-gradient(135deg, rgba(10, 14, 23, 1.0) 0%, rgba(15, 20, 35, 0.98) 50%, rgba(30, 27, 75, 0.95) 100%)',
-            backdropFilter: 'blur(25px) saturate(180%) brightness(95%)',
-            WebkitBackdropFilter: 'blur(25px) saturate(180%) brightness(95%)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.15)',
-            boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.6), 0 -2px 16px rgba(139, 92, 246, 0.1)',
-          }}
+    <div 
+      className={`
+        fixed bottom-4 left-4 right-4 md:left-6 md:right-6 z-50 
+        transition-all duration-500 ease-out
+        ${isAnimating ? 'animate-slide-up opacity-100' : 'translate-y-full opacity-0'}
+      `}
+    >
+      <div className="skeumorphic-glass glass-cookie-banner border border-primary/20 p-4 md:p-6 max-w-md mx-auto md:max-w-2xl shimmer-rare rounded-2xl">
+        {/* Close button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleDismiss}
+          className="absolute top-2 right-2 h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
         >
-          {/* Close button positioned absolutely in upper right */}
-          <Button 
-            onClick={() => setIsVisible(false)}
-            variant="ghost"
-            size="sm"
-            className="absolute top-4 right-4 text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-300 w-8 h-8 p-0 z-10"
-          >
-            <X className="w-4 h-4" />
-          </Button>
+          <X className="h-4 w-4" />
+        </Button>
 
-          <div className="w-full mx-auto">
-            {/* Main content layout */}
-            <div className="flex flex-col lg:flex-row lg:items-start gap-6 pr-12">
-              {/* Content section */}
-              <div className="flex-1 lg:flex-[2]">
-                <div className="flex items-start gap-4">
-                  <Cookie className="w-8 h-8 text-purple-300 flex-shrink-0 mt-1" />
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-3 text-white">We Value Your Privacy</h3>
-                    <p className="text-gray-200 text-sm leading-relaxed mb-4">
-                      AutoPromptr uses cookies and similar technologies to enhance your experience, analyze site usage, 
-                      and assist with our marketing efforts. We work with trusted partners who may also use these 
-                      technologies in connection with our services.
-                    </p>
-                    <p className="text-gray-300 text-xs leading-relaxed">
-                      By clicking "Accept All", you consent to our use of cookies for essential site functions, 
-                      analytics, personalization, and marketing. You can customize your preferences in our Privacy Center 
-                      or reject non-essential cookies. Your choices can be updated anytime.
-                    </p>
-                  </div>
-                </div>
-              </div>
+        <div className="flex items-start gap-3">
+          <Cookie className="h-6 w-6 text-primary mt-1 animate-glow-pulse" />
+          <div className="flex-1">
+            <h3 className="font-semibold text-foreground mb-2 animate-fade-in skeumorphic-text">
+              We use cookies
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4 animate-fade-in delay-100">
+              We use cookies to enhance your experience, analyze site traffic, and personalize content. 
+              Your privacy matters to us.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button 
+                onClick={handleAccept}
+                size="sm" 
+                className="skeumorphic-button animate-scale-in delay-200 shimmer-45-rare"
+              >
+                Accept All
+              </Button>
+              <Button 
+                onClick={handleReject}
+                variant="outline" 
+                size="sm"
+                className="animate-scale-in delay-300 border-primary/30 bg-card/20 hover:bg-card/40"
+              >
+                Reject All
+              </Button>
               
-              {/* Buttons section - Swapped order: Reject All, Privacy Center, Accept All */}
-              <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:flex-shrink-0 lg:ml-8 lg:min-w-[200px]">
-                <Button 
-                  onClick={acceptAllCookies}
-                  size="sm"
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-3 font-semibold"
-                >
-                  Accept All
-                </Button>
-                
-                <Button 
-                  onClick={rejectAllCookies}
-                  variant="secondary"
-                  size="sm"
-                  className="transition-all duration-300 px-6 py-3 font-medium"
-                >
-                  Reject Non-Essential
-                </Button>
-                
-                <Button 
-                  onClick={() => setShowPrivacyCenter(true)}
-                  variant="outline"
-                  size="sm"
-                  className="border-purple-400/50 text-purple-200 hover:bg-purple-500/20 hover:border-purple-300 backdrop-blur-sm transition-all duration-300 px-6 py-3 font-medium flex items-center gap-2"
-                >
-                  <Settings className="w-4 h-4" />
-                  Privacy Center
-                </Button>
-              </div>
-            </div>
-
-            {/* Legal links */}
-            <div className="mt-4 pt-4 border-t border-white/10">
-              <div className="flex flex-wrap gap-4 text-xs text-gray-400">
-                <a href="/privacy-policy" className="hover:text-purple-300 transition-colors underline">
-                  Privacy Policy
-                </a>
-                <a href="/cookie-policy" className="hover:text-purple-300 transition-colors underline">
-                  Cookie Policy
-                </a>
-                <a href="/terms-of-service" className="hover:text-purple-300 transition-colors underline">
-                  Terms of Service
-                </a>
-                <span className="text-gray-500">•</span>
-                <span className="text-gray-500">
-                  MIT Licensed Open Source
-                </span>
-              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="animate-scale-in delay-400 hover:bg-card/30"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="skeumorphic-glass max-w-md shimmer-staggered">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2 skeumorphic-text">
+                      <Settings className="h-5 w-5" />
+                      Cookie Preferences
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium skeumorphic-text">Essential Cookies</h4>
+                      <p className="text-sm text-muted-foreground">Required for basic site functionality</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium skeumorphic-text">Analytics Cookies</h4>
+                      <p className="text-sm text-muted-foreground">Help us understand how you use our site</p>
+                    </div>
+                    <div className="flex gap-2 pt-4">
+                      <Button onClick={handleAccept} size="sm" className="flex-1 skeumorphic-button">
+                        Accept All
+                      </Button>
+                      <Button onClick={handleReject} variant="outline" size="sm" className="flex-1 border-primary/30">
+                        Reject All
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Privacy Center Modal */}
-      <PrivacyCenterModal 
-        isOpen={showPrivacyCenter}
-        onClose={() => setShowPrivacyCenter(false)}
-        onSave={handlePrivacyCenterSave}
-      />
-    </>
+    </div>
   );
-};
-
-export default EnhancedCookieBanner;
+}

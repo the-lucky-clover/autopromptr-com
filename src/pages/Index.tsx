@@ -10,7 +10,7 @@ import SocialProof from "@/components/SocialProof";
 import TrustedBy from "@/components/TrustedBy";
 import BlogPosts from "@/components/BlogPosts";
 import Footer from "@/components/Footer";
-import CompactCookieBanner from "@/components/CompactCookieBanner";
+import EnhancedCookieBanner from "@/components/EnhancedCookieBanner";
 import SpeedometerSection from "@/components/SpeedometerSection";
 import { FloatingConsoleButton } from "@/components/admin/FloatingConsoleButton";
 import { TestingSection } from "@/components/TestingSection";
@@ -86,7 +86,7 @@ const Index = () => {
         </div>
       <Footer />
       <FloatingConsoleButton />
-      <CompactCookieBanner />
+      <EnhancedCookieBanner />
     </div>
   );
 };

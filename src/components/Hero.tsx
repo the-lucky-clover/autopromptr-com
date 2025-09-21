@@ -1,12 +1,10 @@
 
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { useEffect, useState } from "react";
-import VideoBackground from "./VideoBackground";
-import { useTimeBasedVideo } from "@/hooks/useTimeBasedVideo";
-import { BatchAutomationTest } from "./BatchAutomationTest";
-import SimpleErrorBoundary from "./SimpleErrorBoundary";
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
+import dashboardMockup from '@/assets/dashboard-mockup-cyberpunk.png';
+import { useEffect, useState } from 'react';
 
 const Hero = () => {
   const { user, isEmailVerified, isInitialized } = useAuth();
@@ -47,14 +45,25 @@ const Hero = () => {
       animate-fade-in
       w-full
     ">
-      {/* Video Background - Limited to Hero Section */}
-      <VideoBackground
-        enabled={true}
-        videoUrl={heroVideo.url}
-        showAttribution={true}
-        opacity={45}
-        blendMode="multiply"
-      />
+      {/* Aurora Video Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-multiply"
+          style={{ filter: 'blur(1px)' }}
+        >
+          <source src="https://videos.pexels.com/video-files/852435/852435-hd_1920_1080_30fps.mp4" type="video/mp4" />
+        </video>
+        
+        {/* Vertical gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/100 via-background/50 to-background/0" />
+        
+        {/* 3D Vignette Effect */}
+        <div className="absolute inset-0 bg-radial-vignette" />
+      </div>
       
       {/* Psychedelic Background Animation */}
       <div className="absolute inset-0 bg-gradient-psychedelic animate-psychedelic-flow opacity-60"></div>
@@ -70,43 +79,19 @@ const Hero = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="text-center max-w-5xl mx-auto">
           
-            <h1 className="
-              text-5xl md:text-7xl lg:text-8xl 
-              font-bold mb-8 
-              leading-tight 
-              animate-slide-up 
-              font-orbitron
-              skeumorphic-text
-              shimmer-staggered
-            ">
-            <span className="
-              bg-gradient-rainbow-flow 
-              bg-clip-text 
-              text-transparent 
-              animate-rainbow-shift
-              glow-effect
-              drop-shadow-glow
-            " style={{ backgroundSize: '400% 400%' }}>
-              AI On Autopilot
-            </span>
-          </h1>
+        <h1 className="text-6xl sm:text-7xl md:text-8xl font-bold mb-6 animate-scale-in delay-300">
+          <span className="block leading-tight">
+            <span className="animate-gradient-hero skeumorphic-text">AI On</span>
+          </span>
+          <span className="block leading-tight text-foreground/90 skeumorphic-text">
+            Autopilot
+          </span>
+        </h1>
           
-          <p className="
-            text-xl md:text-2xl 
-            text-muted-foreground 
-            mb-12 
-            leading-relaxed 
-            max-w-4xl 
-            mx-auto 
-            font-light 
-            animate-slide-up 
-            delay-200
-            glow-effect
-            skeumorphic-text
-            shimmer-staggered-delay
-          ">
-            Stop babysitting your prompts. Let them transcend dimensions while you architect the impossible—batch processing through hyperspace, where every iteration dissolves into pure creative flow across infinite AI realms.
-          </p>
+        <p className="text-xl sm:text-2xl text-muted-foreground mb-8 animate-fly-in delay-500 max-w-3xl leading-relaxed italic">
+          Stop babysitting your prompts. Let your AI workflows run themselves while you transcend into 
+          <span className="text-gradient-rainbow"> hyperspace dimensions of productivity</span> — where creativity flows like liquid light through quantum neural networks.
+        </p>
           
           {showButtons && (
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16 animate-slide-up delay-400">
@@ -164,38 +149,29 @@ const Hero = () => {
               
               {/* Main floating image */}
               <div className="skeuomorphic-card elevation-3 rounded-2xl overflow-hidden">
-                <img 
-                  src="/lovable-uploads/a7664099-7c32-4d61-9848-0bab8389a73d.png" 
-                  alt="AutoPromptr dashboard interface with system status, batch automation, and real-time activity monitoring"
-                  className="relative mx-auto rounded-2xl max-w-full h-auto"
-                  onError={(e) => {
-                    console.warn('Hero image failed to load, using fallback');
-                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgdmlld0JveD0iMCAwIDgwMCA0NTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNDUwIiBmaWxsPSIjMUUyOTNDIi8+Cjx0ZXh0IHg9IjQwMCIgeT0iMjI1IiBmaWxsPSIjNjM2NjZBIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiPkFJIEF1dG9tYXRpb24gRGFzaGJvYXJkPC90ZXh0Pgo8L3N2Zz4=';
-                  }}
-                />
+          <img 
+            src="/src/assets/dashboard-mockup-cyberpunk.png" 
+            alt="AutoPromptr Cyberpunk Dashboard Interface" 
+            className="w-full h-auto rounded-2xl shadow-elegant border border-primary/20 bg-card/10 backdrop-blur-sm animate-materialize delay-700 skeumorphic-surface shimmer-rare"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
               </div>
             </div>
           </div>
           
-          {/* Video Attribution - Lower Right */}
-          <div className="absolute bottom-8 right-8 z-20">
-            <a
-              href={heroVideo.attribution}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="
-                text-xs text-white/70 hover:text-white/90 
-                bg-black/30 px-3 py-2 rounded-full 
-                backdrop-blur-md transition-all duration-300
-                border border-white/20
-                hover:bg-black/50 hover:border-white/30
-                skeumorphic-glass
-                shimmer-rare
-              "
-            >
-              Aurora by Pexels
-            </a>
-          </div>
+      {/* Video Attribution */}
+      <div className="absolute bottom-4 right-4 z-10 animate-fade-in delay-1000">
+        <a 
+          href="https://www.pexels.com/video/aurora-852435/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors glass-capsule px-2 py-1"
+        >
+          Aurora by Pexels
+        </a>
+      </div>
         </div>
       </div>
     </section>
