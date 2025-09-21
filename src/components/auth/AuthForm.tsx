@@ -17,6 +17,8 @@ interface AuthFormProps {
   setPassword: (password: string) => void;
   fullName: string;
   setFullName: (fullName: string) => void;
+  username: string;
+  setUsername: (username: string) => void;
   loading: boolean;
 }
 
@@ -32,6 +34,8 @@ const AuthForm = ({
   setPassword,
   fullName,
   setFullName,
+  username,
+  setUsername,
   loading
 }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,20 +43,37 @@ const AuthForm = ({
   return (
     <form onSubmit={mode === 'signup' ? onSignUp : onSignIn} className="space-y-4">
       {mode === 'signup' && (
-        <div className="space-y-2">
-          <Label htmlFor="fullName" className="text-sm font-medium text-gray-200">
-            Full Name
-          </Label>
-          <Input
-            id="fullName"
-            type="text"
-            placeholder="Enter your full name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-            className="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
-          />
-        </div>
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="fullName" className="text-sm font-medium text-gray-200">
+              Full Name
+            </Label>
+            <Input
+              id="fullName"
+              type="text"
+              placeholder="Enter your full name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              className="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="username" className="text-sm font-medium text-gray-200">
+              Username
+            </Label>
+            <Input
+              id="username"
+              type="text"
+              placeholder="Choose a unique username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+            />
+          </div>
+        </>
       )}
 
       <div className="space-y-2">

@@ -52,7 +52,7 @@ const Hero = () => {
           muted
           loop
           playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-multiply"
+          className="absolute inset-0 w-full h-full object-cover opacity-100"
           style={{ filter: 'blur(1px)' }}
         >
           <source src="https://videos.pexels.com/video-files/852435/852435-hd_1920_1080_30fps.mp4" type="video/mp4" />
@@ -66,7 +66,7 @@ const Hero = () => {
       </div>
       
       {/* Psychedelic Background Animation */}
-      <div className="absolute inset-0 bg-gradient-psychedelic animate-psychedelic-flow opacity-60"></div>
+      <div className="absolute inset-0 bg-gradient-psychedelic animate-psychedelic-flow opacity-50 mix-blend-multiply"></div>
       
       {/* Vertical Gradient Overlay - 100% to 0% opacity top to bottom */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/40 to-transparent"></div>
@@ -79,18 +79,13 @@ const Hero = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="text-center max-w-5xl mx-auto">
           
-        <h1 className="text-6xl sm:text-7xl md:text-8xl font-bold mb-6 animate-scale-in delay-300">
-          <span className="block leading-tight">
-            <span className="animate-gradient-hero skeumorphic-text">AI On</span>
-          </span>
-          <span className="block leading-tight text-foreground/90 skeumorphic-text">
-            Autopilot
-          </span>
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold mb-6 animate-scale-in delay-300 text-center">
+          <span className="animate-gradient-hero skeumorphic-text">AI On Autopilot</span>
         </h1>
           
-        <p className="text-xl sm:text-2xl text-muted-foreground mb-8 animate-fly-in delay-500 max-w-3xl leading-relaxed italic">
-          Stop babysitting your prompts. Let your AI workflows run themselves while you transcend into 
-          <span className="text-gradient-rainbow"> hyperspace dimensions of productivity</span> — where creativity flows like liquid light through quantum neural networks.
+        <p className="text-lg sm:text-xl text-muted-foreground mb-8 animate-fly-in delay-500 max-w-4xl mx-auto leading-relaxed">
+          Streamline your AI workflows with intelligent automation. Deploy, monitor, and scale your prompt-based operations 
+          <span className="text-gradient-rainbow font-semibold"> with enterprise-grade reliability</span> and precision.
         </p>
           
           {showButtons && (
@@ -161,13 +156,13 @@ const Hero = () => {
             </div>
           </div>
           
-      {/* Video Attribution */}
-      <div className="absolute bottom-4 right-4 z-10 animate-fade-in delay-1000">
+      {/* Video Attribution - Smaller and positioned in lower right */}
+      <div className="fixed bottom-2 right-2 z-10 animate-fade-in delay-1000">
         <a 
           href="https://www.pexels.com/video/aurora-852435/" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors glass-capsule px-2 py-1"
+          className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors glass-capsule px-1.5 py-0.5 rounded-md"
         >
           Aurora by Pexels
         </a>

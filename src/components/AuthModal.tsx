@@ -16,6 +16,7 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [showEmailSent, setShowEmailSent] = useState(false);
   const [mode, setMode] = useState(initialMode);
@@ -264,6 +265,8 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
         setPassword={setPassword}
         fullName={fullName}
         setFullName={setFullName}
+        username={username}
+        setUsername={setUsername}
         loading={loading}
       />
     </div>

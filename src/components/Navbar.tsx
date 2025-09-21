@@ -54,85 +54,124 @@ const Navbar = () => {
           shadow-glow-lg
         ">
           <div className="flex items-center justify-between h-12">
-            {/* Logo with Enhanced Capsule Background */}
+            {/* Logo - Smaller Size */}
             <div className="flex-shrink-0 relative">
               <div className="
-                absolute -inset-4 
+                absolute -inset-2 
                 bg-gradient-psychedelic/30
                 rounded-full blur-sm
                 animate-glow-pulse
                 shimmer-45-stagger
               "></div>
-              <PsychedelicBrandLogo size="medium" />
+              <PsychedelicBrandLogo size="small" />
             </div>
 
-            {/* Navigation Links */}
-            <div className="hidden md:flex items-center space-x-6">
-              <a
-                href="#features"
-                className="text-white/80 hover:text-white transition-colors duration-200 font-medium shimmer-rare"
-              >
-                Features
-              </a>
-              <a
-                href="#results"
-                className="text-white/80 hover:text-white transition-colors duration-200 font-medium shimmer-rare"
-              >
-                Results
-              </a>
-              <a
-                href="/blog"
-                className="text-white/80 hover:text-white transition-colors duration-200 font-medium shimmer-rare"
-              >
-                Blog
-              </a>
-            </div>
-
-            {/* Auth Buttons */}
+            {/* Avatar Menu */}
             {showButtons && (
-              <div className="flex items-center space-x-3">
-                {user && isEmailVerified ? (
+              <Popover>
+                <PopoverTrigger asChild>
                   <Button
-                    onClick={() => window.location.href = '/dashboard'}
+                    variant="ghost"
                     className="
-                      bg-gradient-psychedelic text-primary-foreground 
-                      hover:opacity-90 transition-all duration-300
-                      skeumorphic-button shimmer-45-rare
-                      border-0 rounded-full px-6
+                      w-10 h-10 rounded-full p-0
+                      bg-white/10 hover:bg-white/20
+                      border border-white/30
+                      shimmer-rare
+                      transition-all duration-300
+                      hover:scale-105
                     "
                   >
-                    Dashboard
+                    {user && isEmailVerified ? (
+                      <div className="w-8 h-8 rounded-full bg-gradient-psychedelic flex items-center justify-center">
+                        <span className="text-white text-xs font-semibold">
+                          {user.email?.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    ) : (
+                      <svg
+                        className="w-6 h-6 text-white/80"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                      </svg>
+                    )}
                   </Button>
-                ) : (
-                  <>
-                    <Button
-                      variant="ghost"
-                      onClick={() => window.location.href = '/auth'}
-                      className="
-                        text-white hover:text-primary 
-                        bg-white/10 hover:bg-white/20
-                        border border-white/30
-                        rounded-full px-4
-                        shimmer-rare
-                      "
-                    >
-                      Sign In
-                    </Button>
-                    <Button
-                      onClick={() => window.location.href = '/auth'}
-                      className="
-                        bg-gradient-psychedelic text-primary-foreground 
-                        hover:opacity-90 transition-all duration-300
-                        skeumorphic-button shimmer-45-rare
-                        border-0 rounded-full px-6
-                      "
-                    >
-                      <span className="animate-glow-pulse">⭐︎</span>
-                      Get Started
-                    </Button>
-                  </>
-                )}
-              </div>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="
+                    w-56 p-0 
+                    bg-background/95 backdrop-blur-xl 
+                    border border-white/20
+                    rounded-2xl
+                    animate-scale-in
+                  " 
+                  align="end"
+                >
+                  {user && isEmailVerified ? (
+                    <div className="p-4 space-y-3">
+                      <div className="flex items-center space-x-3 pb-3 border-b border-white/10">
+                        <div className="w-10 h-10 rounded-full bg-gradient-psychedelic flex items-center justify-center">
+                          <span className="text-white text-sm font-semibold">
+                            {user.email?.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-foreground">
+                            {user.email?.split('@')[0]}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-left"
+                        onClick={() => window.location.href = '/dashboard'}
+                      >
+                        Dashboard
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-left"
+                        onClick={() => window.location.href = '/settings'}
+                      >
+                        Settings
+                      </Button>
+                      <div className="pt-2 border-t border-white/10">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start text-left text-red-400 hover:text-red-300"
+                          onClick={() => {
+                            // Add sign out logic here
+                            window.location.href = '/';
+                          }}
+                        >
+                          Sign Out
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-4 space-y-3">
+                      <Button
+                        className="w-full bg-gradient-psychedelic text-primary-foreground border-0"
+                        onClick={() => window.location.href = '/auth'}
+                      >
+                        <span className="animate-glow-pulse mr-2">⭐︎</span>
+                        Get Started
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full border-white/20 bg-white/5"
+                        onClick={() => window.location.href = '/auth'}
+                      >
+                        Sign In
+                      </Button>
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
             )}
           </div>
         </div>
