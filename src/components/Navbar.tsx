@@ -13,6 +13,10 @@ const Navbar = () => {
   const { user, isEmailVerified, isInitialized } = useAuth();
   const [showButtons, setShowButtons] = useState(false);
 
+  const handleLogoClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Delay showing buttons until auth is fully initialized to prevent layout shifts
   useEffect(() => {
     if (isInitialized) {
@@ -50,12 +54,15 @@ const Navbar = () => {
           border border-white/30
           rounded-full px-6 py-3
           skeumorphic-glass-capsule
-          shimmer-persistent
           shadow-glow-lg
+          relative overflow-hidden
         ">
-          <div className="flex items-center justify-between h-12">
-            {/* Logo - Smaller Size */}
-            <div className="flex-shrink-0 relative">
+          {/* Full-width shimmer animation */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-traverse opacity-0 hover:opacity-100 transition-opacity duration-300" />
+          
+          <div className="flex items-center justify-between h-12 relative z-10">
+            {/* Logo - Smaller Size - Clickable */}
+            <div className="flex-shrink-0 relative cursor-pointer" onClick={handleLogoClick}>
               <div className="
                 absolute -inset-2 
                 bg-gradient-psychedelic/30

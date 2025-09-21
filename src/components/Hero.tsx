@@ -41,11 +41,11 @@ const Hero = () => {
       min-h-screen 
       flex items-center justify-center 
       overflow-hidden 
-      pt-24 md:pt-20 
+      pt-32 md:pt-28 
       animate-fade-in
       w-full
     ">
-      {/* Aurora Video Background */}
+      {/* Aurora Video Background - 100% opacity */}
       <div className="absolute inset-0 overflow-hidden">
         <video
           autoPlay
@@ -53,39 +53,29 @@ const Hero = () => {
           loop
           playsInline
           className="absolute inset-0 w-full h-full object-cover opacity-100"
-          style={{ filter: 'blur(1px)' }}
         >
           <source src="https://videos.pexels.com/video-files/852435/852435-hd_1920_1080_30fps.mp4" type="video/mp4" />
         </video>
-        
-        {/* Vertical gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/100 via-background/50 to-background/0" />
-        
-        {/* 3D Vignette Effect */}
-        <div className="absolute inset-0 bg-radial-vignette" />
       </div>
       
-      {/* Psychedelic Background Animation */}
-      <div className="absolute inset-0 bg-gradient-psychedelic animate-psychedelic-flow opacity-50 mix-blend-multiply"></div>
-      
-      {/* Vertical Gradient Overlay - 100% to 0% opacity top to bottom */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/40 to-transparent"></div>
-      
-      {/* Vignette Effect */}
-      <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.4) 100%)'
-      }}></div>
+      {/* Gradient overlay with multiply blend mode at 50% opacity */}
+      <div 
+        className="absolute inset-0 bg-gradient-to-b from-purple-900/30 via-transparent to-black/40"
+        style={{ mixBlendMode: 'multiply', opacity: 0.5 }}
+      />
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="text-center max-w-5xl mx-auto">
           
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold mb-6 animate-scale-in delay-300 text-center">
-          <span className="animate-gradient-hero skeumorphic-text">AI On Autopilot</span>
+        {/* Hero headline - single line with different styling for "AI On" */}
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold mb-6 animate-scale-in delay-300 text-center leading-none">
+          <span className="text-white/90 font-light">AI On </span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 animate-gradient-x">Autopilot</span>
         </h1>
           
-        <p className="text-lg sm:text-xl text-muted-foreground mb-8 animate-fly-in delay-500 max-w-4xl mx-auto leading-relaxed">
-          Streamline your AI workflows with intelligent automation. Deploy, monitor, and scale your prompt-based operations 
-          <span className="text-gradient-rainbow font-semibold"> with enterprise-grade reliability</span> and precision.
+        {/* Professional subheading */}
+        <p className="text-lg sm:text-xl text-gray-200 mb-8 animate-fly-in delay-500 max-w-4xl mx-auto leading-relaxed font-medium">
+          Stop babysitting your prompts. Democratize your coding experience whether local or online—we consolidate the process into one seamless, intelligent automation pipeline that scales with your ambitions.
         </p>
           
           {showButtons && (
@@ -137,7 +127,7 @@ const Hero = () => {
           )}
           
           <div className="mt-16 relative animate-slide-up delay-600">
-            {/* Floating image container - macOS dock style - 50% bigger */}
+            {/* Floating image container */}
             <div className="relative mx-auto max-w-3xl z-10">
               {/* Ambient glow underneath */}
               <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-2/3 h-3 bg-gradient-to-r from-transparent via-primary/40 to-transparent blur-md"></div>
@@ -145,7 +135,7 @@ const Hero = () => {
               {/* Main floating image */}
               <div className="skeuomorphic-card elevation-3 rounded-2xl overflow-hidden">
           <img 
-            src="/src/assets/dashboard-mockup-cyberpunk.png" 
+            src={dashboardMockup}
             alt="AutoPromptr Cyberpunk Dashboard Interface" 
             className="w-full h-auto rounded-2xl shadow-elegant border border-primary/20 bg-card/10 backdrop-blur-sm animate-materialize delay-700 skeumorphic-surface shimmer-rare"
             onError={(e) => {
@@ -155,19 +145,19 @@ const Hero = () => {
               </div>
             </div>
           </div>
-          
-      {/* Video Attribution - Smaller and positioned in lower right */}
-      <div className="fixed bottom-2 right-2 z-10 animate-fade-in delay-1000">
+        </div>
+      </div>
+      
+      {/* Video Attribution - Above fold in lower right, smaller */}
+      <div className="absolute bottom-8 right-4 z-20 animate-fade-in delay-1000">
         <a 
           href="https://www.pexels.com/video/aurora-852435/" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors glass-capsule px-1.5 py-0.5 rounded-md"
+          className="text-xs text-white/50 hover:text-white/70 bg-black/30 px-2 py-1 rounded backdrop-blur-sm transition-colors"
         >
           Aurora by Pexels
         </a>
-      </div>
-        </div>
       </div>
     </section>
   );
