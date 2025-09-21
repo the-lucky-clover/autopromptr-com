@@ -148,6 +148,28 @@ export default {
 				'shimmer': {
 					'0%': { backgroundPosition: '-200% center' },
 					'100%': { backgroundPosition: '200% center' }
+				},
+				'shimmer-45': {
+					'0%': { 
+						backgroundPosition: '-200% -200%',
+						opacity: '0' 
+					},
+					'50%': { opacity: '1' },
+					'100%': { 
+						backgroundPosition: '200% 200%',
+						opacity: '0' 
+					}
+				},
+				'shimmer-stagger': {
+					'0%, 70%': { 
+						backgroundPosition: '-200% center',
+						opacity: '0' 
+					},
+					'80%, 90%': { opacity: '1' },
+					'100%': { 
+						backgroundPosition: '200% center',
+						opacity: '0' 
+					}
 				}
 			},
 			animation: {
@@ -160,7 +182,13 @@ export default {
 				'rainbow-shift': 'rainbow-shift 12s linear infinite',
 				'subtle-breathe': 'subtle-breathe 4s ease-in-out infinite',
 				'float-gentle': 'float-gentle 6s ease-in-out infinite',
-				'shimmer': 'shimmer 2s linear infinite'
+				'shimmer': 'shimmer 2s linear infinite',
+				'shimmer-45': 'shimmer-45 4s infinite',
+				'shimmer-45-rare': 'shimmer-45 8s infinite 2s',
+				'shimmer-stagger': 'shimmer-stagger 6s infinite',
+				'shimmer-stagger-delay': 'shimmer-stagger 6s infinite 2s',
+				'shimmer-persistent': 'shimmer-45 3s infinite',
+				'shimmer-rare': 'shimmer-stagger 12s infinite 3s'
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

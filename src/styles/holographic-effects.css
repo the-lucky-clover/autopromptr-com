@@ -1,5 +1,4 @@
-@layer components {
-  .intermittent-shimmer {
+.intermittent-shimmer {
     position: relative;
     overflow: hidden;
   }
@@ -64,7 +63,6 @@
     transform-style: preserve-3d;
     animation: dockFloat 3s ease-in-out infinite alternate;
   }
-}
 
 @keyframes intermittentShimmer {
   0%, 70% {

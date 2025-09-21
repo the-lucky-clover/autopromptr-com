@@ -1,29 +1,27 @@
 
-@layer base {
-  /* Nuclear Meltdown Animations */
-  .animate-reactor-shake {
-    animation: reactorShake 0.3s ease-in-out infinite;
-  }
+/* Nuclear Meltdown Animations */
+.animate-reactor-shake {
+  animation: reactorShake 0.3s ease-in-out infinite;
+}
 
-  .animate-siren-flash {
-    animation: sirenFlash 0.4s ease-in-out infinite alternate;
-  }
+.animate-siren-flash {
+  animation: sirenFlash 0.4s ease-in-out infinite alternate;
+}
 
-  .animate-critical-pulse {
-    animation: criticalPulse 0.2s ease-in-out infinite alternate;
-  }
+.animate-critical-pulse {
+  animation: criticalPulse 0.2s ease-in-out infinite alternate;
+}
 
-  .animate-door-slide-left {
-    animation: doorSlideLeft 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-  }
+.animate-door-slide-left {
+  animation: doorSlideLeft 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
 
-  .animate-door-slide-right {
-    animation: doorSlideRight 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-  }
+.animate-door-slide-right {
+  animation: doorSlideRight 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
 
-  .animate-radiation-danger {
-    animation: radiationDanger 1s ease-in-out infinite alternate, spin 2s linear infinite;
-  }
+.animate-radiation-danger {
+  animation: radiationDanger 1s ease-in-out infinite alternate, spin 2s linear infinite;
 }
 
 /* Nuclear Meltdown Keyframes */

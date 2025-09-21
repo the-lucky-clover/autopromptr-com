@@ -5,11 +5,11 @@
 @import "./styles/base.css";
 @import "./styles/components.css";
 @import "./styles/animations.css";
+@import "./styles/enhanced-animations.css";
 @import "./styles/glassmorphism.css";
 @import "./styles/psychological-animations.css";
 @import "./styles/scan-line-effects.css";
 @import "./styles/holographic-effects.css";
-@import "./styles/enhanced-animations.css";
 @import "./styles/skeuomorphic-design.css";
 @import "./styles/psychedelic-animations.css";
 
@@ -114,6 +114,13 @@ html, body {
   /* Animation Timings */
   --transition-smooth: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   --transition-glow: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  
+  /* Skeumorphic Design Variables */
+  --glass-surface: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --emboss-light: rgba(255, 255, 255, 0.3);
+  --emboss-dark: rgba(0, 0, 0, 0.3);
 }
 
 /* Dark Mode Overrides for Enhanced Contrast */
@@ -195,6 +202,34 @@ html, body {
   }
 }
 
+@keyframes shimmer-45 {
+  0% {
+    background-position: -200% -200%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    background-position: 200% 200%;
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer-stagger {
+  0%, 70% {
+    background-position: -200% center;
+    opacity: 0;
+  }
+  80%, 90% {
+    opacity: 1;
+  }
+  100% {
+    background-position: 200% center;
+    opacity: 0;
+  }
+}
+
 /* Utility Classes for Enhanced UX */
 .psychedelic-gradient {
   background: var(--gradient-psychedelic);
@@ -226,6 +261,170 @@ html, body {
 
 .glow-transition {
   transition: var(--transition-glow);
+}
+
+/* Skeumorphic Glass Effects */
+.skeumorphic-glass {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(12px);
+}
+
+.skeumorphic-glass-capsule {
+  background: linear-gradient(145deg, 
+    rgba(255, 255, 255, 0.15) 0%, 
+    rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(20px);
+}
+
+.skeumorphic-button {
+  background: linear-gradient(145deg, 
+    hsl(var(--primary)) 0%, 
+    hsl(var(--secondary)) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.skeumorphic-text {
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 20px hsl(var(--glow-purple) / 0.6);
+  filter: drop-shadow(0 0 10px hsl(var(--glow-blue) / 0.4));
+}
+
+.drop-shadow-glow {
+  filter: drop-shadow(0 0 20px hsl(var(--glow-purple) / 0.8))
+          drop-shadow(0 0 40px hsl(var(--glow-blue) / 0.6));
+}
+
+/* Shimmer Animation Classes */
+.shimmer-45-stagger {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-45-stagger::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, 
+    transparent 30%, 
+    rgba(255, 255, 255, 0.4) 50%, 
+    transparent 70%);
+  animation: shimmer-45 4s infinite;
+  animation-delay: 0s;
+}
+
+.shimmer-45-rare {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-45-rare::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, 
+    transparent 30%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    transparent 70%);
+  animation: shimmer-45 8s infinite;
+  animation-delay: 2s;
+}
+
+.shimmer-staggered {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-staggered::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    transparent 100%);
+  animation: shimmer-stagger 6s infinite;
+}
+
+.shimmer-staggered-delay {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-staggered-delay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    transparent 100%);
+  animation: shimmer-stagger 6s infinite;
+  animation-delay: 2s;
+}
+
+.shimmer-persistent {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-persistent::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, 
+    transparent 40%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    transparent 60%);
+  animation: shimmer-45 3s infinite;
+}
+
+.shimmer-rare {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-rare::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    transparent 100%);
+  animation: shimmer-stagger 12s infinite;
+  animation-delay: 3s;
 }
 
 /* Mobile-First Responsive Containers */

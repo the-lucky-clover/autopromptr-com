@@ -1,6 +1,5 @@
-@layer base {
-  /* Scan Line Effects for Digital Clock */
-  .scan-line-glow {
+/* Scan Line Effects for Digital Clock */
+.scan-line-glow {
     position: relative;
   }
 

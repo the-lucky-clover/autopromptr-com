@@ -4,24 +4,22 @@
 @import './scroll-animations.css';
 @import './psychedelic-animations.css';
 
-@layer base {
-  /* Reduced motion support for accessibility */
-  @media (prefers-reduced-motion: reduce) {
-    .synthwave-logo,
-    .synthwave-bolt,
-    .synthwave-text,
-    .grid-line-horizontal,
-    .grid-line-vertical,
-    .star,
-    .terrain-mountain,
-    .palm-tree,
-    .cactus,
-    .animate-reactor-shake,
-    .animate-siren-flash,
-    .animate-critical-pulse,
-    .animate-radiation-danger {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-    }
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .synthwave-logo,
+  .synthwave-bolt,
+  .synthwave-text,
+  .grid-line-horizontal,
+  .grid-line-vertical,
+  .star,
+  .terrain-mountain,
+  .palm-tree,
+  .cactus,
+  .animate-reactor-shake,
+  .animate-siren-flash,
+  .animate-critical-pulse,
+  .animate-radiation-danger {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

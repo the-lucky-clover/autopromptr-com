@@ -1,7 +1,6 @@
 
-@layer components {
-  /* 3D Interactive Background */
-  .dashboard-3d-background {
+/* 3D Interactive Background */
+.dashboard-3d-background {
     position: fixed;
     top: 0;
     left: 0;
@@ -212,7 +211,7 @@
     line-height: 1.382;
     margin-bottom: calc(1rem / 1.618);
   }
-}
+  /* Missing closing brace */
 
 /* Keyframe Animations */
 @keyframes floatingOrbs {

@@ -1,6 +1,5 @@
 
-@layer base {
-  :root {
+:root {
     --background: 222 47% 11%;
     --foreground: 0 0% 98%;
 
@@ -40,100 +39,98 @@
     --sidebar-border: 225 47% 20%;
     --sidebar-ring: 263 85% 70%;
   }
+
+* {
+  border-color: hsl(var(--border));
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+html {
+  scroll-behavior: smooth;
+}
 
-  html {
-    scroll-behavior: smooth;
-  }
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
 
-  body {
-    @apply bg-background text-foreground font-sans;
-    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #7c3aed 100%);
-    min-height: 100vh;
-  }
+/* Ensure ALL buttons have rounded corners */
+button, .btn, [role="button"] {
+  border-radius: 1.5rem;
+}
 
-  /* Ensure ALL buttons have rounded corners */
-  button, .btn, [role="button"] {
-    border-radius: 1.5rem;
-  }
+/* Ensure ALL cards have rounded corners */
+.card, [data-card], .glass-effect {
+  border-radius: 1.5rem;
+}
 
-  /* Ensure ALL cards have rounded corners */
-  .card, [data-card], .glass-effect {
-    border-radius: 1.5rem;
-  }
+/* Ensure all images have rounded corners */
+img {
+  border-radius: 1.5rem;
+}
 
-  /* Ensure all images have rounded corners */
-  img {
-    border-radius: 1.5rem;
-  }
+/* Apply rounded corners to all form elements */
+input, textarea, select {
+  border-radius: 1.5rem;
+}
 
-  /* Apply rounded corners to all form elements */
-  input, textarea, select {
-    border-radius: 1.5rem;
-  }
+/* Ensure rounded corners are applied globally */
+.rounded-sm {
+  border-radius: 1rem;
+}
 
-  /* Ensure rounded corners are applied globally */
-  .rounded-sm {
-    border-radius: 1rem;
-  }
+.rounded {
+  border-radius: 1rem;
+}
 
-  .rounded {
-    border-radius: 1rem;
-  }
+.rounded-md {
+  border-radius: 1rem;
+}
 
-  .rounded-md {
-    border-radius: 1rem;
-  }
+.rounded-lg {
+  border-radius: 1.5rem;
+}
 
-  .rounded-lg {
-    border-radius: 1.5rem;
-  }
+.rounded-xl {
+  border-radius: 1.5rem;
+}
 
-  .rounded-xl {
-    border-radius: 1.5rem;
-  }
+.rounded-2xl {
+  border-radius: 1.5rem;
+}
 
-  .rounded-2xl {
-    border-radius: 1.5rem;
-  }
+.rounded-3xl {
+  border-radius: 2rem;
+}
 
-  .rounded-3xl {
-    border-radius: 2rem;
-  }
+.rounded-full {
+  border-radius: 9999px;
+}
 
-  .rounded-full {
-    border-radius: 9999px;
-  }
+/* Force rounded corners on all interactive elements */
+a, button, input, textarea, select, .card, .glass-effect, [data-radix-collection-item] {
+  border-radius: var(--radius);
+}
 
-  /* Force rounded corners on all interactive elements */
-  a, button, input, textarea, select, .card, .glass-effect, [data-radix-collection-item] {
-    border-radius: var(--radius);
-  }
+/* Enhanced rounded corners for toast notifications */
+[data-toast-viewport] {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 100;
+  max-height: 100vh;
+  width: 390px;
+  list-style: none;
+  outline: none;
+  pointer-events: none;
+  padding: 0;
+  margin: 0;
+}
 
-  /* Enhanced rounded corners for toast notifications */
-  [data-toast-viewport] {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    z-index: 100;
-    max-height: 100vh;
-    width: 390px;
-    list-style: none;
-    outline: none;
-    pointer-events: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  [data-toast] {
-    border-radius: 1.5rem;
-    background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
+[data-toast] {
+  border-radius: 1.5rem;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }

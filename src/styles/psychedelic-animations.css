@@ -1,7 +1,6 @@
 
-@layer base {
-  /* Hero gradient animation matching the "Supercharge" text */
-  .animate-gradient-hero {
+/* Hero gradient animation matching the "Supercharge" text */
+.animate-gradient-hero {
     background: linear-gradient(
       90deg,
       #3B82F6,
