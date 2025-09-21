@@ -75,10 +75,12 @@ const Navbar = () => {
                 <PsychedelicBrandLogo size="small" />
               </div>
 
-              {/* Avatar Menu */}
+              {/* Theme Toggle and Avatar Menu */}
               {showButtons && (
-                <Popover>
-                  <PopoverTrigger asChild>
+                <div className="flex items-center space-x-3">
+                  <DayNightToggle />
+                  <Popover>
+                    <PopoverTrigger asChild>
                     <Button
                       variant="ghost"
                       className="
@@ -180,14 +182,13 @@ const Navbar = () => {
                       </div>
                     )}
                   </PopoverContent>
-                </Popover>
+                  </Popover>
+                </div>
               )}
             </div>
           </div>
         </div>
       </nav>
-      
-      <DayNightToggle />
     </>
   );
 };
