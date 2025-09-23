@@ -1,5 +1,6 @@
 import { AutoPromptr } from './autoPromptr';
 import { AutoPromptrError } from './autoPromptr';
+import { API_BASE_URL } from './autoPromptr/config';
 
 export interface ConnectionTestResult {
   endpoint: string;
@@ -14,7 +15,7 @@ export class ConnectionDiagnostics {
   private autoPromptr: AutoPromptr;
 
   constructor() {
-    this.autoPromptr = new AutoPromptr();
+    this.autoPromptr = new AutoPromptr(API_BASE_URL);
   }
 
   async testConnection(): Promise<{
