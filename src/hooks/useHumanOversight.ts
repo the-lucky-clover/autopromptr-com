@@ -58,8 +58,8 @@ interface HumanOversightHook {
 }
 
 export function useHumanOversight(
-  baseUrl: string = 'http://localhost:5000',
-  websocketUrl: string = 'ws://localhost:8765'
+  baseUrl: string = 'https://autopromptr-backend.onrender.com',
+  websocketUrl: string = 'wss://autopromptr-backend.onrender.com'
 ): HumanOversightHook {
   const [pendingApprovals, setPendingApprovals] = useState<ApprovalRequest[]>([]);
   const [stats, setStats] = useState<HumanOversightStats | null>(null);

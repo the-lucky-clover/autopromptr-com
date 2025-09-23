@@ -84,7 +84,7 @@ const BatchOversightPanel: React.FC<BatchOversightPanelProps> = ({
 
   const loadActiveBatches = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/batches');
+      const response = await fetch('https://autopromptr-backend.onrender.com/api/batches');
       const data = await response.json();
       setActiveBatches(data.active_jobs || []);
     } catch (error) {
@@ -94,7 +94,7 @@ const BatchOversightPanel: React.FC<BatchOversightPanelProps> = ({
 
   const loadBatchDetails = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/batches/${id}/status`);
+      const response = await fetch(`https://autopromptr-backend.onrender.com/api/batches/${id}/status`);
       const data = await response.json();
       
       setBatchProgress(data.progress);
@@ -111,7 +111,7 @@ const BatchOversightPanel: React.FC<BatchOversightPanelProps> = ({
 
   const handleBatchAction = async (action: 'pause' | 'resume' | 'stop', id: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/jobs/${id}/${action}`, {
+      const response = await fetch(`https://autopromptr-backend.onrender.com/api/jobs/${id}/${action}`, {
         method: 'POST'
       });
 
@@ -140,7 +140,7 @@ const BatchOversightPanel: React.FC<BatchOversightPanelProps> = ({
 
   const createOversightBatch = async (batchData: any) => {
     try {
-      const response = await fetch('http://localhost:5000/api/run-batch', {
+      const response = await fetch('https://autopromptr-backend.onrender.com/api/run-batch', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

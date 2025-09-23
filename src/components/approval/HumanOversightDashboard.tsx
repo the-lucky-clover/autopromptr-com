@@ -105,7 +105,7 @@ const HumanOversightDashboard: React.FC = () => {
 
   const loadPendingApprovals = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/approvals/pending');
+      const response = await fetch('https://autopromptr-backend.onrender.com/api/approvals/pending');
       const data = await response.json();
       setPendingApprovals(data.pending_approvals || []);
     } catch (error) {
@@ -115,7 +115,7 @@ const HumanOversightDashboard: React.FC = () => {
 
   const loadApprovalStats = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/approval-service/stats');
+      const response = await fetch('https://autopromptr-backend.onrender.com/api/approval-service/stats');
       const data = await response.json();
       setApprovalStats(data);
     } catch (error) {
@@ -125,7 +125,7 @@ const HumanOversightDashboard: React.FC = () => {
 
   const handleApprovalResponse = async (approvalId: string, decision: 'approve' | 'reject') => {
     try {
-      const response = await fetch(`http://localhost:5000/api/approvals/${approvalId}/respond`, {
+      const response = await fetch(`https://autopromptr-backend.onrender.com/api/approvals/${approvalId}/respond`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

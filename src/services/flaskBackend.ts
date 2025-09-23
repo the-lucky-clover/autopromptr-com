@@ -161,5 +161,5 @@ export class FlaskBackendClient {
 
 // Default client instance
 export const flaskBackend = new FlaskBackendClient({
-  baseUrl: 'http://localhost:5000' // Direct URL since env variables are not supported
+  baseUrl: 'https://autopromptr-backend.onrender.com' // Direct URL since env variables are not supported
 });

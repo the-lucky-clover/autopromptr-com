@@ -9,7 +9,7 @@ interface UseFlaskBackendConfig {
 
 export function useFlaskBackend(config: UseFlaskBackendConfig = {}) {
   const [client] = useState(() => new FlaskBackendClient({
-    baseUrl: config.baseUrl || 'http://localhost:5000' // Direct URL since env variables are not supported
+    baseUrl: config.baseUrl || 'https://autopromptr-backend.onrender.com' // Direct URL since env variables are not supported
   }));
   
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ export function useFlaskBackend(config: UseFlaskBackendConfig = {}) {
     
     // Provide better error messages for common connection issues
     if (errorMessage.includes('Failed to fetch') || errorMessage.includes('fetch')) {
-      errorMessage = 'Flask backend is not running. Please start the backend service on localhost:5000';
+      errorMessage = 'Flask backend is not running. Please check backend service at https://autopromptr-backend.onrender.com';
     } else if (errorMessage.includes('Network request failed')) {
       errorMessage = 'Network error - check if the Flask backend is accessible';
     } else if (errorMessage.includes('Request timeout')) {

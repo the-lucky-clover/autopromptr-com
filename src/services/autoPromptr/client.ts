@@ -6,7 +6,7 @@ export class AutoPromptr {
   public baseUrl: string; // Make baseUrl public
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || 'http://localhost:5000';
+    this.baseUrl = baseUrl || 'https://autopromptr-backend.onrender.com';
   }
 
   async runBatch(batch: Batch, platform: string, options?: any): Promise<any> {

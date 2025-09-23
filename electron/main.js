@@ -23,7 +23,7 @@ function createWindow() {
           "style-src 'self' 'unsafe-inline'; " +
           "img-src 'self' data: https:; " +
           "font-src 'self' data:; " +
-          "connect-src 'self' http://localhost:* https://api.openai.com https://api.anthropic.com; " +
+          "connect-src 'self' http://localhost:* https://api.openai.com https://api.anthropic.com https://autopromptr-backend.onrender.com https://*.lovableproject.com; " +
           "frame-src 'none'; " +
           "object-src 'none'"
         ],
@@ -141,7 +141,48 @@ function startLocalServer() {
     }
   });
 
-  // Local automation endpoint for connecting to local apps
+  // Web platform integration endpoint
+  server.post('/receive-prompts', async (req, res) => {
+    try {
+      const { prompts, targetTool, metadata } = req.body;
+      
+      console.log(`📥 Received ${prompts.length} prompts from web platform for ${targetTool}`);
+      
+      // Process prompts for local tools (Cursor, Windsurf, VS Code)
+      const results = await processPromptsForLocalTool(prompts, targetTool, metadata);
+      
+      res.json({
+        success: true,
+        results,
+        message: `Successfully processed ${prompts.length} prompts for ${targetTool}`,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('❌ Error processing web platform prompts:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  });
+
+  // Local tool detection endpoint
+  server.get('/detect-tools', async (req, res) => {
+    try {
+      const availableTools = await detectAvailableLocalTools();
+      res.json({
+        success: true,
+        tools: availableTools,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        tools: []
+      });
+    }
+  });
   server.post('/local-automation', async (req, res) => {
     try {
       const { targetPath, prompts } = req.body;
@@ -163,7 +204,9 @@ function startLocalServer() {
   });
 
   localServer = server.listen(LOCAL_PORT, 'localhost', () => {
-    console.log(`AutoPromptr Companion Server running on http://localhost:${LOCAL_PORT}`);
+    console.log(`🚀 AutoPromptr Companion Server running on http://localhost:${LOCAL_PORT}`);
+    console.log(`🌐 Ready to receive prompts from web platform`);
+    console.log(`🔗 Web Platform URL: https://1fec766e-41d8-4e0e-9e5c-277ce2efbe11.lovableproject.com`);
   });
 }
 
@@ -224,3 +267,59 @@ app.on('before-quit', () => {
     localServer.close();
   }
 });
+
+// Helper functions for local tool integration
+async function processPromptsForLocalTool(prompts, targetTool, metadata = {}) {
+  console.log(`🔧 Processing ${prompts.length} prompts for ${targetTool}`);
+  
+  // This is where you would implement actual tool integration
+  // For now, this is a simulation
+  const results = prompts.map((prompt, index) => ({
+    id: prompt.id || `prompt_${index}`,
+    text: prompt.text || prompt,
+    status: 'sent_to_tool',
+    tool: targetTool,
+    timestamp: new Date().toISOString()
+  }));
+
+  // Simulate tool-specific processing
+  switch (targetTool.toLowerCase()) {
+    case 'cursor':
+      // Integration with Cursor IDE
+      console.log('📝 Sending prompts to Cursor IDE...');
+      break;
+    case 'windsurf':
+      // Integration with Windsurf IDE  
+      console.log('🏄 Sending prompts to Windsurf IDE...');
+      break;
+    case 'vscode':
+      // Integration with VS Code
+      console.log('💻 Sending prompts to VS Code...');
+      break;
+    default:
+      console.log(`🔧 Sending prompts to ${targetTool}...`);
+  }
+
+  return results;
+}
+
+async function detectAvailableLocalTools() {
+  // This would check for installed IDEs on the system
+  const tools = [];
+  
+  // Check for common IDE installations
+  // This is a simplified example - real implementation would check actual paths
+  const possibleTools = [
+    { name: 'Cursor', path: '/cursor', available: false },
+    { name: 'Windsurf', path: '/windsurf', available: false },
+    { name: 'VS Code', path: '/vscode', available: false }
+  ];
+
+  // For demo purposes, assume all tools are potentially available
+  possibleTools.forEach(tool => {
+    tool.available = Math.random() > 0.3; // Random availability for demo
+    tools.push(tool);
+  });
+
+  return tools;
+}

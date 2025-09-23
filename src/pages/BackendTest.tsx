@@ -57,7 +57,7 @@ export default function BackendTest() {
                 <div className="space-y-2">
                   <h4 className="font-semibold">Requirements:</h4>
                   <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                    <li>Flask backend running on localhost:5000</li>
+                    <li>Flask backend running on https://autopromptr-backend.onrender.com</li>
                     <li>GEMINI_API_KEY environment variable set</li>
                     <li>Python dependencies installed</li>
                   </ul>
