@@ -39,3 +39,6 @@ verify_jwt = false
 
 [functions.ai-agent-orchestrator]
 verify_jwt = false
+
+[functions.prompt-dispatch]
+verify_jwt = false

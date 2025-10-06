@@ -32,7 +32,7 @@ const Navbar = () => {
         <div className="flex justify-center pt-4">
           <div className="w-1/2 min-w-[320px] max-w-2xl bg-background/20 backdrop-blur-xl border border-white/30 rounded-full px-6 py-3">
             <div className="flex items-center justify-center h-12">
-              <PsychedelicBrandLogo size="medium" />
+              <PsychedelicBrandLogo size="medium" animate={false} />
             </div>
           </div>
         </div>
@@ -60,19 +60,12 @@ const Navbar = () => {
             relative overflow-hidden
           ">
             {/* Full-width shimmer animation */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer-traverse opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            
             
             <div className="flex items-center justify-between h-12 relative z-10">
               {/* Logo - Smaller Size - Clickable */}
               <div className="flex-shrink-0 relative cursor-pointer" onClick={handleLogoClick}>
-                <div className="
-                  absolute -inset-2 
-                  bg-gradient-psychedelic/30
-                  rounded-full blur-sm
-                  animate-glow-pulse
-                  shimmer-45-stagger
-                "></div>
-                <PsychedelicBrandLogo size="small" />
+                <PsychedelicBrandLogo size="small" animate={false} />
               </div>
 
               {/* Theme Toggle and Avatar Menu */}

@@ -87,8 +87,7 @@ export function AppSidebar({ width = 256 }: AppSidebarProps) {
   return (
     <Sidebar 
       className="
-        bg-gradient-psychedelic 
-        animate-psychedelic-flow 
+        bg-card/60 
         border-border/30 
         backdrop-blur-xl 
         shadow-glow-lg
@@ -97,7 +96,7 @@ export function AppSidebar({ width = 256 }: AppSidebarProps) {
     >
       <SidebarHeader className="p-4 border-b border-border/30 bg-card/20 backdrop-blur-sm">
         <Link to="/" className="flex items-center justify-center group">
-          <PsychedelicBrandLogo size="small" variant="horizontal" id="sidebar-logo" animate={true} />
+          <PsychedelicBrandLogo size="small" variant="horizontal" id="sidebar-logo" animate={false} />
         </Link>
       </SidebarHeader>
       
@@ -129,7 +128,7 @@ export function AppSidebar({ width = 256 }: AppSidebarProps) {
                     "
                   >
                     <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="h-5 w-5 group-hover:animate-glow-pulse glow-transition" strokeWidth={2} />
+                      <item.icon className="h-5 w-5 glow-transition" strokeWidth={2} />
                       <span className="text-sm font-semibold">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -165,7 +164,7 @@ export function AppSidebar({ width = 256 }: AppSidebarProps) {
                       "
                     >
                       <Link to={item.url} className="flex items-center gap-2">
-                        <item.icon className="h-3.5 w-3.5 animate-glow-pulse" strokeWidth={1.5} />
+                        <item.icon className="h-3.5 w-3.5" strokeWidth={1.5} />
                         <span className="text-xs font-medium">{item.title}</span>
                       </Link>
                     </SidebarMenuButton>

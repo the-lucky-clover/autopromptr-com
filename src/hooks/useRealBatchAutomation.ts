@@ -26,14 +26,40 @@ export function useRealBatchAutomation() {
 
     try {
       console.log('🚀 Starting real batch automation for:', batch.name);
-      
-      // Test connection first
+
+      // Decide route: local companion vs remote backend
+      const target = (batch.targetUrl || '').toLowerCase();
+      const isLocal = /^(https?:\/\/)?(localhost|127\.0\.0\.1)/.test(target);
+      const isRemotePlatform = /(replit\.com|codesandbox\.io|glitch\.com|v0\.dev|lovable\.dev)/.test(target);
+
+      if (isLocal) {
+        const { localCompanionService } = await import('@/services/localCompanionService');
+        const info = await localCompanionService.checkCompanionAvailability();
+        if (!info.available) throw new Error('Local companion not available. Please start the AutoPromptr Companion app.');
+        const res = await localCompanionService.sendBatchToLocalTool(batch, 'local-tool');
+        if (!res.success) throw new Error(res.error || 'Local prompt injection failed');
+        setProgress({ completed: batch.prompts.length, total: batch.prompts.length });
+        toast({ title: 'Local Injection Started', description: 'Your local tool is processing the prompts.' });
+        return;
+      }
+
+      if (isRemotePlatform) {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data, error } = await supabase.functions.invoke('prompt-dispatch', {
+          body: { batch, platform: 'web-remote', options: batch.settings || {} },
+        });
+        if (error) throw new Error(error.message || 'Remote dispatch failed');
+        setProgress({ completed: batch.prompts.length, total: batch.prompts.length });
+        toast({ title: 'Remote Injection Started', description: 'Batch dispatched to automation backend.' });
+        return;
+      }
+
+      // Default: built-in browser automation path
       const isHealthy = await automationService.healthCheck();
       if (!isHealthy) {
         throw new Error('Backend automation service is not available. Please check the service status.');
       }
 
-      // Process the batch
       const result = await automationService.processBatch(batch, {
         maxRetries: batch.settings?.maxRetries || 3,
         waitForIdle: batch.settings?.waitForIdle !== false,
@@ -42,26 +68,13 @@ export function useRealBatchAutomation() {
       });
 
       console.log('✅ Batch automation completed:', result);
-      
       setProgress({ completed: batch.prompts.length, total: batch.prompts.length });
-      
-      toast({
-        title: 'Batch Completed',
-        description: `Successfully processed ${batch.prompts.length} prompts for "${batch.name}"`,
-      });
-
+      toast({ title: 'Batch Completed', description: `Successfully processed ${batch.prompts.length} prompts for "${batch.name}"` });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown automation error';
       setError(errorMessage);
-      
       console.error('❌ Batch automation failed:', err);
-      
-      toast({
-        title: 'Batch Failed',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      
+      toast({ title: 'Batch Failed', description: errorMessage, variant: 'destructive' });
       throw err;
     } finally {
       setLoading(false);
