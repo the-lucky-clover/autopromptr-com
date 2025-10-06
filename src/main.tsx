@@ -5,6 +5,18 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './hooks/useAuth';
 import App from './App.tsx';
 import './index.css';
+import './styles/animations.css';
+import './styles/enhanced-animations.css';
+import './styles/shimmer-animations.css';
+import './styles/glassmorphism.css';
+import './styles/skeuomorphic-design.css';
+import './styles/holographic-effects.css';
+import './styles/scan-line-effects.css';
+import './styles/scroll-animations.css';
+import './styles/psychedelic-animations.css';
+import './styles/psychological-animations.css';
+import './styles/nuclear-animations.css';
+import './styles/award-winning-ux.css';
 import { SecurityHeaders } from './services/security/securityHeaders';
 
 // Initialize security headers

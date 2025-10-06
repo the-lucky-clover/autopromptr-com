@@ -1,14 +1,10 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
-import AuthModal from "@/components/AuthModal";
 import PsychedelicBrandLogo from "@/components/PsychedelicBrandLogo";
-import DayNightToggle from "./DayNightToggle";
 
 const Navbar = () => {
   const { user, isEmailVerified, isInitialized } = useAuth();
@@ -18,19 +14,17 @@ const Navbar = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Delay showing buttons until auth is fully initialized to prevent layout shifts
   useEffect(() => {
     if (isInitialized) {
       setShowButtons(true);
     }
   }, [isInitialized]);
 
-  // Don't render auth-dependent UI until initialized
   if (!isInitialized) {
     return (
       <nav className="fixed top-0 left-0 right-0 z-50">
-        <div className="flex justify-center pt-4">
-          <div className="w-1/2 min-w-[320px] max-w-2xl bg-background/20 backdrop-blur-xl border border-white/30 rounded-full px-6 py-3">
+        <div className="flex justify-center pt-4 px-4">
+          <div className="w-full max-w-7xl bg-background/10 backdrop-blur-2xl border border-white/20 rounded-full px-6 py-3">
             <div className="flex items-center justify-center h-12">
               <PsychedelicBrandLogo size="medium" animate={false} />
             </div>
@@ -40,50 +34,52 @@ const Navbar = () => {
     );
   }
 
-  // Don't render navbar for authenticated users (they should be redirected)
   if (user && isEmailVerified) {
     return null;
   }
 
   return (
-    <>
-      <nav className="fixed top-0 left-0 right-0 z-50">
-        {/* Glass Capsule Container - 50% width centered */}
-        <div className="flex justify-center pt-4">
-          <div className="
-            w-1/2 min-w-[320px] max-w-2xl
-            bg-background/20 backdrop-blur-xl 
-            border border-white/30
-            rounded-full px-6 py-3
-            skeumorphic-glass-capsule
-            shadow-glow-lg
-            relative overflow-hidden
-          ">
-            {/* Full-width shimmer animation */}
-            
-            
-            <div className="flex items-center justify-between h-12 relative z-10">
-              {/* Logo - Smaller Size - Clickable */}
-              <div className="flex-shrink-0 relative cursor-pointer" onClick={handleLogoClick}>
+    <nav className="fixed top-0 left-0 right-0 z-50">
+      <div className="flex justify-center pt-4 px-4">
+        <div className="
+          w-full max-w-7xl
+          bg-background/10 backdrop-blur-2xl 
+          border border-white/20
+          rounded-full 
+          shadow-glow-lg
+          relative overflow-hidden
+          glint-surface
+        " style={{'--glint-delay': Math.random() * 5} as React.CSSProperties}>
+          
+          <div className="flex items-center justify-between px-6 sm:px-8 md:px-12 py-3 relative z-10">
+            {/* Logo - Responsive Dynamic Sizing */}
+            <div className="flex-shrink-0 cursor-pointer dopamine-trigger" onClick={handleLogoClick}>
+              <div className="block md:hidden">
+                <PsychedelicBrandLogo size="small" animate={false} variant="icon-only" />
+              </div>
+              <div className="hidden md:block lg:hidden">
                 <PsychedelicBrandLogo size="small" animate={false} />
               </div>
+              <div className="hidden lg:block">
+                <PsychedelicBrandLogo size="medium" animate={false} />
+              </div>
+            </div>
 
-              {/* Theme Toggle and Avatar Menu */}
-              {showButtons && (
-                <div className="flex items-center space-x-3">
-                  <DayNightToggle />
-                  <Popover>
-                    <PopoverTrigger asChild>
+            {/* Avatar Menu */}
+            {showButtons && (
+              <div className="flex items-center">
+                <Popover>
+                  <PopoverTrigger asChild>
                     <Button
                       variant="ghost"
                       className="
-                        w-10 h-10 rounded-full p-0
+                        w-10 h-10 sm:w-12 sm:h-12 rounded-full p-0
                         bg-white/10 hover:bg-white/20
                         border border-white/30
-                        shimmer-rare
-                        transition-all duration-300
-                        hover:scale-105
+                        dopamine-trigger award-button
+                        glint-surface
                       "
+                      style={{'--glint-delay': Math.random() * 3} as React.CSSProperties}
                     >
                       {user && isEmailVerified ? (
                         <div className="w-8 h-8 rounded-full bg-gradient-psychedelic flex items-center justify-center">
@@ -104,12 +100,15 @@ const Navbar = () => {
                   </PopoverTrigger>
                   <PopoverContent 
                     className="
-                      w-56 p-0 
-                      bg-background/95 backdrop-blur-xl 
-                      border border-white/20
-                      rounded-2xl
+                      w-64 p-0 
+                      bg-background/98 backdrop-blur-2xl 
+                      border border-white/30
+                      rounded-3xl
                       animate-scale-in
+                      shadow-2xl
+                      glint-surface
                     " 
+                    style={{'--glint-delay': 1} as React.CSSProperties}
                     align="end"
                   >
                     {user && isEmailVerified ? (
@@ -131,14 +130,14 @@ const Navbar = () => {
                         </div>
                         <Button
                           variant="ghost"
-                          className="w-full justify-start text-left"
+                          className="w-full justify-start text-left dopamine-trigger text-base"
                           onClick={() => window.location.href = '/dashboard'}
                         >
                           Dashboard
                         </Button>
                         <Button
                           variant="ghost"
-                          className="w-full justify-start text-left"
+                          className="w-full justify-start text-left dopamine-trigger text-base"
                           onClick={() => window.location.href = '/settings'}
                         >
                           Settings
@@ -148,7 +147,6 @@ const Navbar = () => {
                             variant="ghost"
                             className="w-full justify-start text-left text-red-400 hover:text-red-300"
                             onClick={() => {
-                              // Add sign out logic here
                               window.location.href = '/';
                             }}
                           >
@@ -159,30 +157,29 @@ const Navbar = () => {
                     ) : (
                       <div className="p-4 space-y-3">
                         <Button
-                          className="w-full bg-gradient-psychedelic text-primary-foreground border-0"
+                          className="w-full bg-gradient-psychedelic text-primary-foreground border-0 award-button text-base py-6"
                           onClick={() => window.location.href = '/auth'}
                         >
-                          <span className="animate-glow-pulse mr-2">⭐︎</span>
-                          Get Started
+                          <span className="mr-2 text-xl">⭐︎</span>
+                          Get&nbsp;Started
                         </Button>
                         <Button
                           variant="outline"
-                          className="w-full border-white/20 bg-white/5"
+                          className="w-full border-white/30 bg-white/5 dopamine-trigger text-base py-6"
                           onClick={() => window.location.href = '/auth'}
                         >
-                          Sign In
+                          Sign&nbsp;In
                         </Button>
                       </div>
                     )}
                   </PopoverContent>
-                  </Popover>
-                </div>
-              )}
-            </div>
+                </Popover>
+              </div>
+            )}
           </div>
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 };
 

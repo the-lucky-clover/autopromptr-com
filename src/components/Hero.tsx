@@ -64,77 +64,76 @@ const Hero = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="text-center max-w-5xl mx-auto">
           
-        {/* Hero headline - single line with different styling for "AI On" */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold mb-6 animate-scale-in delay-300 text-center leading-none">
-          <span className="text-white/90 font-light">AI On </span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 animate-gradient-x">Autopilot</span>
+        {/* Hero headline - Award-winning typography */}
+        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold mb-8 animate-scale-in delay-300 text-center leading-[0.9] tracking-tight">
+          <span className="block text-white/95 font-light mb-2">AI On</span>
+          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 animate-gradient-x font-black">Autopilot</span>
         </h1>
           
-        {/* Professional subheading */}
-        <p className="text-lg sm:text-xl text-gray-200 mb-8 animate-fly-in delay-500 max-w-4xl mx-auto leading-relaxed font-medium">
-          Stop babysitting your prompts. Democratize your coding experience whether local or online—we consolidate the process into one seamless, intelligent automation pipeline that scales with your ambitions.
+        {/* Subheading - No orphans, dramatic hierarchy */}
+        <p className="text-xl sm:text-2xl md:text-3xl text-gray-100 mb-12 animate-fly-in delay-500 max-w-5xl mx-auto leading-relaxed font-light tracking-wide px-4">
+          Stop babysitting your&nbsp;prompts. Democratize your coding experience whether local or&nbsp;online—we consolidate the process into one seamless, intelligent automation pipeline that scales with your&nbsp;ambitions.
         </p>
           
           {showButtons && (
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16 animate-slide-up delay-400">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-20 animate-slide-up delay-400">
               <Button 
                 size="lg" 
                 onClick={handleGetStarted}
                 className="
                   bg-gradient-psychedelic 
                   text-primary-foreground 
-                  text-lg px-8 py-4 
-                  font-semibold 
-                  smooth-transition 
-                  flex items-center justify-center gap-2 
-                  shadow-glow-md
-                  hover:shadow-glow-lg
-                  animate-subtle-breathe
-                  hover:scale-105
-                  rounded-2xl
+                  text-xl sm:text-2xl px-10 sm:px-16 py-6 sm:py-8
+                  font-bold 
+                  award-button
+                  dopamine-trigger
+                  glint-surface
+                  flex items-center justify-center gap-3
+                  shadow-2xl
+                  rounded-3xl
                   border-0
                 "
+                style={{'--glint-delay': 0.5} as React.CSSProperties}
               >
-                <span className="animate-glow-pulse">⭐︎</span>
-                Get Started
+                <span className="text-2xl sm:text-3xl">⭐︎</span>
+                Get&nbsp;Started
               </Button>
               <Button 
                 size="lg" 
                 onClick={handleSignIn}
                 variant="outline"
                 className="
-                  text-lg px-8 py-4 
-                  font-semibold 
-                  smooth-transition 
-                  flex items-center justify-center gap-2 
-                  border-border/50
-                  bg-card/30
-                  backdrop-blur-sm
-                  hover:bg-card/50
-                  hover:shadow-glow-sm
-                  rounded-2xl
+                  text-xl sm:text-2xl px-10 sm:px-16 py-6 sm:py-8
+                  font-bold 
+                  dopamine-trigger
+                  glint-surface
+                  flex items-center justify-center gap-3
+                  border-white/40
+                  bg-card/20
+                  backdrop-blur-md
+                  hover:bg-card/40
+                  shadow-xl
+                  rounded-3xl
                   text-foreground
                   hover:text-primary
                 "
+                style={{'--glint-delay': 1.2} as React.CSSProperties}
               >
-                Sign In
-                <ArrowRight className="w-5 h-5" />
+                Sign&nbsp;In
+                <ArrowRight className="w-6 h-6" />
               </Button>
             </div>
           )}
           
-          <div className="mt-16 relative animate-slide-up delay-600">
-            {/* Floating image container */}
-            <div className="relative mx-auto max-w-3xl z-10">
-              {/* Ambient glow underneath */}
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-2/3 h-3 bg-gradient-to-r from-transparent via-primary/40 to-transparent blur-md"></div>
+          <div className="mt-20 sm:mt-28 relative animate-slide-up delay-600">
+            <div className="relative mx-auto max-w-6xl z-10 px-4">
+              <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 w-3/4 h-8 bg-gradient-to-r from-transparent via-primary/60 to-transparent blur-2xl"></div>
               
-              {/* Main floating image */}
-              <div className="skeuomorphic-card elevation-3 rounded-2xl overflow-hidden">
+              <div className="skeuomorphic-card elevation-3 rounded-3xl overflow-hidden glint-surface" style={{'--glint-delay': 2} as React.CSSProperties}>
           <img 
             src={dashboardMockup}
             alt="AutoPromptr Cyberpunk Dashboard Interface" 
-            className="w-full h-auto rounded-2xl shadow-elegant border border-primary/20 bg-card/10 backdrop-blur-sm animate-materialize delay-700 skeumorphic-surface shimmer-rare"
+            className="w-full h-auto rounded-3xl shadow-2xl border-2 border-primary/30 bg-card/20 backdrop-blur-sm animate-materialize delay-700"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}

@@ -1,0 +1,175 @@
+/* Award-Winning UX Enhancements - TBWA/Chiat/Day & Banksy Inspired */
+
+/* Psychological Dopamine Farming */
+@keyframes reward-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 10px rgba(168, 85, 247, 0);
+  }
+}
+
+.reward-feedback {
+  animation: reward-pulse 0.6s ease-out;
+}
+
+/* Addictive Hover States */
+.magnetic-hover {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.magnetic-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  filter: brightness(1.1);
+}
+
+/* Intoxicating Color Shifts */
+@keyframes color-morph {
+  0%, 100% { filter: hue-rotate(0deg); }
+  25% { filter: hue-rotate(15deg); }
+  50% { filter: hue-rotate(-15deg); }
+  75% { filter: hue-rotate(10deg); }
+}
+
+.color-seduce {
+  animation: color-morph 8s ease-in-out infinite;
+}
+
+/* Benevolent Power Glow */
+.power-aura {
+  position: relative;
+}
+
+.power-aura::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 70%);
+  filter: blur(20px);
+  opacity: 0;
+  transition: opacity 0.6s;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.power-aura:hover::before {
+  opacity: 1;
+}
+
+/* Ultra-Responsive Touch Feedback */
+@media (hover: none) and (pointer: coarse) {
+  .touch-delight {
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .touch-delight:active {
+    transform: scale(0.96);
+    filter: brightness(1.15);
+  }
+}
+
+/* Masterpiece Scroll Reveal */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.165, 0.84, 0.44, 1),
+              transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Banksy Street Art Aesthetic */
+.street-art-texture {
+  position: relative;
+  overflow: hidden;
+}
+
+.street-art-texture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* AWWWARDS-Worthy Transitions */
+.awwward-transition {
+  transition: all 0.6s cubic-bezier(0.215, 0.610, 0.355, 1.000);
+}
+
+.awwward-transition:hover {
+  transform: perspective(1000px) rotateX(2deg) translateY(-5px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* Positive Energy Particles */
+@keyframes positive-flow {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(0);
+    opacity: 0;
+  }
+}
+
+.energy-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 1), transparent);
+  border-radius: 50%;
+  animation: positive-flow 3s ease-out infinite;
+  pointer-events: none;
+}
+
+/* Mega Hyper Future Button */
+.future-button {
+  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 1px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.future-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: translateX(-100%) skewX(-20deg);
+  transition: transform 0.6s;
+}
+
+.future-button:hover::before {
+  transform: translateX(100%) skewX(-20deg);
+}
+
+.future-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+}
+
+.future-button:active {
+  transform: translateY(-1px) scale(1.02);
+}

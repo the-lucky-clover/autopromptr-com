@@ -157,47 +157,6 @@ const PsychedelicBrandLogo = ({
         </div>
       )}
       
-      {/* Floating Particles Effect */}
-      {animate && (
-        <>
-          <div 
-            className="
-              absolute -top-1 -left-1 
-              w-2 h-2 
-              bg-pastel-pink 
-              rounded-full 
-              animate-float-gentle 
-              opacity-60 
-              blur-sm
-            "
-            style={{ animationDelay: '0s' }}
-          />
-          <div 
-            className="
-              absolute -bottom-1 -right-1 
-              w-1.5 h-1.5 
-              bg-pastel-cyan 
-              rounded-full 
-              animate-float-gentle 
-              opacity-60 
-              blur-sm
-            "
-            style={{ animationDelay: '2s' }}
-          />
-          <div 
-            className="
-              absolute top-1/2 -left-2 
-              w-1 h-1 
-              bg-pastel-mint 
-              rounded-full 
-              animate-float-gentle 
-              opacity-60 
-              blur-sm
-            "
-            style={{ animationDelay: '4s' }}
-          />
-        </>
-      )}
     </div>
   );
 };

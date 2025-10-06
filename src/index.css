@@ -12,6 +12,108 @@
 @import "./styles/holographic-effects.css";
 @import "./styles/skeuomorphic-design.css";
 @import "./styles/psychedelic-animations.css";
+@import "./styles/award-winning-ux.css";
+
+/* Prevent text orphans globally - Award-winning typography */
+p, h1, h2, h3, h4, h5, h6, li, span, div[class*="text"], a, button {
+  text-wrap: pretty;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Ensure no single-word orphans */
+p::after, h1::after, h2::after, h3::after, h4::after, h5::after, h6::after {
+  content: '\00a0\00a0';
+  display: inline;
+  width: 0;
+  white-space: nowrap;
+}
+
+/* Mobile-specific typography */
+@media (max-width: 767px) {
+  p, h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+  }
+}
+
+/* Enhanced random glint animation system */
+@keyframes random-glint {
+  0%, 100% { opacity: 0; transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  10% { opacity: 1; }
+  20%, 90% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateX(200%) translateY(200%) rotate(45deg); }
+}
+
+.glint-surface {
+  position: relative;
+  overflow: hidden;
+}
+
+.glint-surface::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 40%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.1) 60%,
+    transparent 70%
+  );
+  animation: random-glint 8s ease-in-out infinite;
+  animation-delay: calc(var(--glint-delay, 0) * 1s);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.glint-surface:hover::before {
+  animation-duration: 1.2s;
+}
+
+/* Dopamine-optimized micro-interactions */
+@keyframes dopamine-pop {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.dopamine-trigger {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dopamine-trigger:hover {
+  animation: dopamine-pop 0.6s ease-in-out;
+}
+
+/* Award-winning button styles */
+.award-button {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.award-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.award-button:hover::after {
+  transform: translateX(100%);
+}
+
+.award-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
 
 /* Mobile Optimization - Prevent Horizontal Scrolling */
 html, body {
