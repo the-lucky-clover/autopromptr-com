@@ -532,12 +532,7 @@ export type Database = {
       }
       get_batch_stats: {
         Args: Record<PropertyKey, never> | { batch_id: string }
-        Returns: {
-          active_batches: number
-          completed_batches: number
-          failed_batches: number
-          total_batches: number
-        }[]
+        Returns: Json
       }
       get_user_role: {
         Args: { _user_id: string }

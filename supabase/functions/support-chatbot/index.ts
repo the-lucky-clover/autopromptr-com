@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.10';
+import { validateAuth } from './auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -44,10 +45,16 @@ serve(async (req) => {
   }
 
   try {
+    // Validate authentication
+    const authResult = await validateAuth(req);
+    if (authResult instanceof Response) {
+      return authResult; // Return error response
+    }
+    const { user } = authResult;
+
     const { messages, action } = await req.json();
     
-    // Get user from auth header
-    const authHeader = req.headers.get('authorization');
+    // Support chatbot logic continues with authenticated user...
     const token = authHeader?.replace('Bearer ', '');
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     

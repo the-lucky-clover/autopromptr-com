@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { validateAuth } from './auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,6 +13,13 @@ serve(async (req) => {
   }
 
   try {
+    // Validate authentication
+    const authResult = await validateAuth(req);
+    if (authResult instanceof Response) {
+      return authResult; // Return error response
+    }
+    const { user } = authResult;
+
     const { message, context, task_type } = await req.json();
     
     const GEMINI_API_KEY = Deno.env.get('OPENAI_API_KEY');
