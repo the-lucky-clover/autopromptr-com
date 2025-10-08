@@ -141,7 +141,33 @@ function startLocalServer() {
     }
   });
 
-  // Web platform integration endpoint
+  // MVP #1: Batch processing endpoint for local tools
+  server.post('/process-local-batch', async (req, res) => {
+    try {
+      const { batchId, targetTool, prompts, options } = req.body;
+      
+      console.log(`📥 Processing batch ${batchId} for ${targetTool}`);
+      console.log(`📝 Prompts: ${prompts.length}`);
+      
+      const localAutomation = require('./services/local-automation-service');
+      const result = await localAutomation.processBatchForLocalTool(
+        batchId,
+        targetTool,
+        prompts,
+        options || {}
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error('❌ Local batch processing error:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  });
+
+  // Web platform integration endpoint (legacy)
   server.post('/receive-prompts', async (req, res) => {
     try {
       const { prompts, targetTool, metadata } = req.body;
@@ -166,10 +192,11 @@ function startLocalServer() {
     }
   });
 
-  // Local tool detection endpoint
+  // Local tool detection endpoint with real detection
   server.get('/detect-tools', async (req, res) => {
     try {
-      const availableTools = await detectAvailableLocalTools();
+      const localAutomation = require('./services/local-automation-service');
+      const availableTools = await localAutomation.detectLocalTools();
       res.json({
         success: true,
         tools: availableTools,
@@ -180,6 +207,32 @@ function startLocalServer() {
         success: false,
         error: error.message,
         tools: []
+      });
+    }
+  });
+
+  // Batch status endpoint
+  server.get('/batch-status/:batchId', (req, res) => {
+    try {
+      const { batchId } = req.params;
+      const localAutomation = require('./services/local-automation-service');
+      const status = localAutomation.getBatchStatus(batchId);
+      
+      if (!status) {
+        return res.status(404).json({
+          success: false,
+          error: 'Batch not found'
+        });
+      }
+      
+      res.json({
+        success: true,
+        status
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message
       });
     }
   });

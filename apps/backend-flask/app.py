@@ -16,6 +16,8 @@ from services.gemini_service import GeminiService, GeminiConfig
 from services.enhanced_orchestrator_service import EnhancedAIOrchestrator
 from services.human_approval_service import human_approval_service
 from services.universal_batch_service import UniversalBatchService, BatchRequest
+from services.batch_processor_service import batch_processor_service
+from services.playwright_service import playwright_service
 from websocket_service import websocket_service
 
 # Configure logging
@@ -28,6 +30,10 @@ logger = logging.getLogger(__name__)
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app, origins=["*"])  # Allow all origins for development
+
+# Register blueprints
+from routes.automation import automation_bp
+app.register_blueprint(automation_bp)
 
 # Initialize services
 gemini_config = GeminiConfig(
