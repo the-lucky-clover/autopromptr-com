@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle, Clock, AlertCircle, XCircle } from "lucide-react";
-import DashboardWelcomeModule from "@/components/dashboard/DashboardWelcomeModule";
+import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 
 const Results = () => {
   const { data: logs, isLoading } = useQuery({
@@ -61,10 +61,11 @@ const Results = () => {
         <div className="min-h-screen flex w-full">
           <AppSidebar />
           <SidebarInset className="flex-1 relative">
-            <DashboardWelcomeModule
+            <UnifiedDashboardWelcomeModule
               title="Results"
               subtitle="View and analyze the results of your automated prompt processing sessions."
-              clockColor="#10B981" // Green for results dashboard
+              clockColor="#10B981"
+              showPersonalizedGreeting={false}
             />
             
             <div className="px-6 pb-6">

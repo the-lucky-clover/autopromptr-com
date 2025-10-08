@@ -9,7 +9,7 @@ import { AutomationSettingsCard } from "@/components/settings/AutomationSettings
 import { APIConfigurationCard } from "@/components/settings/APIConfigurationCard";
 import { ThemeCustomizationCard } from "@/components/settings/ThemeCustomizationCard";
 import { VideoBackgroundCard } from "@/components/settings/VideoBackgroundCard";
-import DashboardWelcomeModule from "@/components/dashboard/DashboardWelcomeModule";
+import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 
 const Settings = () => {
   return (
@@ -23,10 +23,11 @@ const Settings = () => {
         <div className="min-h-screen flex w-full">
           <AppSidebar />
           <SidebarInset className="flex-1 relative">
-            <DashboardWelcomeModule
+            <UnifiedDashboardWelcomeModule
               title="Settings"
               subtitle="Configure your AutoPromptr application settings and preferences."
-              clockColor="#EA580C" // Orange for settings dashboard
+              clockColor="#EA580C"
+              showPersonalizedGreeting={false}
             />
             
             <div className="px-6 pb-6">

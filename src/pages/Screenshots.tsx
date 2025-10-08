@@ -3,7 +3,7 @@ import React from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import ScreenshotGallery from "@/components/ScreenshotGallery";
-import DashboardWelcomeModule from "@/components/dashboard/DashboardWelcomeModule";
+import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 
 const Screenshots = () => {
   return (
@@ -17,10 +17,11 @@ const Screenshots = () => {
         <div className="min-h-screen flex w-full">
           <AppSidebar />
           <SidebarInset className="flex-1 relative">
-            <DashboardWelcomeModule
+            <UnifiedDashboardWelcomeModule
               title="Screenshots"
               subtitle="Capture and manage screenshots by session to track your automation workflows."
-              clockColor="#8B5CF6" // Purple for screenshots dashboard
+              clockColor="#8B5CF6"
+              showPersonalizedGreeting={false}
             />
             
             <div className="px-6">

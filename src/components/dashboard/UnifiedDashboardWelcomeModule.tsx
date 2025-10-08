@@ -85,9 +85,6 @@ const UnifiedDashboardWelcomeModule = ({
                   <span className="inline-block">!</span>
                 </h1>
                 <div className="pl-6 space-y-2">
-                  <p className="text-white/90 text-lg font-medium leading-relaxed drop-shadow-md">
-                    {currentGreeting.encouragement}
-                  </p>
                   <blockquote className="text-white/75 text-sm font-normal italic leading-relaxed drop-shadow-sm">
                     "{currentQuote.split(' - ')[0]}" - {currentQuote.split(' - ')[1]}
                   </blockquote>

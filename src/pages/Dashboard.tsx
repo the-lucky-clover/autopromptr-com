@@ -12,6 +12,7 @@ import ConsoleMonitorModule from "@/components/ConsoleMonitorModule";
 import QuickActionsModule from "@/components/dashboard/QuickActionsModule";
 import { SupportChatbot } from "@/components/SupportChatbot";
 import CompactRecentActivity from "@/components/CompactRecentActivity";
+import HealthStatusDashboard from "@/components/HealthStatusDashboard";
 import StaticDashboardLayout from "@/components/dashboard/StaticDashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
@@ -92,8 +93,8 @@ const Dashboard = () => {
         </ErrorBoundary>
 
         <div className="px-4 md:px-6 pb-6">
-          {/* Recent Activity aligned with AI Chatbot - Clean 2-column layout */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Top row: 3-column grid with fixed 650px heights */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <div className="animate-shimmer-delayed">
               <ErrorBoundary>
                 <CompactRecentActivity />
@@ -101,9 +102,12 @@ const Dashboard = () => {
             </div>
             <div className="animate-shimmer">
               <ErrorBoundary>
-                <div className="h-[650px]">
-                  <SupportChatbot />
-                </div>
+                <SupportChatbot />
+              </ErrorBoundary>
+            </div>
+            <div className="animate-shimmer-delayed">
+              <ErrorBoundary>
+                <HealthStatusDashboard isCompact={false} />
               </ErrorBoundary>
             </div>
           </div>

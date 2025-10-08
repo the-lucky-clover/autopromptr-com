@@ -140,7 +140,7 @@ export const SupportChatbot = () => {
 
   return (
     <>
-      <Card className="h-full flex flex-col bg-gradient-to-br from-slate-900/95 via-purple-900/95 to-blue-900/95 border-purple-500/30 backdrop-blur-sm">
+      <Card className="h-[650px] flex flex-col bg-gradient-to-br from-slate-900/95 via-purple-900/95 to-blue-900/95 border-purple-500/30 backdrop-blur-sm">
         <CardHeader className="border-b border-purple-500/30 pb-4">
           <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
             <Bot className="w-6 h-6 text-purple-400" />
@@ -149,22 +149,6 @@ export const SupportChatbot = () => {
         </CardHeader>
 
         <CardContent className="flex-1 flex flex-col p-4 space-y-4 overflow-hidden">
-          {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-2">
-            {quickActions.map((action, idx) => (
-              <Button
-                key={idx}
-                variant="outline"
-                size="sm"
-                onClick={action.action}
-                className="text-xs bg-white/5 border-purple-500/30 hover:bg-purple-500/20 text-white"
-              >
-                <action.icon className="w-3 h-3 mr-1" />
-                {action.label}
-              </Button>
-            ))}
-          </div>
-
           {/* Messages */}
           <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-500/50 scrollbar-track-transparent">
             {messages.map((message, index) => (

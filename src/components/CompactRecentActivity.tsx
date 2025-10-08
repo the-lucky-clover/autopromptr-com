@@ -71,7 +71,7 @@ const CompactRecentActivity = () => {
 
   if (loading) {
     return (
-      <Card className="bg-white/5 backdrop-blur-sm border-white/20 rounded-xl">
+      <Card className="h-[650px] flex flex-col bg-white/5 backdrop-blur-sm border-white/20 rounded-xl">
         <CardHeader className="pb-3">
           <CardTitle className="text-white flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
@@ -80,7 +80,7 @@ const CompactRecentActivity = () => {
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="flex-1 overflow-y-auto space-y-2">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="flex items-start gap-2 p-2 bg-white/5 rounded-md animate-pulse">
               <div className="w-3 h-3 bg-white/20 rounded mt-0.5"></div>
@@ -96,8 +96,8 @@ const CompactRecentActivity = () => {
   }
 
   return (
-    <Card className="bg-white/5 backdrop-blur-sm border-white/20 rounded-xl hover:bg-white/10 transition-all duration-300">
-      <CardHeader className="pb-3">
+    <Card className="h-[650px] flex flex-col bg-white/5 backdrop-blur-sm border-white/20 rounded-xl hover:bg-white/10 transition-all duration-300">
+      <CardHeader className="pb-3 flex-shrink-0">
         <CardTitle className="text-white flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4" />
@@ -116,7 +116,7 @@ const CompactRecentActivity = () => {
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-1.5 p-3 pt-0">
+      <CardContent className="flex-1 overflow-y-auto space-y-1.5 p-3 pt-0">
         {activities.length === 0 ? (
           <div className="text-center py-4">
             <Activity className="w-8 h-8 text-white/30 mx-auto mb-2" />

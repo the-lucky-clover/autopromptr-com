@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Mail, MessageSquare, Send } from "lucide-react";
-import DashboardWelcomeModule from "@/components/dashboard/DashboardWelcomeModule";
+import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -79,10 +79,11 @@ const Contact = () => {
         <div className="min-h-screen flex w-full">
           <AppSidebar />
           <SidebarInset className="flex-1 relative">
-            <DashboardWelcomeModule
+            <UnifiedDashboardWelcomeModule
               title="Contact"
               subtitle="Get in touch with our team for support, feedback, or inquiries."
-              clockColor="#3B82F6" // Blue for contact dashboard
+              clockColor="#3B82F6"
+              showPersonalizedGreeting={false}
             />
             
             <div className="px-6 pb-6">

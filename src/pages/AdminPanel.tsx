@@ -11,6 +11,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SecurityStatus } from "@/components/security/SecurityStatus";
+import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 
 const AdminPanel = () => {
   const { isSysOp, loading: roleLoading, setSuperUser } = useUserRole();
@@ -111,23 +112,24 @@ const AdminPanel = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full" style={{ background: 'linear-gradient(135deg, #2D1B69 0%, #3B2A8C 50%, #4C3A9F 100%)' }}>
         <AppSidebar />
-        <main className="flex-1 p-6">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-4">
-              <SidebarTrigger className="text-white hover:text-purple-200 rounded-xl" />
-              <div>
-                <h1 className="text-2xl font-semibold text-white">System Administration</h1>
-                <p className="text-purple-200">Database-Based Security Control Panel</p>
-              </div>
+        <main className="flex-1">
+          <UnifiedDashboardWelcomeModule
+            title="System Administration"
+            subtitle="Database-Based Security Control Panel"
+            clockColor="#EF4444"
+            showPersonalizedGreeting={false}
+          />
+          
+          <div className="px-6 pb-6">
+            <div className="mb-8">
+              <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
+                <Shield className="w-3 h-3 mr-1" />
+                SysOp Access
+              </Badge>
             </div>
-            <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
-              <Shield className="w-3 h-3 mr-1" />
-              SysOp Access
-            </Badge>
-          </div>
 
-          {/* System Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            {/* System Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             {systemStats.map((stat, index) => (
               <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
                 <CardContent className="p-6">
@@ -358,6 +360,7 @@ const AdminPanel = () => {
               </CardContent>
             </Card>
           )}
+          </div>
         </main>
       </div>
     </SidebarProvider>

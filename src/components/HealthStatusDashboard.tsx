@@ -56,7 +56,7 @@ const HealthStatusDashboard = React.memo(({ isCompact = false }: HealthStatusDas
 
   if (isCompact) {
     return (
-      <div className="space-y-3">
+      <div className="h-[650px] flex flex-col space-y-3 overflow-hidden">
         <SystemHealthHeader
           overallHealth={overallHealth}
           isRunning={isLoading}
@@ -75,7 +75,7 @@ const HealthStatusDashboard = React.memo(({ isCompact = false }: HealthStatusDas
   }
 
   return (
-    <div className="space-y-4">
+    <div className="h-[650px] flex flex-col space-y-4 overflow-hidden">
       <SystemHealthHeader
         overallHealth={overallHealth}
         isRunning={isLoading}
