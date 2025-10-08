@@ -36,25 +36,25 @@ const AnalyticsModule = ({ isCompact = false }: AnalyticsModuleProps) => {
 
   if (isCompact) {
     return (
-      <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-        <CardHeader className="pb-3">
+      <Card className="dashboard-module-lg bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+        <CardHeader className="pb-3 flex-shrink-0">
           <div className="flex items-center justify-between">
             <CardTitle className="text-white flex items-center gap-2 text-sm">
               <TrendingUp className="w-4 h-4" />
               System Overview
             </CardTitle>
-            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
+            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs success-celebration">
               {metrics.successRate}%
             </Badge>
           </div>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="flex-1 overflow-hidden dashboard-module-content space-y-2">
           <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white/5 rounded p-2 text-center">
+            <div className="bg-white/5 rounded p-2 text-center reward-feedback">
               <p className="text-white text-lg font-bold">{metrics.totalUsers}</p>
               <p className="text-white/60 text-xs">Users</p>
             </div>
-            <div className="bg-white/5 rounded p-2 text-center">
+            <div className="bg-white/5 rounded p-2 text-center reward-feedback">
               <p className="text-white text-lg font-bold">{metrics.activeToday}</p>
               <p className="text-white/60 text-xs">Active</p>
             </div>

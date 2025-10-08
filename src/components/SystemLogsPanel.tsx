@@ -37,60 +37,62 @@ const SystemLogsPanel = ({ batches, hasActiveBatch, isCompact = false }: SystemL
 
   if (isCompact) {
     return (
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Terminal className="w-3 h-3 text-blue-400" />
-            <span className="text-white font-medium text-xs">System Diagnostics & Logs</span>
+      <Card className="dashboard-module-lg bg-white/5 backdrop-blur-sm border-white/20 rounded-xl">
+        <CardHeader className="flex-shrink-0">
+          <div className="flex items-center justify-between mb-3">
+            <CardTitle className="text-white flex items-center gap-2 text-sm">
+              <Terminal className="w-4 h-4 text-blue-400" />
+              System Diagnostics & Logs
+            </CardTitle>
+            <Button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              size="sm"
+              variant="ghost"
+              className="h-6 w-6 p-0 text-white hover:bg-white/20 press-effect click-feedback"
+            >
+              <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
           </div>
-          <Button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            size="sm"
-            variant="ghost"
-            className="h-6 w-6 p-0 text-white hover:bg-white/20"
-          >
-            <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
 
-        <div className="flex space-x-1">
-          <Button
-            onClick={() => setActiveTab('system')}
-            size="sm"
-            variant={activeTab === 'system' ? 'default' : 'ghost'}
-            className={`text-xs h-6 px-2 ${
-              activeTab === 'system' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-white/10 text-white/60 hover:bg-white/20'
-            }`}
-          >
-            <Terminal className="w-3 h-3 mr-1" />
-            System Logs
-          </Button>
-          <Button
-            onClick={() => setActiveTab('syslog')}
-            size="sm"
-            variant={activeTab === 'syslog' ? 'default' : 'ghost'}
-            className={`text-xs h-6 px-2 ${
-              activeTab === 'syslog' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-white/10 text-white/60 hover:bg-white/20'
-            }`}
-          >
-            <FileText className="w-3 h-3 mr-1" />
-            Render SysLog
-          </Button>
-        </div>
+          <div className="flex space-x-1">
+            <Button
+              onClick={() => setActiveTab('system')}
+              size="sm"
+              variant={activeTab === 'system' ? 'default' : 'ghost'}
+              className={`text-xs h-6 px-2 press-effect ${
+                activeTab === 'system' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-white/10 text-white/60 hover:bg-white/20'
+              }`}
+            >
+              <Terminal className="w-3 h-3 mr-1" />
+              System Logs
+            </Button>
+            <Button
+              onClick={() => setActiveTab('syslog')}
+              size="sm"
+              variant={activeTab === 'syslog' ? 'default' : 'ghost'}
+              className={`text-xs h-6 px-2 press-effect ${
+                activeTab === 'syslog' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-white/10 text-white/60 hover:bg-white/20'
+              }`}
+            >
+              <FileText className="w-3 h-3 mr-1" />
+              Render SysLog
+            </Button>
+          </div>
+        </CardHeader>
 
-        <div className="h-20 overflow-hidden">
+        <CardContent className="flex-1 overflow-hidden dashboard-module-content">
           {activeTab === 'system' ? (
             <SystemLogsDisplay batches={batches} isCompact={true} />
           ) : (
             <RenderSyslogDisplay isCompact={true} />
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 

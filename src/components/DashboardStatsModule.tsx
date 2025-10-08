@@ -19,14 +19,14 @@ const DashboardStatsModule = ({ stats, isCompact = false }: DashboardStatsModule
 
   if (isCompact) {
     return (
-      <Card className="bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
-        <CardHeader className="pb-3">
+      <Card className="dashboard-module-lg bg-white/10 backdrop-blur-sm border-white/20 rounded-xl">
+        <CardHeader className="pb-3 flex-shrink-0">
           <div className="flex items-center justify-between">
             <CardTitle className="text-white flex items-center gap-2 text-sm">
               <BarChart3 className="w-4 h-4" />
               Statistics
             </CardTitle>
-            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
+            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs success-celebration">
               {completionRate}%
             </Badge>
           </div>

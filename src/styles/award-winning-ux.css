@@ -1,4 +1,50 @@
-/* Award-Winning UX Enhancements - TBWA/Chiat/Day & Banksy Inspired */
+/* ============================================
+   AWARD-WINNING UX SYSTEM
+   Inspired by TheFWA and AWWWARDS
+   ============================================ */
+
+/* Perfect Grid Alignment System */
+.dashboard-grid-row-xl {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6;
+}
+
+.dashboard-grid-row-lg {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6 mb-6;
+}
+
+.dashboard-module-xl {
+  @apply h-[650px] flex flex-col overflow-hidden;
+}
+
+.dashboard-module-lg {
+  @apply h-[500px] flex flex-col overflow-hidden;
+}
+
+.dashboard-module-md {
+  @apply h-[400px] flex flex-col overflow-hidden;
+}
+
+/* Scrollable content within fixed heights */
+.dashboard-module-content {
+  @apply flex-1 overflow-y-auto;
+}
+
+.dashboard-module-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-module-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-module-content::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 3px;
+}
+
+.dashboard-module-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
 
 /* Psychological Dopamine Farming */
 @keyframes reward-pulse {
@@ -16,12 +62,21 @@
 
 /* Addictive Hover States */
 .magnetic-hover {
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 }
 
 .magnetic-hover:hover {
   transform: translateY(-4px) scale(1.02);
-  filter: brightness(1.1);
+  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+}
+
+/* Hover Glow Effect */
+.hover-glow {
+  transition: all 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.6), 0 0 60px rgba(139, 92, 246, 0.3);
 }
 
 /* Intoxicating Color Shifts */
@@ -106,12 +161,73 @@
 
 /* AWWWARDS-Worthy Transitions */
 .awwward-transition {
-  transition: all 0.6s cubic-bezier(0.215, 0.610, 0.355, 1.000);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .awwward-transition:hover {
-  transform: perspective(1000px) rotateX(2deg) translateY(-5px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateZ(10px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* Staggered Fade In Animation */
+.stagger-fade-in {
+  animation: staggerFadeIn 0.6s ease-out backwards;
+}
+
+@keyframes staggerFadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Attention Pulse for Important Elements */
+.attention-pulse {
+  animation: attentionPulse 2s ease-in-out infinite;
+}
+
+@keyframes attentionPulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  50% { 
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+}
+
+/* Success Celebration Animation */
+.success-celebration {
+  animation: successCelebrate 0.5s ease-out;
+}
+
+@keyframes successCelebrate {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.1) rotate(-5deg); }
+  50% { transform: scale(1.15) rotate(5deg); }
+  75% { transform: scale(1.1) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Press Effect for Buttons */
+.press-effect {
+  transition: all 0.1s ease;
+}
+
+.press-effect:active {
+  transform: scale(0.95);
+  filter: brightness(0.9);
+}
+
+/* Click Feedback */
+.click-feedback:active {
+  animation: clickRipple 0.6s ease-out;
+}
+
+@keyframes clickRipple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(139, 92, 246, 0);
+  }
 }
 
 /* Positive Energy Particles */
