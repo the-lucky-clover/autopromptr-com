@@ -10,7 +10,7 @@ import DashboardStatsModule from "@/components/DashboardStatsModule";
 import AnalyticsModule from "@/components/AnalyticsModule";
 import ConsoleMonitorModule from "@/components/ConsoleMonitorModule";
 import QuickActionsModule from "@/components/dashboard/QuickActionsModule";
-import AIPromptChatbot from "@/components/AIPromptChatbot";
+import { SupportChatbot } from "@/components/SupportChatbot";
 import CompactRecentActivity from "@/components/CompactRecentActivity";
 import StaticDashboardLayout from "@/components/dashboard/StaticDashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -101,8 +101,8 @@ const Dashboard = () => {
             </div>
             <div className="animate-shimmer">
               <ErrorBoundary>
-                <div className="h-[450px]">
-                  <AIPromptChatbot />
+                <div className="h-[650px]">
+                  <SupportChatbot />
                 </div>
               </ErrorBoundary>
             </div>
