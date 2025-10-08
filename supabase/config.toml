@@ -1,6 +1,15 @@
 
 project_id = "raahpoyciwuyhwlcenpy"
 
+[functions.batch-orchestrator]
+verify_jwt = true
+
+[functions.gemini-processor]
+verify_jwt = false
+
+[functions.platform-detector]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321

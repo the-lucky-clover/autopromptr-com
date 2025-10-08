@@ -1,17 +1,44 @@
 
 import { Batch } from '@/types/batch';
 import { AutoPromptrError } from './errors';
+import { USE_LOVABLE_CLOUD, BACKEND_MODE, LEGACY_BACKEND_URL } from './config';
+import { lovableCloudBackend } from '../lovableCloudBackend';
 
 export class AutoPromptr {
-  public baseUrl: string; // Make baseUrl public
+  public baseUrl: string;
+  private useLovableCloud: boolean;
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || 'https://autopromptr-backend.onrender.com';
+    this.baseUrl = baseUrl || LEGACY_BACKEND_URL || 'https://autopromptr-backend.onrender.com';
+    this.useLovableCloud = USE_LOVABLE_CLOUD || BACKEND_MODE === 'lovable-cloud';
   }
 
   async runBatch(batch: Batch, platform: string, options?: any): Promise<any> {
     try {
-      console.log('🚀 [AutoPromptr] Sending batch to backend:', {
+      if (this.useLovableCloud) {
+        console.log('🚀 [AutoPromptr] Using Lovable Cloud backend:', {
+          batchId: batch.id,
+          platform,
+        });
+
+        // Use Lovable Cloud backend
+        const result = await lovableCloudBackend.runBatchCombined(
+          {
+            name: batch.name,
+            description: batch.description,
+            prompts: batch.prompts.map(p => ({ text: p.text })),
+            targetUrl: batch.settings?.targetUrlOverride || '',
+          },
+          platform,
+          options
+        );
+
+        console.log('✅ [AutoPromptr] Lovable Cloud success:', result);
+        return result;
+      }
+
+      // Legacy Render.com backend
+      console.log('🚀 [AutoPromptr] Sending batch to legacy backend:', {
         batchId: batch.id,
         platform,
         url: `${this.baseUrl}/api/run-batch`
@@ -52,6 +79,11 @@ export class AutoPromptr {
   }
 
   async stopBatch(batchId: string): Promise<any> {
+    if (this.useLovableCloud) {
+      return await lovableCloudBackend.stopBatch(batchId);
+    }
+
+    // Legacy backend
     const response = await fetch(`${this.baseUrl}/api/batches/${batchId}/stop`, {
       method: 'POST',
       headers: {
@@ -73,6 +105,21 @@ export class AutoPromptr {
 
   async getPlatforms(): Promise<any[]> {
     try {
+      if (this.useLovableCloud) {
+        // Return built-in platform list for Lovable Cloud
+        return [
+          { id: 'chatgpt', name: 'ChatGPT', url: 'https://chat.openai.com' },
+          { id: 'claude', name: 'Claude', url: 'https://claude.ai' },
+          { id: 'lovable', name: 'Lovable', url: 'https://lovable.dev' },
+          { id: 'v0', name: 'v0.dev', url: 'https://v0.dev' },
+          { id: 'cursor', name: 'Cursor', url: 'https://cursor.sh' },
+          { id: 'windsurf', name: 'Windsurf', url: '' },
+          { id: 'gemini', name: 'Google Gemini', url: 'https://gemini.google.com' },
+          { id: 'web', name: 'Custom URL', url: '' },
+        ];
+      }
+
+      // Legacy backend
       const response = await fetch(`${this.baseUrl}/api/platforms`);
       
       if (!response.ok) {
@@ -92,6 +139,11 @@ export class AutoPromptr {
 
   async healthCheck(): Promise<any> {
     try {
+      if (this.useLovableCloud) {
+        return await lovableCloudBackend.healthCheck();
+      }
+
+      // Legacy backend
       const response = await fetch(`${this.baseUrl}/health`);
       
       if (!response.ok) {
@@ -111,6 +163,11 @@ export class AutoPromptr {
 
   async getBatchStatus(batchId: string): Promise<any> {
     try {
+      if (this.useLovableCloud) {
+        return await lovableCloudBackend.getBatchStatus(batchId);
+      }
+
+      // Legacy backend
       const response = await fetch(`${this.baseUrl}/api/batches/${batchId}/status`);
       
       if (!response.ok) {

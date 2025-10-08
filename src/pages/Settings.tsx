@@ -9,6 +9,7 @@ import { AutomationSettingsCard } from "@/components/settings/AutomationSettings
 import { APIConfigurationCard } from "@/components/settings/APIConfigurationCard";
 import { ThemeCustomizationCard } from "@/components/settings/ThemeCustomizationCard";
 import { VideoBackgroundCard } from "@/components/settings/VideoBackgroundCard";
+import { BackendModeCard } from "@/components/settings/BackendModeCard";
 import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 
 const Settings = () => {
@@ -32,6 +33,7 @@ const Settings = () => {
             
             <div className="px-6 pb-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <BackendModeCard />
                 <ProfileSettingsCard />
                 <PreferencesCard />
                 <NotificationsCard />
