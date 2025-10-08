@@ -89,10 +89,10 @@ export const useSecureAuth = () => {
       return { error: new Error('Email and password are required') };
     }
 
-    // Password strength validation
-    if (password.length < 8) {
+    // Enhanced password strength validation
+    if (password.length < 12) {
       await logSecurityEvent('invalid_input', { email, action: 'sign_up', error: 'weak_password' });
-      return { error: new Error('Password must be at least 8 characters long') };
+      return { error: new Error('Password must be at least 12 characters long') };
     }
 
     try {
@@ -117,12 +117,16 @@ export const useSecureAuth = () => {
     try {
       await logSecurityEvent('sign_out_initiated', { user_id: auth.user?.id });
       
-      // Clear sensitive data from localStorage
-      const keysToRemove = Object.keys(localStorage).filter(key => 
-        key.includes('batch') || key.includes('auth') || key.includes('session')
-      );
+      // Aggressive cleanup - clear ALL localStorage except safe UI preferences
+      const safeKeys = ['theme', 'language', 'cookie-consent', 'clock-settings'];
+      Object.keys(localStorage).forEach(key => {
+        if (!safeKeys.includes(key)) {
+          localStorage.removeItem(key);
+        }
+      });
       
-      keysToRemove.forEach(key => localStorage.removeItem(key));
+      // Also clear sessionStorage
+      sessionStorage.clear();
       
       await auth.signOut();
       await logSecurityEvent('sign_out_success', { user_id: auth.user?.id });

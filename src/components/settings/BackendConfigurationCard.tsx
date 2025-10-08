@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { EnhancedAutoPromptr } from "@/services/enhancedAutoPromptr";
 import { useToast } from "@/hooks/use-toast";
 import { ConnectionWizard } from "./ConnectionWizard";
+import { EnhancedSecureStorage } from "@/services/security/enhancedSecureStorage";
 
 export const BackendConfigurationCard = () => {
   const [backendUrl, setBackendUrl] = useState('https://autopromptr-backend.onrender.com');
@@ -44,29 +45,41 @@ export const BackendConfigurationCard = () => {
     }
   };
 
-  const saveConfiguration = () => {
-    localStorage.setItem('autopromptr_backend_url', backendUrl);
-    localStorage.setItem('autopromptr_api_key', apiKey);
-    localStorage.setItem('autopromptr_enhanced_mode', enhancedMode.toString());
-    
-    toast({
-      title: "Configuration saved",
-      description: "Backend settings have been updated. The new settings will be used for future connections.",
-    });
-    
-    // Reset connection status to trigger re-testing
-    setConnectionStatus('unknown');
+  const saveConfiguration = async () => {
+    try {
+      localStorage.setItem('autopromptr_backend_url', backendUrl);
+      await EnhancedSecureStorage.storeApiKey('backend_api_key', apiKey);
+      localStorage.setItem('autopromptr_enhanced_mode', enhancedMode.toString());
+      
+      toast({
+        title: "Configuration saved",
+        description: "Backend settings have been securely stored and will be used for future connections.",
+      });
+      
+      // Reset connection status to trigger re-testing
+      setConnectionStatus('unknown');
+    } catch (error) {
+      toast({
+        title: "Error saving settings",
+        description: "Failed to securely store API key. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Load saved configuration
   useEffect(() => {
-    const savedUrl = localStorage.getItem('autopromptr_backend_url');
-    const savedKey = localStorage.getItem('autopromptr_api_key');
-    const savedEnhanced = localStorage.getItem('autopromptr_enhanced_mode');
+    const loadConfig = async () => {
+      const savedUrl = localStorage.getItem('autopromptr_backend_url');
+      const savedKey = await EnhancedSecureStorage.getApiKey('backend_api_key');
+      const savedEnhanced = localStorage.getItem('autopromptr_enhanced_mode');
+      
+      if (savedUrl) setBackendUrl(savedUrl);
+      if (savedKey) setApiKey(savedKey);
+      if (savedEnhanced) setEnhancedMode(savedEnhanced === 'true');
+    };
     
-    if (savedUrl) setBackendUrl(savedUrl);
-    if (savedKey) setApiKey(savedKey);
-    if (savedEnhanced) setEnhancedMode(savedEnhanced === 'true');
+    loadConfig();
   }, []);
 
   return (

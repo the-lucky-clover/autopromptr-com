@@ -35,13 +35,13 @@ jwt_expiry = 3600
 enable_signup = true
 
 [functions.syslog-receiver]
-verify_jwt = false
+verify_jwt = true
 
 [functions.ai-agent-orchestrator]
-verify_jwt = false
+verify_jwt = true
 
 [functions.prompt-dispatch]
-verify_jwt = false
+verify_jwt = true
 
 [functions.support-chatbot]
-verify_jwt = false
+verify_jwt = true
