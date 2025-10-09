@@ -25,6 +25,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import MigrationDashboard from "./pages/MigrationDashboard";
 import BackendTest from "./pages/BackendTest";
 import BackendHealthDashboard from "./pages/BackendHealthDashboard";
+import SongGenerationTest from "./pages/SongGenerationTest";
 
 const queryClient = new QueryClient();
 
@@ -50,7 +51,8 @@ const App = () => (
             
             {/* Backend Testing - accessible without auth for testing */}
             <Route path="/backend-test" element={<BackendTest />} />
-            <Route path="/backend-health" element={<BackendHealthDashboard />} />
+          <Route path="/backend-health" element={<BackendHealthDashboard />} />
+          <Route path="/song-test" element={<SongGenerationTest />} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={
