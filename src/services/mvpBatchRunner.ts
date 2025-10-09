@@ -64,40 +64,40 @@ export class MVPBatchRunner {
       onProgress
     } = options;
     
-    console.log('🚀 Starting MVP #1 batch run:', batch.id);
+    console.log('🚀 Starting MVP #1 batch run via router:', batch.id);
     console.log('📊 Target URL:', batch.targetUrl);
     console.log('📝 Total prompts:', batch.prompts?.length || 0);
     console.log('⏳ Wait for completion:', waitForCompletion);
     
     try {
-      const backendUrl = await this.getBackendUrl();
-      
       // Prepare prompts
       const prompts = (batch.prompts || []).map((p, index) => ({
         id: p.id || `prompt_${index}`,
         text: p.text
       }));
       
-      // Start batch processing on backend
-      const response = await fetch(`${backendUrl}/api/automation/process-batch`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          batch_id: batch.id,
-          target_url: batch.targetUrl,
-          prompts,
-          options: {
-            wait_for_completion: waitForCompletion,
-            max_retries: maxRetries
+      // Use backend router for intelligent routing and failover
+      const { data, error } = await supabase.functions.invoke('backend-router', {
+        body: {
+          action: 'process',
+          batch: {
+            id: batch.id,
+            targetUrl: batch.targetUrl,
+            prompts,
+            options: {
+              wait_for_completion: waitForCompletion,
+              max_retries: maxRetries
+            }
           }
-        })
+        }
       });
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Backend request failed');
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      if (!data) {
+        throw new Error('No response from backend router');
       }
       
       // Start polling for status updates
@@ -106,7 +106,7 @@ export class MVPBatchRunner {
       }
       
       // Wait for final result
-      const result = await response.json();
+      const result = data;
       
       console.log('✅ Batch completed:', result);
       
@@ -206,13 +206,18 @@ export class MVPBatchRunner {
   
   async stopBatch(batchId: string): Promise<boolean> {
     try {
-      const backendUrl = await this.getBackendUrl();
-      
-      const response = await fetch(`${backendUrl}/api/automation/stop-batch/${batchId}`, {
-        method: 'POST'
+      const { data, error } = await supabase.functions.invoke('backend-router', {
+        body: {
+          action: 'stop',
+          batchId
+        }
       });
-      
-      return response.ok;
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data?.success || false;
     } catch (e) {
       console.error('Error stopping batch:', e);
       return false;

@@ -54,3 +54,9 @@ verify_jwt = true
 
 [functions.support-chatbot]
 verify_jwt = true
+
+[functions.backend-router]
+verify_jwt = true
+
+[functions.backend-health-monitor]
+verify_jwt = false
