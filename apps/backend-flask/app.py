@@ -19,6 +19,7 @@ from services.universal_batch_service import UniversalBatchService, BatchRequest
 from services.batch_processor_service import batch_processor_service
 from services.playwright_service import playwright_service
 from websocket_service import websocket_service
+from utils.input_validation import InputValidator, ValidationError
 
 # Configure logging
 logging.basicConfig(
@@ -110,12 +111,33 @@ def create_batch():
         if not prompts:
             return jsonify({'error': 'At least one prompt is required'}), 400
         
-        # Validate prompts format
+        # SECURITY: Validate batch name
+        is_valid, error = InputValidator.validate_batch_name(name)
+        if not is_valid:
+            return jsonify({'error': error}), 400
+        
+        # SECURITY: Validate description
+        if description:
+            is_valid, error = InputValidator.validate_description(description)
+            if not is_valid:
+                return jsonify({'error': error}), 400
+        
+        # SECURITY: Validate prompts format and content
         for i, prompt in enumerate(prompts):
             if not isinstance(prompt, dict) or 'text' not in prompt:
                 return jsonify({
                     'error': f'Invalid prompt format at index {i}. Expected {{text: string, platform?: string}}'
                 }), 400
+            
+            # Validate prompt content
+            is_valid, error = InputValidator.validate_prompt(
+                {'prompt_text': prompt['text']}, i
+            )
+            if not is_valid:
+                return jsonify({'error': error}), 400
+            
+            # Sanitize prompt text
+            prompt['text'] = InputValidator.sanitize_prompt_text(prompt['text'])
         
         orch = get_orchestrator()
         batch_job = orch.create_batch_job(name, description, prompts)
@@ -185,6 +207,15 @@ def run_batch_combined():
         
         if not data:
             return jsonify({'error': 'No JSON data provided'}), 400
+        
+        # SECURITY: Validate input data before processing
+        is_valid, error_message = InputValidator.validate_batch_data(data)
+        if not is_valid:
+            logger.warning(f"Invalid batch data: {error_message}")
+            return jsonify({'error': error_message}), 400
+        
+        # SECURITY: Sanitize all text fields
+        data = InputValidator.sanitize_batch_data(data)
         
         batch_data = data.get('batch', {})
         platform = data.get('platform', 'web')

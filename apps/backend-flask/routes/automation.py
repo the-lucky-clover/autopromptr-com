@@ -7,6 +7,7 @@ import asyncio
 import logging
 from services.batch_processor_service import batch_processor_service
 from services.playwright_service import playwright_service
+from utils.input_validation import InputValidator
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,23 @@ def process_batch():
             return jsonify({
                 'error': 'batch_id, target_url, and prompts are required'
             }), 400
+        
+        # SECURITY: Validate target URL
+        is_valid, error = InputValidator.validate_url(target_url)
+        if not is_valid:
+            logger.warning(f"Invalid target URL: {error}")
+            return jsonify({'error': error}), 400
+        
+        # SECURITY: Validate automation request
+        is_valid, error = InputValidator.validate_automation_request(data)
+        if not is_valid:
+            logger.warning(f"Invalid automation request: {error}")
+            return jsonify({'error': error}), 400
+        
+        # SECURITY: Sanitize prompts
+        for prompt in prompts:
+            if 'text' in prompt:
+                prompt['text'] = InputValidator.sanitize_prompt_text(prompt['text'])
         
         # Start batch processing asynchronously
         result = asyncio.run(
@@ -106,6 +124,18 @@ def test_automation():
         target_url = data.get('target_url', 'https://lovable.dev')
         prompt = data.get('prompt', 'Test prompt')
         wait_for_completion = data.get('wait_for_completion', True)
+        
+        # SECURITY: Validate target URL
+        is_valid, error = InputValidator.validate_url(target_url)
+        if not is_valid:
+            logger.warning(f"Invalid target URL: {error}")
+            return jsonify({'error': error}), 400
+        
+        # SECURITY: Validate and sanitize prompt
+        if len(prompt) > 5000:
+            return jsonify({'error': 'Prompt exceeds maximum length of 5000 characters'}), 400
+        
+        prompt = InputValidator.sanitize_prompt_text(prompt)
         
         result = asyncio.run(
             playwright_service.navigate_and_submit(

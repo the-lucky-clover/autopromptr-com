@@ -11,6 +11,31 @@ const MAX_PROMPTS_PER_BATCH = 100;
 const MAX_PROMPT_LENGTH = 5000;
 const ALLOWED_PLATFORMS = ["lovable", "v0", "cursor", "windsurf", "chatgpt", "claude", "web"];
 
+// Dangerous patterns that indicate potential injection attacks
+const DANGEROUS_PATTERNS = [
+  /import\s+os/i,
+  /import\s+subprocess/i,
+  /eval\s*\(/i,
+  /exec\s*\(/i,
+  /__import__/i,
+  /<script[^>]*>/i,
+  /javascript:/i,
+  /onerror\s*=/i,
+  /onclick\s*=/i,
+  /onload\s*=/i,
+  /<iframe/i,
+  /document\.cookie/i,
+  /localStorage/i,
+  /sessionStorage/i,
+  /XMLHttpRequest/i,
+  /fetch\s*\(/i,
+  /\.system\s*\(/i,
+  /rm\s+-rf/i,
+  /DROP\s+TABLE/i,
+  /DELETE\s+FROM/i,
+  /UPDATE\s+.*\s+SET/i,
+];
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -89,7 +114,9 @@ serve(async (req) => {
     }
 
     // Validate each prompt
-    for (const prompt of batch.prompts) {
+    for (let i = 0; i < batch.prompts.length; i++) {
+      const prompt = batch.prompts[i];
+      
       if (!prompt.prompt_text || typeof prompt.prompt_text !== "string") {
         return new Response(JSON.stringify({ error: "Invalid prompt text" }), {
           status: 400,
@@ -106,11 +133,27 @@ serve(async (req) => {
         });
       }
 
-      // Sanitize prompt text
-      prompt.prompt_text = prompt.prompt_text.trim();
+      // SECURITY: Check for dangerous patterns
+      for (const pattern of DANGEROUS_PATTERNS) {
+        if (pattern.test(prompt.prompt_text)) {
+          console.warn(`Dangerous pattern detected in prompt ${i}:`, pattern.source);
+          return new Response(JSON.stringify({ 
+            error: `Prompt ${i} contains potentially dangerous content and was rejected for security reasons` 
+          }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+
+      // Sanitize prompt text - remove null bytes and excessive whitespace
+      prompt.prompt_text = prompt.prompt_text
+        .replace(/\x00/g, '')  // Remove null bytes
+        .replace(/[\t ]+/g, ' ')  // Normalize spaces
+        .trim();
     }
 
-    // Validate target URL if present
+    // Validate target URL if present (SSRF protection)
     if (batch.settings?.targetUrlOverride) {
       try {
         const url = new URL(batch.settings.targetUrlOverride);
@@ -119,6 +162,46 @@ serve(async (req) => {
             status: 400,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
+        }
+
+        // SECURITY: Block private/local IPs (SSRF protection)
+        const hostname = url.hostname.toLowerCase();
+        const privatePatterns = [
+          'localhost',
+          '127.0.0.1',
+          '0.0.0.0',
+          '::1',
+          '10.',
+          '172.16.',
+          '172.17.',
+          '172.18.',
+          '172.19.',
+          '172.20.',
+          '172.21.',
+          '172.22.',
+          '172.23.',
+          '172.24.',
+          '172.25.',
+          '172.26.',
+          '172.27.',
+          '172.28.',
+          '172.29.',
+          '172.30.',
+          '172.31.',
+          '192.168.',
+          '169.254.',
+          'metadata.google.internal',
+          '169.254.169.254'
+        ];
+
+        for (const pattern of privatePatterns) {
+          if (hostname === pattern || hostname.startsWith(pattern)) {
+            console.warn('SSRF attempt blocked:', hostname);
+            return new Response(JSON.stringify({ error: "Private/local URLs are not allowed" }), {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
         }
       } catch {
         return new Response(JSON.stringify({ error: "Invalid target URL format" }), {
