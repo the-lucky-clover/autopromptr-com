@@ -292,6 +292,66 @@ export type Database = {
         }
         Relationships: []
       }
+      prompt_library: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          is_favorite: boolean | null
+          last_used_at: string | null
+          metadata: Json | null
+          prompt_text: string
+          source: string | null
+          source_batch_id: string | null
+          tags: string[] | null
+          target_platform: string | null
+          target_url: string | null
+          time_saved_seconds: number | null
+          times_used: number | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          last_used_at?: string | null
+          metadata?: Json | null
+          prompt_text: string
+          source?: string | null
+          source_batch_id?: string | null
+          tags?: string[] | null
+          target_platform?: string | null
+          target_url?: string | null
+          time_saved_seconds?: number | null
+          times_used?: number | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          last_used_at?: string | null
+          metadata?: Json | null
+          prompt_text?: string
+          source?: string | null
+          source_batch_id?: string | null
+          tags?: string[] | null
+          target_platform?: string | null
+          target_url?: string | null
+          time_saved_seconds?: number | null
+          times_used?: number | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       prompts: {
         Row: {
           batch_id: string | null
