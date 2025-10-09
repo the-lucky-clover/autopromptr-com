@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,6 +17,34 @@ serve(async (req) => {
   }
 
   try {
+    // CRITICAL: Verify JWT authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.warn('Missing authorization header');
+      return new Response(JSON.stringify({ error: 'Missing authorization' }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.warn('Authentication failed:', authError?.message);
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    console.log('User authenticated:', user.id);
+
     if (!BACKEND_URL) {
       console.error("BACKEND_URL not configured");
       return new Response(JSON.stringify({ error: "Backend configuration missing" }), {
@@ -99,9 +128,51 @@ serve(async (req) => {
       }
     }
 
+    // CRITICAL: Verify batch ownership
+    if (batch.id) {
+      const { data: batchData, error: batchError } = await supabase
+        .from('batches')
+        .select('created_by')
+        .eq('id', batch.id)
+        .single();
+
+      if (batchError || !batchData) {
+        console.error('Failed to fetch batch:', batchError?.message);
+        return new Response(JSON.stringify({ error: 'Batch not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (batchData.created_by !== user.id) {
+        console.warn('Batch ownership verification failed');
+        return new Response(JSON.stringify({ error: 'Forbidden: batch not owned by user' }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Log telemetry for rate limiting
+      try {
+        await supabase.from('telemetry_events').insert({
+          user_id: user.id,
+          event_type: 'prompt_dispatch_called',
+          batch_id: batch.id,
+          platform,
+          metadata: { options }
+        });
+      } catch (telemetryError) {
+        console.error('Failed to log telemetry:', telemetryError);
+      }
+    }
+
     const resp = await fetch(`${BACKEND_URL}/api/run-batch`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "X-User-ID": user.id,
+        "X-Batch-ID": batch.id || ''
+      },
       body: JSON.stringify({ batch, platform, options }),
     });
 

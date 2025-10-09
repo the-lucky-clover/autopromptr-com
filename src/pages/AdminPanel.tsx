@@ -14,7 +14,7 @@ import { SecurityStatus } from "@/components/security/SecurityStatus";
 import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 
 const AdminPanel = () => {
-  const { isSysOp, loading: roleLoading, setSuperUser } = useUserRole();
+  const { isAdmin, loading: roleLoading, setUserRole } = useUserRole();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [securityEvents, setSecurityEvents] = useState<any[]>([]);
@@ -22,17 +22,17 @@ const AdminPanel = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!roleLoading && !isSysOp) {
+    if (!roleLoading && !isAdmin) {
       navigate('/dashboard');
     }
-  }, [isSysOp, roleLoading, navigate]);
+  }, [isAdmin, roleLoading, navigate]);
 
   useEffect(() => {
-    if (isSysOp) {
+    if (isAdmin) {
       fetchSecurityEvents();
       fetchUsers();
     }
-  }, [isSysOp]);
+  }, [isAdmin]);
 
   const fetchSecurityEvents = async () => {
     try {
@@ -56,31 +56,40 @@ const AdminPanel = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, name, role, is_super_user, created_at')
+        .select('id, name, created_at')
         .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching users:', error);
       } else {
-        setUsers(data || []);
+        // Fetch roles separately from user_roles table
+        const usersWithRoles = await Promise.all(
+          (data || []).map(async (user) => {
+            const { data: roleData } = await supabase.rpc('get_user_role', {
+              _user_id: user.id
+            });
+            return { ...user, role: roleData || 'user' };
+          })
+        );
+        setUsers(usersWithRoles);
       }
     } catch (error) {
       console.error('Failed to fetch users:', error);
     }
   };
 
-  const handleToggleSuperUser = async (userId: string, currentStatus: boolean) => {
+  const handleToggleAdmin = async (userId: string, currentRole: string) => {
     setLoading(true);
     try {
-      const result = await setSuperUser(userId, !currentStatus);
+      const newRole = currentRole === 'admin' ? 'user' : 'admin';
+      const result = await setUserRole(userId, newRole);
       if (result.success) {
-        // Refresh users list
         await fetchUsers();
       } else {
-        console.error('Failed to update user privileges:', result.error);
+        console.error('Failed to update user role:', result.error);
       }
     } catch (error) {
-      console.error('Error updating user privileges:', error);
+      console.error('Error updating user role:', error);
     } finally {
       setLoading(false);
     }
@@ -88,7 +97,7 @@ const AdminPanel = () => {
 
   const systemStats = [
     { title: 'Total Users', value: users.length.toString(), icon: Users, color: 'text-blue-400' },
-    { title: 'Super Users', value: users.filter(u => u.is_super_user).length.toString(), icon: Shield, color: 'text-purple-400' },
+    { title: 'Admin Users', value: users.filter(u => u.role === 'admin').length.toString(), icon: Shield, color: 'text-purple-400' },
     { title: 'Security Events', value: securityEvents.length.toString(), icon: Shield, color: 'text-red-400' },
     { title: 'System Health', value: '98.5%', icon: Database, color: 'text-green-400' },
   ];
@@ -104,7 +113,7 @@ const AdminPanel = () => {
     );
   }
 
-  if (!isSysOp) {
+  if (!isAdmin) {
     return null;
   }
 
@@ -246,17 +255,17 @@ const AdminPanel = () => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-4">
-                        <Badge variant={user.is_super_user ? 'destructive' : user.role === 'admin' ? 'secondary' : 'outline'}>
-                          {user.is_super_user ? 'Super User' : user.role || 'user'}
+                        <Badge variant={user.role === 'admin' ? 'destructive' : 'outline'}>
+                          {user.role || 'user'}
                         </Badge>
                         <Button 
                           size="sm" 
-                          variant={user.is_super_user ? "destructive" : "default"}
+                          variant={user.role === 'admin' ? "destructive" : "default"}
                           className="rounded-xl"
-                          onClick={() => handleToggleSuperUser(user.id, user.is_super_user)}
+                          onClick={() => handleToggleAdmin(user.id, user.role)}
                           disabled={loading}
                         >
-                          {user.is_super_user ? 'Revoke Admin' : 'Make Admin'}
+                          {user.role === 'admin' ? 'Revoke Admin' : 'Make Admin'}
                         </Button>
                       </div>
                     </div>

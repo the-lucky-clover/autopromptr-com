@@ -7,9 +7,9 @@ import { useUserRole } from '@/hooks/useUserRole';
 
 export const FloatingConsoleButton = () => {
   const [isConsoleOpen, setIsConsoleOpen] = useState(false);
-  const { isSysOp } = useUserRole();
+  const { isAdmin } = useUserRole();
 
-  if (!isSysOp) return null;
+  if (!isAdmin) return null;
 
   return (
     <>

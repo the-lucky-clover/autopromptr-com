@@ -13,38 +13,38 @@ interface DashboardSubscriptionProps {
 
 const DashboardSubscription = ({ isCompact = false }: DashboardSubscriptionProps) => {
   const { user } = useAuth();
-  const { isSysOp } = useUserRole();
+  const { isAdmin } = useUserRole();
 
-  // Mock subscription data - enhanced for super users
+  // Mock subscription data - enhanced for admins
   const subscription = {
-    plan: isSysOp ? 'God Account' : 'Pro',
+    plan: isAdmin ? 'Admin Account' : 'Pro',
     status: 'active',
-    creditsUsed: isSysOp ? 0 : 150,
-    creditsTotal: isSysOp ? '∞' : 1000,
-    nextBilling: isSysOp ? 'Never' : '2024-02-15'
+    creditsUsed: isAdmin ? 0 : 150,
+    creditsTotal: isAdmin ? '∞' : 1000,
+    nextBilling: isAdmin ? 'Never' : '2024-02-15'
   };
 
-  const creditPercentage = isSysOp ? 0 : (subscription.creditsUsed / (subscription.creditsTotal as number)) * 100;
+  const creditPercentage = isAdmin ? 0 : (subscription.creditsUsed / (subscription.creditsTotal as number)) * 100;
 
   if (isCompact) {
     return (
       <Card className={`backdrop-blur-sm border-white/20 rounded-xl ${
-        isSysOp 
+        isAdmin
           ? 'bg-gradient-to-br from-purple-600/20 via-pink-600/20 to-yellow-600/20 border-yellow-400/30' 
           : 'bg-white/10'
       }`}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-white flex items-center gap-2 text-sm">
-              {isSysOp ? <Crown className="w-4 h-4" /> : <CreditCard className="w-4 h-4" />}
+              {isAdmin ? <Crown className="w-4 h-4" /> : <CreditCard className="w-4 h-4" />}
               Subscription
             </CardTitle>
             <Badge className={`text-xs ${
-              isSysOp 
+              isAdmin
                 ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-yellow-300 border-yellow-400/40' 
                 : 'bg-green-500/20 text-green-300 border-green-500/30'
             }`}>
-              {isSysOp && <Sparkles className="w-3 h-3 mr-1" />}
+              {isAdmin && <Sparkles className="w-3 h-3 mr-1" />}
               {subscription.plan}
             </Badge>
           </div>
@@ -54,7 +54,7 @@ const DashboardSubscription = ({ isCompact = false }: DashboardSubscriptionProps
             <span>Credits</span>
             <span>{subscription.creditsUsed}/{subscription.creditsTotal}</span>
           </div>
-          {!isSysOp && (
+          {!isAdmin && (
             <div className="w-full bg-white/10 rounded-full h-2">
               <div 
                 className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
@@ -62,7 +62,7 @@ const DashboardSubscription = ({ isCompact = false }: DashboardSubscriptionProps
               />
             </div>
           )}
-          {isSysOp && (
+          {isAdmin && (
             <div className="text-center py-2">
               <div className="text-yellow-300 text-xs font-mono animate-pulse">
                 ∞ UNLIMITED POWER ∞
@@ -76,22 +76,22 @@ const DashboardSubscription = ({ isCompact = false }: DashboardSubscriptionProps
 
   return (
     <Card className={`backdrop-blur-sm border-white/20 rounded-xl ${
-      isSysOp 
+      isAdmin
         ? 'bg-gradient-to-br from-purple-600/20 via-pink-600/20 to-yellow-600/20 border-yellow-400/30' 
         : 'bg-white/10'
     }`}>
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-white flex items-center gap-2">
-            {isSysOp ? <Crown className="w-5 h-5 text-yellow-400" /> : <CreditCard className="w-5 h-5" />}
+            {isAdmin ? <Crown className="w-5 h-5 text-yellow-400" /> : <CreditCard className="w-5 h-5" />}
             Subscription
           </CardTitle>
           <Badge className={`${
-            isSysOp 
+            isAdmin
               ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-yellow-300 border-yellow-400/40' 
               : 'bg-green-500/20 text-green-300 border-green-500/30'
           }`}>
-            {isSysOp ? (
+            {isAdmin ? (
               <>
                 <Sparkles className="w-3 h-3 mr-1 animate-spin" />
                 {subscription.plan}
@@ -117,7 +117,7 @@ const DashboardSubscription = ({ isCompact = false }: DashboardSubscriptionProps
           </div>
         </div>
 
-        {isSysOp ? (
+        {isAdmin ? (
           <div className="space-y-2">
             <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-lg p-4 border border-yellow-400/30">
               <div className="text-center space-y-2">
@@ -148,7 +148,7 @@ const DashboardSubscription = ({ isCompact = false }: DashboardSubscriptionProps
           </div>
         )}
 
-        {!isSysOp && (
+        {!isAdmin && (
           <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl">
             <Zap className="w-4 h-4 mr-2" />
             Upgrade Plan

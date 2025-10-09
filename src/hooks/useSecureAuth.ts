@@ -7,7 +7,7 @@ import { useToast } from './use-toast';
 
 export const useSecureAuth = () => {
   const auth = useAuth();
-  const { role, isSysOp, isAdmin, loading: roleLoading } = useUserRole();
+  const { role, isAdmin, loading: roleLoading } = useUserRole();
   const { toast } = useToast();
 
   // Log security events to the database
@@ -187,7 +187,6 @@ export const useSecureAuth = () => {
   return {
     ...auth,
     role,
-    isSysOp,
     isAdmin,
     roleLoading,
     secureSignIn,

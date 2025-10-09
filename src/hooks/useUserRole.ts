@@ -55,19 +55,18 @@ export const useUserRole = () => {
     fetchUserRole();
   }, [user]);
 
-  const isSysOp = role === 'sysop';
-  const isAdmin = role === 'admin' || role === 'sysop';
+  const isAdmin = role === 'admin';
 
-  // Function to promote/demote users (only available to sysops)
-  const setSuperUser = async (userId: string, isSuper: boolean) => {
-    if (!isSysOp) {
-      throw new Error('Only system operators can modify user privileges');
+  // Function to set user role (only available to admins)
+  const setUserRole = async (userId: string, newRole: 'admin' | 'user') => {
+    if (!isAdmin) {
+      throw new Error('Only admins can modify user roles');
     }
 
     try {
-      const { error } = await supabase.rpc('set_super_user', {
+      const { error } = await supabase.rpc('set_user_role', {
         _user_id: userId,
-        _is_super: isSuper
+        _role: newRole
       });
 
       if (error) {
@@ -76,17 +75,16 @@ export const useUserRole = () => {
 
       return { success: true };
     } catch (error) {
-      console.error('Failed to update user privileges:', error);
+      console.error('Failed to update user role:', error);
       return { success: false, error };
     }
   };
 
   return {
     role,
-    isSysOp,
     isAdmin,
     loading,
     user,
-    setSuperUser
+    setUserRole
   };
 };

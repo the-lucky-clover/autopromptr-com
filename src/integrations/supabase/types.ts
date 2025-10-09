@@ -255,10 +255,8 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           id: string
-          is_super_user: boolean | null
           name: string | null
           preferred_language: string | null
-          role: string | null
           subscription: string | null
           updated_at: string
           video_background_blend_mode: string | null
@@ -270,10 +268,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           id: string
-          is_super_user?: boolean | null
           name?: string | null
           preferred_language?: string | null
-          role?: string | null
           subscription?: string | null
           updated_at?: string
           video_background_blend_mode?: string | null
@@ -285,10 +281,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           id?: string
-          is_super_user?: boolean | null
           name?: string | null
           preferred_language?: string | null
-          role?: string | null
           subscription?: string | null
           updated_at?: string
           video_background_blend_mode?: string | null
@@ -473,6 +467,36 @@ export type Database = {
         }
         Relationships: []
       }
+      telemetry_events: {
+        Row: {
+          batch_id: string | null
+          created_at: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          platform: string | null
+          user_id: string | null
+        }
+        Insert: {
+          batch_id?: string | null
+          created_at?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          platform?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          batch_id?: string | null
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          platform?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -549,8 +573,11 @@ export type Database = {
         Args: { event_data?: Json; event_type: string; user_id_param?: string }
         Returns: undefined
       }
-      set_super_user: {
-        Args: { _is_super: boolean; _user_id: string }
+      set_user_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
         Returns: undefined
       }
       update_batch_status: {

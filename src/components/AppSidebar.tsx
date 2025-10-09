@@ -82,7 +82,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ width = 256 }: AppSidebarProps) {
   const location = useLocation()
-  const { role, isSysOp } = useUserRole()
+  const { role, isAdmin } = useUserRole()
 
   return (
     <Sidebar 
@@ -139,7 +139,7 @@ export function AppSidebar({ width = 256 }: AppSidebarProps) {
         </SidebarGroup>
 
         {/* Admin Menu - Enhanced with new design system */}
-        {isSysOp && (
+        {isAdmin && (
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu className="px-2 space-y-1">
