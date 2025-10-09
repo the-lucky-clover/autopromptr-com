@@ -1,5 +1,5 @@
 
-import { Home, Zap, FileText, BarChart3, Camera, Settings, Mail, Shield, Users, Database } from "lucide-react"
+import { Home, Zap, FileText, BarChart3, Camera, Settings, Mail, Shield, Users, Database, BookOpen } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import PsychedelicBrandLogo from "@/components/PsychedelicBrandLogo"
 import EnhancedUserProfile from "@/components/EnhancedUserProfile"
@@ -34,6 +34,11 @@ const items = [
     title: "Extractor",
     url: "/dashboard/extractor",
     icon: FileText,
+  },
+  {
+    title: "Library",
+    url: "/library",
+    icon: BookOpen,
   },
   {
     title: "Results",

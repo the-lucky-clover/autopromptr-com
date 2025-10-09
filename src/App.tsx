@@ -13,6 +13,7 @@ import BatchExtractor from "./pages/BatchExtractor";
 import BatchProcessorDashboard from "./pages/BatchProcessorDashboard";
 import BatchExtractorDashboard from "./pages/BatchExtractorDashboard";
 import Screenshots from "./pages/Screenshots";
+import PromptLibrary from "./pages/PromptLibrary";
 import Results from "./pages/Results";
 import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
@@ -88,6 +89,11 @@ const App = () => (
             <Route path="/screenshots" element={
               <ProtectedRoute>
                 <Screenshots />
+              </ProtectedRoute>
+            } />
+            <Route path="/library" element={
+              <ProtectedRoute>
+                <PromptLibrary />
               </ProtectedRoute>
             } />
             <Route path="/results" element={
