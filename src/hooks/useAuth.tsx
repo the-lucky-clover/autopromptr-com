@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext, useMemo, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
 
 interface AuthContextType {
   user: User | null;
@@ -28,6 +28,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [user?.email_confirmed_at]);
 
   useEffect(() => {
+    // If Supabase is not configured, initialize in public mode
+    if (!isSupabaseConfigured) {
+      console.log('Supabase not configured, initializing in public mode');
+      setIsInitialized(true);
+      setLoading(false);
+      return;
+    }
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {

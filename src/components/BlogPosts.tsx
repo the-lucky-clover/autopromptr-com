@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, ArrowRight } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 
 interface BlogPost {
@@ -24,6 +24,12 @@ const BlogPosts = () => {
 
   const fetchBlogPosts = async () => {
     try {
+      if (!isSupabaseConfigured) {
+        console.log('Supabase not configured, skipping blog posts fetch');
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('blog_posts')
         .select('id, title, slug, excerpt, published_at')
