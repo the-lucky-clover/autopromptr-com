@@ -40,10 +40,25 @@ const DigitalClock: React.FC<DigitalClockProps> = ({
     };
 
     updateTime();
-    const interval = setInterval(updateTime, 1000);
 
-    return () => clearInterval(interval);
-  }, [getCurrentTime]);
+    // Dashboard mode: update only once per minute
+    if (size === 'dashboard') {
+      const now = new Date();
+      const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+      
+      const timeout = setTimeout(() => {
+        updateTime();
+        const interval = setInterval(updateTime, 60000);
+        return () => clearInterval(interval);
+      }, msToNextMinute);
+      
+      return () => clearTimeout(timeout);
+    } else {
+      // Other modes: update every second
+      const interval = setInterval(updateTime, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [getCurrentTime, size]);
 
   const formatDate = () => {
     const now = new Date();

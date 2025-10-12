@@ -111,7 +111,8 @@ const AnalyticsModule = ({ isCompact = false }: AnalyticsModuleProps) => {
           {/* Weekly Activity */}
           <div className="bg-white/5 rounded-lg p-4 border border-white/10">
             <h4 className="text-white font-medium mb-3">Weekly Batch Activity</h4>
-            <ResponsiveContainer width="100%" height={120}>
+            <div className="min-h-[160px]">
+              <ResponsiveContainer width="100%" height={120}>
               <BarChart data={chartData}>
                 <XAxis 
                   dataKey="name" 
@@ -133,12 +134,13 @@ const AnalyticsModule = ({ isCompact = false }: AnalyticsModuleProps) => {
                 </defs>
               </BarChart>
             </ResponsiveContainer>
+            </div>
           </div>
 
           {/* Status Distribution */}
           <div className="bg-white/5 rounded-lg p-4 border border-white/10">
             <h4 className="text-white font-medium mb-3">Batch Status Distribution</h4>
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center min-h-[160px]">
               <ResponsiveContainer width="100%" height={120}>
                 <PieChart>
                   <Pie

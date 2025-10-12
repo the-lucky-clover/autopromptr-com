@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ResizableDashboardLayout } from "@/components/dashboard/ResizableDashboardLayout";
 import { useDashboardModules } from "@/hooks/useDashboardModules";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,7 +31,7 @@ const Dashboard = () => {
     module.id !== 'batch-extractor'
   );
 
-  const renderModuleContent = (moduleId: string, componentName: string) => {
+  const renderModuleContent = useCallback((moduleId: string, componentName: string) => {
     try {
       switch (componentName) {
         case 'HealthStatusDashboard':
@@ -62,7 +62,7 @@ const Dashboard = () => {
       console.error(`Error rendering module ${moduleId}:`, error);
       return <div className="text-red-400">Error loading module</div>;
     }
-  };
+  }, [stats, batches, hasActiveBatch]);
 
   return (
     <div 

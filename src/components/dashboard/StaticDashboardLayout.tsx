@@ -7,7 +7,7 @@ interface StaticDashboardLayoutProps {
   renderModuleContent: (moduleId: string, componentName: string) => React.ReactNode;
 }
 
-const StaticDashboardLayout = ({ visibleModules, renderModuleContent }: StaticDashboardLayoutProps) => {
+const StaticDashboardLayout = React.memo(({ visibleModules, renderModuleContent }: StaticDashboardLayoutProps) => {
   return (
     <div className="space-y-6">
       {/* Console Monitor & Dashboard Stats (500px height) */}
@@ -17,7 +17,7 @@ const StaticDashboardLayout = ({ visibleModules, renderModuleContent }: StaticDa
           .map((module, index) => (
             <div 
               key={module.id} 
-              className="stagger-fade-in magnetic-hover hover-glow awwward-transition"
+              className="stagger-fade-in magnetic-hover hover-glow awwward-transition transform-gpu will-change-transform [backface-visibility:hidden]"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               {renderModuleContent(module.id, module.component)}
@@ -32,7 +32,7 @@ const StaticDashboardLayout = ({ visibleModules, renderModuleContent }: StaticDa
           .map((module, index) => (
             <div 
               key={module.id} 
-              className="stagger-fade-in magnetic-hover hover-glow awwward-transition"
+              className="stagger-fade-in magnetic-hover hover-glow awwward-transition transform-gpu will-change-transform [backface-visibility:hidden]"
               style={{ animationDelay: `${(index + 2) * 0.1}s` }}
             >
               {renderModuleContent(module.id, module.component)}
@@ -47,7 +47,7 @@ const StaticDashboardLayout = ({ visibleModules, renderModuleContent }: StaticDa
           .map((module, index) => (
             <div 
               key={module.id} 
-              className="stagger-fade-in magnetic-hover hover-glow awwward-transition"
+              className="stagger-fade-in magnetic-hover hover-glow awwward-transition transform-gpu will-change-transform [backface-visibility:hidden]"
               style={{ animationDelay: `${(index + 4) * 0.1}s` }}
             >
               {renderModuleContent(module.id, module.component)}
@@ -56,6 +56,8 @@ const StaticDashboardLayout = ({ visibleModules, renderModuleContent }: StaticDa
       </div>
     </div>
   );
-};
+});
+
+StaticDashboardLayout.displayName = 'StaticDashboardLayout';
 
 export default StaticDashboardLayout;
