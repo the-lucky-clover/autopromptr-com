@@ -37,7 +37,17 @@ const queryClient = new QueryClient({
   },
 });
 
-createRoot(document.getElementById('root')!).render(
+console.log('Main.tsx: Starting app initialization');
+
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  console.error('Root element not found!');
+  throw new Error('Root element not found');
+}
+
+console.log('Main.tsx: Root element found, creating React root');
+
+createRoot(rootElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -46,3 +56,5 @@ createRoot(document.getElementById('root')!).render(
     </QueryClientProvider>
   </StrictMode>,
 );
+
+console.log('Main.tsx: React root created and rendered');

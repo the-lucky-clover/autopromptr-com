@@ -20,21 +20,56 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    console.error('ErrorBoundary caught error:', error);
+    console.error('Error info:', errorInfo);
+    console.error('Error stack:', error.stack);
   }
 
   public render() {
     if (this.state.hasError) {
+      console.error('ErrorBoundary rendering error state:', this.state.error);
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-slate-900 via-blue-900 to-purple-600">
-          <div className="text-center text-white p-8">
-            <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
-            <p className="text-purple-200 mb-4">
-              We're sorry, but something unexpected happened.
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#1e293b',
+          color: 'white',
+          padding: '2rem'
+        }}>
+          <div style={{ textAlign: 'center', maxWidth: '600px' }}>
+            <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+              Something went wrong
+            </h1>
+            <p style={{ marginBottom: '1rem', color: '#cbd5e1' }}>
+              {this.state.error?.message || 'An unexpected error occurred'}
             </p>
+            <pre style={{
+              background: '#0f172a',
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              textAlign: 'left',
+              overflow: 'auto',
+              marginBottom: '1rem',
+              fontSize: '0.875rem'
+            }}>
+              {this.state.error?.stack}
+            </pre>
             <button
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-colors"
-              onClick={() => this.setState({ hasError: false, error: undefined })}
+              style={{
+                background: '#8b5cf6',
+                color: 'white',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.5rem',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '1rem'
+              }}
+              onClick={() => {
+                console.log('Resetting error boundary');
+                this.setState({ hasError: false, error: undefined });
+              }}
             >
               Try again
             </button>
@@ -43,6 +78,7 @@ export class ErrorBoundary extends Component<Props, State> {
       );
     }
 
+    console.log('ErrorBoundary rendering children');
     return this.props.children;
   }
 }
