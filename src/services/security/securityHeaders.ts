@@ -11,8 +11,15 @@ export class SecurityHeaders {
     }
 
     try {
-      // Enhanced Content Security Policy - Updated to allow video and font sources
-      const csp = [
+      // Detect if running in an iframe (e.g., Lovable preview)
+      const isEmbedded = typeof window !== 'undefined' && window.self !== window.top;
+      
+      if (isEmbedded) {
+        console.log('🖼️ Running in iframe - applying iframe-friendly security headers');
+      }
+
+      // Build CSP directives dynamically based on environment
+      const cspDirectives = [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://lovable.dev https://cdn.gpteng.co",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
@@ -21,25 +28,38 @@ export class SecurityHeaders {
         "media-src 'self' data: blob: https://videos.pexels.com",
         "connect-src 'self' https://raahpoyciwuyhwlcenpy.supabase.co https://api.openai.com https://autopromptr-backend.onrender.com wss: https:",
         "frame-src 'self' https://dashboard.render.com",
-        "frame-ancestors 'none'",
         "base-uri 'self'",
         "form-action 'self'",
         "object-src 'none'",
         "upgrade-insecure-requests"
-      ].join('; ');
+      ];
+
+      // Only add frame-ancestors when NOT embedded
+      if (!isEmbedded) {
+        cspDirectives.push("frame-ancestors 'none'");
+      }
+
+      const csp = cspDirectives.join('; ');
 
       // Create and append security meta tags
       this.createMetaTag('Content-Security-Policy', csp);
-      this.createMetaTag('X-Frame-Options', 'DENY');
+      
+      // X-Frame-Options: skip in embedded mode
+      if (!isEmbedded) {
+        this.createMetaTag('X-Frame-Options', 'DENY');
+      }
+      
       this.createMetaTag('X-Content-Type-Options', 'nosniff');
       this.createMetaTag('X-XSS-Protection', '1; mode=block');
       this.createMetaTag('Referrer-Policy', 'strict-origin-when-cross-origin');
       this.createMetaTag('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
       
-      // Additional security headers for modern browsers
-      this.createMetaTag('Cross-Origin-Embedder-Policy', 'require-corp');
-      this.createMetaTag('Cross-Origin-Opener-Policy', 'same-origin');
-      this.createMetaTag('Cross-Origin-Resource-Policy', 'same-origin');
+      // Additional security headers for modern browsers - only when NOT embedded
+      if (!isEmbedded) {
+        this.createMetaTag('Cross-Origin-Embedder-Policy', 'require-corp');
+        this.createMetaTag('Cross-Origin-Opener-Policy', 'same-origin');
+        this.createMetaTag('Cross-Origin-Resource-Policy', 'same-origin');
+      }
 
       this.isInitialized = true;
       

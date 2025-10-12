@@ -19,8 +19,14 @@ import './styles/nuclear-animations.css';
 import './styles/award-winning-ux.css';
 import { SecurityHeaders } from './services/security/securityHeaders';
 
-// Initialize security headers
-SecurityHeaders.init();
+// Initialize security headers (safe for embedded mode)
+if (typeof window !== 'undefined') {
+  const isEmbedded = window.self !== window.top;
+  if (isEmbedded) {
+    console.log('🖼️ Running in iframe - security headers will be iframe-friendly');
+  }
+  SecurityHeaders.init();
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {

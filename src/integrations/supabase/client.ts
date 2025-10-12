@@ -3,9 +3,9 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-// Use environment variables - no fallbacks for security
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+// Hardcoded Supabase configuration (anon key is safe to expose)
+const SUPABASE_URL = 'https://raahpoyciwuyhwlcenpy.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhYWhwb3ljaXd1eWh3bGNlbnB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5Njc4NTAsImV4cCI6MjA2NDU0Mzg1MH0.lAzBUV4PumqVGQqJNhS-5snJIt_qnSAARSYKb5WEUQo';
 
 // Export configuration status
 export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
