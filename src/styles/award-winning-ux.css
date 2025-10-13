@@ -179,6 +179,19 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
+/* Dashboard Stable Fade - Never re-triggers */
+.dashboard-stable-fade {
+  animation: dashboardStableFade 0.5s ease-out forwards;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  opacity: 1;
+}
+
+@keyframes dashboardStableFade {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
 /* Attention Pulse for Important Elements */
 .attention-pulse {
   animation: attentionPulse 2s ease-in-out infinite;

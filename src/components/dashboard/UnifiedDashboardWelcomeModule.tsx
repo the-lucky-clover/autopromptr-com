@@ -159,4 +159,4 @@ const UnifiedDashboardWelcomeModule = ({
   );
 };
 
-export default UnifiedDashboardWelcomeModule;
+export default React.memo(UnifiedDashboardWelcomeModule);

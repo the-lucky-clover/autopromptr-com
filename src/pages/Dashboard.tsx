@@ -95,17 +95,17 @@ const Dashboard = () => {
         <div className="px-4 md:px-6 pb-6">
           {/* Top row: 3-column grid with fixed 650px heights */}
           <div className="dashboard-grid-row-xl">
-            <div className="stagger-fade-in magnetic-hover hover-glow awwward-transition" style={{ animationDelay: '0s' }}>
+            <div className="dashboard-stable-fade magnetic-hover hover-glow awwward-transition">
               <ErrorBoundary>
                 <CompactRecentActivity />
               </ErrorBoundary>
             </div>
-            <div className="stagger-fade-in magnetic-hover hover-glow awwward-transition" style={{ animationDelay: '0.1s' }}>
+            <div className="dashboard-stable-fade magnetic-hover hover-glow awwward-transition">
               <ErrorBoundary>
                 <SupportChatbot />
               </ErrorBoundary>
             </div>
-            <div className="stagger-fade-in magnetic-hover hover-glow awwward-transition" style={{ animationDelay: '0.2s' }}>
+            <div className="dashboard-stable-fade magnetic-hover hover-glow awwward-transition">
               <ErrorBoundary>
                 <HealthStatusDashboard isCompact={false} />
               </ErrorBoundary>
