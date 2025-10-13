@@ -113,44 +113,15 @@ const UnifiedDashboardWelcomeModule = ({
                  transform: 'scale(0.6) translateY(-20px)',
                  transformOrigin: 'top right'
                }}>
-            {/* Digital Clock - Upper Area */}
+            {/* Digital Clock with Reactor Status */}
             <div className="flex justify-end">
               <DigitalClock 
                 clockColor={clockColor}
-                showReactorStatus={false}
+                showReactorStatus={true}
                 showTimezone={true}
                 showDate={true}
                 size="dashboard"
               />
-            </div>
-
-            {/* Reactor Status and Attribution - Lower Area */}
-            <div className="flex flex-col items-end space-y-4">
-              {/* Reactor Status */}
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-white/80 font-medium">Sector 7-G</span>
-                <span className="text-green-400 font-medium">//</span>
-                <span className="text-white/80 font-medium">Reactor:</span>
-                <span 
-                  className="text-green-400 font-semibold"
-                  style={{ 
-                    textShadow: '0 0 8px rgba(34, 197, 94, 0.6)' 
-                  }}
-                >
-                  Stable
-                </span>
-                <Radiation 
-                  className="w-4 h-4 text-yellow-400 animate-[radioactive-pulse_3s_ease-in-out_infinite]"
-                  style={{
-                    filter: 'drop-shadow(0 0 8px rgba(250, 204, 21, 0.8))'
-                  }}
-                />
-              </div>
-
-              {/* Attribution */}
-              <div className="text-white/60 text-base font-medium tracking-wide">
-                AutoPromptr Systems
-              </div>
             </div>
           </div>
         </div>

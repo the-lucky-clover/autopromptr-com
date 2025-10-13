@@ -166,6 +166,25 @@ const DigitalClock: React.FC<DigitalClockProps> = ({
             {getTimezoneDisplay()}
           </div>
         )}
+
+        {/* Sector 7-G Reactor Status */}
+        {showReactorStatus && (
+          <div 
+            className="flex items-center gap-2 text-green-400 text-base mt-1"
+            style={{ 
+              textShadow: '0 0 8px rgba(34, 197, 94, 0.6)' 
+            }}
+          >
+            <Radiation 
+              className="w-4 h-4"
+              style={{ 
+                filter: 'drop-shadow(0 0 4px rgba(34, 197, 94, 0.6))',
+                animation: 'pulse 2s infinite' 
+              }} 
+            />
+            <span className="font-medium">Sector 7-G • Reactor: Stable</span>
+          </div>
+        )}
       </div>
     );
   }
