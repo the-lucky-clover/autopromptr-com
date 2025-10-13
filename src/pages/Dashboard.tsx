@@ -93,33 +93,33 @@ const Dashboard = () => {
         </ErrorBoundary>
 
         <div className="px-4 md:px-6 pb-6">
-          {/* Top row: 3-column grid with fixed 650px heights */}
-          <div className="dashboard-grid-row-xl">
-            <div className="dashboard-stable-fade magnetic-hover hover-glow awwward-transition">
+          {/* All modules in full-width vertical stack */}
+          <div className="space-y-6">
+            <div className="w-full dashboard-stable-fade magnetic-hover hover-glow awwward-transition">
               <ErrorBoundary>
                 <CompactRecentActivity />
               </ErrorBoundary>
             </div>
-            <div className="dashboard-stable-fade magnetic-hover hover-glow awwward-transition">
+            <div className="w-full dashboard-stable-fade magnetic-hover hover-glow awwward-transition">
               <ErrorBoundary>
                 <SupportChatbot />
               </ErrorBoundary>
             </div>
-            <div className="dashboard-stable-fade magnetic-hover hover-glow awwward-transition">
+            <div className="w-full dashboard-stable-fade magnetic-hover hover-glow awwward-transition">
               <ErrorBoundary>
                 <HealthStatusDashboard isCompact={false} />
               </ErrorBoundary>
             </div>
-          </div>
 
-          {/* Main Dashboard Modules */}
-          <div className="animate-shimmer-delayed">
-            <ErrorBoundary>
-              <StaticDashboardLayout
-                visibleModules={overviewModules}
-                renderModuleContent={renderModuleContent}
-              />
-            </ErrorBoundary>
+            {/* Main Dashboard Modules */}
+            <div className="animate-shimmer-delayed">
+              <ErrorBoundary>
+                <StaticDashboardLayout
+                  visibleModules={overviewModules}
+                  renderModuleContent={renderModuleContent}
+                />
+              </ErrorBoundary>
+            </div>
           </div>
         </div>
       </ResizableDashboardLayout>
