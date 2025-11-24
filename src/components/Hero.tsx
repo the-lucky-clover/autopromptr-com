@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
-import dashboardMockup from '@/assets/dashboard-mockup-cyberpunk.png';
+import dashboardRealScreenshot from '@/assets/dashboard-real-cyberpunk.png';
 import { useEffect, useState } from 'react';
 
 const Hero = () => {
@@ -65,13 +65,13 @@ const Hero = () => {
         <div className="text-center max-w-5xl mx-auto">
           
         {/* Hero headline - Award-winning typography */}
-        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold mb-8 animate-scale-in delay-300 text-center leading-[0.9] tracking-tight">
+        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold mb-4 animate-scale-in delay-300 text-center leading-[0.9] tracking-tight">
           <span className="block text-white/95 font-light mb-2">AI On</span>
           <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 animate-gradient-x font-black">Autopilot</span>
         </h1>
           
         {/* Subheading - No orphans, dramatic hierarchy */}
-        <p className="text-xl sm:text-2xl md:text-3xl text-gray-100 mb-12 animate-fly-in delay-500 max-w-5xl mx-auto leading-relaxed font-light tracking-wide px-4">
+        <p className="text-xl sm:text-2xl md:text-3xl text-gray-100 mb-8 animate-fly-in delay-500 max-w-5xl mx-auto leading-relaxed font-light tracking-wide px-4">
           Stop babysitting your&nbsp;prompts. Democratize your coding experience whether local or&nbsp;online—we consolidate the process into one seamless, intelligent automation pipeline that scales with your&nbsp;ambitions.
         </p>
           
@@ -131,8 +131,8 @@ const Hero = () => {
               
               <div className="skeuomorphic-card elevation-3 rounded-3xl overflow-hidden glint-surface" style={{'--glint-delay': 2} as React.CSSProperties}>
           <img 
-            src={dashboardMockup}
-            alt="AutoPromptr Cyberpunk Dashboard Interface" 
+            src={dashboardRealScreenshot}
+            alt="AutoPromptr Real Dashboard - Batch Processing in Action" 
             className="w-full h-auto rounded-3xl shadow-2xl border-2 border-primary/30 bg-card/20 backdrop-blur-sm animate-materialize delay-700"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
