@@ -5,10 +5,13 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import PsychedelicBrandLogo from "@/components/PsychedelicBrandLogo";
+import AnimatedAuthModal from "@/components/AnimatedAuthModal";
 
 const Navbar = () => {
   const { user, isEmailVerified, isInitialized } = useAuth();
   const [showButtons, setShowButtons] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
 
   const handleLogoClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -157,16 +160,22 @@ const Navbar = () => {
                     ) : (
                       <div className="p-4 space-y-3">
                         <Button
-                          className="w-full bg-gradient-psychedelic text-primary-foreground border-0 award-button text-base py-6"
-                          onClick={() => window.location.href = '/auth'}
+                          className="w-full bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-magenta text-background border-0 award-button text-base py-6 font-semibold shadow-[0_0_30px_rgba(0,255,255,0.5)] hover:shadow-[0_0_50px_rgba(0,255,255,0.8)] transition-all duration-300"
+                          onClick={() => {
+                            setAuthMode('signup');
+                            setShowAuthModal(true);
+                          }}
                         >
                           <span className="mr-2 text-xl">⭐︎</span>
                           Get&nbsp;Started
                         </Button>
                         <Button
                           variant="outline"
-                          className="w-full border-white/30 bg-white/5 dopamine-trigger text-base py-6"
-                          onClick={() => window.location.href = '/auth'}
+                          className="w-full border-neon-cyan/50 bg-card/30 backdrop-blur-sm dopamine-trigger text-base py-6 hover:border-neon-cyan hover:shadow-[0_0_20px_rgba(0,255,255,0.3)] transition-all duration-300"
+                          onClick={() => {
+                            setAuthMode('signin');
+                            setShowAuthModal(true);
+                          }}
                         >
                           Sign&nbsp;In
                         </Button>
@@ -179,6 +188,13 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+      
+      {/* Animated Auth Modal */}
+      <AnimatedAuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        mode={authMode}
+      />
     </nav>
   );
 };
