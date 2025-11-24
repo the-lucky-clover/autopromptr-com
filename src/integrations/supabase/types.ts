@@ -503,7 +503,7 @@ export type Database = {
           event_data: Json | null
           event_type: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
           user_id: string | null
         }
@@ -512,7 +512,7 @@ export type Database = {
           event_data?: Json | null
           event_type: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -521,7 +521,7 @@ export type Database = {
           event_data?: Json | null
           event_type?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -610,25 +610,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      cleanup_old_logs: {
-        Args: Record<PropertyKey, never> | { days_to_keep: number }
-        Returns: undefined
-      }
-      get_batch_stats: {
-        Args: Record<PropertyKey, never> | { batch_id: string }
-        Returns: Json
-      }
-      get_user_role: {
-        Args: { _user_id: string }
-        Returns: string
-      }
-      has_role: {
-        Args:
-          | { _role: Database["public"]["Enums"]["app_role"]; _user_id: string }
-          | { role_name: string }
-          | { roles: string[]; user_id: string }
-        Returns: boolean
-      }
+      cleanup_old_logs:
+        | { Args: { days_to_keep: number }; Returns: undefined }
+        | { Args: never; Returns: undefined }
+      get_batch_stats:
+        | { Args: { batch_id: string }; Returns: Json }
+        | {
+            Args: never
+            Returns: {
+              active_batches: number
+              completed_batches: number
+              failed_batches: number
+              total_batches: number
+            }[]
+          }
+      get_user_role: { Args: { _user_id: string }; Returns: string }
+      has_role:
+        | { Args: { roles: string[]; user_id: string }; Returns: boolean }
+        | {
+            Args: {
+              _role: Database["public"]["Enums"]["app_role"]
+              _user_id: string
+            }
+            Returns: boolean
+          }
+        | { Args: { role_name: string }; Returns: boolean }
       log_security_event: {
         Args: { event_data?: Json; event_type: string; user_id_param?: string }
         Returns: undefined
