@@ -46,7 +46,7 @@ const Navbar = () => {
       <div className="flex justify-center pt-4 px-4">
         <div className="
           w-full max-w-7xl
-          bg-background/10 backdrop-blur-2xl 
+          bg-background/10 backdrop-blur-sm 
           border border-white/20
           rounded-full 
           shadow-glow-lg
