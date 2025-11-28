@@ -2,43 +2,91 @@
 name = "autopromptr-worker"
 main = "src/index.ts"
 compatibility_date = "2024-01-15"
+node_compat = true
 
-# D1 Database binding
+# Durable Objects Configuration (FREE TIER)
+[[durable_objects.bindings]]
+name = "BATCH_QUEUE"
+class_name = "BatchQueue"
+script_name = "autopromptr-worker"
+
+# Migrations for Durable Objects
+[[migrations]]
+tag = "v1"
+new_classes = ["BatchQueue"]
+
+# D1 Database (FREE TIER - 5GB storage, 5M reads/day, 100K writes/day)
 [[d1_databases]]
 binding = "AUTOPROMPTR_DB"
-database_name = "autopromptr-production"
-database_id = "your-d1-database-id"
+database_name = "autopromptr"
+database_id = "" # Will be created: wrangler d1 create autopromptr
 
-# R2 Storage binding
+# KV Namespace (FREE TIER - 100K reads/day, 1K writes/day, 1GB storage)
+[[kv_namespaces]]
+binding = "AUTOPROMPTR_KV"
+id = "" # Will be created: wrangler kv:namespace create "AUTOPROMPTR_KV"
+
+# R2 Storage (FREE TIER - 10GB storage, 1M Class A operations/month)
 [[r2_buckets]]
 binding = "AUTOPROMPTR_STORAGE"
 bucket_name = "autopromptr-files"
 
+# Browser Rendering API binding (PAID - disabled for free tier)
+# [[browser]]
+# binding = "BROWSER"
+
+# Environment Variables
+# Set these via: wrangler secret put <KEY>
+[vars]
+ENVIRONMENT = "production"
+
+# Production Environment
 [env.production]
-name = "autopromptr-worker-production"
+name = "autopromptr-worker"
+vars = { ENVIRONMENT = "production" }
+
+[[env.production.durable_objects.bindings]]
+name = "BATCH_QUEUE"
+class_name = "BatchQueue"
+script_name = "autopromptr-worker"
 
 [[env.production.d1_databases]]
 binding = "AUTOPROMPTR_DB"
 database_name = "autopromptr-production"
-database_id = "your-d1-database-id"
+database_id = "" # Create with: wrangler d1 create autopromptr-production
+
+[[env.production.kv_namespaces]]
+binding = "AUTOPROMPTR_KV"
+id = "" # Create with: wrangler kv:namespace create "AUTOPROMPTR_KV" --env production
 
 [[env.production.r2_buckets]]
 binding = "AUTOPROMPTR_STORAGE"
-bucket_name = "autopromptr-files-production"
+bucket_name = "autopromptr-files"
 
-[env.staging]
-name = "autopromptr-worker-staging"
+# Preview/Staging Environment
+[env.preview]
+name = "autopromptr-worker-preview"
+vars = { ENVIRONMENT = "preview" }
 
-[[env.staging.d1_databases]]
+[[env.preview.durable_objects.bindings]]
+name = "BATCH_QUEUE"
+class_name = "BatchQueue"
+script_name = "autopromptr-worker-preview"
+
+[[env.preview.d1_databases]]
 binding = "AUTOPROMPTR_DB"
-database_name = "autopromptr-staging"
-database_id = "your-staging-d1-database-id"
+database_name = "autopromptr-preview"
+database_id = "" # Create with: wrangler d1 create autopromptr-preview
 
-[[env.staging.r2_buckets]]
+[[env.preview.kv_namespaces]]
+binding = "AUTOPROMPTR_KV"
+id = "" # Create with: wrangler kv:namespace create "AUTOPROMPTR_KV" --env preview
+
+[[env.preview.r2_buckets]]
 binding = "AUTOPROMPTR_STORAGE"
-bucket_name = "autopromptr-files-staging"
+bucket_name = "autopromptr-files-preview"
 
-# Environment variables (configure in Cloudflare dashboard)
-# SUPABASE_URL
-# SUPABASE_ANON_KEY  
-# SUPABASE_SERVICE_ROLE_KEY
+# Secrets (set via CLI or dashboard):
+# wrangler secret put SUPABASE_URL
+# wrangler secret put SUPABASE_ANON_KEY
+# wrangler secret put SUPABASE_SERVICE_ROLE_KEY

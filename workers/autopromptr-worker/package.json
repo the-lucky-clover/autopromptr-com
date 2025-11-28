@@ -2,16 +2,37 @@
 {
   "name": "autopromptr-worker",
   "version": "1.0.0",
-  "description": "Cloudflare Worker for AutoPromptr backend services",
+  "description": "Cloudflare Worker with Durable Objects for AutoPromptr batch processing",
   "main": "src/index.ts",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "deploy:staging": "wrangler deploy --env staging",
-    "deploy:production": "wrangler deploy --env production"
+    "deploy:production": "wrangler deploy --env production",
+    "deploy:preview": "wrangler deploy --env preview",
+    "tail": "wrangler tail",
+    "d1:create": "wrangler d1 create autopromptr",
+    "d1:create:prod": "wrangler d1 create autopromptr-production",
+    "d1:create:preview": "wrangler d1 create autopromptr-preview",
+    "d1:migrate": "wrangler d1 execute autopromptr --file=./schema.sql",
+    "d1:migrate:prod": "wrangler d1 execute autopromptr-production --file=./schema.sql --env production",
+    "d1:migrate:preview": "wrangler d1 execute autopromptr-preview --file=./schema.sql --env preview",
+    "d1:query": "wrangler d1 execute autopromptr --command",
+    "kv:create": "wrangler kv:namespace create AUTOPROMPTR_KV",
+    "kv:create:prod": "wrangler kv:namespace create AUTOPROMPTR_KV --env production",
+    "kv:create:preview": "wrangler kv:namespace create AUTOPROMPTR_KV --env preview",
+    "r2:create": "wrangler r2 bucket create autopromptr-files",
+    "r2:create:prod": "wrangler r2 bucket create autopromptr-files",
+    "r2:create:preview": "wrangler r2 bucket create autopromptr-files-preview",
+    "setup": "npm run d1:create && npm run kv:create && npm run r2:create && npm run d1:migrate",
+    "setup:prod": "npm run d1:create:prod && npm run kv:create:prod && npm run r2:create:prod && npm run d1:migrate:prod",
+    "secret:set": "wrangler secret put"
   },
+  "keywords": ["cloudflare", "workers", "durable-objects", "automation"],
+  "author": "",
+  "license": "MIT",
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240129.0",
-    "wrangler": "^3.28.2"
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "wrangler": "^3.84.0",
+    "typescript": "^5.7.2"
   }
 }

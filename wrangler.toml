@@ -3,13 +3,19 @@ name = "autopromptr"
 compatibility_date = "2024-01-15"
 pages_build_output_dir = "dist"
 
+# Pages Functions configuration
+[[pages_plugins]]
+binding = "ASSETS"
+
 [env.production]
 name = "autopromptr-production"
 
 [env.preview]
 name = "autopromptr-preview"
 
-# Environment variables will be configured in Cloudflare Pages dashboard
-# SUPABASE_URL
-# SUPABASE_ANON_KEY
-# Any other API keys you're using
+# Environment variables for Pages
+# Configure in Cloudflare Pages dashboard:
+# VITE_SUPABASE_URL = https://your-project.supabase.co
+# VITE_SUPABASE_ANON_KEY = your-anon-key
+# VITE_WORKER_URL = https://autopromptr-worker.your-subdomain.workers.dev
+# VITE_BACKEND_URL = https://autopromptr-worker.your-subdomain.workers.dev (legacy)
