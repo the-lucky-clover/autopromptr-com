@@ -1,0 +1,7 @@
+
+# Handle client-side routing for React Router
+/* /index.html 200
+
+# API redirects to Cloudflare Worker
+/api/* https://autopromptr-worker.autopromptr.workers.dev/api/:splat 200
+/auth/* https://autopromptr-worker.autopromptr.workers.dev/api/auth/:splat 200
