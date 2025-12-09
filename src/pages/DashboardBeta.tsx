@@ -185,7 +185,7 @@ const DesktopSidebar = ({
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stat Card Component (Mobile-First)
+// Stat Card Component (Mobile-First) - Enhanced Glassmorphism
 // ─────────────────────────────────────────────────────────────────────────────
 const StatCard = ({ 
   title, 
@@ -193,7 +193,8 @@ const StatCard = ({
   subtitle, 
   icon: Icon, 
   trend, 
-  color = 'from-purple-500 to-blue-500' 
+  color = 'from-purple-500 to-blue-500',
+  animate = true
 }: {
   title: string;
   value: string | number;
@@ -201,33 +202,62 @@ const StatCard = ({
   icon: React.ElementType;
   trend?: { value: number; positive: boolean };
   color?: string;
+  animate?: boolean;
 }) => (
-  <Card className="bg-white/5 backdrop-blur-sm border-white/10 overflow-hidden group hover:bg-white/10 transition-colors">
-    <CardContent className="p-4">
-      <div className="flex items-start justify-between mb-3">
-        <div className={`p-2.5 rounded-xl bg-gradient-to-br ${color} shadow-lg`}>
-          <Icon className="w-5 h-5 text-white" />
+  <Card className="
+    bg-gradient-to-br from-white/[0.08] to-white/[0.02] 
+    backdrop-blur-xl border-white/10 overflow-hidden group 
+    hover:bg-white/[0.12] hover:border-white/20
+    transition-all duration-500 ease-out
+    hover:shadow-lg hover:shadow-purple-500/10
+    hover:scale-[1.02] active:scale-[0.98]
+    cursor-default
+  ">
+    <CardContent className="p-4 relative">
+      {/* Subtle gradient overlay */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500`} />
+      
+      <div className="flex items-start justify-between mb-3 relative z-10">
+        <div className={`
+          p-2.5 rounded-xl bg-gradient-to-br ${color} 
+          shadow-lg shadow-black/20
+          group-hover:shadow-xl group-hover:scale-110
+          transition-all duration-300
+        `}>
+          <Icon className="w-5 h-5 text-white drop-shadow-sm" />
         </div>
         {trend && (
           <Badge 
             variant="secondary" 
-            className={`text-xs ${trend.positive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}
+            className={`
+              text-xs font-semibold backdrop-blur-sm
+              ${trend.positive 
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                : 'bg-red-500/20 text-red-400 border border-red-500/30'
+              }
+            `}
           >
+            <TrendingUp className={`w-3 h-3 mr-1 ${!trend.positive && 'rotate-180'}`} />
             {trend.positive ? '+' : ''}{trend.value}%
           </Badge>
         )}
       </div>
-      <div className="space-y-1">
-        <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight">{value}</h3>
-        <p className="text-sm text-gray-400 font-medium">{title}</p>
-        {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
+      <div className="space-y-1 relative z-10">
+        <h3 className={`
+          text-2xl md:text-3xl font-bold text-white tracking-tight
+          ${animate ? 'animate-pulse-subtle' : ''}
+        `}>
+          {value}
+        </h3>
+        <p className="text-sm text-gray-400 font-medium group-hover:text-gray-300 transition-colors">{title}</p>
+        {subtitle && <p className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors">{subtitle}</p>}
       </div>
     </CardContent>
   </Card>
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Quick Action Button Component
+// Quick Action Button Component - Enhanced with Micro-interactions
 // ─────────────────────────────────────────────────────────────────────────────
 const QuickActionButton = ({ 
   title, 
@@ -247,14 +277,20 @@ const QuickActionButton = ({
     className={`
       w-full p-4 rounded-2xl bg-gradient-to-br ${color} 
       text-left transition-all duration-300 
-      hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]
+      hover:scale-[1.03] hover:shadow-2xl hover:shadow-black/30
+      active:scale-[0.97] active:shadow-lg
       min-h-[100px] flex flex-col justify-between
+      relative overflow-hidden group
+      border border-white/10 hover:border-white/20
     `}
   >
-    <Icon className="w-8 h-8 text-white/90" />
-    <div>
-      <h4 className="text-white font-semibold text-lg">{title}</h4>
-      <p className="text-white/70 text-sm">{subtitle}</p>
+    {/* Animated shine effect */}
+    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+    
+    <Icon className="w-8 h-8 text-white/90 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300" />
+    <div className="relative z-10">
+      <h4 className="text-white font-semibold text-lg group-hover:text-white/100 transition-colors">{title}</h4>
+      <p className="text-white/70 text-sm group-hover:text-white/80 transition-colors">{subtitle}</p>
     </div>
   </button>
 );
@@ -262,7 +298,18 @@ const QuickActionButton = ({
 // ─────────────────────────────────────────────────────────────────────────────
 // Overview Section
 // ─────────────────────────────────────────────────────────────────────────────
-const OverviewSection = ({ stats, userName, greeting }: { stats: any; userName: string; greeting: string }) => {
+interface DashboardStats {
+  totalBatches: number;
+  activeBatches?: number;
+  completedBatches: number;
+  runningBatches?: number;
+  failedBatches?: number;
+  pendingBatches?: number;
+  totalPrompts?: number;
+  successRate?: number;
+}
+
+const OverviewSection = ({ stats, userName, greeting }: { stats: DashboardStats | null; userName: string; greeting: string }) => {
   const navigate = useNavigate();
   
   return (

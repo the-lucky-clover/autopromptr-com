@@ -1,94 +1,54 @@
+/**
+ * Batch Database Service - Dual Supabase/Cloudflare D1 Support
+ * 
+ * This service provides backward-compatible functions for batch operations,
+ * now powered by the unified database service.
+ */
 
-import { cloudflare } from '@/integrations/cloudflare/client';
+import { 
+  saveBatch as unifiedSaveBatch, 
+  getBatches, 
+  getBatchById,
+  updateBatchStatus as unifiedUpdateStatus,
+  deleteBatch as unifiedDeleteBatch,
+  DATABASE_MODE 
+} from './unifiedDatabase';
 import { Batch } from '@/types/batch';
 
+console.log(`🗄️ Batch Database using mode: ${DATABASE_MODE}`);
+
 export const saveBatchToDatabase = async (batch: Batch): Promise<boolean> => {
-  try {
-    console.log('Saving batch to database:', batch.id);
-    
-    const { data: { session }, error: authError } = await cloudflare.auth.getSession();
-    if (authError) {
-      console.error('Auth error:', authError);
-      throw new Error('Authentication required');
-    }
-    
-    if (!session?.user) {
-      throw new Error('User not authenticated');
-    }
-    
-    const createdAt = batch.createdAt instanceof Date 
-      ? batch.createdAt.toISOString() 
-      : new Date(batch.createdAt).toISOString();
-    
-    const batchData = {
-      id: batch.id,
-      name: batch.name,
-      platform: batch.platform || 'unknown',
-      description: batch.description || '',
-      status: batch.status || 'pending',
-      settings_json: JSON.stringify(batch.settings || {}),
-      created_at: createdAt,
-      user_id: session.user.id,
-      target_url: batch.targetUrl || ''
-    };
-    
-    const { error: batchError } = await cloudflare.db
-      .from('batches')
-      .insert([batchData]);
-
-    if (batchError) {
-      console.error('Error saving batch:', batchError);
-      throw new Error(`Database error: ${batchError.message}`);
-    }
-    
-    console.log('Batch saved successfully:', batch.id);
-
-    if (batch.prompts && batch.prompts.length > 0) {
-      for (const prompt of batch.prompts) {
-        const promptData = {
-          id: prompt.id,
-          batch_id: batch.id,
-          prompt_text: prompt.text,
-          order_index: prompt.order,
-          status: 'pending'
-        };
-        
-        const { error: promptError } = await cloudflare.db
-          .from('prompts')
-          .insert([promptData]);
-
-        if (promptError) {
-          console.error('Error saving prompt:', promptError);
-          throw new Error(`Prompt save error: ${promptError.message}`);
-        }
-      }
-    }
-
-    return true;
-  } catch (error) {
-    console.error('Failed to save batch to database:', error);
+  console.log('Saving batch to database:', batch.id);
+  const result = await unifiedSaveBatch(batch);
+  
+  if (result.error) {
+    console.error('Failed to save batch:', result.error);
     return false;
   }
+  
+  console.log(`✅ Batch saved successfully via ${result.source}`);
+  return true;
 };
 
 export const verifyBatchInDatabase = async (batchId: string): Promise<boolean> => {
-  try {
-    const { data: existingBatch, error: checkError } = await cloudflare.db
-      .from('batches')
-      .select('id')
-      .eq('id', batchId)
-      .single();
-      
-    if (checkError) {
-      if (checkError.message?.includes('not found')) {
-        return false; // Batch not found
-      }
-      throw checkError;
-    }
-    
-    return !!existingBatch;
-  } catch (error) {
-    console.error('Could not verify batch in database:', error);
-    return false;
-  }
+  const result = await getBatchById(batchId);
+  return result.data !== null;
+};
+
+export const getUserBatches = async (): Promise<Batch[]> => {
+  const result = await getBatches();
+  return result.data || [];
+};
+
+export const updateBatchStatus = async (
+  batchId: string, 
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'stopped'
+): Promise<boolean> => {
+  const result = await unifiedUpdateStatus(batchId, status);
+  return result.data === true;
+};
+
+export const deleteBatchFromDatabase = async (batchId: string): Promise<boolean> => {
+  const result = await unifiedDeleteBatch(batchId);
+  return result.data === true;
 };
