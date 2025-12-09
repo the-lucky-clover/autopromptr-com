@@ -1,28 +1,28 @@
 
 import { Batch } from '@/types/batch';
 import { AutoPromptrError } from './errors';
-import { USE_LOVABLE_CLOUD, BACKEND_MODE, LEGACY_BACKEND_URL } from './config';
-import { lovableCloudBackend } from '../lovableCloudBackend';
+import { USE_CLOUDFLARE, BACKEND_MODE, LEGACY_BACKEND_URL, CLOUDFLARE_WORKER_URL } from './config';
+import { cloudflareBackend } from '../cloudflareBackend';
 
 export class AutoPromptr {
   public baseUrl: string;
-  private useLovableCloud: boolean;
+  private useCloudflare: boolean;
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || LEGACY_BACKEND_URL || 'https://autopromptr-backend.onrender.com';
-    this.useLovableCloud = USE_LOVABLE_CLOUD || BACKEND_MODE === 'lovable-cloud';
+    this.baseUrl = baseUrl || CLOUDFLARE_WORKER_URL || 'https://autopromptr-worker.autopromptr.workers.dev';
+    this.useCloudflare = USE_CLOUDFLARE || BACKEND_MODE === 'cloudflare';
   }
 
   async runBatch(batch: Batch, platform: string, options?: any): Promise<any> {
     try {
-      if (this.useLovableCloud) {
-        console.log('🚀 [AutoPromptr] Using Lovable Cloud backend:', {
+      if (this.useCloudflare) {
+        console.log('🚀 [AutoPromptr] Using Cloudflare Workers backend:', {
           batchId: batch.id,
           platform,
         });
 
-        // Use Lovable Cloud backend
-        const result = await lovableCloudBackend.runBatchCombined(
+        // Use Cloudflare Workers backend
+        const result = await cloudflareBackend.runBatchCombined(
           {
             name: batch.name,
             description: batch.description,
@@ -33,11 +33,11 @@ export class AutoPromptr {
           options
         );
 
-        console.log('✅ [AutoPromptr] Lovable Cloud success:', result);
+        console.log('✅ [AutoPromptr] Cloudflare Workers success:', result);
         return result;
       }
 
-      // Legacy Render.com backend
+      // Legacy Render.com backend (fallback)
       console.log('🚀 [AutoPromptr] Sending batch to legacy backend:', {
         batchId: batch.id,
         platform,
@@ -79,8 +79,8 @@ export class AutoPromptr {
   }
 
   async stopBatch(batchId: string): Promise<any> {
-    if (this.useLovableCloud) {
-      return await lovableCloudBackend.stopBatch(batchId);
+    if (this.useCloudflare) {
+      return await cloudflareBackend.stopBatch(batchId);
     }
 
     // Legacy backend
@@ -105,8 +105,8 @@ export class AutoPromptr {
 
   async getPlatforms(): Promise<any[]> {
     try {
-      if (this.useLovableCloud) {
-        // Return built-in platform list for Lovable Cloud
+      if (this.useCloudflare) {
+        // Return built-in platform list for Cloudflare Workers
         return [
           { id: 'chatgpt', name: 'ChatGPT', url: 'https://chat.openai.com' },
           { id: 'claude', name: 'Claude', url: 'https://claude.ai' },
@@ -139,8 +139,8 @@ export class AutoPromptr {
 
   async healthCheck(): Promise<any> {
     try {
-      if (this.useLovableCloud) {
-        return await lovableCloudBackend.healthCheck();
+      if (this.useCloudflare) {
+        return await cloudflareBackend.healthCheck();
       }
 
       // Legacy backend
@@ -163,8 +163,8 @@ export class AutoPromptr {
 
   async getBatchStatus(batchId: string): Promise<any> {
     try {
-      if (this.useLovableCloud) {
-        return await lovableCloudBackend.getBatchStatus(batchId);
+      if (this.useCloudflare) {
+        return await cloudflareBackend.getBatchStatus(batchId);
       }
 
       // Legacy backend

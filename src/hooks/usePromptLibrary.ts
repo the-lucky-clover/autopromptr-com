@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 import { useToast } from '@/hooks/use-toast';
 
 export interface PromptLibraryItem {
@@ -77,10 +77,11 @@ export function usePromptLibrary() {
 
   const savePrompt = async (promptData: Partial<PromptLibraryItem>) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await cloudflare.auth.getSession();
+      const user = session?.user;
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await cloudflare
         .from('prompt_library')
         .insert([{
           user_id: user.id,
@@ -164,10 +165,11 @@ export function usePromptLibrary() {
       const prompt = prompts.find(p => p.id === id);
       if (!prompt) throw new Error('Prompt not found');
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await cloudflare.auth.getSession();
+      const user = session?.user;
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
+      const { data, error } = await cloudflare
         .from('prompt_library')
         .insert({
           user_id: user.id,

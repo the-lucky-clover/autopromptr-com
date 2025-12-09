@@ -21,7 +21,7 @@ const EnhancedWelcomeVideoBackground = ({
   const [hasError, setHasError] = useState(false);
   const [activeVideo, setActiveVideo] = useState(1);
   const [loadAttempts, setLoadAttempts] = useState(0);
-  const currentVideo = useTimeBasedVideo(userVideoUrl);
+  const currentVideo = useTimeBasedVideo(userVideoUrl ?? '');
 
   useEffect(() => {
     if (!enabled || !currentVideo.url) return;

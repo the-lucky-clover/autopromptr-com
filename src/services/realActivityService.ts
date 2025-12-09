@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 
 export interface RealActivityItem {
   id: string;
@@ -15,7 +15,7 @@ export const fetchRecentActivity = async (limit: number = 10): Promise<RealActiv
     const activities: RealActivityItem[] = [];
     
     // Fetch recent batches
-    const { data: batches } = await supabase
+    const { data: batches } = await cloudflare
       .from('batches')
       .select('id, name, status, created_at, started_at, completed_at')
       .order('created_at', { ascending: false })
@@ -56,7 +56,7 @@ export const fetchRecentActivity = async (limit: number = 10): Promise<RealActiv
     }
 
     // Fetch automation logs
-    const { data: logs } = await supabase
+    const { data: logs } = await cloudflare
       .from('automation_logs')
       .select('id, message, timestamp, level, metadata')
       .order('timestamp', { ascending: false })
@@ -85,34 +85,19 @@ export const fetchRecentActivity = async (limit: number = 10): Promise<RealActiv
   }
 };
 
+// Cloudflare doesn't have realtime subscriptions like Supabase
+// Use polling instead for activity updates
 export const subscribeToActivityUpdates = (callback: (activities: RealActivityItem[]) => void) => {
-  const batchChannel = supabase
-    .channel('batch-changes')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'batches'
-      },
-      () => {
-        fetchRecentActivity().then(callback);
-      }
-    )
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'automation_logs'
-      },
-      () => {
-        fetchRecentActivity().then(callback);
-      }
-    )
-    .subscribe();
+  // Initial fetch
+  fetchRecentActivity().then(callback);
+  
+  // Poll every 10 seconds for updates
+  const pollInterval = setInterval(() => {
+    fetchRecentActivity().then(callback);
+  }, 10000);
 
+  // Return cleanup function
   return () => {
-    supabase.removeChannel(batchChannel);
+    clearInterval(pollInterval);
   };
 };

@@ -12,6 +12,15 @@ const Navbar = () => {
   const [showButtons, setShowButtons] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  
+  // Debug logging
+  console.log('🔍 Navbar - Auth state:', { 
+    hasUser: !!user, 
+    isVerified: isEmailVerified, 
+    isInitialized,
+    showModal: showAuthModal,
+    mode: authMode 
+  });
 
   const handleLogoClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -55,16 +64,16 @@ const Navbar = () => {
         " style={{'--glint-delay': Math.random() * 5} as React.CSSProperties}>
           
           <div className="flex items-center justify-between px-6 sm:px-8 md:px-12 py-3 relative z-10">
-            {/* Logo - Responsive Dynamic Sizing */}
+            {/* Logo - Responsive Dynamic Sizing - Always show text */}
             <div className="flex-shrink-0 cursor-pointer dopamine-trigger" onClick={handleLogoClick}>
               <div className="block md:hidden">
-                <PsychedelicBrandLogo size="small" animate={false} variant="icon-only" />
+                <PsychedelicBrandLogo size="small" animate={false} variant="horizontal" />
               </div>
               <div className="hidden md:block lg:hidden">
-                <PsychedelicBrandLogo size="small" animate={false} />
+                <PsychedelicBrandLogo size="small" animate={false} variant="horizontal" />
               </div>
               <div className="hidden lg:block">
-                <PsychedelicBrandLogo size="medium" animate={false} />
+                <PsychedelicBrandLogo size="medium" animate={false} variant="horizontal" />
               </div>
             </div>
 

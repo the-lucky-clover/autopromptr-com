@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 
 export interface MistralRequest {
   type: 'text-inference' | 'web-search' | 'web-scrape' | 'ai-processing';
@@ -47,7 +47,7 @@ export function useMistralAI() {
     try {
       console.log('🤖 Sending request to Mistral AI processor:', request.type);
 
-      const { data, error: functionError } = await supabase.functions.invoke('mistral-ai-processor', {
+      const { data, error: functionError } = await cloudflare.functions.invoke('mistral-ai-processor', {
         body: request
       });
 

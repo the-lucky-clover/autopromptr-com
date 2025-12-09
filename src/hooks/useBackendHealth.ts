@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 
 interface BackendHealthStatus {
   backend: string;
@@ -35,7 +35,7 @@ export const useBackendHealth = (autoRefresh = true, intervalMs = 30000) => {
     setError(null);
     
     try {
-      const { data, error: invokeError } = await supabase.functions.invoke('backend-health-monitor');
+      const { data, error: invokeError } = await cloudflare.functions.invoke('backend-health-monitor');
       
       if (invokeError) {
         throw new Error(invokeError.message);

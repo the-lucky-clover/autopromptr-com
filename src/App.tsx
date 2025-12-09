@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import DashboardBeta from "./pages/DashboardBeta";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import Settings from "./pages/Settings";
@@ -26,6 +27,7 @@ import MigrationDashboard from "./pages/MigrationDashboard";
 import BackendTest from "./pages/BackendTest";
 import BackendHealthDashboard from "./pages/BackendHealthDashboard";
 import SongGenerationTest from "./pages/SongGenerationTest";
+import AuthTest from "./pages/AuthTest";
 
 const App = () => (
   <TooltipProvider>
@@ -50,11 +52,17 @@ const App = () => (
             <Route path="/backend-test" element={<BackendTest />} />
           <Route path="/backend-health" element={<BackendHealthDashboard />} />
           <Route path="/song-test" element={<SongGenerationTest />} />
+          <Route path="/auth-test" element={<AuthTest />} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard-beta" element={
+              <ProtectedRoute>
+                <DashboardBeta />
               </ProtectedRoute>
             } />
             <Route path="/settings" element={

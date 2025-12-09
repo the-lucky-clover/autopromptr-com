@@ -3,6 +3,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface State {
@@ -28,6 +29,12 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       console.error('ErrorBoundary rendering error state:', this.state.error);
+      
+      // Use custom fallback if provided
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+      
       return (
         <div style={{
           minHeight: '100vh',

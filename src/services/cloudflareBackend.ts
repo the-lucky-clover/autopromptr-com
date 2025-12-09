@@ -1,6 +1,6 @@
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 
-export interface LovableCloudBatch {
+export interface CloudflareBatch {
   id: string;
   name: string;
   description?: string;
@@ -32,16 +32,16 @@ export interface BatchTask {
 }
 
 export interface BatchJobStatus {
-  job: LovableCloudBatch;
+  job: CloudflareBatch;
   progress: BatchProgress;
   tasks: BatchTask[];
 }
 
 /**
- * Lovable Cloud Backend Client
- * Replaces Flask backend with Supabase Edge Functions
+ * Cloudflare Workers Backend Client
+ * Handles batch automation via Cloudflare Workers and D1
  */
-export class LovableCloudBackend {
+export class CloudflareBackend {
   /**
    * Create a new batch job
    */
@@ -53,7 +53,7 @@ export class LovableCloudBackend {
     settings?: Record<string, any>
   ): Promise<{ job_id: string; status: string; message: string }> {
     try {
-      const { data, error } = await supabase.functions.invoke('batch-orchestrator/create', {
+      const { data, error } = await cloudflare.functions.invoke('batch-orchestrator/create', {
         body: {
           name,
           description,
@@ -76,7 +76,7 @@ export class LovableCloudBackend {
    */
   async runBatch(jobId: string): Promise<{ message: string; job_id: string; status: string }> {
     try {
-      const { data, error } = await supabase.functions.invoke(`batch-orchestrator/run/${jobId}`, {
+      const { data, error } = await cloudflare.functions.invoke(`batch-orchestrator/run/${jobId}`, {
         body: {},
       });
 
@@ -93,7 +93,7 @@ export class LovableCloudBackend {
    */
   async getBatchStatus(jobId: string): Promise<BatchJobStatus> {
     try {
-      const { data, error } = await supabase.functions.invoke(`batch-orchestrator/status/${jobId}`, {
+      const { data, error } = await cloudflare.functions.invoke(`batch-orchestrator/status/${jobId}`, {
         body: {},
       });
 
@@ -110,7 +110,7 @@ export class LovableCloudBackend {
    */
   async stopBatch(jobId: string): Promise<{ status: string; job_id: string; message: string }> {
     try {
-      const { data, error } = await supabase.functions.invoke(`batch-orchestrator/stop/${jobId}`, {
+      const { data, error } = await cloudflare.functions.invoke(`batch-orchestrator/stop/${jobId}`, {
         body: {},
       });
 
@@ -126,11 +126,11 @@ export class LovableCloudBackend {
    * List all batch jobs
    */
   async listBatches(): Promise<{
-    active_jobs: LovableCloudBatch[];
-    job_history: LovableCloudBatch[];
+    active_jobs: CloudflareBatch[];
+    job_history: CloudflareBatch[];
   }> {
     try {
-      const { data, error } = await supabase.functions.invoke('batch-orchestrator/list', {
+      const { data, error } = await cloudflare.functions.invoke('batch-orchestrator/list', {
         body: {},
       });
 
@@ -151,7 +151,7 @@ export class LovableCloudBackend {
     error?: string;
   }> {
     try {
-      const { data, error } = await supabase.functions.invoke('gemini-processor', {
+      const { data, error } = await cloudflare.functions.invoke('gemini-processor', {
         body: {
           prompt_text: prompt,
         },
@@ -159,7 +159,7 @@ export class LovableCloudBackend {
 
       if (error) throw error;
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to test Gemini:', error);
       return {
         success: false,
@@ -179,7 +179,7 @@ export class LovableCloudBackend {
     metadata?: Record<string, any>;
   }> {
     try {
-      const { data, error } = await supabase.functions.invoke('platform-detector', {
+      const { data, error } = await cloudflare.functions.invoke('platform-detector', {
         body: { url },
       });
 
@@ -201,23 +201,23 @@ export class LovableCloudBackend {
     timestamp: string;
   }> {
     try {
-      // Check if we can access Supabase
-      const { data, error } = await supabase.from('batches').select('count').limit(1);
+      // Check if we can access Cloudflare D1
+      const { data, error } = await cloudflare.from('batches').select('count').limit(1);
 
       if (error) throw error;
 
       return {
         status: 'healthy',
-        service: 'lovable-cloud-backend',
-        version: '2.0.0',
+        service: 'cloudflare-workers-backend',
+        version: '3.0.0',
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
       console.error('Health check failed:', error);
       return {
         status: 'unhealthy',
-        service: 'lovable-cloud-backend',
-        version: '2.0.0',
+        service: 'cloudflare-workers-backend',
+        version: '3.0.0',
         timestamp: new Date().toISOString(),
       };
     }
@@ -268,4 +268,8 @@ export class LovableCloudBackend {
 }
 
 // Export singleton instance
-export const lovableCloudBackend = new LovableCloudBackend();
+export const cloudflareBackend = new CloudflareBackend();
+
+// Legacy export aliases for backwards compatibility
+export const lovableCloudBackend = cloudflareBackend;
+export type LovableCloudBatch = CloudflareBatch;

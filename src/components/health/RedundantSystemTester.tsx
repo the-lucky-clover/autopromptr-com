@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 import { Play, CheckCircle, XCircle, Loader2, AlertCircle } from 'lucide-react';
 
 interface TestResult {
@@ -41,7 +41,7 @@ export const RedundantSystemTester = () => {
     updateResult('Backend Health Monitor', { status: 'running' });
     const startTime1 = Date.now();
     try {
-      const { data, error } = await supabase.functions.invoke('backend-health-monitor');
+      const { data, error } = await cloudflare.functions.invoke('backend-health-monitor');
       const duration = Date.now() - startTime1;
       
       if (error) throw error;
@@ -64,7 +64,7 @@ export const RedundantSystemTester = () => {
     updateResult('Backend Router Connection', { status: 'running' });
     const startTime2 = Date.now();
     try {
-      const { data, error } = await supabase.functions.invoke('backend-router', {
+      const { data, error } = await cloudflare.functions.invoke('backend-router', {
         body: { action: 'health' }
       });
       const duration = Date.now() - startTime2;
@@ -96,7 +96,7 @@ export const RedundantSystemTester = () => {
         options: { wait_for_completion: false, max_retries: 1 }
       };
       
-      const { data, error } = await supabase.functions.invoke('backend-router', {
+      const { data, error } = await cloudflare.functions.invoke('backend-router', {
         body: { action: 'process', batch: testBatch }
       });
       const duration = Date.now() - startTime3;
@@ -128,7 +128,7 @@ export const RedundantSystemTester = () => {
         options: { wait_for_completion: false, max_retries: 1 }
       };
       
-      const { data, error } = await supabase.functions.invoke('backend-router', {
+      const { data, error } = await cloudflare.functions.invoke('backend-router', {
         body: { action: 'process', batch: testBatch }
       });
       const duration = Date.now() - startTime4;
@@ -154,7 +154,7 @@ export const RedundantSystemTester = () => {
     const startTime5 = Date.now();
     try {
       // Check health first
-      const { data: healthData } = await supabase.functions.invoke('backend-health-monitor');
+      const { data: healthData } = await cloudflare.functions.invoke('backend-health-monitor');
       const duration = Date.now() - startTime5;
       
       const hasHealthyBackend = healthData?.summary?.healthy > 0;
@@ -180,10 +180,10 @@ export const RedundantSystemTester = () => {
     const startTime6 = Date.now();
     try {
       // Call health twice rapidly to test caching
-      const call1 = await supabase.functions.invoke('backend-router', {
+      const call1 = await cloudflare.functions.invoke('backend-router', {
         body: { action: 'health' }
       });
-      const call2 = await supabase.functions.invoke('backend-router', {
+      const call2 = await cloudflare.functions.invoke('backend-router', {
         body: { action: 'health' }
       });
       const duration = Date.now() - startTime6;

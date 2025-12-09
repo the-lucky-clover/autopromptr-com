@@ -81,7 +81,12 @@ const Dashboard = () => {
           </div>
         </ErrorBoundary>
         
-        <ErrorBoundary>
+        <ErrorBoundary fallback={
+          <div className="mx-6 mb-6 p-8 bg-red-900/20 border border-red-500/50 rounded-xl">
+            <h3 className="text-red-400 text-lg font-semibold mb-2">Failed to load welcome module</h3>
+            <p className="text-red-300 text-sm">Please refresh the page. If the issue persists, try clearing your browser cache.</p>
+          </div>
+        }>
           <div className="animate-shimmer">
             <UnifiedDashboardWelcomeModule
               title="AutoPromptr Dashboard"

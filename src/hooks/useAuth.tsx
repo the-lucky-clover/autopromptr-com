@@ -1,6 +1,9 @@
 import React, { useState, useEffect, createContext, useContext, useMemo, useCallback } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
+import { cloudflare, isCloudflareConfigured, CloudflareUser, CloudflareSession } from '@/integrations/cloudflare/client';
+
+// Re-export types for backwards compatibility
+export type User = CloudflareUser;
+export type Session = CloudflareSession;
 
 interface AuthContextType {
   user: User | null;
@@ -24,20 +27,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Memoize email verification status to prevent unnecessary re-renders
   const isEmailVerified = useMemo(() => {
-    return user?.email_confirmed_at !== null;
+    return user?.email_confirmed_at !== null && user?.email_confirmed_at !== undefined;
   }, [user?.email_confirmed_at]);
 
   useEffect(() => {
-    // If Supabase is not configured, initialize in public mode
-    if (!isSupabaseConfigured) {
-      console.log('Supabase not configured, initializing in public mode');
+    // If Cloudflare is not configured, initialize in public mode
+    if (!isCloudflareConfigured) {
+      console.log('Cloudflare Worker not configured, initializing in public mode');
       setIsInitialized(true);
       setLoading(false);
       return;
     }
 
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const unsubscribe = cloudflare.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session);
         setSession(session);
@@ -50,11 +53,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const verified = session.user.email_confirmed_at !== null;
           console.log('Email verification status:', verified);
 
-          // Only auto-redirect on explicit SIGNED_IN events (not INITIAL_SESSION or TOKEN_REFRESHED)
-          // This prevents redirect loops on page load
+          // Only auto-redirect on explicit SIGNED_IN events
           if (verified && event === 'SIGNED_IN') {
             console.log('Auto-redirecting verified user to dashboard on sign in');
-            // Use setTimeout to prevent immediate redirect conflicts
             setTimeout(() => {
               if (window.location.pathname === '/' || window.location.pathname === '/auth') {
                 window.location.href = '/dashboard';
@@ -69,7 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    cloudflare.auth.getSession().then(({ data: { session } }) => {
       console.log('Initial session check:', session);
       setSession(session);
       setUser(session?.user ?? null);
@@ -79,7 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => unsubscribe();
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, fullName?: string) => {
@@ -87,7 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     // Clear any existing session first
     try {
-      await supabase.auth.signOut();
+      await cloudflare.auth.signOut();
       console.log('Cleared existing session');
     } catch (err) {
       console.log('No existing session to clear');
@@ -97,7 +98,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const redirectUrl = `${window.location.origin}/auth/callback`;
     console.log('Using redirect URL:', redirectUrl);
     
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await cloudflare.auth.signUp({
       email,
       password,
       options: {
@@ -127,7 +128,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = useCallback(async (email: string, password: string) => {
     console.log('Starting signin process for:', email);
     
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await cloudflare.auth.signInWithPassword({
       email,
       password,
     });
@@ -145,7 +146,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = useCallback(async () => {
     console.log('Signing out...');
-    await supabase.auth.signOut();
+    await cloudflare.auth.signOut();
     setUser(null);
     setSession(null);
     window.location.href = '/';
@@ -157,7 +158,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const redirectUrl = `${window.location.origin}/auth/callback`;
     console.log('Using redirect URL for resend:', redirectUrl);
     
-    const { error } = await supabase.auth.resend({
+    const { error } = await cloudflare.auth.resend({
       type: 'signup',
       email: email,
       options: {

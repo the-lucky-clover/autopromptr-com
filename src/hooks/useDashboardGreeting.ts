@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase } from "@/integrations/supabase/client";
+import { CloudflareUser } from '@/integrations/cloudflare/client';
+import { cloudflare } from "@/integrations/cloudflare/client";
 import { getTimeBasedGreeting } from "@/services/simpleGreetingService";
 import { useAuth } from './useAuth';
 
@@ -27,7 +27,7 @@ export const useDashboardGreeting = () => {
 
     const loadUserProfile = async () => {
       if (user) {
-        const { data: profile } = await supabase
+        const { data: profile } = await cloudflare
           .from('profiles')
           .select('*')
           .eq('id', user.id)

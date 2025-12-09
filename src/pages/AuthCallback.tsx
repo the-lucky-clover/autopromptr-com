@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession();
+        const { data, error } = await cloudflare.auth.getSession();
         
         if (error) {
           console.error('Auth callback error:', error);

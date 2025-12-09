@@ -1,9 +1,9 @@
 /**
  * MVP #1 Batch Runner - Frontend integration
- * Connects to Flask backend for smart prompt injection
+ * Connects to Cloudflare Worker backend for smart prompt injection
  */
 import { Batch } from '@/types/batch';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 
 interface BatchRunOptions {
   waitForCompletion?: boolean;
@@ -35,19 +35,19 @@ export class MVPBatchRunner {
   private pollInterval = 2000; // Poll every 2 seconds
   
   constructor() {
-    // Backend URL will be set from environment or Supabase secret
-    this.backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://autopromptr-backend.onrender.com';
+    // Backend URL - Cloudflare Worker endpoint
+    this.backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://autopromptr-worker.autopromptr.workers.dev';
   }
   
   async getBackendUrl(): Promise<string> {
-    // Try to get from Supabase secrets first
+    // Try to get from Cloudflare functions first
     try {
-      const { data } = await supabase.functions.invoke('get-backend-url');
+      const { data } = await cloudflare.functions.invoke('get-backend-url');
       if (data?.url) {
         return data.url;
       }
     } catch (e) {
-      console.warn('Could not fetch backend URL from Supabase, using default');
+      console.warn('Could not fetch backend URL from Cloudflare, using default');
     }
     
     return this.backendUrl;
@@ -76,8 +76,8 @@ export class MVPBatchRunner {
         text: p.text
       }));
       
-      // Use backend router for intelligent routing and failover
-      const { data, error } = await supabase.functions.invoke('backend-router', {
+      // Use Cloudflare backend router for intelligent routing
+      const { data, error } = await cloudflare.functions.invoke('backend-router', {
         body: {
           action: 'process',
           batch: {
@@ -110,8 +110,8 @@ export class MVPBatchRunner {
       
       console.log('✅ Batch completed:', result);
       
-      // Update Supabase batch status
-      await this.updateBatchInSupabase(batch.id, result);
+      // Update Cloudflare D1 batch status
+      await this.updateBatchInDatabase(batch.id, result);
       
       return {
         success: result.status === 'completed',
@@ -172,12 +172,12 @@ export class MVPBatchRunner {
     poll();
   }
   
-  private async updateBatchInSupabase(batchId: string, result: any): Promise<void> {
+  private async updateBatchInDatabase(batchId: string, result: any): Promise<void> {
     try {
       const status = result.status === 'completed' ? 'completed' : 
                      result.status === 'failed' ? 'failed' : 'processing';
       
-      await supabase
+      await cloudflare.db
         .from('batches')
         .update({
           status,
@@ -188,25 +188,25 @@ export class MVPBatchRunner {
       // Update individual prompts
       if (result.results) {
         for (const promptResult of result.results) {
-          await supabase
+          await cloudflare.db
             .from('prompts')
             .update({
               status: promptResult.status,
-              result: promptResult.result,
+              result_json: JSON.stringify(promptResult.result),
               error_message: promptResult.error,
-              processed_at: new Date().toISOString()
+              completed_at: new Date().toISOString()
             })
             .eq('id', promptResult.prompt_id);
         }
       }
     } catch (e) {
-      console.error('Error updating Supabase:', e);
+      console.error('Error updating database:', e);
     }
   }
   
   async stopBatch(batchId: string): Promise<boolean> {
     try {
-      const { data, error } = await supabase.functions.invoke('backend-router', {
+      const { data, error } = await cloudflare.functions.invoke('backend-router', {
         body: {
           action: 'stop',
           batchId

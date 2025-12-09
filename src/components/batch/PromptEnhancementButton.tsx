@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { cloudflare } from "@/integrations/cloudflare/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface PromptEnhancementButtonProps {
@@ -28,7 +28,7 @@ const PromptEnhancementButton = ({ promptText, onEnhanced, size = 'sm' }: Prompt
     setIsEnhancing(true);
     
     try {
-      const { data, error } = await supabase.functions.invoke('enhance-prompt', {
+      const { data, error } = await cloudflare.functions.invoke('enhance-prompt', {
         body: { prompt: promptText }
       });
 

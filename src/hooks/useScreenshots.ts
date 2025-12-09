@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface Screenshot {
@@ -27,7 +27,7 @@ export const useScreenshots = () => {
     
     setLoading(true);
     try {
-      let query = supabase
+      let query = cloudflare
         .from('screenshots')
         .select('*')
         .order('created_at', { ascending: false });
@@ -84,15 +84,15 @@ export const useScreenshots = () => {
       const filename = `screenshot-${timestamp}.png`;
       const filePath = `${user.id}/${sessionId}/${filename}`;
 
-      // Upload to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      // Upload to Cloudflare Storage
+      const { data: uploadData, error: uploadError } = await cloudflare.storage
         .from('screenshots')
         .upload(filePath, blob);
 
       if (uploadError) throw uploadError;
 
       // Save metadata to database
-      const { data: dbData, error: dbError } = await supabase
+      const { data: dbData, error: dbError } = await cloudflare
         .from('screenshots')
         .insert({
           user_id: user.id,
@@ -131,7 +131,7 @@ export const useScreenshots = () => {
 
   const getScreenshotUrl = async (filePath: string) => {
     try {
-      const { data } = await supabase.storage
+      const { data } = await cloudflare.storage
         .from('screenshots')
         .createSignedUrl(filePath, 3600); // 1 hour expiry
 
@@ -145,14 +145,14 @@ export const useScreenshots = () => {
   const deleteScreenshot = async (id: string, filePath: string) => {
     try {
       // Delete from storage
-      const { error: storageError } = await supabase.storage
+      const { error: storageError } = await cloudflare.storage
         .from('screenshots')
         .remove([filePath]);
 
       if (storageError) throw storageError;
 
       // Delete from database
-      const { error: dbError } = await supabase
+      const { error: dbError } = await cloudflare
         .from('screenshots')
         .delete()
         .eq('id', id);

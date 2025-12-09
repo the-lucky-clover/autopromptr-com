@@ -68,11 +68,14 @@ import { saveBatchToDatabase } from '@/services/batchDatabase';
 await saveBatchToDatabase(batch);
 ```
 
-## Supabase Integration
+## Cloudflare Integration
 
-- Auth: `supabase.auth.getUser()` for user context
-- Database: Tables `batches` and `prompts` with RLS policies
-- Edge Functions: `backend-router`, `batch-orchestrator`, `enhance-prompt`
+- Auth: `cloudflare.auth.getSession()` for user context
+- Database: Cloudflare D1 with tables `batches`, `prompts`, `users`, `profiles`
+- Storage: Cloudflare R2 for file storage
+- KV: Session and cache storage
+- Durable Objects: Batch queue processing
+- Functions: Worker endpoints for `backend-router`, `batch-orchestrator`
 
 ## Supported Platforms
 
@@ -102,15 +105,15 @@ npm run lint         # ESLint
 - All dates stored as ISO strings in DB, converted to `Date` objects in frontend
 - Batch IDs use `crypto.randomUUID()`
 - Status flow: `pending` → `running` → `completed|failed|stopped`
-- Error handling: Always wrap Supabase calls in try-catch
+- Error handling: Always wrap Cloudflare calls in try-catch
 - Logging: Use `console.log` with emoji prefixes (🚀, ✅, ❌, 🔧)
 
 ## Common Gotchas
 
-1. **Auth Required**: Most routes require `supabase.auth.getUser()` check
-2. **RLS Policies**: Supabase tables have Row Level Security - always filter by `user_id`
-3. **Backend URL**: Use `VITE_BACKEND_URL` env var or fetch from Supabase secrets
-4. **CORS**: Flask backend must allow origin from Lovable.dev domain
+1. **Auth Required**: Most routes require `cloudflare.auth.getSession()` check
+2. **User Context**: Always filter by `user_id` from session
+3. **Backend URL**: Use `VITE_BACKEND_URL` env var - defaults to Cloudflare Worker
+4. **CORS**: Worker allows all origins via `Access-Control-Allow-Origin: *`
 5. **Playwright**: Headless mode required in production, headed for local dev
 
 ## Adding New AI Platforms

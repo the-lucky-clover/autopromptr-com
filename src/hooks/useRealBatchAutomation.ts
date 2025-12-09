@@ -44,8 +44,8 @@ export function useRealBatchAutomation() {
       }
 
       if (isRemotePlatform) {
-        const { supabase } = await import('@/integrations/supabase/client');
-        const { data, error } = await supabase.functions.invoke('prompt-dispatch', {
+        const { cloudflare } = await import('@/integrations/cloudflare/client');
+        const { data, error } = await cloudflare.functions.invoke('prompt-dispatch', {
           body: { batch, platform: 'web-remote', options: batch.settings || {} },
         });
         if (error) throw new Error(error.message || 'Remote dispatch failed');

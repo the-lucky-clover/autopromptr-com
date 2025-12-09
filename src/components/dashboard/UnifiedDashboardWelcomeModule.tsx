@@ -33,7 +33,22 @@ const UnifiedDashboardWelcomeModule = ({
   showPersonalizedGreeting = false 
 }: UnifiedDashboardWelcomeModuleProps) => {
   const { user } = useAuth();
-  const { videoSettings } = useDashboardVideoSettings(user);
+  
+  // Initialize with safe defaults to prevent initialization errors
+  let videoSettings = { 
+    videoUrl: '', 
+    opacity: 85, 
+    blendMode: 'multiply', 
+    enabled: true 
+  };
+  
+  try {
+    const settings = useDashboardVideoSettings(user);
+    videoSettings = settings.videoSettings;
+  } catch (error) {
+    console.error('Error loading video settings:', error);
+  }
+  
   const currentGreeting = useDashboardGreeting();
   const [currentQuote, setCurrentQuote] = useState(illuminatedQuotes[0]);
 

@@ -1,18 +1,18 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 import { Batch } from '@/types/batch';
 
 export const saveBatchToDatabase = async (batch: Batch): Promise<boolean> => {
   try {
     console.log('Saving batch to database:', batch.id);
     
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { session }, error: authError } = await cloudflare.auth.getSession();
     if (authError) {
       console.error('Auth error:', authError);
       throw new Error('Authentication required');
     }
     
-    if (!user) {
+    if (!session?.user) {
       throw new Error('User not authenticated');
     }
     
@@ -26,26 +26,22 @@ export const saveBatchToDatabase = async (batch: Batch): Promise<boolean> => {
       platform: batch.platform || 'unknown',
       description: batch.description || '',
       status: batch.status || 'pending',
-      settings: batch.settings || {},
+      settings_json: JSON.stringify(batch.settings || {}),
       created_at: createdAt,
-      created_by: user.id
+      user_id: session.user.id,
+      target_url: batch.targetUrl || ''
     };
     
-    const { data: batchResult, error: batchError } = await supabase
+    const { error: batchError } = await cloudflare.db
       .from('batches')
-      .upsert(batchData, { 
-        onConflict: 'id',
-        ignoreDuplicates: false 
-      })
-      .select()
-      .single();
+      .insert([batchData]);
 
     if (batchError) {
       console.error('Error saving batch:', batchError);
       throw new Error(`Database error: ${batchError.message}`);
     }
     
-    console.log('Batch saved successfully:', batchResult);
+    console.log('Batch saved successfully:', batch.id);
 
     if (batch.prompts && batch.prompts.length > 0) {
       for (const prompt of batch.prompts) {
@@ -57,12 +53,9 @@ export const saveBatchToDatabase = async (batch: Batch): Promise<boolean> => {
           status: 'pending'
         };
         
-        const { error: promptError } = await supabase
+        const { error: promptError } = await cloudflare.db
           .from('prompts')
-          .upsert(promptData, { 
-            onConflict: 'id',
-            ignoreDuplicates: false 
-          });
+          .insert([promptData]);
 
         if (promptError) {
           console.error('Error saving prompt:', promptError);
@@ -80,14 +73,14 @@ export const saveBatchToDatabase = async (batch: Batch): Promise<boolean> => {
 
 export const verifyBatchInDatabase = async (batchId: string): Promise<boolean> => {
   try {
-    const { data: existingBatch, error: checkError } = await supabase
+    const { data: existingBatch, error: checkError } = await cloudflare.db
       .from('batches')
       .select('id')
       .eq('id', batchId)
       .single();
       
     if (checkError) {
-      if (checkError.code === 'PGRST116') {
+      if (checkError.message?.includes('not found')) {
         return false; // Batch not found
       }
       throw checkError;

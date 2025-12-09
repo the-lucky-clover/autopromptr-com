@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 
 export class SecureStorage {
   private static readonly ENCRYPTION_KEY_NAME = 'app_encryption_key';

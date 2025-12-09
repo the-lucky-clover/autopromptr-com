@@ -207,9 +207,9 @@ export class DualStorageService {
       const result = await r2Client.uploadFile(path, file, options);
       return `r2://${result.key}`;
     } else {
-      // Fallback to Supabase Storage
-      const { supabase } = await import('@/integrations/supabase/client');
-      const { data, error } = await supabase.storage
+      // Fallback to Cloudflare Storage
+      const { cloudflare } = await import('@/integrations/cloudflare/client');
+      const { data, error } = await cloudflare.storage
         .from('screenshots')
         .upload(path, file, {
           contentType: options?.contentType,
@@ -229,9 +229,9 @@ export class DualStorageService {
       if (!object) throw new Error('File not found in R2');
       return await object.blob();
     } else {
-      // Fallback to Supabase Storage
-      const { supabase } = await import('@/integrations/supabase/client');
-      const { data, error } = await supabase.storage
+      // Fallback to Cloudflare Storage
+      const { cloudflare } = await import('@/integrations/cloudflare/client');
+      const { data, error } = await cloudflare.storage
         .from('screenshots')
         .download(path);
       
@@ -246,9 +246,9 @@ export class DualStorageService {
       const key = path.replace('r2://', '');
       await r2Client.deleteFile(key);
     } else {
-      // Fallback to Supabase Storage
-      const { supabase } = await import('@/integrations/supabase/client');
-      const { error } = await supabase.storage
+      // Fallback to Cloudflare Storage
+      const { cloudflare } = await import('@/integrations/cloudflare/client');
+      const { error } = await cloudflare.storage
         .from('screenshots')
         .remove([path]);
       

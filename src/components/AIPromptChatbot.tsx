@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Brain, Send, Sparkles, Zap, Cpu, MessageSquare, Code, Search, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { cloudflare } from "@/integrations/cloudflare/client";
 
 interface ChatMessage {
   id: string;
@@ -61,7 +61,7 @@ const AIPromptChatbot = () => {
     setIsTyping(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('ai-agent-orchestrator', {
+      const { data, error } = await cloudflare.functions.invoke('ai-agent-orchestrator', {
         body: {
           message: currentInput,
           task_type: selectedTask,

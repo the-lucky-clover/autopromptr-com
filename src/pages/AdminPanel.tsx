@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Users, Settings, Activity, Database, Shield, Zap, AlertTriangle } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { cloudflare } from "@/integrations/cloudflare/client";
 import { SecurityStatus } from "@/components/security/SecurityStatus";
 import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 
@@ -36,7 +36,7 @@ const AdminPanel = () => {
 
   const fetchSecurityEvents = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await cloudflare
         .from('security_events')
         .select('*')
         .order('created_at', { ascending: false })
@@ -54,7 +54,7 @@ const AdminPanel = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await cloudflare
         .from('profiles')
         .select('id, name, created_at')
         .order('created_at', { ascending: false });
@@ -65,7 +65,7 @@ const AdminPanel = () => {
         // Fetch roles separately from user_roles table
         const usersWithRoles = await Promise.all(
           (data || []).map(async (user) => {
-            const { data: roleData } = await supabase.rpc('get_user_role', {
+            const { data: roleData } = await cloudflare.rpc('get_user_role', {
               _user_id: user.id
             });
             return { ...user, role: roleData || 'user' };

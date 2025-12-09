@@ -1,12 +1,12 @@
-// Configuration - Migrated to Lovable Cloud (Supabase Edge Functions)
+// Configuration - Migrated to Cloudflare Workers
 // Legacy backend URLs kept for reference but no longer used
-export const USE_LOVABLE_CLOUD = true;
+export const USE_CLOUDFLARE = true;
 
-// Lovable Cloud uses Supabase Edge Functions - no external backend URL needed
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://raahpoyciwuyhwlcenpy.supabase.co';
+// Cloudflare Worker URL
+export const CLOUDFLARE_WORKER_URL = import.meta.env.VITE_CLOUDFLARE_WORKER_URL || 'https://autopromptr-worker.autopromptr.workers.dev';
 
 // Backend Mode Selection
-export const BACKEND_MODE = 'lovable-cloud'; // Options: 'lovable-cloud' | 'legacy-render'
+export const BACKEND_MODE = 'cloudflare'; // Options: 'cloudflare' | 'legacy-render'
 
 // Legacy configuration (deprecated - kept for migration compatibility)
 export const LEGACY_BACKEND_URL = localStorage.getItem('autopromptr_backend_url') || '';

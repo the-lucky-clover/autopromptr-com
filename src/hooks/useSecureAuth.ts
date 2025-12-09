@@ -1,7 +1,7 @@
 
 import { useAuth } from './useAuth';
 import { useUserRole } from './useUserRole';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 import { authRateLimiter } from '@/services/security/rateLimiter';
 import { useToast } from './use-toast';
 
@@ -13,7 +13,7 @@ export const useSecureAuth = () => {
   // Log security events to the database
   const logSecurityEvent = async (eventType: string, eventData?: any) => {
     try {
-      await supabase.from('security_events').insert({
+      await cloudflare.from('security_events').insert({
         user_id: auth.user?.id || null,
         event_type: eventType,
         event_data: eventData,
@@ -52,7 +52,7 @@ export const useSecureAuth = () => {
 
     try {
       // Clear any existing auth state before signing in
-      await supabase.auth.signOut();
+      await cloudflare.auth.signOut();
       
       const result = await auth.signIn(email, password);
       
@@ -144,7 +144,7 @@ export const useSecureAuth = () => {
     if (!auth.user) return false;
     
     try {
-      const { data, error } = await supabase.rpc('has_role', {
+      const { data, error } = await cloudflare.rpc('has_role', {
         _user_id: auth.user.id,
         _role: requiredRole
       });

@@ -98,6 +98,15 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validation
+    if (!email || !password) {
+      setErrorMessage('Please enter both email and password');
+      return;
+    }
+    
+    console.log('🔐 Starting sign-in process for:', email);
+    
     setLoading(true);
     setProgressStep('creating');
     setProgressMessage('Signing you in...');
@@ -107,25 +116,37 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
     
     const { error } = await signIn(email, password);
     
+    console.log('🔐 Sign-in response:', error ? 'Error' : 'Success', error);
+    
     if (error) {
       setProgressStep('error');
-      console.error('Signin error details:', error);
+      console.error('❌ Signin error details:', error);
       
+      // Handle different error types
       if (error.message.includes('Invalid login credentials')) {
-        setErrorMessage('Invalid email or password. Please check your credentials.');
+        setErrorMessage('❌ Invalid email or password. Please check your credentials or sign up if you don\'t have an account.');
       } else if (error.message.includes('Email not confirmed')) {
-        setErrorMessage('Please check your email and verify your account first.');
+        setErrorMessage('⚠️ Please verify your email address. Check your inbox for the verification link.');
+      } else if (error.message.includes('User not found')) {
+        setErrorMessage('❌ No account found with this email. Please sign up first.');
+      } else if (error.message.includes('Too many requests')) {
+        setErrorMessage('⏱️ Too many attempts. Please wait a moment and try again.');
       } else {
-        setErrorMessage(`Sign in failed: ${error.message}`);
+        setErrorMessage(`❌ Sign in failed: ${error.message}`);
       }
       
       setTimeout(() => {
         setProgressStep('idle');
+      }, 5000);
+      
+      // Don't clear error message automatically for better user experience
+      setTimeout(() => {
         setErrorMessage('');
-      }, 4000);
+      }, 7000);
     } else {
+      console.log('✅ Sign-in successful! Redirecting...');
       setProgressStep('complete');
-      setProgressMessage('Welcome back! Redirecting...');
+      setProgressMessage('✅ Welcome back! Redirecting...');
       
       // Close the modal immediately and let the auth hook handle redirect
       setTimeout(() => {
@@ -246,10 +267,10 @@ const AuthModal = ({ mode: initialMode, onClose, isMobile = false }: AuthModalPr
         </div>
       )}
 
-      {/* Error Message Display */}
-      {errorMessage && progressStep === 'idle' && (
-        <div className="mb-4 p-3 bg-red-900/50 border border-red-500 rounded-xl">
-          <p className="text-red-300 text-sm text-center">{errorMessage}</p>
+      {/* Error Message Display - Show on idle or error state */}
+      {errorMessage && (progressStep === 'idle' || progressStep === 'error') && (
+        <div className="mb-4 p-4 bg-red-900/50 border-2 border-red-500 rounded-xl animate-pulse">
+          <p className="text-red-200 text-sm text-center font-medium leading-relaxed">{errorMessage}</p>
         </div>
       )}
 

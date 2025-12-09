@@ -14,6 +14,36 @@
 @import "./styles/psychedelic-animations.css";
 @import "./styles/award-winning-ux.css";
 
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MOBILE-FIRST SAFE AREA SUPPORT
+   For notched devices (iPhone X+, modern Android)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+.safe-area-pt {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-area-pl {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.safe-area-pr {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.safe-area-inset {
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+
+/* Touch target optimization - minimum 44px for accessibility */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
 /* Prevent text orphans globally - Award-winning typography */
 p, h1, h2, h3, h4, h5, h6, li, span, div[class*="text"], a, button {
   text-wrap: pretty;
@@ -393,6 +423,7 @@ html, body {
   background: var(--glass-surface);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 
@@ -405,6 +436,7 @@ html, body {
     inset 0 1px 0 rgba(255, 255, 255, 0.4),
     inset 0 -1px 0 rgba(0, 0, 0, 0.2),
     0 8px 32px rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
 }
 
@@ -588,6 +620,7 @@ html, body {
     inset 0 -1px 0 rgba(0, 0, 0, 0.6),
     0 0 20px hsl(var(--neon-cyan) / 0.4),
     0 4px 8px rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   transform-style: preserve-3d;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -616,6 +649,7 @@ html, body {
   background: var(--glass-surface);
   border: 2px solid var(--glass-border);
   border-radius: var(--bento-radius);
+  -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   transform-style: preserve-3d;
   box-shadow: var(--shadow-3d-raised);

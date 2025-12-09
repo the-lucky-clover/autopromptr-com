@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Send, Bot, User, LogOut, FileText, Shield } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 import { toast } from 'sonner';
 import { useLegalModals } from './LegalModals';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +38,7 @@ export const SupportChatbot = () => {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      await cloudflare.auth.signOut();
       toast.success('Logged out successfully');
       navigate('/auth');
     } catch (error) {
@@ -61,9 +61,9 @@ export const SupportChatbot = () => {
     setIsLoading(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await cloudflare.auth.getSession();
       
-      const response = await supabase.functions.invoke('support-chatbot', {
+      const response = await cloudflare.functions.invoke('support-chatbot', {
         body: { 
           messages: [...messages, userMessage].map(m => ({ 
             role: m.role, 

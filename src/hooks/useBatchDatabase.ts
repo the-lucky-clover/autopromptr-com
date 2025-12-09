@@ -1,7 +1,7 @@
 
 import { useToast } from '@/hooks/use-toast';
 import { Batch } from '@/types/batch';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 
 export const useBatchDatabase = () => {
   const { toast } = useToast();
@@ -12,7 +12,8 @@ export const useBatchDatabase = () => {
       console.log('Enhanced batch data to save:', JSON.stringify(batch, null, 2));
       
       // Get current user with timeout
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const { data: { session }, error: authError } = await cloudflare.auth.getSession();
+      const user = session?.user;
       if (authError) {
         console.error('Enhanced auth error:', authError);
       }

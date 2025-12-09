@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 
 interface AutoSaveOptions {
   promptText: string;
@@ -32,7 +32,8 @@ export function useAutoSavePrompt({
     }
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await cloudflare.auth.getSession();
+      const user = session?.user;
       if (!user) return;
 
       const draftData = {

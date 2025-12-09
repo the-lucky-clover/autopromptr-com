@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { cloudflare } from "@/integrations/cloudflare/client";
 import { Mail, MessageSquare, Send } from "lucide-react";
 import UnifiedDashboardWelcomeModule from "@/components/dashboard/UnifiedDashboardWelcomeModule";
 
@@ -35,7 +35,7 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.functions.invoke('send-contact-email', {
+      const { error } = await cloudflare.functions.invoke('send-contact-email', {
         body: {
           ...formData,
           captcha: parseInt(captchaAnswer)

@@ -3,7 +3,7 @@
  * Tracks user behavior, conversions, performance, and marketing attribution
  */
 
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 
 // ===== TYPE DEFINITIONS =====
 
@@ -141,7 +141,8 @@ async function initializeSession() {
   const deviceInfo = getDeviceInfo();
   
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await cloudflare.auth.getSession();
+    const user = session?.user;
     
     // Track session start event
     await trackEvent({
@@ -215,7 +216,8 @@ function getStoredUtmData() {
  */
 export async function trackEvent(event: Partial<TelemetryEvent>): Promise<void> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await cloudflare.auth.getSession();
+    const user = session?.user;
     const deviceInfo = getDeviceInfo();
     const utmData = getStoredUtmData();
     
@@ -257,7 +259,8 @@ export async function trackEvent(event: Partial<TelemetryEvent>): Promise<void> 
  */
 export async function trackConversion(conversion: Partial<ConversionEvent>): Promise<void> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await cloudflare.auth.getSession();
+    const user = session?.user;
     const utmData = getStoredUtmData();
     
     const fullConversion: ConversionEvent = {
@@ -309,7 +312,8 @@ export async function trackConversion(conversion: Partial<ConversionEvent>): Pro
  */
 export async function trackPerformance(metric: Partial<PerformanceMetric>): Promise<void> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await cloudflare.auth.getSession();
+    const user = session?.user;
     
     const fullMetric: PerformanceMetric = {
       id: crypto.randomUUID(),
@@ -344,7 +348,8 @@ export async function trackPerformance(metric: Partial<PerformanceMetric>): Prom
  */
 export async function trackError(errorEvent: Partial<ErrorEvent>): Promise<void> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await cloudflare.auth.getSession();
+    const user = session?.user;
     const deviceInfo = getDeviceInfo();
     
     const fullError: ErrorEvent = {

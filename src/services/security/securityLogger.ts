@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 
 export interface SecurityEvent {
   eventType: string;
@@ -21,7 +21,7 @@ export class SecurityLogger {
 
   async logEvent(event: SecurityEvent): Promise<void> {
     try {
-      const { error } = await supabase.from('security_events').insert({
+      const { error } = await cloudflare.from('security_events').insert({
         user_id: event.userId || null,
         event_type: event.eventType,
         event_data: event.eventData || null,

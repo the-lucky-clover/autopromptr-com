@@ -39,11 +39,29 @@ bucket_name = "autopromptr-files"
 # Set these via: wrangler secret put <KEY>
 [vars]
 ENVIRONMENT = "production"
+SITE_URL = "https://autopromptr.pages.dev"
+EMAIL_FROM = "noreply@autopromptr.com"
+EMAIL_FROM_NAME = "AutoPromptr"
+
+# Secrets (set via wrangler secret put):
+# - JWT_SECRET: Secret key for JWT signing (required for auth)
+# - RESEND_API_KEY: API key for Resend email service (optional - falls back to MailChannels)
+# 
+# Email Configuration (optional - MailChannels is free for Cloudflare Workers):
+# - DKIM_DOMAIN: Your domain for DKIM signing (e.g., autopromptr.com)
+# - DKIM_SELECTOR: DKIM selector (e.g., mailchannels)
+# - DKIM_PRIVATE_KEY: Your DKIM private key (base64 encoded)
+#
+# For MailChannels (FREE), add this SPF record to your DNS:
+# Type: TXT, Name: @, Value: v=spf1 a mx include:relay.mailchannels.net ~all
+#
+# For domain lockdown (recommended), add this TXT record:
+# Type: TXT, Name: _mailchannels, Value: v=mc1 cfid=your-worker-subdomain.workers.dev
 
 # Production Environment
 [env.production]
 name = "autopromptr-worker"
-vars = { ENVIRONMENT = "production" }
+vars = { ENVIRONMENT = "production", SITE_URL = "https://autopromptr.pages.dev" }
 
 [[env.production.durable_objects.bindings]]
 name = "BATCH_QUEUE"

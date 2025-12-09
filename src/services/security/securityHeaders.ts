@@ -26,7 +26,7 @@ export class SecurityHeaders {
         "font-src 'self' https://fonts.gstatic.com data:",
         "img-src 'self' data: https: blob:",
         "media-src 'self' data: blob: https://videos.pexels.com",
-        "connect-src 'self' https://raahpoyciwuyhwlcenpy.supabase.co https://api.openai.com https://autopromptr-backend.onrender.com wss: https:",
+        "connect-src 'self' https://autopromptr-worker.autopromptr.workers.dev https://api.openai.com https://autopromptr-backend.onrender.com wss: https:",
         "frame-src 'self' https://dashboard.render.com",
         "base-uri 'self'",
         "form-action 'self'",

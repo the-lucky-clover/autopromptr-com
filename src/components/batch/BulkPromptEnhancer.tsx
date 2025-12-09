@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Zap, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
-import { supabase } from "@/integrations/supabase/client";
+import { cloudflare } from "@/integrations/cloudflare/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface BulkPromptEnhancerProps {
@@ -50,7 +50,7 @@ const BulkPromptEnhancer = ({ prompts, onPromptsEnhanced, targetPlatform }: Bulk
         setProgress(prev => ({ ...prev, currentPrompt: prompt.substring(0, 50) + '...' }));
 
         try {
-          const { data, error } = await supabase.functions.invoke('enhance-prompt', {
+          const { data, error } = await cloudflare.functions.invoke('enhance-prompt', {
             body: { 
               prompt,
               targetPlatform,

@@ -1,7 +1,7 @@
 
 import { AutoPromptr } from '@/services/autoPromptr';
 import { Batch } from '@/types/batch';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 
 interface LogEntry {
   id: string;
@@ -19,19 +19,19 @@ interface SystemDiagnosticsProps {
 }
 
 export const useSystemDiagnostics = ({ batches, addLog, setSystemStatus }: SystemDiagnosticsProps) => {
-  const checkLovableSupabaseHandshake = async () => {
+  const checkCloudflareConnection = async () => {
     try {
-      addLog('info', 'Lovable-Supabase', 'Testing connection handshake...');
+      addLog('info', 'Cloudflare-D1', 'Testing connection...');
       
-      // Test Supabase connection using the configured client
-      const { data, error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
+      // Test Cloudflare D1 connection using the configured client
+      const { data, error } = await cloudflare.from('profiles').select('id').limit(1);
       
       if (!error) {
-        setSystemStatus((prev: any) => ({ ...prev, lovableSupabase: 'connected' }));
-        addLog('success', 'Lovable-Supabase', 'Connection established successfully', 'Database accessible');
+        setSystemStatus((prev: any) => ({ ...prev, cloudflareD1: 'connected' }));
+        addLog('success', 'Cloudflare-D1', 'Connection established successfully', 'Database accessible');
       } else {
-        setSystemStatus((prev: any) => ({ ...prev, lovableSupabase: 'error' }));
-        addLog('error', 'Lovable-Supabase', 'Connection failed', error.message);
+        setSystemStatus((prev: any) => ({ ...prev, cloudflareD1: 'error' }));
+        addLog('error', 'Cloudflare-D1', 'Connection failed', error.message);
       }
     } catch (error) {
       setSystemStatus((prev: any) => ({ ...prev, lovableSupabase: 'error' }));

@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Plus, Trash2, GripVertical, Edit2, Save, X, Sparkles, Zap, Target } from 'lucide-react';
 import { TextPrompt } from '@/types/batch';
-import { supabase } from "@/integrations/supabase/client";
+import { cloudflare } from "@/integrations/cloudflare/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface EnhancedPromptEditorProps {
@@ -70,7 +70,7 @@ const EnhancedPromptEditor = ({
     setEnhancingPrompts(prev => new Set(prev).add(prompt.id));
     
     try {
-      const { data, error } = await supabase.functions.invoke('enhance-prompt', {
+      const { data, error } = await cloudflare.functions.invoke('enhance-prompt', {
         body: { 
           prompt: prompt.text,
           targetPlatform,
@@ -124,7 +124,7 @@ const EnhancedPromptEditor = ({
     
     try {
       const enhancementPromises = validPrompts.map(async (prompt) => {
-        const { data, error } = await supabase.functions.invoke('enhance-prompt', {
+        const { data, error } = await cloudflare.functions.invoke('enhance-prompt', {
           body: { 
             prompt: prompt.text,
             targetPlatform,

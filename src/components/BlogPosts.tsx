@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, ArrowRight } from 'lucide-react';
-import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
+import { cloudflare, isCloudflareConfigured } from '@/integrations/cloudflare/client';
 import { Link } from 'react-router-dom';
 
 interface BlogPost {

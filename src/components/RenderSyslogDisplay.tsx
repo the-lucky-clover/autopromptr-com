@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 import { Clock, Server, AlertCircle } from 'lucide-react';
 
 interface RenderSyslogEntry {
@@ -47,7 +47,7 @@ const RenderSyslogDisplay = ({ batchId, maxEntries = 50, isCompact = false }: Re
 
   const fetchSyslogEntries = async () => {
     try {
-      let query = supabase
+      let query = cloudflare
         .from('render_syslog')
         .select('*')
         .order('timestamp', { ascending: false })
@@ -75,26 +75,13 @@ const RenderSyslogDisplay = ({ batchId, maxEntries = 50, isCompact = false }: Re
   useEffect(() => {
     fetchSyslogEntries();
 
-    // Subscribe to real-time updates
-    const channel = supabase
-      .channel('render-syslog-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'render_syslog',
-          filter: batchId ? `batch_id=eq.${batchId}` : undefined
-        },
-        (payload) => {
-          console.log('New syslog entry:', payload);
-          setSyslogEntries(prev => [payload.new as RenderSyslogEntry, ...prev.slice(0, maxEntries - 1)]);
-        }
-      )
-      .subscribe();
+    // Poll for updates instead of realtime subscription (Cloudflare doesn't support realtime)
+    const pollInterval = setInterval(() => {
+      fetchSyslogEntries();
+    }, 5000); // Poll every 5 seconds
 
     return () => {
-      supabase.removeChannel(channel);
+      clearInterval(pollInterval);
     };
   }, [batchId, maxEntries]);
 

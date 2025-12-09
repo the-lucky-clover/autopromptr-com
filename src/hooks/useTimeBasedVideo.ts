@@ -26,7 +26,21 @@ const TIME_BASED_VIDEOS: TimeBasedVideo[] = [
 ];
 
 export const useTimeBasedVideo = (userVideoUrl?: string) => {
-  const [currentVideo, setCurrentVideo] = useState<TimeBasedVideo>(TIME_BASED_VIDEOS[2]);
+  // Initialize with a safe default
+  const getInitialVideo = () => {
+    if (userVideoUrl) {
+      return {
+        period: 'custom' as const,
+        url: userVideoUrl,
+        attribution: userVideoUrl.includes('pexels.com') 
+          ? userVideoUrl.replace(/video-files.*/, '') 
+          : ''
+      };
+    }
+    return TIME_BASED_VIDEOS[2]; // Default to evening video
+  };
+  
+  const [currentVideo, setCurrentVideo] = useState<TimeBasedVideo>(getInitialVideo);
 
   useEffect(() => {
     if (userVideoUrl) {

@@ -1,0 +1,14 @@
+{
+  "files.associations": {
+    "*.sql": "sql"
+  },
+  "mssql.connections": [],
+  "mssql.intelliSense.enableIntelliSense": false,
+  "mssql.intelliSense.enableSuggestions": false,
+  "mssql.intelliSense.enableQuickInfo": false,
+  "mssql.intelliSense.enableErrorChecking": false,
+  "[sql]": {
+    "editor.defaultFormatter": null
+  },
+  "sql.linting.enabled": false
+}

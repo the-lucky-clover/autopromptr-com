@@ -7,7 +7,7 @@ import { Cloud, Server, Rocket } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export const BackendModeCard = () => {
-  const [backendMode, setBackendMode] = useState<'lovable-cloud' | 'legacy-render'>('lovable-cloud');
+  const [backendMode, setBackendMode] = useState<'cloudflare' | 'legacy-render'>('cloudflare');
 
   useEffect(() => {
     const saved = localStorage.getItem('autopromptr_backend_mode');
@@ -32,10 +32,10 @@ export const BackendModeCard = () => {
               Backend Mode
             </CardTitle>
             <CardDescription>
-              Choose between Lovable Cloud or legacy Render.com backend
+              Choose between Cloudflare Workers or legacy Render.com backend
             </CardDescription>
           </div>
-          {backendMode === 'lovable-cloud' && (
+          {backendMode === 'cloudflare' && (
             <Badge variant="default" className="bg-green-500">
               <Cloud className="h-3 w-3 mr-1" />
               Cloud Enabled
@@ -46,15 +46,15 @@ export const BackendModeCard = () => {
       <CardContent className="space-y-4">
         <RadioGroup value={backendMode} onValueChange={handleModeChange}>
           <div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:bg-accent/50 cursor-pointer">
-            <RadioGroupItem value="lovable-cloud" id="lovable-cloud" />
-            <Label htmlFor="lovable-cloud" className="flex-1 cursor-pointer">
+            <RadioGroupItem value="cloudflare" id="cloudflare" />
+            <Label htmlFor="cloudflare" className="flex-1 cursor-pointer">
               <div className="flex items-center gap-2">
                 <Cloud className="h-4 w-4 text-green-500" />
-                <span className="font-medium">Lovable Cloud</span>
+                <span className="font-medium">Cloudflare Workers</span>
                 <Badge variant="outline" className="text-xs">Recommended</Badge>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                Serverless edge functions powered by Supabase. Faster, more reliable, and no external dependencies.
+                Serverless edge functions powered by Cloudflare Workers. Faster, more reliable, and no external dependencies.
               </p>
               <div className="flex gap-2 mt-2">
                 <Badge variant="secondary" className="text-xs">Free Tier</Badge>
@@ -83,11 +83,11 @@ export const BackendModeCard = () => {
           </div>
         </RadioGroup>
 
-        {backendMode === 'lovable-cloud' && (
+        {backendMode === 'cloudflare' && (
           <Alert className="bg-green-500/10 border-green-500/50">
             <Cloud className="h-4 w-4 text-green-500" />
             <AlertDescription className="text-sm">
-              <strong>Lovable Cloud is now active!</strong> All batch operations are powered by Supabase Edge Functions.
+              <strong>Cloudflare Workers is now active!</strong> All batch operations are powered by Cloudflare Workers and D1.
               Enjoy faster response times, global edge deployment, and unlimited scalability.
             </AlertDescription>
           </Alert>

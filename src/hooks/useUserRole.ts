@@ -1,6 +1,6 @@
 
 import { useAuth } from './useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 import { useState, useEffect } from 'react';
 
 export type UserRole = 'user' | 'admin' | 'sysop';
@@ -20,7 +20,7 @@ export const useUserRole = () => {
 
       try {
         // Use the database function to get user role (now checks is_super_user)
-        const { data, error } = await supabase.rpc('get_user_role', {
+        const { data, error } = await cloudflare.rpc('get_user_role', {
           _user_id: user.id
         });
 
@@ -64,7 +64,7 @@ export const useUserRole = () => {
     }
 
     try {
-      const { error } = await supabase.rpc('set_user_role', {
+      const { error } = await cloudflare.rpc('set_user_role', {
         _user_id: userId,
         _role: newRole
       });

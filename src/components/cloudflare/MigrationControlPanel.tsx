@@ -77,7 +77,7 @@ export const MigrationControlPanel = () => {
           Migration Control Panel
         </CardTitle>
         <CardDescription>
-          Monitor and control the transition between Lovable and Cloudflare systems
+          Monitor and control the Cloudflare Workers backend system
         </CardDescription>
       </CardHeader>
       
@@ -87,13 +87,13 @@ export const MigrationControlPanel = () => {
           <div className="p-4 border rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <Zap className="w-4 h-4 text-purple-600" />
-              <span className="font-medium">Lovable System</span>
+              <span className="font-medium">Legacy System</span>
               <Badge variant={config.useLovable ? 'default' : 'secondary'}>
                 {config.useLovable ? 'Active' : 'Inactive'}
               </Badge>
             </div>
             <p className="text-sm text-gray-600">
-              Original Lovable.dev hosting and backend services
+              Legacy Render.com Flask backend (deprecated)
             </p>
           </div>
           
@@ -106,7 +106,7 @@ export const MigrationControlPanel = () => {
               </Badge>
             </div>
             <p className="text-sm text-gray-600">
-              Cloudflare Pages + Workers backend services
+              Cloudflare Pages + Workers + D1 backend services
             </p>
           </div>
         </div>

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { LogOut, User, Upload } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { cloudflare } from '@/integrations/cloudflare/client';
 import { useToast } from '@/hooks/use-toast';
 
 const UserProfile = () => {
@@ -25,7 +25,7 @@ const UserProfile = () => {
     }
     
     try {
-      const { data: profile } = await supabase
+      const { data: profile } = await cloudflare
         .from('profiles')
         .select('avatar_url')
         .eq('id', user.id)
@@ -73,17 +73,17 @@ const UserProfile = () => {
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/avatar.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await cloudflare.storage
         .from('avatars')
         .upload(fileName, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      const { data: { publicUrl } } = cloudflare.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await cloudflare
         .from('profiles')
         .update({ avatar_url: publicUrl })
         .eq('id', user.id);
@@ -206,6 +206,7 @@ const UserProfile = () => {
                     type="file"
                     accept="image/*"
                     className="hidden"
+                    aria-label="Upload avatar image"
                     onChange={handleAvatarUpload}
                   />
                 </div>

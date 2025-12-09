@@ -10,6 +10,7 @@
     "deploy:production": "wrangler deploy --env production",
     "deploy:preview": "wrangler deploy --env preview",
     "tail": "wrangler tail",
+    "typecheck": "tsc --noEmit",
     "d1:create": "wrangler d1 create autopromptr",
     "d1:create:prod": "wrangler d1 create autopromptr-production",
     "d1:create:preview": "wrangler d1 create autopromptr-preview",
@@ -17,6 +18,8 @@
     "d1:migrate:prod": "wrangler d1 execute autopromptr-production --file=./schema.sql --env production",
     "d1:migrate:preview": "wrangler d1 execute autopromptr-preview --file=./schema.sql --env preview",
     "d1:query": "wrangler d1 execute autopromptr --command",
+    "d1:cleanup-tokens": "wrangler d1 execute autopromptr --command \"DELETE FROM email_tokens WHERE expires_at < datetime('now') OR used_at IS NOT NULL\"",
+    "d1:cleanup-ratelimits": "wrangler d1 execute autopromptr --command \"DELETE FROM rate_limits WHERE window_start < datetime('now', '-2 hours')\"",
     "kv:create": "wrangler kv:namespace create AUTOPROMPTR_KV",
     "kv:create:prod": "wrangler kv:namespace create AUTOPROMPTR_KV --env production",
     "kv:create:preview": "wrangler kv:namespace create AUTOPROMPTR_KV --env preview",
@@ -25,9 +28,14 @@
     "r2:create:preview": "wrangler r2 bucket create autopromptr-files-preview",
     "setup": "npm run d1:create && npm run kv:create && npm run r2:create && npm run d1:migrate",
     "setup:prod": "npm run d1:create:prod && npm run kv:create:prod && npm run r2:create:prod && npm run d1:migrate:prod",
-    "secret:set": "wrangler secret put"
+    "secret:set": "wrangler secret put",
+    "secret:jwt": "wrangler secret put JWT_SECRET",
+    "secret:resend": "wrangler secret put RESEND_API_KEY",
+    "secret:dkim-domain": "wrangler secret put DKIM_DOMAIN",
+    "secret:dkim-selector": "wrangler secret put DKIM_SELECTOR",
+    "secret:dkim-key": "wrangler secret put DKIM_PRIVATE_KEY"
   },
-  "keywords": ["cloudflare", "workers", "durable-objects", "automation"],
+  "keywords": ["cloudflare", "workers", "durable-objects", "automation", "email", "auth"],
   "author": "",
   "license": "MIT",
   "devDependencies": {
