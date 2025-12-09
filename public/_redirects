@@ -1,7 +1,6 @@
-
-# Handle client-side routing for React Router
-/* /index.html 200
-
-# API redirects to Cloudflare Worker
+# API redirects to Cloudflare Worker (must be BEFORE the catch-all)
 /api/* https://autopromptr-worker.autopromptr.workers.dev/api/:splat 200
-/auth/* https://autopromptr-worker.autopromptr.workers.dev/api/auth/:splat 200
+/auth/callback/* /index.html 200
+
+# Handle client-side routing for React Router (catch-all MUST be last)
+/* /index.html 200
